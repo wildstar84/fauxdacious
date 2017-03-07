@@ -1,0 +1,598 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<title>Notes for Building Fauxdacious on Windows</title>
+</head>
+<body>
+
+<h2>Notes for Building Fauxdacious on Windows</h2>
+
+<p><em>Jim Turner<br>
+Oct 24, 2016<br>from "Building Audacious (v. 3.8) on Windows", by: John Lindgren<br>
+May 16, 2015</em></p>
+
+<p>Several patch files should accompany this document.</p>
+
+<h3>Set up system paths</h3>
+
+<p>Under <em>My Computer -> Properties -> Advanced -> Environment Variables</em>, set:</p>
+<blockquote><p><tt>PATH=C:\MinGW\bin;C:\MinGW\msys\1.0\bin;C:\Python27;C:\CMake\bin;C:\GTK\bin;C:\libs\bin;C:\aud\bin<br>
+PKG_CONFIG_PATH=/C/GTK/lib/pkgconfig:/C/libs/lib/pkgconfig:/C/aud/lib/pkgconfig<br>
+C_INCLUDE_PATH=/C/GTK/include:/C/libs/include<br>
+CPLUS_INCLUDE_PATH=/C/GTK/include:/C/libs/include<br>
+LIBRARY_PATH=/C/GTK/lib:/C/libs/lib</tt></p></blockquote>
+
+<h3>Install MinGW</h3>
+
+<p>Download and run:<br>
+<a href="http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download">
+<tt>http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download</tt></a></p>
+
+<p>In the MinGW Installation Manager window, install the following packages:</p>
+<ul><li>mingw32-base (bin)</li>
+<li>mingw32-gcc-g++ (bin)</li>
+<li>mingw-developer-toolkit (bin)</li>
+<li>mingw32-pthreads-w32 (dev)</li>
+<li>mingw32-libz (dev)</li></ul>
+
+<p>Edit the file <tt>C:\MinGW\msys\1.0\etc\fstab</tt> to contain only the
+following line, in lowercase:</p>
+<blockquote><p><tt>c:/mingw /mingw</tt></p></blockquote>
+
+<p>As of version 4.0.3-1, the MinGW runtime library is missing some mathematical
+functions that are necessary to build Fauxdacious.  Downgrade the library by
+running the following in a command prompt window:</p>
+<blockquote><p><tt>mingw-get upgrade mingw32-mingwrt-dev=3.20-2<br>
+mingw-get upgrade mingw32-w32api=3.17-2</tt></p></blockquote>
+
+<p>Open the file <tt>C:\MinGW\lib\gcc\mingw32\4.8.1\include\c++\mingw32\bits\c++config.h</tt>
+and locate the following line:</p>
+<blockquote><p><tt>/* #undef _GLIBCXX_HAVE_FENV_H */</tt></p></blockquote>
+<p>Change it to read:</p>
+<blockquote><p><tt>#define _GLIBCXX_HAVE_FENV_H 1</tt></p></blockquote>
+
+<h3>Install Python</h3>
+
+<p>Download and run:<br>
+<a href="http://python.org/ftp/python/2.7.6/python-2.7.6.msi">
+<tt>http://python.org/ftp/python/2.7.6/python-2.7.6.msi</tt></a></p>
+
+<p>Follow the prompts to install with default options to <tt>C:\Python27</tt>.</p>
+
+<h3>Install CMake</h3>
+
+<p>Download to your Desktop folder and run:<br>
+<a href="https://cmake.org/files/v3.6/cmake-3.6.1-win32-x86.msi">
+<tt>https://cmake.org/files/v3.6/cmake-3.6.1-win32-x86.msi</tt></a></p>
+
+<p>Follow the prompts to install, changing the installation path to <tt>C:\CMake</tt>.&nbsp;  Might as well tell it NOT to add itself to your "PATH", since it doesn't seem to AND you need it in the order shown above!</p>
+
+<h3>Install libpng</h3>
+
+<p>Download and unzip to <tt>C:\libpng</tt>:<br>
+<a href="http://sourceforge.net/projects/libpng/files/libpng16/1.6.17/libpng-1.6.17.tar.xz/download">
+<tt>http://sourceforge.net/projects/libpng/files/libpng16/1.6.17/libpng-1.6.17.tar.xz/download</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libpng<br>
+./configure --prefix=/C/GTK<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libjpeg-turbo</h3>
+
+<p>Download and unzip to <tt>C:\libjpeg</tt>:<br>
+<a href="https://sourceforge.net/projects/libjpeg-turbo/files/1.5.0/libjpeg-turbo-1.5.0.tar.gz/download">
+<tt>https://sourceforge.net/projects/libjpeg-turbo/files/1.5.0/libjpeg-turbo-1.5.0.tar.gz/download</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libjpeg<br>
+./configure --prefix=/C/GTK --without-simd --without-turbojpeg<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libffi</h3>
+
+<p>Download and unzip to <tt>C:\libffi</tt>:<br>
+<a href="ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz">
+<tt>ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libffi<br>
+./configure --prefix=/C/GTK --with-gcc-arch=i686<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install GLib</h3>
+
+<p>Download and unzip to <tt>C:\glib</tt>:<br>
+<a href="http://ftp.gnome.org/pub/GNOME/sources/glib/2.44/glib-2.44.1.tar.xz">
+<tt>http://ftp.gnome.org/pub/GNOME/sources/glib/2.44/glib-2.44.1.tar.xz</tt></a></p>
+
+<p>Apply the patch <tt>ggettext.c.diff</tt> to <tt>C:\glib\glib\ggettext.c</tt>.<br>
+Apply the patch <tt>gcontenttype-win32.c.diff</tt> to <tt>C:\glib\gio\gcontenttype-win32.c.diff</tt>.<br>
+Apply the patch <tt>gwin32appinfo.c.diff</tt> to <tt>C:\glib\gio\gwin32appinfo.c.diff</tt>.<br>
+Apply the patch <tt>gwin32networking.h.diff</tt> to <tt>C:\glib\gio\gwin32networking.h</tt>.</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/glib<br>
+CFLAGS="-O2 -march=i686" LIBFFI_CFLAGS="-I/C/GTK/lib/libffi-3.2.1/include" LIBFFI_LIBS="-lffi" ZLIB_CFLAGS="" ZLIB_LIBS="-lz" ./configure --prefix=/C/GTK<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install pkg-config</h3>
+
+<p>Download and unzip to <tt>C:\pkgconfig</tt>:<br>
+<a href="https://pkg-config.freedesktop.org/releases/pkg-config-0.29.1.tar.gz">
+<tt>https://pkg-config.freedesktop.org/releases/pkg-config-0.29.1.tar.gz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/pkgconfig<br>
+GLIB_CFLAGS="-I/C/GTK/include/glib-2.0 -I/C/GTK/lib/glib-2.0/include" GLIB_LIBS="-lglib-2.0" ./configure --prefix=/C/GTK<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p>Copy <tt>C:\GTK\share\aclocal\pkg.m4</tt> to <tt>C:\MinGW\share\aclocal</tt>.</p>
+
+<h3>Install pixman</h3>
+
+<p>Download and unzip to <tt>C:\pixman</tt>:<br>
+<a href="https://www.cairographics.org/releases/pixman-0.34.0.tar.gz">
+<tt>https://www.cairographics.org/releases/pixman-0.34.0.tar.gz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/pixman<br>
+./configure --prefix=/C/GTK --disable-sse2 --disable-ssse3<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install Cairo</h3>
+
+<p>Download and unzip to <tt>C:\cairo</tt>:<br>
+<a href="https://www.cairographics.org/releases/cairo-1.14.6.tar.xz">
+<tt>https://www.cairographics.org/releases/cairo-1.14.6.tar.xz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/cairo<br>
+./configure --prefix=/C/GTK --disable-interpreter<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install Pango</h3>
+
+<p>Download and unzip to <tt>C:\pango</tt>:<br>
+<a href="http://ftp.gnome.org/pub/GNOME/sources/pango/1.40/pango-1.40.1.tar.xz">
+<tt>http://ftp.gnome.org/pub/GNOME/sources/pango/1.40/pango-1.40.1.tar.xz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/pango<br>
+./configure --prefix=/C/GTK<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install gdk-pixbuf</h3>
+
+<p>Download and unzip to <tt>C:\gdk-pixbuf</tt>:<br>
+<a href="http://ftp.gnome.org/pub/GNOME/sources/gdk-pixbuf/2.34/gdk-pixbuf-2.34.0.tar.xz">
+<tt>http://ftp.gnome.org/pub/GNOME/sources/gdk-pixbuf/2.34/gdk-pixbuf-2.34.0.tar.xz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/gdk-pixbuf<br>
+./configure --prefix=/C/GTK --without-gdiplus --without-libtiff --with-included-loaders=jpeg,png<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install ATK</h3>
+
+<p>Download and unzip to <tt>C:\atk</tt>:<br>
+<a href="http://ftp.gnome.org/pub/gnome/sources/atk/2.20/atk-2.20.0.tar.xz">
+<tt>http://ftp.gnome.org/pub/gnome/sources/atk/2.20/atk-2.20.0.tar.xz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/atk<br>
+./configure --prefix=/C/GTK<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install GTK+</h3>
+
+<p>Download and unzip to <tt>C:\gtksrc</tt>:<br>
+<a href="http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.24/gtk+-2.24.30.tar.xz">
+<tt>http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.24/gtk+-2.24.30.tar.xz</tt></a></p>
+
+<p><i>NOTE:  It WILL be necessary to run the MinGW shell with administrative privileges
+for GTK+ to build successfully!&nbsp;  make took 30-50 minutes!&nbsp;  Ignore "has been moved" warnings.</i></p>
+
+<p>Open up another MinGW shell - (<B>with Admin privileges</B>)!:</p>
+<blockquote><p><tt>cd /C/gtksrc<br>
+CFLAGS="-O2 -D_WIN32_WINNT=0x0501" ./configure --prefix=/C/GTK<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p>Copy <tt>gtkrc</tt> (accompanying this document) to <tt>C:\GTK\etc\gtk-2.0\gtkrc</tt>.
+
+<h3>Install intltool</h3>
+
+<p>Download and unzip to <tt>C:\intltool</tt>:<br>
+<a href="http://ftp.gnome.org/pub/GNOME/sources/intltool/0.40/intltool-0.40.6.tar.bz2">
+<tt>http://ftp.gnome.org/pub/GNOME/sources/intltool/0.40/intltool-0.40.6.tar.bz2</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/intltool<br>
+./configure --prefix=/C/GTK<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install GNOME Icon Theme</h3>
+
+<p>Download and unzip to <tt>C:\gnome-icon-theme</tt>:<br>
+<a href="http://ftp.gnome.org/pub/GNOME/sources/gnome-icon-theme/3.12/gnome-icon-theme-3.12.0.tar.xz">
+<tt>http://ftp.gnome.org/pub/GNOME/sources/gnome-icon-theme/3.12/gnome-icon-theme-3.12.0.tar.xz</tt></a></p>
+
+<p>In the MinGW shell (<B>with Admin privileges</B>):</p>
+<blockquote><p><tt>cd /C/gnome-icon-theme<br>
+./configure --prefix=/C/GTK --disable-icon-mapping<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p><i>It may be necessary to run the MinGW shell with administrative privileges
+for GNOME Icon Theme to install successfully.</i></p>
+
+<h3>Install yasm assembler</h3>
+
+<p>Download yasm.1.3.0-win32.exe (or latest) and rename to c:\libs\bin\yasm.exe</tt>:<br>
+<a href="http://yasm.tortall.net/Download.html">
+<tt>http://yasm.tortall.net/Download.html</tt></a></p>
+
+<h3>Install SDL (v2)</h3>
+
+<p>Download and unzip to <tt>C:\libsdl</tt>:<br>
+<a href="https://www.libsdl.org/download-2.0.php">
+<tt>https://www.libsdl.org/download-2.0.php</tt></a> and download the file:  SDL2-devel-2.0.5-mingw.tar.gz, untar it into c:\libsdl2.</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libsdl2<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p><strike>Fauxdacious Note:&nbsp;  The compiled SDL dll does NOT work for all videos (most produce black screen), 
+but does provide the needed header files, so I ended up also downloading the Win32 binary from here:  </strike><a href="https://www.libsdl.org/download-1.2.php">
+<tt><strike>https://www.libsdl.org/download-1.2.php</strike></tt></a><strike> and copying the provided SDL.dll file to c:\libs\bin\ (which does work for all videos)!</strike></p>
+
+<h3>Install GNU regex</h3>
+
+<p>Download and unzip to <tt>C:\libs</tt>:<br>
+<a href="http://sourceforge.net/projects/mingw/files/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-bin.tar.gz/download">
+<tt>http://sourceforge.net/projects/mingw/files/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-bin.tar.gz/download</tt></a><br>
+<a href="http://sourceforge.net/projects/mingw/files/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-dev.tar.gz/download">
+<tt>http://sourceforge.net/projects/mingw/files/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-dev.tar.gz/download</tt></a></p>
+
+<h3>Install libxml</h3>
+
+<p>Download and unzip to <tt>C:\libxml</tt>:<br>
+<a href="ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz">
+<tt>ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libxml<br>
+./configure --prefix=/C/libs --with-python=no<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install mpg123</h3>
+
+<p>Download and unzip to <tt>C:\mpg123</tt>:<br>
+<a href="http://mpg123.de/download/mpg123-1.23.6.tar.bz2">
+<tt>http://mpg123.de/download/mpg123-1.23.6.tar.bz2</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/mpg123<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libfaad</h3>
+
+<p>Download and unzip to <tt>C:\libfaad</tt>:<br>
+<a href="http://sourceforge.net/projects/faac/files/faad2-src/faad2-2.7/faad2-2.7.tar.bz2/download">
+<tt>http://sourceforge.net/projects/faac/files/faad2-src/faad2-2.7/faad2-2.7.tar.bz2/download</tt></a></p>
+
+<p>Apply the patch <tt>libfaad-makefile.am.diff</tt> to <tt>C:\libfaad\libfaad\Makefile.am</tt>.<br>
+Apply the patch <tt>libfaad-main.c.diff</tt> to <tt>C:\libfaad\frontend\main.c</tt>.</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libfaad<br>
+cp /C/MinGW/share/libtool/config/ltmain.sh .<br>
+autoreconf<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libsndfile</h3>
+
+<p>Download and unzip to <tt>C:\libsndfile</tt>:<br>
+<a href="http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27.tar.gz">
+<tt>http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.27.tar.gz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libsndfile<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libbs2b</h3>
+
+<p>Download and unzip to <tt>C:\libbs2b</tt>:<br>
+<a href="http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2/download">
+<tt>http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2/download</tt></a></p>
+
+<p>Apply the patch <tt>libbs2b-makefile.am.diff</tt> to <tt>C:\libs2b\src\Makefile.am</tt>.</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libbs2b<br>
+cp /C/MinGW/share/libtool/config/ltmain.sh build-aux<br>
+autoreconf<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libcdio</h3>
+
+<p>Download and unzip to <tt>C:\libcdio</tt>:<br>
+<a href="http://ftp.gnu.org/gnu/libcdio/libcdio-0.83.tar.gz">
+<tt>http://ftp.gnu.org/gnu/libcdio/libcdio-0.83.tar.gz</tt></a></p>
+
+<p>Apply the patch <tt>libcdio-util.c.diff</tt> to <tt>C:\libcdio\src\util.c</tt>.</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libcdio<br>
+./configure --prefix=/C/libs --disable-rock<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libcddb</h3>
+
+<p>Download and unzip to <tt>C:\libcddb</tt>:<br>
+<a href="http://sourceforge.net/projects/libcddb/files/libcddb/1.3.2/libcddb-1.3.2.tar.bz2/download">
+<tt>http://sourceforge.net/projects/libcddb/files/libcddb/1.3.2/libcddb-1.3.2.tar.bz2/download</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libcddb<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libcue</h3>
+
+<p>Download and unzip to <tt>C:\libcue</tt>:<br>
+<a href="https://github.com/lipnitsk/libcue/archive/v2.1.0.tar.gz">
+<tt>https://github.com/lipnitsk/libcue/archive/v2.1.0.tar.gz</tt></a></p>
+
+<p>Apply the patch <tt>libcue-makefile.am.diff</tt> to <tt>C:\libcue\src\libcue\Makefile.am</tt>.</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libcue<br>
+cmake -DCMAKE_INSTALL_PREFIX=/C/libs -G"MSYS Makefiles"<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p>Fauxdacious Note:&nbsp;  This is under new management so the URL changed from the Audacious notes (the new URL is shown above)</p>
+
+<h3>Install LAME</h3>
+
+<p>Download and unzip to <tt>C:\lame</tt>:<br>
+<a href="http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download">
+<tt>http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/lame<br>
+sed -i -e '/xmmintrin\.h/d' configure  &nbsp;&nbsp;#LAME won't compile w/o this change (see:  <a href="http://blfs-dev.linuxfromscratch.narkive.com/9JWdWm7K/i686-lame-fails-to-build-for-me"><tt>http://blfs-dev.linuxfromscratch.narkive.com/9JWdWm7K/i686-lame-fails-to-build-for-me</tt></a>)!<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libflac</h3>
+
+<p>Download and unzip to <tt>C:\libflac</tt>:<br>
+<a href="http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz">
+<tt>http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libflac<br>
+./configure --prefix=/C/libs --disable-asm-optimizations --disable-sse --disable-ogg<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p>Fauxdacious Note:&nbsp;  I built without the --disable-asm-optimizations option.</p>
+
+<h3>Install libogg</h3>
+
+<p>Download and unzip to <tt>C:\libogg</tt>:<br>
+<a href="http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.xz">
+<tt>http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.xz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libogg<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libvorbis</h3>
+
+<p>Download and unzip to <tt>C:\libvorbis</tt>:<br>
+<a href="http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz">
+<tt>http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libvorbis<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libneon</h3>
+
+<p>Download and unzip to <tt>C:\libneon</tt>:<br>
+<a href="http://www.webdav.org/neon/neon-0.30.1.tar.gz">
+<tt>http://www.webdav.org/neon/neon-0.30.1.tar.gz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libneon<br>
+./configure --prefix=/C/libs --enable-shared<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libsamplerate</h3>
+
+<p>Download and unzip to <tt>C:\libsamplerate</tt>:<br>
+<a href="http://www.mega-nerd.com/SRC/libsamplerate-0.1.8.tar.gz">
+<tt>http://www.mega-nerd.com/SRC/libsamplerate-0.1.8.tar.gz</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libsamplerate<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libwavpack</h3>
+
+<p>Download and unzip to <tt>C:\libwavpack</tt>:<br>
+<a href="http://www.wavpack.com/wavpack-4.80.0.tar.bz2">
+<tt>http://www.wavpack.com/wavpack-4.80.0.tar.bz2</tt></a></p>
+
+<p>Apply the recursive patch <tt>wavpack-4.80.diff</tt>.</p>
+NOTE:  I had to edit the diff file splitting it up into 3 separate files, one for each "diff" and remove the "diff" lines out of each and apply each individually with patch command from the directory that "wavpack-###" subdirectory was in?!
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libwavpack<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install FFmpeg</h3>
+
+<p>Download and unzip latest version to <tt>C:\ffmpeg</tt>:<br>
+<a href="http://ffmpeg.org/releases/">
+<tt>http://ffmpeg.org/releases/</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/ffmpeg<br>
+./configure --prefix=/C/libs --enable-shared --enable-ffplay --enable-gpl --enable-postproc --enable-nonfree --cpu=i686<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p>Fauxdacious Note:&nbsp;  (I think this is the flag list, if it complains about one, then reconfigure without that one).&nbsp;  When trying to get all videos to play (which ended up with SDL being the culprit), I ended up 
+also fetching the "Shared" and "Dev" versions from here:&nbsp;  <a href="https://ffmpeg.zeranoe.com/builds/">
+<tt>https://ffmpeg.zeranoe.com/builds/</tt></a> and copying the .a and .dll (and ffplay.exe) files over the ones I compiled into c:\libs\, however, if you get videos playing with ffplay, you can SKIP all this!</p>
+
+<h3>Install Libbinio</h3>
+
+<p>Download and unzip to <tt>C:\libbinio</tt>:<br>
+<a href="https://sourceforge.net/projects/libbinio/files/latest/download">
+<tt>https://sourceforge.net/projects/libbinio/files/latest/download</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libbinio<br>
+Edit /C/libbinio/src/binwrap.cpp and ADD "#include &lt;stdio.h&gt;" (see:  <a href="https://github.com/repoforge/rpms/blob/master/specs/libbinio/libbinio-1.4-includes.patch"><tt>https://github.com/repoforge/rpms/blob/master/specs/libbinio/libbinio-1.4-includes.patch</tt></a>)!<br>
+cp /C/MinGW/share/libtool/config/ltmain.sh .<br>
+autoreconf<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libmms</h3>
+
+<p>Download and unzip to <tt>C:\libmms</tt>:<br>
+<a href="http://sourceforge.net/projects/libmms/files/libmms/0.6.4/libmms-0.6.4.tar.gz/download">
+<tt>http://sourceforge.net/projects/libmms/files/libmms/0.6.4/libmms-0.6.4.tar.gz/download</tt></a></p>
+
+<p>Apply the patch <tt>libmms-strndup.diff</tt> (it changes multiple files).</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libmms<br>
+cp /C/MinGW/share/libtool/config/ltmain.sh .<br>
+autoreconf<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libmodplug</h3>
+
+<p>Download and unzip to <tt>C:\libmodplug</tt>:<br>
+<a href="http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.5/libmodplug-0.8.8.5.tar.gz/download">
+<tt>http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.5/libmodplug-0.8.8.5.tar.gz/download</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libmodplug<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install libsidplayfp</h3>
+
+<p>Download and unzip to <tt>C:\libsidplayfp</tt>:<br>
+<a href="https://sourceforge.net/projects/sidplay-residfp/files/libsidplayfp/1.8/libsidplayfp-1.8.6.tar.gz/download">
+<tt>https://sourceforge.net/projects/sidplay-residfp/files/libsidplayfp/1.8/libsidplayfp-1.8.6.tar.gz/download</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libsidplayfp<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install FluidSynth</h3>
+
+<p>Download and unzip to <tt>C:\fluidsynth</tt>:<br>
+<a href="http://sourceforge.net/projects/fluidsynth/files/fluidsynth-1.1.6/fluidsynth-1.1.6.tar.bz2/download">
+<tt>http://sourceforge.net/projects/fluidsynth/files/fluidsynth-1.1.6/fluidsynth-1.1.6.tar.bz2/download</tt></a></p>
+
+<p>Apply the patch <tt>fluidsynth.diff</tt> (it changes multiple files).</p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/fluidsynth<br>
+./autogen.sh<br>
+./configure --prefix=/C/libs<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install Fauxdacious</h3>
+
+<p>Download and unzip to <tt>C:\fauxdacious</tt>:<br>
+<a href="http://phoenixcomm.net/~jturner/">
+<tt>http://phoenixcomm.net/~jturner/</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/fauxdacious<br>
+Fauxdacious Note:&nbsp;  You should make sure that the "-win32.*" versions of the image files are used in /C/fauxdacious/src/images/about-logo.*!</B><br>
+./configure --prefix=/C/aud --with-buildstamp=Fauxdacious<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install Fauxdacious Plugins</h3>
+
+<p>Download and unzip to <tt>C:\fauxdacious-plugins</tt>:<br>
+<a href="http://phoenixcomm.net/~jturner/">
+<tt>http://phoenixcomm.net/~jturner/</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/fauxdacious-plugins<br>
+./configure --prefix=/C/aud [--with-libsdl=2]<br>
+make<br>
+make install<br>
+cd /C/fauxdacious-plugins/src/waveout #(to add the new Windows native audio output plugin)<br>
+make<br>
+make install</tt></p></blockquote>
+
+<p>NOTE:&nbsp;  I had to go into Windows Explorer and make the directoriy c:\aud owned by me and give myself "full control" to prevent Windows from making the dll files READONLY and preventing me from recompiling and subsequent "make install"s fail w/"permission denied"!</p>
+
+<h3>(Optional) Create executable Fauxdacious Windows Binary Install Wizard</h3>
+
+<p>To build the installable binary (for use on other MS-Windows systems), download and untar the file <a href="http://phoenixcomm.net/~jturner/faud.tar.bz2">http://phoenixcomm.net/~jturner/faud.tar.bz2</a> in your root directory (C:\).  It will create a directory called C:\faud\.</p>
+
+<p>Install the <a href="http://www.jrsoftware.org/isinfo.php">Inno Setup Wizard(tm)</a>, and install it.</p>
+
+<p>In the gui / editor window, open the file C:\fauxdacious-3.8\contrib\win32\installer\Fauxdacious.iss, then select [Build].[Cimpile] to create the executable binary "Fauxdacious_install.zip".  By defauit it creates and puts it in a folder called "Output" in "My Documents".  It combines what's in C:\fauxdacious-[vsn#]\, C:\fauxdacious-plugins-[vsn#], and C:\faud\ to build the fully-independent stand-alone binary executable.  When run on another M$-Windows machine, it installs Fauxdacious, audtool, and all the necessary libraries needed to run Fauxdacious (and nothing else - no crapware!).  To configure Fauxdacious on systems where it is installed, the default configuration file (editable with Notepad, Wordpad, etc.) is installed as C:\Users\[user-id]\AppData\Local\audacious\config. (at least on Windows-7).</p>
+</body>
+</html>

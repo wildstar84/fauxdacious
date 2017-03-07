@@ -1,0 +1,133 @@
+() Version 3.82-final
+
+* Added the ability to capture the thumbnail images ("cover art") associated with youtube video streams.  This also involved changing the youtubedl_metadatahelper.pl script.  It now uses youtube-dl to fetch and download the thumbnail file when the other tag metadata is fetched.  By default, it stores them in the /tmp directory, but you can change this in the aforementioned perl script.
+
+* GTK equalizer:  Added the [Auto] checkbox, (and relabeled the [Reset to Zero] button to [Flat] to make room for it), and added a two-state indicator icon to the [Preset] button to indicate whether a song-specific preset file is currently in use (so the GTK equalizer now works the same way the Winamp Skins equalizer).
+
+* Fixed playlist column headers in the QT interface to work like the GTK version, labeling all unlabeled column headers using the same abbreviations we used in GTK.  Also on the QT side, there's an optional "Now Playing" column (header was blank, but is now labeled "On") which was useless (always blank), but now shows an asterisk next to the currently playing song (The GTK side does not offer this column, but the currently playing song is displayed in bold type).
+
+* Tweaked instance name / dbus handling by adding instance names to the window titles (as Audacious does with their instance numbers) and also making numbers valid as instance names allowing one to specify the commandline option "-#" (ie. -1, -2, etc. in lieu of "--new=1, etc.) for compatability with Audacious.  The config directories work the same as Fauxdacious instance names with underscores, ie. ~/.config/audacious_1 (~/.config/audacious_instancename) instead of ~/.config/audacious-1, etc. though.  TODO:  Quitting the QT interface exits with a bunch of "dbus errors" (warnings) (even before these changes) that I haven't been able to explain, though everything still shuts down normally.
+
+* More leaks, more tweaks to ffaudio-core.cc (video playing) and others.  So far this seems to have pretty much eliminated memory-usage growth creep when using SDL1 and further reduced it for SDL2.  Audio-only in both appears to be leak-free.  I have not yet been able to completely isolate the source of the slight growth in SDL2 (over repeated play of a video) though.  Also added new config option:  [ffaudio].video_render_scale.  Default is 1, but valid values are 0, 1, or 2.  Sets the SDL_HINT_VIDEO_RENDER_SCALE_QUALITY hint value.  I think I also have the "black video screen on replay" issue on the Windows version fixed.  TODO:  The only remaining issue is that the video window still doesn't always close when exiting Fauxdacious with the video window playing (on Windows version only - this was never an issue except on Windows).
+
+* Merged ALL Audacious pulls since 2119d19 through b216d4e; and 0ee73f2, d1463c1, 8700688, 217a39f, 4da2cb8, 236ee1d, d6e115e, f47bede; and plugin pulls since ab45ec5 through 585518c (everything through 2/13), including their resolution of the issue with plugin pull# eaf7949; and 5e9fc66, f4c9b02, 5b50d20, 400825a.
+
+(02/16/17) Version 3.82-beta2
+
+* Tweaked and generally tidied up ffaudio-core.cc a bit to make sure AVPackets are efficiently initialized and freed properly and slightly optimized play by eliminating some redundant video function checks and inlining some calls while hopefully eliminating rare and occasionally random seg-fault when stopping audio stream play.  There still appears to be a slight bit of memory leakage? / growth creep in video play, but my guess it's somewhere deep in the bowels of SDL.  
+
+* Changed The default "video_qsize" value from 8 to 6 and Added new config option: [ffaudio].allow_highdpi (default FALSE) to enable SDL2 SDL_WINDOW_ALLOW_HIGHDPI flag.
+
+* Merged in all latest QT stuff (finally) and tested and seems to work!  NOTE:  I did not build it into this release to save file sizes, so you must recompile yourself if you want QT configuring with "--enable-qt"!  NOTE2:  Audacious's QT interface is rather behind, for example Equalizer presets and Plugin parameters are NOT currently configurable from the GUI.
+
+* Merged in Audacious pulls# 40237df, 6d9acec, bb439b0, d17911e, 425aa54, 2119d19; and plugin pulls# ab45ec5.  Did NOT merge plugin pull# eaf7949 due to compile error under g++.
+
+* Includes all unreleased Version 3.82-beta1 changes (below):
+
+(Not released) Version 3.82-beta1
+
+* Added new config file option:  [audacious].eqpreset_nameonly (boolean) which causes the first question mark (if any) and anything following it in a URL to be removed for purpose of exporting song-specific equalization presets.  This is needed for some live-streaming station URLs that change "keys" dynamically and regularly.  Default is FALSE (old behavior - keep the full url base name), add and set to TRUE for the new behavior.  For example, this will affect youtube-dl urls as well, as previously the preset file would be exported as "watch?xxxxxx.preset" where "xxxxxx" was the actual video id.  With the new option, exporting song-specific equalizer presets will be the same preset file "watch.preset".
+
+* Fixed the exporting of song-specific equalization presets for cuesheet (.cue) files.  This worked before Audacious apparantly fixed the file-name used when opening a song for playback from it's cuesheet filename to the actual referenced file-name, breaking our logic.  As a result, the equalization presets exported for a cuesheet file will apply to all tracks in the cuesheet.  They are still exported (reguardless of track) as "<filename>.cue.preset".  I made the decision to do it this way assuming that all tracks in a cuesheet are (very likely) recorded with the same equalizer settings.
+
+* Merged in Audacious plugin pulls# 2c267a2
+
+(01/30/17) Version 3.81-final:
+
+* Added ability to directly play tunein.com radio stations using the station's tunein.com website url (as opposed to having to manually dig out the actual live-streaming urls).  This requires the new helper script in the contrib/ directory (getTuneinStream.pl) installed in your path, and installing the new Perl modules "LWP::Simple" and "Tunein::Streams" from CPAN (www.cpan.org).  
+
+(01/13/17) Version 3.81-beta2:
+
+* Added headers to all columns in GTK playlist.  Previously, some column headers were not shown since they were longer than the default column width (as determined by a boolean array ui_playlist_widget.cc:pw_col_label).  I added a separate array of "short" names (columns.cc:pw_col_headers) so that all columns are now properly labeled and understood without making them unnecessarily wide.
+
+* Merged in Audacious pulls# 361a6fc, c3b0659, b96fbd4, c1fe83b, 11e4915, 8bea900, 25dd624, 65af13f; and plugin pulls# 25dd624, 0bcc904, 0abceec, eb3e8a8, 45c1f38, a21e4a2
+
+(12/27/16) Version 3.81-beta1:
+
+* Fixed Audacious-rejected bug# 681 to make pause just do pause, as it should!
+
+* Fixed audtool --help to work even if unable to connect to dbus.
+
+* Merged in Audacious pulls# 5297008, a67d6be, b321ee5, and c3287dd; and plugins pulls# bf6661e, 403020b and 8174f13, addressing Audacious bugs: 560 and 685.
+
+* Added comments as another optional column field to the playlist table (GTK interface) and made it sortable.  I had started to add this and (on the SAME day, the Audacious team added it, so I dropped my work and merged theirs!  The files I changed were almost identical to their changes, but they had finished the ones I hadn't gotten to).  I wanted to make each column sort when clicking on the header (like my Tk::HMListbox), but this was going to be a huge boondoggle.
+
+* Started looking into adding the ability to sniff out the streams in tunein.com online radio stations (and then play them), but this also appears to be a ton of work for a small benefit, maybe someday when I get another wild hair up my nose!
+
+(11/21/16) Version 3.8-final:  
+
+* Fixed bug in "live_flv" streams that incorrectly reported a stream length of "419:57:08" when the length could not be determined, and removed the special "NonSeekable" tag we had added previously to work around this and hide the position slider and all the supporing code.
+
+* Merged in Audacious pull# 1415ff8 and closing Audacious bug# 680.
+
+* Fixed two huge memory leaks in ffaudio by using smart-pointers to open input file, frames, and properly flushing and destroying queues.
+
+* Added queueing for audio packets when playing video.  This makes for smoother video-play while allowing for a reduction in the queue-size which improves audio-video syncing.  The default "video_qsize" value is now 8 instead of 16.
+
+* Added separate config option [youtubedl].video_qsize (default: use [ffaudio].video_qsize) for Youtube-DL video streams, which seem to need a bigger queue.
+
+* Removed the [Services].[Eject CD] from Windows version, since it doesn't work anyway because it requires a command that is not included with Windows.
+
+* Added a few lines of code to copy selected playlist entry URLs / files to the PRIMARY selection when copying so that they can be retrieved / pasted into other applications.
+
+TO DO:  Windows version does not always shut down the video window when shutting down without stopping playback first.  Windows version sometimes produces black playback window when stopping and restarting play on same item fixable by advancing playlist.
+
+(11/8/16):  Version 3.8-beta3:  
+
+* Added Youtube-DL transport plugin to live-stream videos from Youtube, Vimeo, and other sites that require using a helper application such as youtube-dl in order to play outside of a web-browser.  The plugin recognizes any URL with the "ytdl://" prefix and converts that to the proper "https://".  Simply grab the URL off Youtube and paste it in as a URL in Fauxdacious, and change "https" to "ytdl" to add to your playlist.  The video is downloaded and piped directly to Fauxdacious without storage to a hard drive, therefore, there's no ability to seek.  To do that, simply use youtube-dl to download the video and then add the downloaded file to Fauxdacious.  NOTE:  This type of piping will require a good internet connection or may require downloading lower-quality video formats, otherwise, a buffer-underrun may occur ending video playback.  The user may specify / configure the youtube-dl (or other helper application) using the new configure option:  [youtubedl].command - the default string is:  "youtube-dl --no-continue --no-playlist --no-cache-dir --no-progress --no-call-home --youtube-skip-dash-manifest --prefer-ffmpeg -q -f mp4 --no-part".  Do NOT add the "-o -" to feed to stdout, as Fauxdacious does this for you.  Four additional related user config variables have also been added:  
+
+[youtubedl].video_windowtitle (default "Youtube-DL") for specifying what to add to the window titlebar (set to "FILENAME" to get the url); -OR- use the included metadata helper script (youtubedl_metadatahelper.pl) to fetch the title and author, and then set (in the config file):
+
+[audacious].youtubedl_tag_data=TRUE (default FALSE)
+
+[youtubedl].metadata_helper=/usr/local/bin/youtubedl_metadatahelper.pl (default empty)
+
+[youtubedl].save_video (default FALSE).  If true, a copy of the video is saved out to either the file path specified by [youtubedl].save_video_file or "/tmp/lastyoutubevideo".
+
+NOTE:  If you are compiling from scratch, you'll need to switch to the src/youtubedl directory and do a separate make and make install there as it's not currently int the configure script.  There's also slim to no chance that this plugin will work in M$-Windows.
+
+* Fixed major glitch discovered during all this that caused the video to freeze (audio kept playing) if one had a video playing and a url to a "live-flv"-based radio stream in the playlist and hovered their mouse over it (causing it's metadata to be fetched).
+
+* Added special metadata tag (that can be added to the custom tags file (user_tag_data) and that the youtubedl_metadatahelper.pl helper script also adds to youtubedl_tag_data called "NonSeekable", which if set to 1 prevents display of the file-positioning slider.  This is helpful for certain streams, including youtube-dl videos that include a "length" (time) value but which are non-seekable.  (If the slider is visable in such a stream and the user attempts to adjust it (into the future) playback seizes up and Faudacious must be killed to abort).
+
+* Fixed small glitch in the Lavadacious skin so that playlist window now expands properly.
+
+(10/29/16):  Version 3.8-beta2:  
+
+* Added config-based file for user-added tag metadata and new config-file option:  [Audacious].user_tag_data.  Specify TRUE to activate this feature, 
+FALSE or omit to keep old behavior.  This permits user to save "song info" for streams (urls) and other files who's decoder does not permit saving tag metadata into the media file itself.  I added this to be able to assign readable titles to radio streams that otherwise just show the (useless) url in the title making it difficult to see which station I'm playing.
+
+* Added the song info popup "balloon" that currently pops up over the playlist when the user has the existing option "show_filepopup_for_tuple" option set to TRUE to also pop up now for the currently-playing song when user hovers the mouse over the middle (equalizer / time part) of the main window (Winamp Skins interface) whenever the main window is "shaded" (rolled up into a thin line).  This now makes it possible to see what is playing without having to pop up the playlist (since nothing regarding the current song is otherwise displayed when the main window is shaded)!
+
+* Massively improved video window-resizing, tweaked video-scaling smoothness to improve video quality back to SDL1 level (fixed small degradation in SDL2).  Added resizing feature to allow user to shrink video window below a user-specified size (default 149x149, user-configurable by the 2 new config file variables:  [ffaudio].video_doreset_width and [ffaudio].video_doreset_height) and have it snap back to it's originally-requested size.  
+
+* Fixed video-play to work in headless mode.
+
+* Additional minor tweaks to improve video efficiency.  
+
+(10/20/16):  Version 3.8-beta1:  Snapshotted latest Audacious v3.8 GIT as of 2016/10/13 and manually refactored and reapplied all Fauxdacious features and changes.
+
+* Rewrote the ffmpeg plugin (ffaudio-core.cc) to use SDL2 for video and latest ffmpeg / avcodec API while remaining backward-compatable with prev. ffmpeg release (now compiles without warnings (these were all "depreciated" warnings).  This also eliminates muting issues on playback when using the SDL "Output" audio system and the nasty manual-editing of separate Makefile and extra.mk files for Linux and Windows.  Also refactored and tweaked to slightly better optimize video performance and include all Audacious v3.8 improvements possible (excluding their new "SmartPtr" and "Scoped" structs) which I was not able to get fully working compatably with Fauxdacious video features.
+
+* Added a [Close] button to the Equalizer window in the GTK interface.  
+
+* Merged in post-3.8 final commits:  97257b6 and (plugins) 43a6bf1.
+
+(05/31/16):  Version 3.74-beta2:  Fixed glitch that prevented creating song-specific Equalizer Auto-presets for Cue-file based songs.  Added the song / video title to the Fauxdacious Video window titlebar.  Merged Audacious commits:  3be5957, 450984e, e12ae5d, 2349933, d768ae1, 3cd305e, 60c4632, 475490c, 5384dc5, b855336, b34cbdb, c729ff5, ad0a172, 6b5bfae, 96a19b5, 5a8d6e5, and Plugin commits:  4ededd4 and ebf17e6.  Eliminated (most) compiler warnings in ffaudio-core.cc from "depreciated" AVCodec stuff.  Obtained a working version of libcue and compiled that in.  Updated the Win32 build notes in the contrib directory to reflect additional Fauxdacious requirements and fixes for module compilation issues.  
+
+TODO:  Only known unresolved issue (Windows) is audio is sometimes lost when jumping from some videos to audio playlist items when using SDL Output plugin, non-issue if using the new Waveout plugin.  Also probably need to add a "file-association" in the Windows setup wizard to associate .xspm (playlist files) with Fauxdacious.  Someday, if I really get ambitious, I might write / modify a plugin merge in "youtube-dl" functionality in order to play Youtube video URLs directly, patches / help / advice welcome!  When Audacious v3.8 comes out and settles down, I should remove the "beta" moniker as Fauxdacious seems pretty stable now.  I need to create a DEB package too, but looking at the documentation howto for that just gave me a headache.  At least John Lindgren's Audacious build instructions for Windows were concise by comparisen!
+
+(05/27/16):  Version 3.74-beta1:  Built Windows installable binary and bundled with Inno Setup Wizard.
+
+(05/18/16):  Version 3.73-beta2:  Changed multi-instance feature to use unique config directories now (like the new Audacious multi-instance feature does) instead of just unique config files.  The default config directory remains "~/.config/audacious/" whereas new instances created with --new=instancename are now "~/.config/audacious_instancename/".  The config file is now once again always "config" within the directory "~/.config/audacious_instancename/" instead of "instancename".  The default instance name remains "audacious" so that Fauxdacious shouldn't create a "~/.config/audacious_audacious/" directory, even if that instance name is specified.  Also updated the manpages.  
+Commits merged:  60d1ce5, 2908e84 (taylored for our instance-names), 9dde289, 34d5a2d, 7abddc7, c75b543, 66767b6, 8e5122c, 1cf1a81, d74d231, e31774c, 577298c, 32dbd44, 02fb683, 3aaa228, f208db4, 6087afd, 1c8d8e0, 8f3fcc4, and 1c9c04c.
+
+(05/13/16):  Version 3.73-beta1 Released.  The Audacious Team has been very busy of late fixing bugs and adding features for a future 3.8 release and I'm having a hard time keeping up with all of their changes (and rejections)!  I've decided to call this release the first beta of version 3.73, skipping 3.72 due to many 3.8 GIT fixes and features included from their latest development commits.  Some of their recent commits have involved moving and combining code from many source files and QT features which I have not had the time or patience to do, test, and include here, so I have focused my efforts on cherry-picking commits that actually fix things and add features for users in this release, and included a few minor touches of my own!  Audacious bugs/features fixed/added and closed by this release:  628, 629, 630, 637, and 638.  Commits merged:  d4e7a38, 149ceb2, 91182a1, 44de6de, 762a447, 1d5ae03, 54abb4e, 10dad29, ed2f46f, 59ab0aa, ecbc461, 0eefebb, 507f3b0, 4558f91 and perhaps a few others I forgot to write down.  Pretty much through May 6th or so, unless listed here.  I did reject (specifically 63b0f41 (video needs SDL), e19cf1d, 2908e84, 45d6887, and 77ae4c6) ones involving their new multiple-instance feature for now as we already long have that implemented in a different way, but may incorporate their separate configuration directory aspect of that later.  Theirs appears to use instance numbers and instance-specific configuration directories whereas ours already uses instance names and only the "config" file itself is instance-specific.  I also have neglected to update many QT-specific commits as I don't currently compile that in nor use it and probably won't unless people start specifically asking me for it.
+
+New Fauxdacious-only features implemented include new "set-volume-relative" audtool option (rejected feature#637), The "About" popup window is now toggleable by the lower-right corner button in WinAmp skins (previously you had to press the <Esc> key to close that popup).  Also Fauxdacious will now no longer leave the "Record/Dub" feature enabled when closed and later reopened, a major annoyance that has bitten me a couple of times (fixes rejected bug#629).  I've also updated the Lavadacious skin to clean up some titlebar and other apparance issues.  Also added new violet version of the Default skin (DefaultViolet) and added a gtk-2 theme portion to the Lavadacious theme.  Added a "Changes" file.
+
+(4/29/16):  Version 3.71-beta3 Released.  Removed debug output used to fix/verify the popup fix in the last version. Merged in cherry-picked Audacious v3.72 commits: 2113b3d, 6ed0f32, 133802e, fcbb689, and 4d1c41e thus closing bug#627.  Iâve also got a shiny new machine that also has Windows-7 Professional 64 bit on it with a hard drive big enough to install all three dozen or so libraries on it, so hopefully soon, I can begin building a Windows binary version to be combined with the free Inno Setup Wizard!  
+
+(2/26/16):  Version 3.71-beta2 Released.  Seems to fix the popup "missing file" error message mentioned at the bottom of the post. Also includes most recent Audacious GIT update commits through 2/26!
+
+(12/13/15):  Version 3.7-beta2 Released, fixed annoying error msg. popup that occasionally comes up saying it can’t find a (should've been deleted) playlist.

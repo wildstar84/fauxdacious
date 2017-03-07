@@ -1,0 +1,163 @@
+#!/bin/sh
+
+case "$1" in
+ast.po)
+    LANGUAGE="Asturian"
+    ;;
+be.po)
+    LANGUAGE="Belarusian"
+    ;;
+bg.po)
+    LANGUAGE="Bulgarian"
+    ;;
+ca.po)
+    LANGUAGE="Catalan"
+    ;;
+cmn.po)
+    LANGUAGE="Chinese (Mandarin)"
+    ;;
+cs.po)
+    LANGUAGE="Czech"
+    ;;
+da.po)
+    LANGUAGE="Danish"
+    ;;
+de.po)
+    LANGUAGE="German"
+    ;;
+el.po)
+    LANGUAGE="Greek"
+    ;;
+en_GB.po)
+    LANGUAGE="English (United Kingdom)"
+    ;;
+eo.po)
+    LANGUAGE="Esperanto"
+    ;;
+es_AR.po)
+    LANGUAGE="Spanish (Argentinian)"
+    ;;
+es_MX.po)
+    LANGUAGE="Spanish (Mexican)"
+    ;;
+es.po)
+    LANGUAGE="Spanish"
+    ;;
+et.po)
+    LANGUAGE="Estonian"
+    ;;
+eu.po)
+    LANGUAGE="Basque"
+    ;;
+fa_IR.po)
+    LANGUAGE="Persian (Iran)"
+    ;;
+fi.po)
+    LANGUAGE="Finnish"
+    ;;
+fr.po)
+    LANGUAGE="French"
+    ;;
+gl.po)
+    LANGUAGE="Galician"
+    ;;
+he.po)
+    LANGUAGE="Hebrew"
+    ;;
+hu.po)
+    LANGUAGE="Hungarian"
+    ;;
+id_ID.po)
+    LANGUAGE="Indonesian"
+    ;;
+it.po)
+    LANGUAGE="Italian"
+    ;;
+ja.po)
+    LANGUAGE="Japanese"
+    ;;
+ko.po)
+    LANGUAGE="Korean"
+    ;;
+ky.po)
+    LANGUAGE="Kirgyz"
+    ;;
+lt.po)
+    LANGUAGE="Lithuanian"
+    ;;
+lv.po)
+    LANGUAGE="Latvian"
+    ;;
+ml_IN.po)
+    LANGUAGE="Malayalam (India)"
+    ;;
+ms.po)
+    LANGUAGE="Malay"
+    ;;
+nl.po)
+    LANGUAGE="Dutch"
+    ;;
+pl.po)
+    LANGUAGE="Polish"
+    ;;
+pt_BR.po)
+    LANGUAGE="Portuguese (Brazil)"
+    ;;
+pt_PT.po)
+    LANGUAGE="Portuguese"
+    ;;
+ro.po)
+    LANGUAGE="Romanian"
+    ;;
+ru.po)
+    LANGUAGE="Russian"
+    ;;
+si.po)
+    LANGUAGE="Sinhala"
+    ;;
+sk.po)
+    LANGUAGE="Slovak"
+    ;;
+sq.po)
+    LANGUAGE="Albanian"
+    ;;
+sr@latin.po)
+    LANGUAGE="Serbian (Latin)"
+    ;;
+sr.po)
+    LANGUAGE="Serbian"
+    ;;
+sr_RS.po)
+    LANGUAGE="Serbian (Serbia)"
+    ;;
+sv.po)
+    LANGUAGE="Swedish"
+    ;;
+ta.po)
+    LANGUAGE="Tamil"
+    ;;
+tr.po)
+    LANGUAGE="Turkish"
+    ;;
+uk.po)
+    LANGUAGE="Ukrainian"
+    ;;
+vi.po)
+    LANGUAGE="Vietnamese"
+    ;;
+zh_CN.po)
+    LANGUAGE="Chinese (simplified)"
+    ;;
+zh_TW.po)
+    LANGUAGE="Chinese (traditional)"
+    ;;
+*)
+    echo "Unknown language $1"
+    exit 1
+    ;;
+esac
+
+sed -i -e "s/SOME DESCRIPTIVE TITLE./$LANGUAGE translation for Audacious/" "$1"
+sed -i -e "s/YEAR THE PACKAGE'S COPYRIGHT HOLDER/Audacious translators/" "$1"
+sed -i -e "s/as the PACKAGE package/as the Audacious package/" "$1"
+sed -i -e "s/LANGUAGE <LL@li.org>/$LANGUAGE/" "$1"

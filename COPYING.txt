@@ -1,0 +1,76 @@
+Fauxdacious for Windows
+
+    https://wildstar84.wordpress.com/2015/11/25/fauxdacious-media-player-for-linux-released/
+    http://audacious-media-player.org
+
+Fauxdacious / Audacious are free and open source software.  
+By installing Fauxdacious, you agree to be bound by various licenses governing 
+its use and redistribution.
+
+LICENSE
+
+Copyright © 2001-2016 Audacious developers and others
+
+(A list of the copyright holders is provided in the AUTHORS file.)
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    1. Redistributions of source code must retain the above copyright notice,
+       this list of conditions, and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright notice,
+       this list of conditions, and the following disclaimer in the
+       documentation provided with the distribution.
+
+    This software is provided “as is” and without any warranty, express or
+    implied.  In no event shall the authors be liable for any damages arising
+    from the use of this software.
+
+EXCEPTIONS
+
+The Fauxdacious logo was designed by (c 2015) Jim Turner.  All Fauxdacious changes 
+and patches, including plugin changes are copyright (c 2015) by Jim Turner,  with 
+all rights reserved.  You are free to use Fauxdacious subject to the same license 
+and terms as Audacious itself.  
+
+Other than the Fauxdacious and Audacious logos themselves, the images included with 
+Fauxdacious are based on the Tango Icon Library and are in the public domain.
+
+Please note that many of the plugins distributed with Fauxdacious / Audacious are under
+different licenses.
+
+THIRD-PARTY LICENSES
+
+libguess - a high-speed character set detection library
+
+    Copyright © 2000-2003 Shiro Kawai
+    Copyright © 2005-2010 Yoshiki Yazawa
+    Copyright © 2007-2010 William Pitcock
+
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    1. Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright notice,
+       this list of conditions and the following disclaimer in the documentation
+       and/or other materials provided with the distribution.
+
+    3. Neither the name of the authors nor the names of its contributors may be
+       used to endorse or promote products derived from this software without
+       specific prior written permission.
+
+    This software is provided by the copyright holders and contributors "as is"�.     and any express or implied warranties, including, but not limited to, the
+    Implied warranties of merchantability and fitness for a particular purpose
+    are disclaimed.  In no event shall the copyright owner or contributors be
+    liable for any direct, indirect, incidental, special, exemplary, or
+    consequential damages (including, but not limited to, procurement of
+    substitute goods or services; loss of use, data, or profits; or business
+    interruption) however caused and on any theory of liability, whether in
+    contract, strict liability, or tort (including negligence or otherwise)
+    arising in any way out of the use of this software, even if advised of the
+    possibility of such damage.

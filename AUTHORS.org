@@ -1,0 +1,51 @@
+HISTORY
+
+Audacious was originally based on the X Multimedia System (“XMMS”) via its
+GTK+ 2.x port Beep Media Player (“BMP”).  Audacious has changed quite a bit
+since its first release, however, and little XMMS/BMP code remains.
+
+The Audacious project began in 2005 under the leadership of William Pitcock
+(“nenolod”).  Many people have made contributions, both large and small, since
+that time.  At present, the project is led by John Lindgren and Michał Lipski
+(“tallica”), with help from a few others.  Special thanks go to Michał Lipski
+for setting up and maintaining the current website, and to Thomas Lange for
+leading the translation effort.
+
+The Audacious logo was designed by George Averill and updated by John Lindgren.
+It uses the “Circulate” font created by Brian Kent.
+
+Besides the developers listed below, a word of thanks is also due to the many
+people who have helped to translate the Audacious interface into a number of
+different (human) languages.  The translation effort is now done mostly through
+Transifex, making it easier to contribute but also nearly impossible to
+maintain a list of those who have done so.
+
+
+DEVELOPERS
+
+Audacious was written by:
+
+  George Averill
+  Daniel Barkalow
+  Christian Birchinger
+  Ralf Ertzinger
+  Michael Färber
+  Matti Hämäläinen
+  Michael Hanselmann
+  Anders Johansson
+  Jussi Judin
+  Thomas Lange
+  John Lindgren
+  Michał Lipski
+  Giacomo Lozito
+  Mikael Magnusson
+  Tomasz Moń
+  William Pitcock
+  Paula Stanciu
+  Ben Tucker
+  Tony Vroon
+  Yoshiki Yazawa
+  Eugene Zagidullin
+
+Please note that many of Audacious’s features are implemented by plugins, whose
+authors are listed elsewhere.
