@@ -1,4 +1,4 @@
-() Version 3.82-final
+(03/08/17) Version 3.82-final
 
 * Added the ability to capture the thumbnail images ("cover art") associated with youtube video streams.  This also involved changing the youtubedl_metadatahelper.pl script.  It now uses youtube-dl to fetch and download the thumbnail file when the other tag metadata is fetched.  By default, it stores them in the /tmp directory, but you can change this in the aforementioned perl script.
 
@@ -9,6 +9,8 @@
 * Tweaked instance name / dbus handling by adding instance names to the window titles (as Audacious does with their instance numbers) and also making numbers valid as instance names allowing one to specify the commandline option "-#" (ie. -1, -2, etc. in lieu of "--new=1, etc.) for compatability with Audacious.  The config directories work the same as Fauxdacious instance names with underscores, ie. ~/.config/audacious_1 (~/.config/audacious_instancename) instead of ~/.config/audacious-1, etc. though.  TODO:  Quitting the QT interface exits with a bunch of "dbus errors" (warnings) (even before these changes) that I haven't been able to explain, though everything still shuts down normally.
 
 * More leaks, more tweaks to ffaudio-core.cc (video playing) and others.  So far this seems to have pretty much eliminated memory-usage growth creep when using SDL1 and further reduced it for SDL2.  Audio-only in both appears to be leak-free.  I have not yet been able to completely isolate the source of the slight growth in SDL2 (over repeated play of a video) though.  Also added new config option:  [ffaudio].video_render_scale.  Default is 1, but valid values are 0, 1, or 2.  Sets the SDL_HINT_VIDEO_RENDER_SCALE_QUALITY hint value.  I think I also have the "black video screen on replay" issue on the Windows version fixed.  TODO:  The only remaining issue is that the video window still doesn't always close when exiting Fauxdacious with the video window playing (on Windows version only - this was never an issue except on Windows).
+
+* Merged in Audacious pull request #25: "Add SOCKS proxy support." as written.
 
 * Merged ALL Audacious pulls since 2119d19 through b216d4e; and 0ee73f2, d1463c1, 8700688, 217a39f, 4da2cb8, 236ee1d, d6e115e, f47bede; and plugin pulls since ab45ec5 through 585518c (everything through 2/13), including their resolution of the issue with plugin pull# eaf7949; and 5e9fc66, f4c9b02, 5b50d20, 400825a.
 
