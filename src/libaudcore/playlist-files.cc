@@ -31,21 +31,23 @@
 
 EXPORT bool aud_filename_is_playlist (const char * filename)
 {
-    bool istuneinstream = false;
-    if (strstr(filename, "://tunein.com/"))
+    bool userurl2playlist = false;
+    if (strstr (filename, "://") && ! strstr (filename, "file:/"))  //JWT:WE'RE SOME KIND OF URL:
     {
-        String tunein_helper = aud_get_str("audacious", "tunein_helper");
-    	   StringBuf temp_tunein_filename = filename_build ({aud_get_path (AudPath::UserDir), "tunein.pls"});
-    	   remove ((const char *) temp_tunein_filename);
-        //system ((const char *) str_concat ({"getTuneinStream.pl ", filename, " >", temp_tunein_filename}));
-        if (! tunein_helper[0])
-            tunein_helper = String ("getTuneinStream.pl");
-        system ((const char *) str_concat ({tunein_helper, " ", filename, " ", aud_get_path (AudPath::UserDir), " >", temp_tunein_filename}));    
-        if (access((const char *) temp_tunein_filename, F_OK ) != -1 )
-            istuneinstream = true;
+        String url_helper = aud_get_str ("audacious", "url_helper");
+    	   StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
+    	   remove ((const char *) temp_playlist_filename);
+        if (url_helper[0])  //JWT:WE HAVE A PERL HELPER, LESSEE IF IT RECOGNIZES & CONVERTS IT (ie. tunein.com, youtube, etc):
+        {
+            system ((const char *) str_concat ({url_helper, " ", filename, " ", aud_get_path (AudPath::UserDir)}));    
+            if (access((const char *) temp_playlist_filename, F_OK ) != -1 )
+                userurl2playlist = true;
+        }
     }
 
-    StringBuf ext = istuneinstream ? str_printf (_("pls")) : uri_get_extension (filename);
+    /* JWT:THE HELPER CONVERTS RECOGNIZED URL PATTERNS TO A TEMP. SINGLE-ITEM PLAYLIST AS THIS IS 
+       THE ONLY WAY IN AUDACIOUS TO *CHANGE* THE URL (filename) TO SOMETHING ELSE! */
+    StringBuf ext = userurl2playlist ? str_printf (_("pls")) : uri_get_extension (filename);
     if (ext)
     {
         for (PluginHandle * plugin : aud_plugin_list (PluginType::Playlist))
@@ -60,15 +62,19 @@ EXPORT bool aud_filename_is_playlist (const char * filename)
 
 bool playlist_load (const char * filename, String & title, Index<PlaylistAddItem> & items)
 {
-    bool istuneinstream = false;
+    bool userurl2playlist = false;
     bool plugin_found = false;
 
     AUDINFO ("Loading playlist %s.\n", filename);
 
-    if (strstr(filename, "://tunein.com/"))
-        istuneinstream = true;
+    if (strstr (filename, "://") && ! strstr (filename, "file:/"))
+    {
+        StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
+        if (access((const char *) temp_playlist_filename, F_OK ) != -1 )
+            userurl2playlist = true;
+    }
 
-    StringBuf ext = istuneinstream ? str_printf (_("pls")) : uri_get_extension (filename);
+    StringBuf ext = userurl2playlist ? str_printf (_("pls")) : uri_get_extension (filename);
 
     if (ext)
     {
@@ -84,10 +90,9 @@ bool playlist_load (const char * filename, String & title, Index<PlaylistAddItem
             if (! pp)
                 continue;
 
-            if (istuneinstream)
+            if (userurl2playlist)
             {
-                //StringBuf temp_tunein_filename = filename_build ({"file://", aud_get_path (AudPath::UserDir), "tunein.pls"});
-                ext.steal (str_printf (_("tunein.pls")));
+                ext.steal (str_printf (_("tempurl.pls")));
                 ext.steal (filename_build ({aud_get_path (AudPath::UserDir), ext}));
                 ext.steal (filename_to_uri (ext));
 
