@@ -1,14 +1,18 @@
 #!/usr/bin/perl
 
 #MUST INSTALL youtube-dl FOR Youtube to work!
+#pp -o FauxdaciousUrlHelper.exe -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
 #FAUXDACIOUS "HELPER" SCRIPT TO HANDLE URLS THAT FAUXDACIOUS CAN'T PLAY DIRECTLY:
+
+#USAGE:  ~/.config/audacious[_instancename]/config:  [audacious].url_helper=FauxdaciousUrlHelper.pl
+
 #THIS SCRIPT WORKS BY TAKING THE URL THAT FAUXDACIOUS IS ATTEMPTING TO ADD TO IT'S
 #PLAYLIST AND TRIES TO MATCH IT AGAINST USER-WRITTEN REGEX PATTERNS.  IF IT MATCHES
 #ONE THEN CODE IS EXECUTED TO CONVERT IT TO A PLAYABLE URL AND WRITTEN OUT AS A 
 #TEMPORARY ONE (OR MORE) LINE ".pls" "PLAYLIST" THAT FAUXDACIOUS WILL THEN ACTUALLY
 #ADD TO IT'S PLAYLIST.  THIS IS NECESSARY BECAUSE THERE'S NO OTHER KNOWN WAY TO 
-#CHANGE THE URL WITHING FAUXDACIOUS.  IF THE URL "FALLS THROUGH" - NOT MATCHING ANY
+#CHANGE THE URL WITHIN FAUXDACIOUS.  IF THE URL "FALLS THROUGH" - NOT MATCHING ANY
 #OF THE USER-SUPPLIED PATTERNS HERE, THIS PROGRAM EXITS SILENTLY AND FAUXACIOUS 
 #HANDLES THE URL NORMALLY (UNCHANGED).
 #THE CURRENTLY-PROVIDED PATTERNS ARE FOR "tunein.com" RADIO STATIONS AND "youtube" 
@@ -25,9 +29,35 @@
 #    &writeTagData($comment);
 #}
 
+#STRIP OUT INC PATHS USED IN COMPILATION - COMPILER PUTS EVERYTING IN IT'S OWN
+#TEMPORARY PATH AND WE DONT WANT THE RUN-TIME PHISHING AROUND THE USER'S LOCAL
+#MACHINE FOR (POSSIBLY OLDER) INSTALLED PERL LIBS (IF HE HAS PERL INSTALLED)!
+BEGIN
+{
+	$isExe = 1  if ($0 =~ /exe$/io);
+	if ($isExe)
+	{
+		while (@INC)
+		{
+			$_ = shift(@INC);
+			push (@myNewINC, $_)  if (/(?:cache|CODE)/o);
+		}
+		@INC = @myNewINC;
+	}
+	else
+	{
+		while (@INC)   #REMOVE THE "." DIRECTORY!
+		{
+			$_ = shift(@INC);
+			push (@myNewINC, $_)  unless ($_ eq '.');
+		}
+		@INC = @myNewINC;
+	}
+}
 use strict;
 use LWP::Simple qw();
 use Tunein::Streams;
+use WWW::YouTube::Download;
 
 die "..usage: $0 url\n"  unless ($ARGV[0]);
 my $configPath = '';
@@ -52,24 +82,37 @@ if ($ARGV[0] =~ m#\:\/\/tunein\.com\/#) {   #HANDLE tunein.com STATION URLS:
 		my $art_image = $art_url ? LWP::Simple::get($art_url) : '';
 		(my $image_ext = $art_url) =~ s/^.+\.//;
 		if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
+			binmode IMGOUT;
 			print IMGOUT $art_image;
 			close IMGOUT;
-			$comment = "Comment=file://${configPath}/${stationID}.$image_ext\n";
+			my $path = $configPath;
+			if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+				$path =~ s#^(\w)\:#\/$1\%3A#;
+				$path =~ s#\\#\/#g;
+			}
+			$comment = "Comment=file://${path}/${stationID}.$image_ext\n";
 		}
 	}
 	&writeTagData($comment);
-} elsif ($ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*youtube\.#) {   #HANDLE Youtube URLS:
+} elsif ($ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*youtu(?:be)?\.# 
+		|| $ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*vimeo\.#) {   #HANDLE Youtube/Vimeo URLS:
 	my $client = WWW::YouTube::Download->new;
-	my $meta_data = $client->prepare_download($ARGV[0]);
+	my $meta_data = '';
+	eval "\$meta_data = \$client->prepare_download(\$ARGV[0]);";
 	my %metadata;
-	foreach my $name (qw(video_id title user)) {
-		eval "\$metadata{$name} = \$client->get_$name(\$ARGV[0]);";
+	if ($meta_data) {
+		foreach my $name (qw(video_id title user)) {
+			eval "\$metadata{$name} = \$client->get_$name(\$ARGV[0]);";
+		}
 	}
 	$title = $metadata{title};
 	my $comment = "Album=$ARGV[0]\n";
 	$comment .= "Artist=$metadata{user}\n"  if ($metadata{user});
 	$_ = `youtube-dl --get-url --get-thumbnail -f mp4 $ARGV[0]`;
 	my @urls = split(/\r?\n/);
+	while (@urls && $urls[0] !~ m#\:\/\/#o) {
+		shift @urls;
+	}
 	$newPlaylistURL = $urls[0];
 	my $art_url = ($#urls >= 1) ? $urls[$#urls] : '';
 	if ($configPath) {
@@ -77,9 +120,15 @@ if ($ARGV[0] =~ m#\:\/\/tunein\.com\/#) {   #HANDLE tunein.com STATION URLS:
 		if ($art_image) {
 			(my $image_ext = $art_url) =~ s/^.+\.//;
 			if (open IMGOUT, ">/tmp/$metadata{video_id}.$image_ext") {
+				binmode IMGOUT;
 				print IMGOUT $art_image;
 				close IMGOUT;
-				$comment .= "Comment=file:///tmp/$metadata{video_id}.$image_ext\n";
+				my $path = $configPath;
+				if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+					$comment .= "Comment=file:///C%3A/tmp/$metadata{video_id}.$image_ext\n";
+				} else {
+					$comment .= "Comment=file:///tmp/$metadata{video_id}.$image_ext\n";
+				}
 			}
 		}
 	}
