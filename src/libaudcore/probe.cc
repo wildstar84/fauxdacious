@@ -92,6 +92,32 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 
     AUDDBG ("Matched %d plugins by extension.\n", ext_matches.len ());
 
+    /* JWT:SPECIAL CHECK FOR YOUTUBE STREAMS: CHECK URL FOR EMBEDDED MIME-TYPE (SINCE BY-CONTENT SOMETIMES FAILS): */
+    const char * urlmime = strstr(filename, "&mime=video%2F");
+    if (urlmime)
+    {
+        urlmime += 14;
+        const char * end = urlmime;
+        while (end[0] && end[0] != '&')
+        {
+            ++end;
+        }
+        ext.steal (str_printf ("%.*s", end - urlmime, urlmime));
+        for (PluginHandle * plugin : list)
+        {
+            if (! aud_plugin_get_enabled (plugin))
+                continue;
+
+            if (ext && input_plugin_has_key (plugin, InputKey::Ext, ext))
+                ext_matches.append (plugin);
+        }
+        if (ext_matches.len () == 1)
+        {
+            AUDINFO ("Matched %s by in-url mimetype.\n", aud_plugin_get_name (ext_matches[0]));
+            return ext_matches[0];
+        }
+    }
+
     if (fast && ! ext_matches.len ())
         return nullptr;
 
