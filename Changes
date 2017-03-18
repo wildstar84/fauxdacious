@@ -1,3 +1,17 @@
+(03/18/17) Version 3.83-beta1
+
+* FIXED occasional "black screens" when re-starting videos on Windows version (never affected Linux/Unix versions)!
+
+* FIXED video screen not always shutting down when Fauxdacious is stopped mid-play in a video on Windows version (never affected Linux/Unix versions)!
+
+* Eliminated "hackey" code to always "rescan" ffaudio plugin for "early" initialization of SDL2.  This will (hopefully) now permit release of our video-capable ffaudio for users of mainline Audacious.
+
+* Added ability to play Youtube and Vimeo videos directly (with seek!) via new optional user-supplied helper program/script (similar to and which REPLACES the recently-added "tunein_helper" script: getTuneinStream.pl).  With this new option ([audacious].url_helper), one can use this script to alter ANY url!  The new (included) script, in contrib (which will handle youtube, vimeo, and tunein urls via a regular expression) is FauxdaciousUrlHelper.pl.  Copy it from the contrib directory to your executable path, and add "url_helper=FauxdaciousUrlHelper.pl" in the "audacious" section of your config file and remove the "tunein_helper" line.  NOTE:  If running M$-Windows, a binary version (FauxdaciousUrlHelper.exe) is already in your path with fauxdacious and faudtool)!  You will, however, need to add the "url_helper" line above to your config file (/Users/<your_userid>/AppData/Local/audacious/config).  For Windows, you must also add another section ([neon] and the line:  "ignore_ssl_certs=TRUE" in order to play youtube and vimeo videos!
+
+* Upgraded libneon and added SSL capability (to get the https: stream urls returned for youtube and vimeo to play).
+
+* Merged in audacious plugin pulls:  fb2d50a, 4c38261, and 221c248.
+
 (03/08/17) Version 3.82-final
 
 * Added the ability to capture the thumbnail images ("cover art") associated with youtube video streams.  This also involved changing the youtubedl_metadatahelper.pl script.  It now uses youtube-dl to fetch and download the thumbnail file when the other tag metadata is fetched.  By default, it stores them in the /tmp directory, but you can change this in the aforementioned perl script.

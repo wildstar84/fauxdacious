@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Fauxdacious"
-#define MyAppVersion "3.8-beta2"
+#define MyAppVersion "3.83-beta1"
 #define MyAppPublisher "Jim Turner"
 #define MyAppURL "https://wildstar84.wordpress.com/2015/11/25/fauxdacious-media-player-for-linux-released/"
 #define MyAppExeName "fauxdacious.exe"
@@ -14,7 +14,7 @@
 AppId={{736A9232-B76C-423A-9AEB-C443D32FC6CF}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -82,6 +82,9 @@ Source: "C:\libs\bin\libmodplug-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversi
 Source: "C:\libs\bin\libmpg123-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libmp3lame-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libneon-27.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\libeay32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\libssl32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\ssleay32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libogg-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\bin\libpango-1.0-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\bin\libpangocairo-1.0-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -113,6 +116,8 @@ Source: "C:\GTK\lib\gtk-2.0\*"; DestDir: "{app}\lib\gtk-2.0"; Flags: ignoreversi
 ;Source: "C:\pango\modules\basic\.libs\pango-basic-win32.dll"; DestDir: "{app}\lib\pango\1.8.0\modules\pango-basic-win32.dll"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\aud\bin\audacious.exe"; DestDir: "{app}\bin"; DestName: "fauxdacious.exe"; Flags: ignoreversion
 Source: "C:\aud\bin\audtool.exe"; DestDir: "{app}\bin"; DestName: "fauxdtool.exe"; Flags: ignoreversion
+;Source: "C:\aud\bin\getTuneinStream.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\aud\bin\FauxdaciousUrlHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\aud\*"; DestDir: "{app}"; Excludes: "*.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
