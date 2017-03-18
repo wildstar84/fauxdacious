@@ -123,8 +123,7 @@ if ($ARGV[0] =~ m#\:\/\/tunein\.com\/#) {   #HANDLE tunein.com STATION URLS:
 				binmode IMGOUT;
 				print IMGOUT $art_image;
 				close IMGOUT;
-				my $path = $configPath;
-				if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+				if ($configPath =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 					$comment .= "Comment=file:///C%3A/tmp/$metadata{video_id}.$image_ext\n";
 				} else {
 					$comment .= "Comment=file:///tmp/$metadata{video_id}.$image_ext\n";
