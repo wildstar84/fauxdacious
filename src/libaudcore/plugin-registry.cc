@@ -544,11 +544,7 @@ void plugin_register (const char * path, int timestamp)
         AUDINFO ("Register plugin: %s\n", path);
         plugin->path = String (path);
 
-        /* JWT:FIXME:  *ALWAYS* "RESCAN" ffaudio (HERE EARLY) SO WE CAN CREATE SDL2 WINDOW, 
-           VIA (FFAudio::init) WHICH *MUST* BE DONE HERE IN *MAIN* THREAD otherwise SEGFAULTS 
-           IF A GTK WINDOW (ie. playlist or about) IS OPENED LATER!
-           (WE NEED TO FIGURE OUT HOW TO CALL SDL2_CreateWindow () IN THE "MAIN" THREAD?!) */
-        if (plugin->timestamp != timestamp || strstr(path, "ffaudio.so"))
+        if (plugin->timestamp != timestamp)
         {
             AUDINFO ("Rescan plugin: %s\n", path);
             Plugin * header = plugin_load (path);
