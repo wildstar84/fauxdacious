@@ -28,6 +28,10 @@
 #         #IT'S URI/URL HERE AS "Comment=<art_uri>" SEE THE PREDEFINED PATTERNS FOR EXAMPLES:
 #    &writeTagData($comment);
 #}
+#YOU CAN CHANGE "DEFAULT" TO "OVERRIDE" IN writeTagData() TO KEEP STATION TITLE FROM BEING 
+#OVERWRITTEN BY CURRENT SONG TITLE:
+
+#===================================================================================================
 
 #STRIP OUT INC PATHS USED IN COMPILATION - COMPILER PUTS EVERYTING IN IT'S OWN
 #TEMPORARY PATH AND WE DONT WANT THE RUN-TIME PHISHING AROUND THE USER'S LOCAL
@@ -56,8 +60,12 @@ BEGIN
 }
 use strict;
 use LWP::Simple qw();
-use Tunein::Streams;
-use WWW::YouTube::Download;
+my $haveTuneinStreams = 0;
+my $haveIheartRadioStreams = 0;
+my $haveYoutubeDownload = 0;
+eval 'use Tunein::Streams; $haveTuneinStreams = 1; 1';
+eval 'use IHeartRadio::Streams; $haveIheartRadioStreams = 1; 1';
+eval 'use WWW::YouTube::Download; $haveYoutubeDownload = 1; 1';
 
 die "..usage: $0 url\n"  unless ($ARGV[0]);
 my $configPath = '';
@@ -68,34 +76,8 @@ my $newPlaylistURL = '';
 my $title = $ARGV[0];
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
-if ($ARGV[0] =~ m#\:\/\/tunein\.com\/#) {   #HANDLE tunein.com STATION URLS:
-	my $station = new Tunein::Streams($ARGV[0]);
-	die "f:Invalid URL($ARGV[0]) or no streams!\n"  unless ($station);
-	$newPlaylistURL = $station->getBest('Url');
-	die "f:No streams for $ARGV[0]!\n"  unless ($newPlaylistURL);
-	
-	my $art_url = $station->getIconURL();
-	my $stationID = $station->getStationID();
-	$title = $station->getStationTitle();
-	my $comment = '';
-	if ($art_url) {
-		my $art_image = $art_url ? LWP::Simple::get($art_url) : '';
-		(my $image_ext = $art_url) =~ s/^.+\.//;
-		if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
-			binmode IMGOUT;
-			print IMGOUT $art_image;
-			close IMGOUT;
-			my $path = $configPath;
-			if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
-				$path =~ s#^(\w)\:#\/$1\%3A#;
-				$path =~ s#\\#\/#g;
-			}
-			$comment = "Comment=file://${path}/${stationID}.$image_ext\n";
-		}
-	}
-	&writeTagData($comment);
-} elsif ($ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*youtu(?:be)?\.# 
-		|| $ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*vimeo\.#) {   #HANDLE Youtube/Vimeo URLS:
+if ($haveYoutubeDownload && ($ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*youtu(?:be)?\.# 
+		|| $ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*vimeo\.#)) {   #HANDLE Youtube/Vimeo URLS:
 	my $client = WWW::YouTube::Download->new;
 	my $meta_data = '';
 	eval "\$meta_data = \$client->prepare_download(\$ARGV[0]);";
@@ -133,6 +115,40 @@ if ($ARGV[0] =~ m#\:\/\/tunein\.com\/#) {   #HANDLE tunein.com STATION URLS:
 	}
 	chomp $newPlaylistURL;
 	die "f:No valid video stream found!\n"  unless ($newPlaylistURL);
+	&writeTagData($comment);
+} elsif (($haveTuneinStreams && $ARGV[0] =~ m#\:\/\/tunein\.com\/#)
+		|| ($haveIheartRadioStreams && $ARGV[0] =~ m#\:\/\/www\.iheart\.com\/#)) {   #HANDLE tunein.com & iheart.com STATION URLS:
+	my $isTunein = ($ARGV[0] =~ /tunein\./) ? 1 : 0;
+	my $station = $isTunein ? new Tunein::Streams($ARGV[0])
+			: new IHeartRadio::Streams($ARGV[0], 'secure_shoutcast', 'secure', 'any', '!rtmp');
+	die "f:Invalid URL($ARGV[0]) or no streams!\n"  unless ($station);
+	$newPlaylistURL = $isTunein ? $station->getBest('Url') : $station->getStream();
+	die "f:No streams for $ARGV[0]!\n"  unless ($newPlaylistURL);
+	
+	my $art_url = $station->getIconURL();
+	my $stationID = $isTunein ? $station->getStationID() : $station->getFccID();
+	$title = $station->getStationTitle();
+	my $comment = "Album=$ARGV[0]\n";
+	if ($art_url) {
+		my $art_image = $art_url ? LWP::Simple::get($art_url) : '';
+		my $image_ext = $art_url;
+		if ($isTunein) {
+			$image_ext =~ s/^.+\.//;
+		} else {
+			$image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'png';
+		}
+		if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
+			binmode IMGOUT;
+			print IMGOUT $art_image;
+			close IMGOUT;
+			my $path = $configPath;
+			if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+				$path =~ s#^(\w)\:#\/$1\%3A#;
+				$path =~ s#\\#\/#g;
+			}
+			$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
+		}
+	}
 	&writeTagData($comment);
 }
 #END USER-DEFINED PATTERN-MATCHING CODE.
@@ -172,6 +188,7 @@ sub writeTagData {
 		while (@tagdata) {
 			print TAGDATA shift(@tagdata);
 		}
+		# USER:CHANGE "DEFAULT" TO "OVERRIDE" BELOW TO KEEP STATION TITLE FROM BEING OVERWRITTEN BY CURRENT SONG TITLE:
 		print TAGDATA <<EOF;
 [$newPlaylistURL]
 Precedence=DEFAULT
