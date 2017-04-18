@@ -743,6 +743,14 @@ EXPORT void Tuple::generate_fallbacks ()
         if (! album)
             data->set_str (FallbackAlbum, _("Audio CD"));
     }
+    else if (! strcmp (filepath, "dvd://"))
+    {
+        // DVD:
+        // use "DVD" as the album
+
+        if (! album)
+            data->set_str (FallbackAlbum, _("DVD"));
+    }
     else if ((s = find_domain (filepath)))
     {
         // internet URL:
@@ -824,6 +832,15 @@ EXPORT void Tuple::generate_title ()
         int subtune = get_int (Subtune);
         if (subtune >= 0)
             data->set_str (FallbackTitle, str_printf (_("Track %d"), subtune));
+    }
+    else if (filepath && ! strcmp (filepath, "dvd://"))
+    {
+        // DVD:
+        // use "Track N" as the title
+
+        int subtune = get_int (Subtune);
+        if (subtune >= 0)
+            data->set_str (FallbackTitle, str_printf (_("Title %d"), subtune));
     }
     else
     {

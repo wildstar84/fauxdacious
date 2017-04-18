@@ -634,6 +634,8 @@ EXPORT StringBuf uri_to_display (const char * uri)
         return str_copy (_("Standard input"));
     if (! strncmp (uri, "cdda://?", 8))
         return str_printf (_("Audio CD, track %s"), uri + 8);
+    if (! strncmp (uri, "dvd://?", 7))
+        return str_printf (_("DVD, title %s"), uri + 8);
 
     StringBuf buf = str_to_utf8 (str_decode_percent (uri));
     if (! buf)
