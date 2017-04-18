@@ -237,7 +237,7 @@ static void print_help ()
 {
     static const char pad[21] = "                    ";
 
-    fprintf (stderr, _("Usage: fauxdacious [OPTION] ... [FILE] ...\n\n"));
+    fprintf (stderr, "%s", _("Usage: fauxdacious [OPTION] ... [FILE] ...\n\n"));
     for (auto & arg_info : arg_map)
         fprintf (stderr, "  -%c, --%s%.*s%s\n", arg_info.short_arg,
          arg_info.long_arg, (int) (20 - strlen (arg_info.long_arg)), pad,
