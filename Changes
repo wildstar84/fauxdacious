@@ -1,3 +1,51 @@
+(04/29/17) Version 3.83-beta2
+
+* Added DVD-playing plugin (Linux version)!  It uses libdvdnav, libdvdread, and libdvdcss to play most dvds, including menus.  Issues remain for getting this to work in Windows.  This is a first stab at this and it seems to work pretty well so far for most DVDs I've thrown at it, but there are several rough edges that remain that I have not been able yet to satisfactoraly address:
+
+WARNING:  Playing DVDs that contain CSS encryption DRM requires a special decrypting software library that is ILLEGAL in many jurisdictions.  This plugin software does NOT contain such decrypting software, but can make use of it in jurisdictions where such use is not prohibited.  It is the sole responsibility and liability of the user to ensure that such decrypting software is legal to use in their jurisdiction before installing and using such software with this plugin or any other software and / or hardware capable of playing DVD discs.
+
+1)  A small number of menus display with artifacts despite my best efforts to flush buffers and force all frames to display.
+
+2)  The audio stream on rare situations does not always play in the desired language.
+
+3)  Seeking via the timing slider seems to work well, but the displayed time is not meaningful due to the way DVD chapters continue playing after the selected chapter completes.  This needs a lot more thought on how to best handle.
+
+4)  When "playing" a "menu" that has no audio stream, the Fauxdacious [Stop play] button will not stop play of the menu, requiring the user to click the [x] button in the upper right corner of the video window to stop play.  This is a limitation of Audacious (because Audacious is an AUDIO player)!  Fixing will require either adding a silent "dummy" audio stream to such menus or rewriting the underlying Audacious code (which I don't plan to do).
+
+By default, Fauxdacious will add all tracks to the playlist (including menus), even though via the menus, most DVDs can be controlled by playing only the first track (track 0).  Having the others displayed in the playlist enables playing of the individual VOBs found on the DVD, useful for playing DVDs that require you to view a bunch of previews before taking you to the main menu or movie feature!  To eliminate this "clutter" from the playlist, the new config option [dvd].title_track_only to TRUE.
+
+Other new config-file options:
+
+[dvd].first_track_only (boolean, default FALSE).  If set, only Track 1 (the 2nd track, almost always the main "movie" track) will be displayed in the playlist.  If both this and [dvd].title_track_only are set to TRUE, then both Track 0 (main menu) and Track 1 (main movie) will be added to the playlist.  If neither set, then all tracks will be added to the Fauxdacious playlist.
+
+[dvd].nomenus (boolean, default FALSE)  If TRUE, menus will not play, but will still be processed - the first or default button will be pressed.  This is also the course of action if [dvd].play_video is FALSE since, in that case, no video screen is shown (audio only plays).  NOTE:  May not work ideally with all DVDs, (ymmv).
+
+[dvd].play_video (boolean, default TRUE)  If FALSE, only audio is played.
+
+[dvd].highlight_buttons (boolean, default TRUE) - Draw a grey rectangle around each menubutton showing the region in which to click the mouse to activate.  (We do not currently do the button subpicture palettes and highlighting (hard), so this will have to do for now).
+
+[dvd].menudrain (boolean, default FALSE)  If TRUE, "drains" any remaining unwritten audio/video frames before activating the menubutton if it is activating another menu.  Also causes display of the menu to be totally skipped if [dvd].nomenus is also set.  If set, some menus will not be displayed properly, ie. appear "smudgy" or have buttons missing, or may not work properly.  If not set (default), you will likely experience some delay and some remaining music play between pressing a button and the next menu being activated.
+
+[dvd].nomoviedrain (boolean, default FALSE)  If TRUE, prevents "draining" any remaining unwritten audio/video frames before activating the menubutton if it is activating a movie.  May be necessary for some DVDs to work correctly (ie. go to the right feature and play the right audio language, not abort with an "Assert 0", etc.  Leave FALSE unless you run into a specific DVD that doesn't work properly, they try setting to TRUE and reloading the DVD.  If TRUE, you may get some garbled sounds for less than a second after activating a menu button before the movie starts.
+
+[dvd].use_cdtext (boolean, default TRUE)  If TRUE, include the title text from the DVD as the titles as part of each track, otherwise, "dvd" is used.
+
+[dvd].disk_speed (integer, default 2)  Set the default speed the hardware is capable for (similar to [cdaudio].disc_speed.
+
+[dvd].device (string, default "/dev/dvd")  The device name of the dvd drive.
+
+[dvd].fifo (string, default "fifo.mpg")  Name / path of the fifo for the dvd reader and writer threads to share.  If only the name is given, it is created in the $HOME/.config/audacious/ directory.  You should not need to change this.
+
+[dvd].video_windowtitle (string, default "")  Appended, along with a hyphen to the DVD title on the video window titlebar (like [ffaudio].video_windowtitle).  The author uses "Fauxdacious DVD".
+
+[dvd].video_xmove, video_xsize, video_ysize, and video_qsize:  (integer) similar to the same options in [ffaudio].  Recommended settings:  1, 0, -1, and 5 respectively.
+
+NOTE:  The new DVD plugin must be installed separately.  After running "make install" to install fauxdacious-plugins, first, make sure that libdvdnav4 and libdvdread4 are installed, then, simply switch over to the fauxdacious-plugins-3.8/src/dvd/ directory and run "make install" again from there to install the DVD plugin!  In Fauxdacious itself, under Settings.Plugins.Input.DVD Plugin.Settings, make sure that the "Play video stream in popup window" box is checked.
+
+* Includes all Fauxdacious commits through 8242198; and plugin commits through 2ecd6fd.
+
+* Merged Audacious commits:  a127b46, 2b17e03, 221c248, 6386996, and b55246c.
+
 (03/18/17) Version 3.83-beta1
 
 * FIXED occasional "black screens" when re-starting videos on Windows version (never affected Linux/Unix versions)!

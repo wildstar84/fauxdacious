@@ -4,23 +4,25 @@ Fauxdacious is a fork of Audacious, by Jim Turner, starting at Audacious vsn. 3.
 which adds several features to Audacious that the Audacious team refuses to
 implement: 
 
+* A "DVD-player" plugin for playing DVDs (video, audio & menus)! (Linux only) 
 * A "visualization" option for displaying the video of ffmpeg files
-and streams that contain both an audio and a video stream.  
-* New transport plugin for streaming Youtube videos (Linux/Unix).  
-* Ability to parse and stream Tunein.com radio stations (requires Perl).
+and streams that contain both an audio and a video stream!
+* User-customizable URL-preprocessing script option (Youtube.com, iheart.com, 
+and tunein.com url-handling already included).  Users can add more!
+(Included script Requires Perl, but user can choose own scripting language).
 * User-savable metadata for streams, and media codecs that don't support it.
 * Restoration of XMMS "auto" equalization button for song-specific and 
-cuesheet-specific equalization. 
-(WinAmp interface only).
+cuesheet-specific equalization.  (WinAmp interface only).
 * Option to divert audio output to stdout in the user's choice of selected audio 
 formats for further processing by another program.
 * Piping through stdin input for playlists as well as most media formats.
 * Option to use the Pause button to simply mute (ie. commercials) while stream 
-continues to play, allowing you to listen to something else in another instance
+continues to play, allowing you to listen to something else in another instance 
 (see next feature).
 * Multiple instances with command-line option to specify alternate named 
 configurations and audtool instances.
 * Additional command-line options!
+* Most new Audacious features / fixes merged in in a timely manner!
 * Cool new name, logo and skins! :D
 
 The Fauxdacious logo was designed by (c 2015) Jim Turner.  All Fauxdacious changes 
