@@ -1,6 +1,6 @@
 (04/29/17) Version 3.83-beta2
 
-* Added DVD-playing plugin (Linux version)!  It uses libdvdnav, libdvdread, and libdvdcss to play most dvds, including menus.  Issues remain for getting this to work in Windows.  This is a first stab at this and it seems to work pretty well so far for most DVDs I've thrown at it, but there are several rough edges that remain that I have not been able yet to satisfactoraly address:
+* Added DVD-playing plugin (Linux version)!  It uses libdvdnav and libdvdread to play dvds, including menus.  Issues remain for getting this to work in Windows.  This is a first stab at this and it seems to work pretty well so far for most DVDs I've thrown at it, but there are several rough edges that remain that I have not been able yet to satisfactoraly address:
 
 WARNING:  Playing DVDs that contain CSS encryption DRM requires a special decrypting software library that is ILLEGAL in many jurisdictions.  This plugin software does NOT contain such decrypting software, but can make use of it in jurisdictions where such use is not prohibited.  It is the sole responsibility and liability of the user to ensure that such decrypting software is legal to use in their jurisdiction before installing and using such software with this plugin or any other software and / or hardware capable of playing DVD discs.
 
