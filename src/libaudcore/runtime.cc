@@ -337,6 +337,7 @@ static void do_autosave (void *)
 {
     hook_call ("config save", nullptr);
     save_playlists (false);
+    plugin_registry_save ();
     config_save ();
 }
 
