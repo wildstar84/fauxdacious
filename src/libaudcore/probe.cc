@@ -118,7 +118,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
         }
     }
 
-    if (fast && ! ext_matches.len ())
+    if (fast && (! ext_matches.len () || ! strncmp (filename, "stdin://", 8)))
         return nullptr;
 
     AUDDBG ("Opening %s.\n", filename);
@@ -401,14 +401,14 @@ EXPORT bool aud_file_can_write_tuple (const char * filename, PluginHandle * deco
 }
 
 /* JWT: NEW FUNCTION TO WRITE TAG METADATA TO USER-CREATED TEXT FILE: */
-int write_tag_to_tagfile (const char * song_filename, const Tuple & tuple)
+EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & tuple)
 {
     GKeyFile * rcfile = g_key_file_new ();
     StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), "user_tag_data"});
 
     if (! g_key_file_load_from_file (rcfile, filename, 
             (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))
-        AUDDBG ("w:write_tag_to_tagfile: error opening key file (%s), assuming we're creating a new one.",
+        AUDDBG ("w:aud_write_tag_to_tagfile: error opening key file (%s), assuming we're creating a new one.",
             (const char *) filename);
 
     char * precedence = g_key_file_get_string (rcfile, song_filename, "Precedence", nullptr);
@@ -489,12 +489,40 @@ EXPORT bool aud_file_write_tuple (const char * filename,
     }
     /* JWT:IF CAN'T SAVE TAGS TO FILE (IE. STREAM), TRY SAVING TO USER'S CONFIG: */
     if (! success && aud_get_bool (nullptr, "user_tag_data"))
-        success = write_tag_to_tagfile (filename, tuple);
+        success = aud_write_tag_to_tagfile (filename, tuple);
 
     if (success)
         aud_playlist_rescan_file (filename);
 
     return success;
+}
+
+/* JWT: NEW FUNCTION TO REMOVE A TITLE FROM THE TAG FILE: */
+EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename)
+{
+    GKeyFile * rcfile = g_key_file_new ();
+    StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), "user_tag_data"});
+
+    if (! g_key_file_load_from_file (rcfile, filename, 
+            (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))
+    {
+        g_key_file_free (rcfile);
+        return false;
+    }
+
+    bool success = g_key_file_remove_group (rcfile, song_filename, nullptr);
+
+    if (success)
+    {
+        size_t len;
+        char * data = g_key_file_to_data (rcfile, & len, nullptr);
+        success = g_file_set_contents (filename, data, len, nullptr);
+        g_key_file_free (rcfile);
+        g_free (data);
+    }
+    else
+        g_key_file_free (rcfile);
+    return true;
 }
 
 EXPORT bool aud_custom_infowin (const char * filename, PluginHandle * decoder)
