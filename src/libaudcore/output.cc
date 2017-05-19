@@ -478,34 +478,23 @@ static void do_load_eq_file (StringBuf filename, bool load_songautoeq)
         filename.steal (filename_to_uri (filenamechar));
     }
     else
-    havesongeqfile = false;
+        havesongeqfile = false;
+
     if (! havesongeqfile)
     {
-        /* JWT:SEE IF WE ARE REALLY A CUESHEET, IF SO, LOOK FOR A PRESET FOR THAT CUESHEET. */
-        int current_playlist = aud_playlist_get_playing ();
-        if (current_playlist >= 0)
+        /* JWT:SEE IF WE ARE REALLY A CUESHEET, IF SO, LOOK FOR A PRESET FOR THAT CUESHEET: */
+        String cue_suffix = in_tuple.get_str (Tuple::Suffix);
+        if (cue_suffix && cue_suffix[0] && strstr ((const char *) cue_suffix, "cue"))
         {
-            int current_song = aud_playlist_get_position (current_playlist);
-            String cuefilename = aud_playlist_entry_get_filename (current_playlist, current_song);
-            if (strstr ((const char *) cuefilename, ".cue?"))
+            filename.steal (filename_build ({aud_get_path (AudPath::UserDir), 
+                    in_tuple.get_str (Tuple::Basename)}));
+            filename.steal (str_concat ({"file://", filename, ".", (const char *)cue_suffix,
+                    ".preset"}));
+            const char * filenamechar = (const char *) filename + 7;
+            if (filenamechar)
             {
-                const char * slash;
-                const char * base;        
-                slash = strrchr ((const char *) cuefilename, '/');
-                base = slash ? slash + 1 : nullptr;
-                const char * queri = strstr (cuefilename, "?");
-                if (base && base[0] != '\0' && queri > base)
-                {
-                    filename.steal (str_printf ("%.*s%s", queri-base, base, ".preset"));
-                    filename.steal (filename_build ({aud_get_path (AudPath::UserDir), filename}));
-                    filename.steal (filename_to_uri (filename));
-                    const char * filenamechar = (const char *) filename + 7;
-                    if (filenamechar)
-                    {
-                        struct stat statbuf;
-                        havesongeqfile = ! (stat (filenamechar, &statbuf));
-                    }
-                }
+                struct stat statbuf;
+                havesongeqfile = ! (stat (filenamechar, &statbuf));
             }
         }
     }
@@ -626,6 +615,7 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
     UNLOCK_ALL;
 
     aud_set_bool(nullptr, "equalizer_songauto", s_songautoeq);
+
     return true;
 }
 
