@@ -24,12 +24,12 @@ endif
 
 LD = ${CXX}
 
-CPPFLAGS := -I.. -I../.. \
+CPPFLAGS := -I/usr/include/SDL2 -I.. -I../.. \
             ${CPPFLAGS} \
             ${GLIB_CFLAGS}
 
 LIBS := -L../libaudcore -laudcore \
-        ${LIBS} -lm \
+        ${LIBS} -lm -lSDL2 \
         ${LIBINTL} \
         ${GLIB_LIBS}
 

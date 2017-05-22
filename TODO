@@ -1,0 +1,3 @@
+Add SDL2 to the configure script, since now REQUIRED by Fauxdacious 
+as of version 3.83-beta3!
+

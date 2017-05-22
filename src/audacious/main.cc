@@ -23,6 +23,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#define SDL_MAIN_HANDLED
+#include "SDL.h"
 #endif
 
 #define AUD_GLIB_INTEGRATION
@@ -505,6 +508,16 @@ int main (int argc, char * * argv)
 #endif
 
     initted = true;
+#ifndef _WIN32
+    bool sdl_initialized = false;  // TRUE IF SDL (VIDEO) IS SUCCESSFULLY INITIALIZED.
+    SDL_SetMainReady ();
+    if (SDL_InitSubSystem (SDL_INIT_VIDEO) < 0)
+    {
+        AUDERR ("e:Failed to init SDL in main(): (no video playing): %s.\n", SDL_GetError ());
+    }
+    else
+        sdl_initialized = true;
+#endif
     aud_init ();
 
     do_commands ();
@@ -524,6 +537,11 @@ int main (int argc, char * * argv)
         hook_dissociate ("playlist add complete", (HookFunction) maybe_quit);
         hook_dissociate ("quit", (HookFunction) aud_quit);
     }
+
+#ifndef _WIN32
+    if (sdl_initialized)
+        SDL_QuitSubSystem (SDL_INIT_VIDEO);
+#endif
 
     aud_drct_enable_record (0);  //JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
 #ifdef USE_DBUS
