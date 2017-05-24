@@ -38,7 +38,6 @@
 #include <libaudcore/playlist.h>
 #include <libaudcore/runtime.h>
 #include <libaudcore/tuple.h>
-#include <libaudcore/templates.h>
 
 #ifdef USE_DBUS
 #include "aud-dbus.h"
@@ -118,29 +117,7 @@ static bool parse_options (int argc, char * * argv)
         const char * arg = argv[n];
 #endif
 
-        if (!(strcmp (arg, "-")))  /* JWT:ARG IS "-", ACCEPT LIST OF FILES TO PLAY FROM STDIN */
-        {
-            char lnfromstdin[1000];
-            String uri;
-
-            while (fgets (lnfromstdin, 1000 , stdin) != NULL)
-            {
-                lnfromstdin[strlen(lnfromstdin)-1] = '\0';
-                if (strlen(lnfromstdin) > 1 && lnfromstdin[0] != '#')       /* filter out the comments		*/
-                {
-                    if (strstr (lnfromstdin, "://"))
-                        uri = String (lnfromstdin);
-                    else if (g_path_is_absolute (lnfromstdin))
-                        uri = String (filename_to_uri (lnfromstdin));
-                    else
-                        uri = String (filename_to_uri (filename_build ({cur, lnfromstdin})));
-
-                    if (uri)
-                        filenames.append (uri);
-                }
-            }
-        }
-        else if (arg[0] != '-')  /* filename */
+        if (arg[0] != '-')  /* filename */
         {
             String uri;
 
@@ -157,6 +134,16 @@ static bool parse_options (int argc, char * * argv)
 
             if (uri)
                 filenames.append (uri);
+        }
+        else if (! arg[1])  /* "-" (standard input) */
+        {
+            filenames.append (String ("stdin://"));
+            jwt_norepeat = true;
+        }
+        else if (arg[1] == '.')  /* "-.ext (standard input w/extension) */
+        {
+            filenames.append (String (str_concat ({"stdin://", arg})));
+            jwt_norepeat = true;
         }
         else if (arg[1] >= '1' && arg[1] <= '9')  /* instance number */
         {
@@ -349,13 +336,6 @@ static void do_remote ()
     g_object_unref (obj);
 
     exit (EXIT_SUCCESS);
-
-    /* JWT:MAY BE DEAD CODE */
-    if (error)
-    {
-        AUDERR ("D-Bus error: %s\n", error->message);
-        g_error_free (error);
-    }
 }
 #endif
 
@@ -412,7 +392,7 @@ static void do_commands ()
     {
         if (! aud_drct_get_playing ())
             aud_drct_play ();
-        else if (options.play_pause || aud_drct_get_paused ())
+        else if (aud_drct_get_paused ())
             aud_drct_pause ();
     }
 }
