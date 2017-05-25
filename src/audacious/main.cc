@@ -64,8 +64,7 @@ static struct {
 static bool initted = false;
 static Index<PlaylistAddItem> filenames;
 static int starting_gain = 0;           /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
-const char * instanceDefault = "";  /* JWT:NEXT 2 TO ADD MULTIPLE INSTANCE OPTION */
-char * instancename = (char *)instanceDefault;
+char instancename[100];                 /* JWT:ADD OPTIONAL INSTANCE NAME */
 
 static const struct {
     const char * long_arg;
@@ -84,7 +83,6 @@ static const struct {
     {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window")},
     {"show-main-window", 'm', & options.mainwin, N_("Display the main window")},
     {"new", 'n', & options.newinstance, N_("New Instance no. or name (ie: -1 | -n | --new=name)")}, 
-      /* {"output-plugin", 'o', & options.outputplugin, N_("Set Output Plugin to <plugin>(.so)")}, */
     {"play", 'p', & options.play, N_("Start playback")},
     {"pause-mute", 'P', & options.pauseismute, N_("Pause mutes instead of pausing")},  /* JWT:ADD PAUSEMUTE OPTION */
     {"quit-after-play", 'q', & options.quit_after_play, N_("Quit on playback stop")},
@@ -104,6 +102,7 @@ static const struct {
 static bool parse_options (int argc, char * * argv)
 {
     CharPtr cur (g_get_current_dir ());
+    memset (instancename, '\0', sizeof (instancename));
 
 #ifdef _WIN32
     Index<String> args = get_argv_utf8 ();
@@ -121,10 +120,10 @@ static bool parse_options (int argc, char * * argv)
         {
             String uri;
 
-            if (strstr (arg, "://"))
+            if (strstr (arg, "://"))  /* uri */
             {
                 uri = String (arg);
-                if (strstr (arg, "://-."))   /* JWT:FORCE REPEAT OFF IF STREAMING FROM stdin, SINCE IMPOSSIBLE TO REWIND! */
+                if (strstr (arg, "stdin://"))   /* JWT:FORCE REPEAT OFF IF STREAMING FROM stdin, SINCE IMPOSSIBLE TO REWIND! */
                     jwt_norepeat = true;
             }
             else if (g_path_is_absolute (arg))
@@ -135,7 +134,7 @@ static bool parse_options (int argc, char * * argv)
             if (uri)
                 filenames.append (uri);
         }
-        else if (! arg[1])  /* "-" (standard input) */
+        else if (! arg[1])       /* "-" (standard input) */
         {
             filenames.append (String ("stdin://"));
             jwt_norepeat = true;
@@ -145,12 +144,7 @@ static bool parse_options (int argc, char * * argv)
             filenames.append (String (str_concat ({"stdin://", arg})));
             jwt_norepeat = true;
         }
-        else if (arg[1] >= '1' && arg[1] <= '9')  /* instance number */
-        {
-            options.newinstance = 1;
-            instancename = (char *)& arg[1];
-        }
-        else if (arg[1] == '-')  /* long option */
+        else if (arg[1] == '-')  /* --long option */
         {
             bool found = false;
 
@@ -164,14 +158,11 @@ static bool parse_options (int argc, char * * argv)
                     const char * parmpos = strstr (arg + 2, "=");
                     if ( parmpos )
                     {
-                        if (! strcmp (arg_info.long_arg, "new"))  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
-                        {
-                            instancename = (char *)parmpos + 1;
-                        }
+                        ++parmpos;
+                        if (! strcmp (arg_info.long_arg, "new"))           /* JWT:ADD OPTIONAL INSTANCE NAME */
+                            strcpy (instancename, parmpos);
                         else if (! strcmp (arg_info.long_arg, "no-gain"))  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
-                        {
-                            starting_gain = atoi (parmpos + 1);
-                        }
+                            starting_gain = atoi (parmpos);
                     }
                     break;
                 }
@@ -183,7 +174,7 @@ static bool parse_options (int argc, char * * argv)
                 return false;
             }
         }
-        else  /* short form */
+        else  /* -short option list (single letters and/or digit) */
         {
             for (int c = 1; arg[c]; c ++)
             {
@@ -191,7 +182,7 @@ static bool parse_options (int argc, char * * argv)
 
                 for (auto & arg_info : arg_map)
                 {
-                    if (arg[c] == arg_info.short_arg)
+                    if (arg[c] == arg_info.short_arg)  /* valid option letter found */
                     {
                         (* arg_info.value) ++;
                         found = true;
@@ -201,8 +192,20 @@ static bool parse_options (int argc, char * * argv)
 
                 if (! found)
                 {
-                    fprintf (stderr, _("Unknown option: -%c\n"), arg[c]);
-                    return false;
+                    if (arg[c] >= '0' && arg[c] <= '9')  /* digit (instance number) found */
+                    {
+                        if (arg[c] > '0')  /* new instance number (0 == default: no new instance) */
+                        {
+                            options.newinstance = 1;
+                            strncpy (instancename, arg + c, 1);
+                            instancename[1] = '\0';
+                        }
+                    }
+                    else
+                    {
+                        fprintf (stderr, _("Unknown option: -%c\n"), arg[c]);
+                        return false;
+                    }
                 }
             }
         }
@@ -251,17 +254,17 @@ static void do_remote ()
 
     /* check whether the selected instance is running */
     /* JWT:REPLACED BY NEXT 17: if (options.newinstance || dbus_server_init () != StartupType::Client) */
-    char instname [100];
-    char instpath [100];
-    strcpy(instname, "org.atheme.");
-    strcpy(instpath, "/org/atheme/");
+    char instname [111];
+    char instpath [112];
+    strcpy (instname, "org.atheme.");
+    strcpy (instpath, "/org/atheme/");
     if (options.newinstance)
     {
         int maxstrsz = 88;
         if (strlen (instancename) < 88)
             maxstrsz = strlen (instancename);
         aud_set_instancename (instancename);   /* TRY SETTING EARLY SINCE instancename GETS BLANKED?! */
-        if (instancename[0] >= '0' && instancename[0] <= '9') /* IF THEY INSIST ON USING NUMBERS, WE HAVE TO APPEND AN UNDERSCORE! */
+        if (instancename[0] >= '1' && instancename[0] <= '9') /* IF THEY INSIST ON USING NUMBERS, WE HAVE TO APPEND AN UNDERSCORE! */
         {
         	   strncat (instname, "_", 1);
         	   strncat (instpath, "_", 1);
@@ -488,7 +491,8 @@ int main (int argc, char * * argv)
 #endif
 
     initted = true;
-#ifndef _WIN32
+
+    /* JWT:MUST INITIALIZE SDL2 BEFORE ANY GTK WINDOWS POPUP ELSE MAY GET SEGFAULT WHEN OPENING ONE! */
     bool sdl_initialized = false;  // TRUE IF SDL (VIDEO) IS SUCCESSFULLY INITIALIZED.
     SDL_SetMainReady ();
     if (SDL_InitSubSystem (SDL_INIT_VIDEO) < 0)
@@ -497,7 +501,7 @@ int main (int argc, char * * argv)
     }
     else
         sdl_initialized = true;
-#endif
+
     aud_init ();
 
     do_commands ();
@@ -518,10 +522,8 @@ int main (int argc, char * * argv)
         hook_dissociate ("quit", (HookFunction) aud_quit);
     }
 
-#ifndef _WIN32
     if (sdl_initialized)
         SDL_QuitSubSystem (SDL_INIT_VIDEO);
-#endif
 
     aud_drct_enable_record (0);  //JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
 #ifdef USE_DBUS
