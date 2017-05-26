@@ -1,3 +1,23 @@
+(05/25/2017) Version 3.83-beta3
+
+* FIXED bug that occasionally hangs Fauxdacious on startup when loading up with a wild-card list of files (usually .wav files), ie:  fauxdacious ~/Music/*.wav (Fauxdacious commit #8e3ba79).  This was due to a mutex deadlock in our song-specific equalizer-preset feature code.
+
+* I gave up and made SDL v2 a REQUIREMENT now for Fauxdacious itself (The new DVD plugin already requires SDL2).  This is due to the fact that the nasty old issue of gtk-window vs SDL segfault kerfuffle resurfaced again (see plugin commit #5c09006 for a brief history of this issue), so now we will properly initialize SDL in main() since SDL seems to want to pretend like it has the "main()" function and must be initialized very early (now in main()) in order to play nicely with gtk windows created later (Fauxdacious commit #cec5946).  TODO:  Add this to the configure script!
+
+* Added cover-art via the user_tag_file option for both DVDs and Audio CDs.  User must manually obtain cover art images and store the image files, rename them to the same name matching the respective CD or DVD title (shown in the playlist) and place them either in the [dvd|CDDA].cover_art_path (config file option) or the default: ~/.config/audacious[_instancename]/ directory (if not specified) - (plugin commits #5b0f6d7 and #cce218a).  The manual requirement is currently due to my inability to find free urls for reliably locating cover art programatically by searching with the information at Fauxdacious's disposal (the CD/DVD "Title" string and disk IDs).  If I or someone else can find and provide URLS for such libraries and scrape logic (ok if separate ones for Audio-CDs and/or DVDs), I'll be happy to test and include in a future release!
+
+* Merged (mostly) our stdin streaming feature with that of Audacious.  Our implementation of this feature predates Audacious's and required specifying the file extension (as "stdin://-.mp3" for mp3) but theirs does not ("-").  Since they now support stdin piping, including seekability via buffering during probing, I've now REMOVED my (now ancient) "hacks" to the sndfile, vorbis, and gio plugins previously needed to support stdin streaming without seeking, and remerged their latest versions of these plugins (less maintenance for me - yay)!  I'm leaving it in ffaudio for now though as it handles so many different formats.   (commit #8524685, and plugin commits # 7b0be4f, 9d4cfa3, 240e090 and 2ba6b75)
+
+With Fauxdacious, one can still include the extension (the old Fauxdacious way) and save the overhead of probing all the plugins, however, the extension is still REQUIRED for non-"Input" plugins such as cue-sheets ("-.cue") and playlist files ("-.pls", etc.), as these do not "probe" to determine what's being piped in!  Believe me, I spent a day trying to get the Fauxdacious core to "probe" playlists and cue-sheets piped in via stdin, but the underlying Audacious architecture simply doesn't permiti it as written.
+
+Also removed the added Fauxdacious requirement of specifying "stdin://-" (instead of just "-"), though the old way is still acceptable.  NOTE:  This did result in one minor regression:  when piping a simple line-separated list of items to play (ie. "ls *.mp3 | fauxdacious -"), one must now specify either "-.txt", "-.ls" or "-.m3u" (doesn't matter which) instead of just "-" as I've removed the old code in main() that specially handled this and now use the standard m3u playlist plugin for this.  
+
+* Instance numbers (single digits) can now be combined with single-letter command-line options, ie. "fauxdacious -Dc2" and instance# 0 is now a synanymn for th20170429_Fauxdacious3.83-betae default instance (name: audacious) (commit #712b923).
+
+* Merge in all Fauxdacious commits through 712b923 and plugin commits through b4882eb.
+
+* Merge in Audacious commits:  20ecbff, 9303781, baabb80, 79dcc0f, e859ae3, 11b4856 (plugin commit a7ba191 has long been part of Fauxdacious).
+
 (04/29/17) Version 3.83-beta2
 
 * Added DVD-playing plugin (Linux version)!  It uses libdvdnav and libdvdread to play dvds, including menus.  Issues remain for getting this to work in Windows.  This is a first stab at this and it seems to work pretty well so far for most DVDs I've thrown at it, but there are several rough edges that remain that I have not been able yet to satisfactoraly address:
