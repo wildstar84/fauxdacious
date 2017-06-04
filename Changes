@@ -1,3 +1,9 @@
+(06/03/2017) Version 3.83-beta3 (Windows)
+
+* Added DVD-Player Plugin to Windows version, fixed "smudgy menu" problem.
+
+* Updated FauxdaciousURLHelper program (Windows EXE) to correspond to latest script version.
+
 (05/25/2017) Version 3.83-beta3
 
 * FIXED bug that occasionally hangs Fauxdacious on startup when loading up with a wild-card list of files (usually .wav files), ie:  fauxdacious ~/Music/*.wav (Fauxdacious commit #8e3ba79).  This was due to a mutex deadlock in our song-specific equalizer-preset feature code.
