@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Fauxdacious"
-#define MyAppVersion "3.83-beta1"
+#define MyAppVersion "3.83-beta3"
 #define MyAppPublisher "Jim Turner"
 #define MyAppURL "https://wildstar84.wordpress.com/2015/11/25/fauxdacious-media-player-for-linux-released/"
 #define MyAppExeName "fauxdacious.exe"
@@ -110,6 +110,8 @@ Source: "C:\libs\bin\swresample-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversi
 Source: "C:\libs\bin\swscale-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libcue.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\MinGW\bin\zlib1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\libdvdread-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\libdvdnav-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\lib\gdk-pixbuf-2.0\*"; DestDir: "{app}\lib\gdk-pixbuf-2.0"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\GTK\lib\gtk-2.0\*"; DestDir: "{app}\lib\gtk-2.0"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "C:\GTK\etc\gtk-2.0\*"; DestDir: "{app}\etc\gtk-2.0"; Flags: ignoreversion recursesubdirs createallsubdirs

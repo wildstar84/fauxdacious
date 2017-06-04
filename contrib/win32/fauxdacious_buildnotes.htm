@@ -577,6 +577,30 @@ make install</tt></p></blockquote>
 make<br>
 make install</tt></p></blockquote>
 
+<H3>(needed for DVD player plugin): Install libdvdread</H3>
+
+<p>Download and unzip to <tt>C:\libdvdread-5.0.3</tt>:<br>
+<a href="http://download.videolan.org/videolan/libdvdread/5.0.3/libdvdread-5.0.3.tar.bz2">
+<tt>http://download.videolan.org/videolan/libdvdread/5.0.3/libdvdread-5.0.3.tar.bz2</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libdvdread-5.0.3<br>
+./configure --prefix=/C/libs --disable-static<br>
+make LDFLAGS=-no-undefined<br>
+make install</tt></p></blockquote>
+
+<H3>(needed for DVD player plugin): Install libdvdnav</H3>
+
+<p>Download and unzip to <tt>C:\libdvdnav-5.0.3</tt>:<br>
+<a href="http://download.videolan.org/videolan/libdvdnav/5.0.3/libdvdnav-5.0.3.tar.bz2">
+<tt>http://download.videolan.org/videolan/libdvdnav/5.0.3/libdvdnav-5.0.3.tar.bz2</tt></a></p>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/libdvdnav-5.0.3<br>
+./configure --prefix=/C/libs --disable-static<br>
+make LDFLAGS=-no-undefined<br>
+make install</tt></p></blockquote>
+
 <h3>Install Fauxdacious</h3>
 
 <p>Download and unzip to <tt>C:\fauxdacious</tt>:<br>
@@ -602,6 +626,13 @@ make install</tt></p></blockquote>
 make<br>
 make install<br>
 cd /C/fauxdacious-plugins/src/waveout #(to add the new Windows native audio output plugin)<br>
+make<br>
+make install</tt></p></blockquote>
+
+<h3>Install DVD-player plugin (optional)</H3>
+
+<p>In the MinGW shell:</p>
+<blockquote><p><tt>cd /C/fauxdacious-plugins/src/dvd<br>
 make<br>
 make install</tt></p></blockquote>
 
