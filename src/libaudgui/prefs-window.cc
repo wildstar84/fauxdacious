@@ -730,8 +730,8 @@ static void * record_create_about_button ()
 {
     auto do_about = [] (void *)
     {
-        if (aud_drct_get_record_enabled ())
-            audgui_show_plugin_about (aud_drct_get_record_plugin ());
+        /* JWT:REMOVED CONDITION TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: if (aud_drct_get_record_enabled ()) */
+        audgui_show_plugin_about (aud_drct_get_record_plugin ());
     };
 
     return (record_about_button = audgui_button_new (_("_About"), "help-about",

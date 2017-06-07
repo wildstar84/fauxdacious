@@ -201,10 +201,10 @@ static void iface_combo_changed ();
 static void * iface_create_prefs_box ();
 
 static const PreferencesWidget appearance_page_widgets[] = {
-    WidgetLabel (N_("<b>Interface Settings</b>")),
-    WidgetCombo (N_("Interface plugin:"),
+    WidgetCombo (N_("Interface:"),
         WidgetInt (iface_combo_selected, iface_combo_changed),
         {0, iface_combo_fill}),
+    WidgetSeparator ({true}),
     WidgetCustomQt (iface_create_prefs_box)
 };
 
@@ -698,13 +698,13 @@ void PrefsWindow::record_setup ()
     });
 
     QObject::connect (record_config_button, & QPushButton::clicked, [] (bool) {
-        if (aud_drct_get_record_enabled ())
-            plugin_prefs (aud_drct_get_record_plugin ());
+        /* JWT:REMOVED CONDITION TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: if (aud_drct_get_record_enabled ()) */
+        plugin_prefs (aud_drct_get_record_plugin ());
     });
 
     QObject::connect (record_about_button, & QPushButton::clicked, [] (bool) {
-        if (aud_drct_get_record_enabled ())
-            plugin_about (aud_drct_get_record_plugin ());
+        /* JWT:REMOVED CONDITION TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: if (aud_drct_get_record_enabled ()) */
+        plugin_about (aud_drct_get_record_plugin ());
     });
 }
 
@@ -720,8 +720,10 @@ void PrefsWindow::record_update ()
         record_checkbox->setEnabled (true);
         record_checkbox->setText ((const char *) text);
         record_checkbox->setChecked (enabled);
-        record_config_button->setEnabled (enabled && aud_plugin_has_configure (p));
-        record_about_button->setEnabled (enabled && aud_plugin_has_about (p));
+        /* JWT:CHGD. TO NEXT TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: record_config_button->setEnabled (enabled && aud_plugin_has_configure (p));
+        record_about_button->setEnabled (enabled && aud_plugin_has_about (p)); */
+        record_config_button->setEnabled (aud_plugin_has_configure (p));
+        record_about_button->setEnabled (aud_plugin_has_about (p));
     }
     else
     {
