@@ -58,7 +58,8 @@ static struct {
     int headless, quit_after_play;
     int verbose;
     int qt;
-    int clearplaylist, newinstance, pauseismute, forcenoequalizer, forcenogainchg, deleteallplaylists;  /* JWT:NEW COMMAND-LINE OPTIONS */
+    int clearplaylist, newinstance, pauseismute, forcenoequalizer, forcenogainchg, deleteallplaylists,
+            force_recording;  /* JWT:NEW COMMAND-LINE OPTIONS */
 } options;
 
 static bool initted = false;
@@ -91,6 +92,7 @@ static const struct {
     {"qt", 'Q', & options.qt, N_("Run in Qt mode")},
 #endif
     {"rew", 'r', & options.rew, N_("Skip to previous song")},
+    {"force_recording", 'R', & options.force_recording, N_("Start Recording")},
     {"stop", 's', & options.stop, N_("Stop playback")},
     {"play-pause", 't', & options.play_pause, N_("Pause if playing, play otherwise")},
     {"pause", 'u', & options.pause, N_("Pause playback")},
@@ -266,8 +268,8 @@ static void do_remote ()
         aud_set_instancename (instancename);   /* TRY SETTING EARLY SINCE instancename GETS BLANKED?! */
         if (instancename[0] >= '1' && instancename[0] <= '9') /* IF THEY INSIST ON USING NUMBERS, WE HAVE TO APPEND AN UNDERSCORE! */
         {
-        	   strncat (instname, "_", 1);
-        	   strncat (instpath, "_", 1);
+            strncat (instname, "_", 1);
+            strncat (instpath, "_", 1);
         }
         strncat (instname, instancename, maxstrsz);
         strncat (instpath, instancename, maxstrsz);
@@ -371,6 +373,9 @@ static void do_commands ()
         if (playlist_count > 0)
             aud_playlist_delete(playlist_count-1);
     }
+
+    if (options.force_recording)
+        aud_drct_enable_record (1);  //JWT:USER WANTS TO START WITH RECORDING ON (GREAT FOR RECORDING FROM STDIN!)!
 
     if (filenames.len ())
     {
