@@ -628,10 +628,33 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
 
     ::String val = stream.get_metadata ("track-name");
 
-    if (val && val != get_str (Title))
+    if (val)
     {
-        set_str (Title, val);
-        updated = true;
+        const char * ttloffset = strstr ((const char *)val, " - text=\"");
+        if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
+        {
+            const char * endquote = strstr (ttloffset+10, "\"");
+            if (endquote)
+            {
+                const char * ttloffset9 = ttloffset + 9;
+                int artlen = ttloffset - (const char *)val;
+                if (strncmp ((const char *)val, (const char *)get_str (Title), artlen))
+                {
+                    set_str (Title, str_printf ("%.*s - %.*s", artlen,
+                            (const char *)val, (endquote-ttloffset9), ttloffset9));
+                    set_str (Artist, str_printf ("%.*s", artlen, (const char *)val));
+                    updated = true;
+                }
+            }
+        }
+        else if (strncmp ((const char *)val, "  -  ", 5))  //JWT:DON'T OVERWRITE W/"EMPTY" STREAM TITLES!:
+        {
+            if (val != get_str (Title))
+            {
+                set_str (Title, val);
+                updated = true;
+            }
+        }
     }
 
     val = stream.get_metadata ("stream-name");
