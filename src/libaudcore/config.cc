@@ -100,6 +100,7 @@ static const char * const core_defaults[] = {
  "metadata_on_play", "FALSE",
  "show_numbers_in_pl", "FALSE",
  "slow_probe", "FALSE",
+ "user_tag_data", "TRUE",
 
  nullptr};
 
