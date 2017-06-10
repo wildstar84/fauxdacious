@@ -250,23 +250,15 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
     else
         tuple.unset (Tuple::Track);
 
+    g_free (precedence);
     g_key_file_free (rcfile);
 
     if (strstr (precedence, "ONLY"))
-    {
-    	   g_free (precedence);
         return -1;
-    }
     else if (strstr (precedence, "OVERRIDE"))
-    {
-    	   g_free (precedence);
         return 1;
-    }
-    else
-    {
-    	   g_free (precedence);
-        return 2;
-    }
+
+    return 2;
 }
 
 EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
