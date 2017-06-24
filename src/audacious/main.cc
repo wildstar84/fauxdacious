@@ -23,10 +23,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#else
+#endif
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
-#endif
 
 #define AUD_GLIB_INTEGRATION
 #include <libaudcore/audstrings.h>
