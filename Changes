@@ -1,3 +1,11 @@
+() Version 3.83-final
+
+* FIXED filewriter plugin to "fail over" to "unknown" for the filename if the playing filename is too long or invalid (needed for youtube streams, etc.).  Also fixed a potential null-pointer reference.
+
+* Added "close after song chg." checkbox for STDOUT output to "close" STDOUT when either song stops playing or record is toggled off in order to avoid errors in the created output stream.  Otherwise, output to STDOUT accumulates as a single long stream until recording stops.  This allows for combining multiple songs into a single output file, but can produces (somewhat harmless) errors at end of playback in such files.  The default is TRUE (checked) (properly close and prevent errors and only record the last song (overwrite).
+
+* Merged Audacious commits: 7886b7b; and plugin commits:  #9816dc6, 4f327c6, 10abf7d, 94d95fc, b13a35d.
+
 (06/03/2017) Version 3.83-beta3 (Windows)
 
 * Added DVD-Player Plugin to Windows version, fixed "smudgy menu" problem.
