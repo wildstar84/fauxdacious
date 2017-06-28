@@ -637,8 +637,9 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
             if (endquote)
             {
                 const char * ttloffset9 = ttloffset + 9;
+                const char * tupletitle = (const char *)get_str (Title);
                 int artlen = ttloffset - (const char *)val;
-                if (artlen > 0 && strncmp ((const char *)val, (const char *)get_str (Title), artlen))
+                if (artlen > 0 && (! tupletitle || strncmp ((const char *)val, tupletitle, artlen)))
                 {
                     set_str (Title, str_printf ("%.*s - %.*s", artlen,
                             (const char *)val, (endquote-ttloffset9), ttloffset9));
@@ -655,10 +656,11 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                 /* WARNING: THIS THING SPLITS ON "-", SO IF "-" IN TITLE, ARTIST, ALBUM, ETC. THE 
                    "-" & CHARACTERS AFTER IT WILL BE OMITTED!
                 */
+                const char * tupletitle = (const char *)get_str (Title);
                 const char * artoffset = strstr ((const char *)val, "Artist: ");
                 if (artoffset)
                 {
-                    if (strncmp (artoffset+8, (const char *)get_str (Title), (ttloffset-(artoffset+8))))
+                    if (! tupletitle || strncmp (artoffset+8, tupletitle, (ttloffset-(artoffset+8))))
                     {
                         Index<::String> metaparts = str_list_to_index ((const char *)val, "-");
                         const char * ptr;
@@ -700,7 +702,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                         updated = true;
                     }
                 }
-                else if (strcmp (ttloffset+7, (const char *)get_str (Title)))
+                else if (! tupletitle || strcmp (ttloffset+7, tupletitle))
                     set_str (Title, ttloffset+7);  // WE HAVE "Title: " BUT NO ARTIST, SO ASSUME NOTHING ELSE!
             }
             else if (val != get_str (Title))
