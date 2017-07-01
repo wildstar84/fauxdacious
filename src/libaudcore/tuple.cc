@@ -628,7 +628,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
 
     ::String val = stream.get_metadata ("track-name");
 
-    if (val)
+    if (val && strncmp ((const char *)val, "  - ", 4))
     {
         const char * ttloffset = strstr ((const char *)val, " - text=\"");
         if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
@@ -648,7 +648,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                 }
             }
         }
-        else if (strncmp ((const char *)val, "  -  ", 5))  //JWT:DON'T OVERWRITE W/"EMPTY" STREAM TITLES!:
+        else
         {
             ttloffset = strstr ((const char *)val, "Title: ");
             if (ttloffset)  //JWT:FIXUP STREAM TILES IN FORMAT: "[[Artist: ]artist - ]Title: title [Album: album]:
