@@ -196,8 +196,15 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
         result->items.append (std::move (item));
 }
 
+/* To prevent infinite recursion, we currently allow adding a folder from within
+ * a playlist, but not a playlist from within a folder, nor a second playlist
+ * from within a playlist (this last rule is enforced by setting
+ * <allow_playlist> to false from within add_playlist()). */
+static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
+ void * user, AddResult * result, bool save_title, bool allow_playlist);
+
 static void add_playlist (const char * filename, PlaylistFilterFunc filter,
- void * user, AddResult * result, bool is_single)
+ void * user, AddResult * result, bool save_title)
 {
     AUDINFO ("Adding playlist: %s\n", filename);
     status_update (filename, result->items.len ());
@@ -208,16 +215,11 @@ static void add_playlist (const char * filename, PlaylistFilterFunc filter,
     if (! playlist_load (filename, title, items))
         return;
 
-    if (is_single)
+    if (save_title)
         result->title = title;
 
     for (auto & item : items)
-    {
-        if (! filter || filter (item.filename, user))
-            add_file (std::move (item), filter, user, result, false);
-        else
-            result->filtered = true;
-    }
+        add_generic (std::move (item), filter, user, result, false, false);
 }
 
 static void add_cuesheets (Index<String> & files, PlaylistFilterFunc filter,
@@ -279,7 +281,7 @@ static void add_cuesheets (Index<String> & files, PlaylistFilterFunc filter,
 }
 
 static void add_folder (const char * filename, PlaylistFilterFunc filter,
- void * user, AddResult * result, bool is_single)
+ void * user, AddResult * result, bool save_title)
 {
     AUDINFO ("Adding folder: %s\n", filename);
     status_update (filename, result->items.len ());
@@ -293,7 +295,7 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
     if (! files.len ())
         return;
 
-    if (is_single)
+    if (save_title)
     {
         const char * slash = strrchr (filename, '/');
         if (slash)
@@ -331,7 +333,7 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
 }
 
 static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
- void * user, AddResult * result, bool is_single)
+ void * user, AddResult * result, bool save_title, bool allow_playlist)
 {
     if (filter && ! filter (item.filename, user))
     {
@@ -354,11 +356,11 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
              (const char *) item.filename, (const char *) error));
         else if (mode & VFS_IS_DIR)
         {
-            add_folder (item.filename, filter, user, result, is_single);
+            add_folder (item.filename, filter, user, result, save_title);
             result->saw_folder = true;
         }
-        else if (aud_filename_is_playlist (item.filename))
-            add_playlist (item.filename, filter, user, result, is_single);
+        else if (allow_playlist && aud_filename_is_playlist (item.filename))
+            add_playlist (item.filename, filter, user, result, save_title);
         else
             add_file (std::move (item), filter, user, result, false);
     }
@@ -486,10 +488,10 @@ static void * add_worker (void * unused)
         result->at = task->at;
         result->play = task->play;
 
-        bool is_single = (task->items.len () == 1);
+        bool save_title = (task->items.len () == 1);
 
         for (auto & item : task->items)
-            add_generic (std::move (item), task->filter, task->user, result, is_single);
+            add_generic (std::move (item), task->filter, task->user, result, save_title, true);
 
         delete task;
 
