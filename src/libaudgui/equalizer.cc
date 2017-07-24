@@ -73,7 +73,7 @@ static GtkWidget * create_autobtn ()
 {
     GtkWidget * auto_btn = gtk_check_button_new_with_mnemonic (_("_Auto"));
     g_signal_connect (auto_btn, "toggled", (GCallback) eq_auto_cb, nullptr);
-    hook_associate ("set equalizer_active", (HookFunction) autobtn_update, auto_btn);
+    hook_associate ("set equalizer_autoload", (HookFunction) autobtn_update, auto_btn);
 
     autobtn_update (nullptr, auto_btn);
     return auto_btn;
