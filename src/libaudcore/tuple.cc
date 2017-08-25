@@ -628,7 +628,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
 
     ::String val = stream.get_metadata ("track-name");
 
-    if (val && strncmp ((const char *)val, "  - ", 4))
+    if (val && val[0] && strncmp ((const char *)val, "  - ", 4))
     {
         const char * ttloffset = strstr ((const char *)val, " - text=\"");
         if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
