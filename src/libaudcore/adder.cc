@@ -283,6 +283,8 @@ static void add_cuesheets (Index<String> & files, PlaylistFilterFunc filter,
 static void add_folder (const char * filename, PlaylistFilterFunc filter,
  void * user, AddResult * result, bool save_title)
 {
+    bool nosubdirs = aud_get_bool (nullptr, "no_subdirs");
+
     AUDINFO ("Adding folder: %s\n", filename);
     status_update (filename, result->items.len ());
 
@@ -327,7 +329,7 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
 
         if (mode & VFS_IS_REGULAR)
             add_file ({String (file)}, filter, user, result, true);
-        else if (mode & VFS_IS_DIR)
+        else if (! nosubdirs && (mode & VFS_IS_DIR))
             add_folder (file, filter, user, result, false);
     }
 }

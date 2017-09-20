@@ -302,6 +302,8 @@ static const PreferencesWidget playlist_page_widgets[] = {
         WidgetBool (0, "clear_playlist")),
     WidgetCheck (N_("Open files in a temporary playlist"),
         WidgetBool (0, "open_to_temporary")),
+    WidgetCheck (N_("Do not load files from subfolders"),
+        WidgetBool (0, "no_subdirs")),
     WidgetLabel (N_("<b>Song Display</b>")),
     WidgetCheck (N_("Show song numbers"),
         WidgetBool (0, "show_numbers_in_pl", send_title_change)),
