@@ -2110,6 +2110,38 @@ static void shuffle_reset (PlaylistData * playlist)
         entry->shuffle_num = 0;
 }
 
+static Index<int> shuffle_history (PlaylistData * playlist)
+{
+    Index<int> history;
+
+    // create a list of all entries in the shuffle list
+    for (auto & entry : playlist->entries)
+    {
+        if (entry->shuffle_num)
+            history.append (entry->number);
+    }
+
+    // sort by shuffle order
+    history.sort ([playlist] (int entry_a, int entry_b) {
+        return playlist->entries[entry_a]->shuffle_num - playlist->entries[entry_b]->shuffle_num;
+    });
+
+    return history;
+}
+
+void shuffle_replay (PlaylistData * playlist, const Index<int> & history)
+{
+    shuffle_reset (playlist);
+
+    // replay the given history, entry by entry
+    for (int entry_num : history)
+    {
+        auto entry = playlist->entries[entry_num].get ();
+        if (entry)
+            entry->shuffle_num = ++ playlist->last_shuffle_num;
+    }
+}
+
 static bool next_song_locked (PlaylistData * playlist, bool repeat, int hint)
 {
     int entries = playlist->entries.len ();
@@ -2260,6 +2292,16 @@ void playlist_save_state ()
 
         fprintf (handle, "position %d\n", playlist->position ? playlist->position->number : -1);
 
+        /* save shuffle history */
+        auto history = shuffle_history (playlist.get ());
+
+        for (int i = 0; i < history.len (); i += 16)
+        {
+            int count = aud::min (16, history.len () - i);
+            auto list = int_array_to_str (& history[i], count);
+            fprintf (handle, "shuffle %s\n", (const char *) list);
+        }
+
         /* resume state is stored per-playlist for historical reasons */
         bool is_playing = (playlist.get () == playing_playlist);
         fprintf (handle, "resume-state %d\n", (is_playing && paused) ? ResumePause : ResumePlay);
@@ -2312,6 +2354,19 @@ void playlist_load_state ()
 
         if (position >= 0 && position < entries)
             set_position (playlist, playlist->entries [position].get (), true);
+
+        /* restore shuffle history */
+        Index<int> history;
+
+        for (String list; (list = parser.get_str ("shuffle")); parser.next ())
+        {
+            auto split = str_list_to_index (list, ", ");
+            for (auto & str : split)
+                history.append (str_to_int (str));
+        }
+
+        if (history.len ())
+            shuffle_replay (playlist, history);
 
         /* resume state is stored per-playlist for historical reasons */
         int resume_state = ResumePlay;
