@@ -129,6 +129,7 @@ void aud_leak_check ();
 
 String aud_history_get (int entry);
 void aud_history_add (const char * path);
+void aud_history_clear ();
 
 void aud_output_reset (OutputReset type);
 
