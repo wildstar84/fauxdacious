@@ -128,6 +128,7 @@ enum {
     CATEGORY_PLAYLIST,
     CATEGORY_SONG_INFO,
     CATEGORY_PLUGINS,
+    CATEGORY_ADVANCED,
     CATEGORY_COUNT
 };
 
@@ -137,7 +138,8 @@ static const Category categories[] = {
     { "connectivity.png", N_("Network") },
     { "playlist.png", N_("Playlist")} ,
     { "info.png", N_("Song Info") },
-    { "plugins.png", N_("Plugins") }
+    { "plugins.png", N_("Plugins") },
+    { "advanced.png", N_("Advanced") }
 };
 
 static const TitleFieldTag title_field_tags[] = {
@@ -346,10 +348,9 @@ static const PreferencesWidget playlist_page_widgets[] = {
     WidgetCheck (N_("Show hours separately (1:30:00 vs. 90:00)"),
         WidgetBool (0, "show_hours", send_title_change)),
     WidgetCustomQt (create_titlestring_table),
-    WidgetLabel (N_("<b>Compatibility</b>")),
-    WidgetCheck (N_("Interpret \\ (backward slash) as a folder delimiter"),
-        WidgetBool (0, "convert_backslash")),
-    WidgetTable ({{chardet_elements}})
+    WidgetLabel (N_("<b>Export</b>")),
+    WidgetCheck (N_("Use relative paths when possible"),
+        WidgetBool (0, "export_relative_paths"))
 };
 
 static const PreferencesWidget song_info_page_widgets[] = {
@@ -375,8 +376,15 @@ static const PreferencesWidget song_info_page_widgets[] = {
         WIDGET_CHILD),
     WidgetCheck (N_("Show time scale for current song"),
         WidgetBool (0, "filepopup_showprogressbar"),
-        WIDGET_CHILD),
-    WidgetLabel (N_("<b>Advanced</b>")),
+        WIDGET_CHILD)
+};
+
+static const PreferencesWidget advanced_page_widgets[] = {
+    WidgetLabel (N_("<b>Compatibility</b>")),
+    WidgetCheck (N_("Interpret \\ (backward slash) as a folder delimiter"),
+        WidgetBool (0, "convert_backslash")),
+    WidgetTable ({{chardet_elements}}),
+    WidgetLabel (N_("<b>Metadata</b>")),
     WidgetCheck (N_("Guess missing metadata from file path"),
         WidgetBool (0, "metadata_fallbacks")),
     WidgetCheck (N_("Do not load metadata for songs until played"),
@@ -629,6 +637,7 @@ PrefsWindow::PrefsWindow () :
     create_category (s_category_notebook, playlist_page_widgets);
     create_category (s_category_notebook, song_info_page_widgets);
     create_plugin_category (s_category_notebook);
+    create_category (s_category_notebook, advanced_page_widgets);
 
     QDialogButtonBox * bbox = new QDialogButtonBox (QDialogButtonBox::Close);
     bbox->button (QDialogButtonBox::Close)->setText (translate_str (N_("_Close")));
