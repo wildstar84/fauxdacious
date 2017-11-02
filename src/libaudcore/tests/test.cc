@@ -62,11 +62,11 @@ static void test_audio_conversion ()
 
 static void test_case_conversion ()
 {
-    const char in[]        = "AÃ„aÃ¤EÃŠeÃªIÃŒiÃ¬OÃ•oÃµUÃšuÃº";
-    const char low_ascii[] = "aÃ„aÃ¤eÃŠeÃªiÃŒiÃ¬oÃ•oÃµuÃšuÃº";
-    const char low_utf8[]  = "aÃ¤aÃ¤eÃªeÃªiÃ¬iÃ¬oÃµoÃµuÃºuÃº";
-    const char hi_ascii[]  = "AÃ„AÃ¤EÃŠEÃªIÃŒIÃ¬OÃ•OÃµUÃšUÃº";
-    const char hi_utf8[]   = "AÃ„AÃ„EÃŠEÃŠIÃŒIÃŒOÃ•OÃ•UÃšUÃš";
+    const char in[]        = "AÄaäEÊeêIÌiìOÕoõUÚuú";
+    const char low_ascii[] = "aÄaäeÊeêiÌiìoÕoõuÚuú";
+    const char low_utf8[]  = "aäaäeêeêiìiìoõoõuúuú";
+    const char hi_ascii[]  = "AÄAäEÊEêIÌIìOÕOõUÚUú";
+    const char hi_utf8[]   = "AÄAÄEÊEÊIÌIÌOÕOÕUÚUÚ";
 
     assert (! strcmp (low_ascii, str_tolower (in)));
     assert (! strcmp (low_utf8, str_tolower_utf8 (in)));
@@ -96,28 +96,28 @@ static void test_case_conversion ()
     assert (! strcmp_nocase (in, hi_ascii));
     assert (strcmp_nocase (in, hi_utf8));
 
-    assert (str_has_prefix_nocase (low_ascii, "AÃ„aÃ¤"));
-    assert (! str_has_prefix_nocase (low_utf8, "AÃ„aÃ¤"));
-    assert (str_has_prefix_nocase (hi_ascii, "AÃ„aÃ¤"));
-    assert (! str_has_prefix_nocase (hi_utf8, "AÃ„aÃ¤"));
+    assert (str_has_prefix_nocase (low_ascii, "AÄaä"));
+    assert (! str_has_prefix_nocase (low_utf8, "AÄaä"));
+    assert (str_has_prefix_nocase (hi_ascii, "AÄaä"));
+    assert (! str_has_prefix_nocase (hi_utf8, "AÄaä"));
 
-    assert (str_has_suffix_nocase (low_ascii, "UÃšuÃº"));
-    assert (! str_has_suffix_nocase (low_utf8, "UÃšuÃº"));
-    assert (str_has_suffix_nocase (hi_ascii, "UÃšuÃº"));
-    assert (! str_has_suffix_nocase (hi_utf8, "UÃšuÃº"));
+    assert (str_has_suffix_nocase (low_ascii, "UÚuú"));
+    assert (! str_has_suffix_nocase (low_utf8, "UÚuú"));
+    assert (str_has_suffix_nocase (hi_ascii, "UÚuú"));
+    assert (! str_has_suffix_nocase (hi_utf8, "UÚuú"));
 
     assert (! str_has_suffix_nocase ("abc", "abcd"));
 
-    assert (! strcmp (strstr_nocase (low_ascii, "OÃ•oÃµ"), "oÃ•oÃµuÃšuÃº"));
-    assert (strstr_nocase (low_utf8, "OÃ•oÃµ") == nullptr);
-    assert (! strcmp (strstr_nocase (hi_ascii, "OÃ•oÃµ"), "OÃ•OÃµUÃšUÃº"));
-    assert (strstr_nocase (hi_utf8, "OÃ•oÃµ") == nullptr);
+    assert (! strcmp (strstr_nocase (low_ascii, "OÕoõ"), "oÕoõuÚuú"));
+    assert (strstr_nocase (low_utf8, "OÕoõ") == nullptr);
+    assert (! strcmp (strstr_nocase (hi_ascii, "OÕoõ"), "OÕOõUÚUú"));
+    assert (strstr_nocase (hi_utf8, "OÕoõ") == nullptr);
 
-    assert (! strcmp (strstr_nocase_utf8 (low_ascii, "OÃ•oÃµ"), "oÃ•oÃµuÃšuÃº"));
-    assert (! strcmp (strstr_nocase_utf8 (low_utf8, "OÃ•oÃµ"), "oÃµoÃµuÃºuÃº"));
+    assert (! strcmp (strstr_nocase_utf8 (low_ascii, "OÕoõ"), "oÕoõuÚuú"));
+    assert (! strcmp (strstr_nocase_utf8 (low_utf8, "OÕoõ"), "oõoõuúuú"));
     assert (strstr_nocase_utf8 (low_utf8, "OOoo") == nullptr);
-    assert (! strcmp (strstr_nocase_utf8 (hi_ascii, "OÃ•oÃµ"), "OÃ•OÃµUÃšUÃº"));
-    assert (! strcmp (strstr_nocase_utf8 (hi_utf8, "OÃ•oÃµ"), "OÃ•OÃ•UÃšUÃš"));
+    assert (! strcmp (strstr_nocase_utf8 (hi_ascii, "OÕoõ"), "OÕOõUÚUú"));
+    assert (! strcmp (strstr_nocase_utf8 (hi_utf8, "OÕoõ"), "OÕOÕUÚUÚ"));
     assert (strstr_nocase_utf8 (hi_utf8, "OOoo") == nullptr);
 }
 
@@ -454,6 +454,70 @@ static void test_ringbuf ()
     string_leak_check ();
 }
 
+static StringBuf str_recursive_insert (const char * str, int level)
+{
+    StringBuf buf = str_copy (str);
+    buf.insert (buf.len () / 2, str);
+
+    if (level == 1)
+        return buf;
+
+    // don't do this yet, it leaves the stack fragmented
+    // return str_recursive_insert (buf, level - 1);
+    buf = str_recursive_insert (buf, level - 1);
+    return buf;
+}
+
+static StringBuf str_repeated_nest (const char * str, int level)
+{
+    StringBuf buf1 = str_copy (str);
+    StringBuf buf2 = str_copy (str);
+
+    while (level -- > 0)
+    {
+        buf1.insert (buf1.len () / 2, buf2);
+        buf2.insert (buf2.len () / 2, buf1);
+    }
+
+    // this leaves lots of fragmentation
+    return buf2;
+}
+
+static void test_stringbuf ()
+{
+    char expect[262145];
+
+    StringBuf str1 = str_recursive_insert ("ab", 17);
+
+    memset (expect, 'a', 121393);
+    memset (expect + 121393, 'b', 121393);
+    expect[242786] = 0;
+
+    assert (! strcmp (str_repeated_nest ("ab", 12), expect));
+
+    memset (expect, 'a', 131072);
+    memset (expect + 131072, 'b', 131072);
+    expect[262144] = 0;
+
+    assert (! strcmp (str1, expect));
+}
+
+static void test_str_printf ()
+{
+    StringBuf problem = str_printf ("%d", 6);
+    const char * loc1 = problem;
+    str_append_printf (problem, " * %d", 7);
+    const char * loc2 = problem;
+
+    assert (loc1 == loc2);
+    assert (! strcmp (problem, "6 * 7"));
+
+    StringBuf answer = str_printf ("%d", 6 * 7);
+    str_append_printf (problem, " = %s", (const char *) answer);
+
+    assert (! strcmp (problem, "6 * 7 = 42"));
+}
+
 int main ()
 {
     test_audio_conversion ();
@@ -462,6 +526,8 @@ int main ()
     test_filename_split ();
     test_tuple_formats ();
     test_ringbuf ();
+    test_stringbuf ();
+    test_str_printf ();
 
     return 0;
 }

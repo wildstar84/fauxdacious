@@ -102,7 +102,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
         {
             ++end;
         }
-        ext.steal (str_printf ("%.*s", end - urlmime, urlmime));
+        ext = str_printf ("%.*s", end - urlmime, urlmime);
         for (PluginHandle * plugin : list)
         {
             if (! aud_plugin_get_enabled (plugin))

@@ -159,7 +159,7 @@ static StringBuf get_path_to_self ()
         throw std::bad_alloc ();
 
     buf.resize (lenw * sizeof (wchar_t));
-    buf.steal (str_convert (buf, buf.len (), UTF16_NATIVE, "UTF-8"));
+    buf = str_convert (buf, buf.len (), UTF16_NATIVE, "UTF-8");
     return buf;
 
 #elif defined __APPLE__
@@ -230,7 +230,7 @@ static void set_install_paths ()
         return;
     }
 
-    to.steal (filename_normalize (std::move (to)));
+    to = filename_normalize (std::move (to));
 
     const char * base = last_path_element (to);
 

@@ -160,12 +160,28 @@ EXPORT StringBuf str_printf (const char * format, ...)
     return str;
 }
 
+EXPORT void str_append_printf (StringBuf & str, const char * format, ...)
+{
+    va_list args;
+    va_start (args, format);
+    str_append_vprintf (str, format, args);
+    va_end (args);
+}
+
 EXPORT StringBuf str_vprintf (const char * format, va_list args)
 {
     StringBuf str (-1);
     int len = vsnprintf (str, str.len (), format, args);
     str.resize (len);
     return str;
+}
+
+EXPORT void str_append_vprintf (StringBuf & str, const char * format, va_list args)
+{
+    int len0 = str.len ();
+    str.resize (-1);
+    int len1 = vsnprintf (str + len0, str.len () - len0, format, args);
+    str.resize (len0 + len1);
 }
 
 EXPORT bool str_has_prefix_nocase (const char * str, const char * prefix)
@@ -585,15 +601,12 @@ EXPORT StringBuf filename_to_uri (const char * name)
      * 1) system locale is not UTF-8, and
      * 2) filename is not already valid UTF-8 */
     if (! g_get_charset (nullptr) && ! g_utf8_validate (name, -1, nullptr))
-        buf.steal (str_from_locale (name));
-
-    if (! buf)
-        buf.steal (str_copy (name));
+        buf = str_from_locale (name);
 #endif
 
-    buf.steal (str_encode_percent (buf));
+    buf = str_encode_percent (buf ? buf : name);
     buf.insert (0, URI_PREFIX);
-    return buf;
+    return buf.settle ();
 }
 
 /* Like g_filename_from_uri, but converts the filename from UTF-8 to the system
@@ -616,19 +629,19 @@ EXPORT StringBuf uri_to_filename (const char * uri, bool use_locale)
     {
         StringBuf locale = str_to_locale (buf);
         if (locale)
-            buf.steal (std::move (locale));
+            buf = std::move (locale);
     }
 #endif
 
     /* if UTF-8 was requested, make sure the result is valid */
     if (! use_locale)
     {
-        buf.steal (str_to_utf8 (std::move (buf)));
+        buf = str_to_utf8 (std::move (buf));
         if (! buf)
             return StringBuf ();
     }
 
-    return filename_normalize (std::move (buf));
+    return filename_normalize (buf.settle ());
 }
 
 /* Formats a URI for human-readable display.  Percent-decodes and, for file://
@@ -741,14 +754,14 @@ EXPORT StringBuf uri_construct (const char * path, const char * reference)
 
     StringBuf buf = str_to_utf8 (path, -1);
     if (! buf)
-        return buf;
+        return StringBuf ();
 
     if (aud_get_bool (nullptr, "convert_backslash"))
         str_replace_char (buf, '\\', '/');
 
-    buf.steal (str_encode_percent (buf));
+    buf = str_encode_percent (buf);
     buf.insert (0, reference, slash + 1 - reference);
-    return buf;
+    return buf.settle ();
 }
 
 /* Basically the reverse of uri_construct().
@@ -1024,24 +1037,22 @@ EXPORT double str_to_double (const char * string)
     return neg ? -val : val;
 }
 
-EXPORT StringBuf int_to_str (int val)
+EXPORT void str_insert_int (StringBuf & string, int pos, int val)
 {
     bool neg = (val < 0);
     unsigned absval = neg ? -val : val;
 
     int digits = digits_for (absval);
-    StringBuf buf ((neg ? 1 : 0) + digits);
+    int len = (neg ? 1 : 0) + digits;
+    char * set = string.insert (pos, nullptr, len);
 
-    char * set = buf;
     if (neg)
         * (set ++) = '-';
 
     uint_to_str (absval, set, digits);
-
-    return buf;
 }
 
-EXPORT StringBuf double_to_str (double val)
+EXPORT void str_insert_double (StringBuf & string, int pos, double val)
 {
     bool neg = (val < 0);
     if (neg)
@@ -1061,9 +1072,9 @@ EXPORT StringBuf double_to_str (double val)
         decimals --;
 
     int digits = digits_for (i);
-    StringBuf buf ((neg ? 1 : 0) + digits + (decimals ? 1 : 0) + decimals);
+    int len = (neg ? 1 : 0) + digits + (decimals ? 1 : 0) + decimals;
+    char * set = string.insert (pos, nullptr, len);
 
-    char * set = buf;
     if (neg)
         * (set ++) = '-';
 
@@ -1075,7 +1086,19 @@ EXPORT StringBuf double_to_str (double val)
         * (set ++) = '.';
         uint_to_str (f, set, decimals);
     }
+}
 
+EXPORT StringBuf int_to_str (int val)
+{
+    StringBuf buf;
+    str_insert_int (buf, 0, val);
+    return buf;
+}
+
+EXPORT StringBuf double_to_str (double val)
+{
+    StringBuf buf;
+    str_insert_double (buf, 0, val);
     return buf;
 }
 

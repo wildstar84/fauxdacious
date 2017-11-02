@@ -92,9 +92,11 @@ bool playlist_load (const char * filename, String & title, Index<PlaylistAddItem
 
             if (userurl2playlist)
             {
-                ext.steal (str_printf (_("tempurl.pls")));
-                ext.steal (filename_build ({aud_get_path (AudPath::UserDir), ext}));
-                ext.steal (filename_to_uri (ext));
+                //ext.steal (str_printf (_("tempurl.pls")));
+                //ext.steal (filename_build ({aud_get_path (AudPath::UserDir), ext}));
+                //ext.steal (filename_to_uri (ext));
+                ext = filename_build ({aud_get_path (AudPath::UserDir), _("tempurl.pls")});
+                ext = filename_to_uri (ext);
 
                 VFSFile file ((const char *) ext, "r");
                 if (! file)

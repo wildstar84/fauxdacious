@@ -475,7 +475,7 @@ static void do_load_eq_file (StringBuf filename, bool load_songautoeq)
         struct stat statbuf;
         if (stat (filenamechar, &statbuf))
                 havesongeqfile = false;   /* (*->N) SONG HAS NO SONG-SPECIFIC PRESET FILE, SO DO NOTHING. */
-        filename.steal (filename_to_uri (filenamechar));
+        filename = filename_to_uri (filenamechar);
     }
     else
         havesongeqfile = false;
@@ -486,10 +486,10 @@ static void do_load_eq_file (StringBuf filename, bool load_songautoeq)
         String cue_suffix = in_tuple.get_str (Tuple::Suffix);
         if (cue_suffix && cue_suffix[0] && strstr ((const char *) cue_suffix, "cue"))
         {
-            filename.steal (filename_build ({aud_get_path (AudPath::UserDir), 
-                    in_tuple.get_str (Tuple::Basename)}));
-            filename.steal (str_concat ({"file://", filename, ".", (const char *)cue_suffix,
-                    ".preset"}));
+            filename = filename_build ({aud_get_path (AudPath::UserDir), 
+                    in_tuple.get_str (Tuple::Basename)});
+            filename = str_concat ({"file://", filename, ".", (const char *)cue_suffix,
+                    ".preset"});
             const char * filenamechar = (const char *) filename + 7;
             if (filenamechar)
             {
