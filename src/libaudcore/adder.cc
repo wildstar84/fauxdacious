@@ -337,6 +337,13 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
 static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
  void * user, AddResult * result, bool save_title, bool from_playlist)
 {
+    if (! strstr (item.filename, "://"))
+    {
+        /* Let's not add random junk to the playlist. */
+        AUDERR ("Invalid URI: %s\n", (const char *) item.filename);
+        return;
+    }
+
     if (filter && ! filter (item.filename, user))
     {
         result->filtered = true;
