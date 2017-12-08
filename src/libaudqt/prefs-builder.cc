@@ -62,6 +62,7 @@ void prefs_populate (QBoxLayout * layout, ArrayRef<PreferencesWidget> widgets, c
                 }
 
                 parent_layout->addLayout (layout);
+
                 orig_layout = layout;
 
                 if (parent_widget)

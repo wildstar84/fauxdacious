@@ -35,8 +35,8 @@ namespace audqt {
 
 static int init_count;
 static QApplication * qapp;
-static PixelMargins margins_local;
 static PixelSizes sizes_local;
+static PixelMargins margins_local;
 
 EXPORT const PixelSizes & sizes = sizes_local;
 EXPORT const PixelMargins & margins = margins_local;
