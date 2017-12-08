@@ -284,7 +284,6 @@ static void load_playlists_real ()
             playlist_set_modified (count + i, true);
     }
 
-DONE:
     if (! aud_playlist_count ())
         aud_playlist_insert (0);
 
