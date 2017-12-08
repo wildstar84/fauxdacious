@@ -79,7 +79,7 @@ Plugin * plugin_load (const char * filename)
 
     if (! header || header->magic != _AUD_PLUGIN_MAGIC)
     {
-        AUDERR ("%s is not a valid Audacious plugin.\n", filename);
+        AUDERR ("%s is not a valid Fauxdacious plugin.\n", filename);
         g_module_close (module);
         return nullptr;
     }
@@ -87,7 +87,7 @@ Plugin * plugin_load (const char * filename)
     if (header->version < _AUD_PLUGIN_VERSION_MIN ||
         header->version > _AUD_PLUGIN_VERSION)
     {
-        AUDERR ("%s is not compatible with this version of Audacious.\n", filename);
+        AUDERR ("%s is not compatible with this version of Fauxdacious.\n", filename);
         g_module_close (module);
         return nullptr;
     }
