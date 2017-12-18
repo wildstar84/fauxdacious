@@ -187,9 +187,6 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 /* JWT: NEW FUNCTION TO FETCH TAG METADATA FROM USER-CREATED TEXT FILE: */
 EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * tagdata_filename, Tuple & tuple)
 {
-    if (! aud_get_bool (nullptr, tagdata_filename))
-        return 0;
-
     GKeyFile * rcfile = g_key_file_new ();
     StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
@@ -250,14 +247,19 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
     else
         tuple.unset (Tuple::Track);
 
-    g_free (precedence);
     g_key_file_free (rcfile);
 
     if (strstr (precedence, "ONLY"))
+    {
+        g_free (precedence);
         return -1;
+    }
     else if (strstr (precedence, "OVERRIDE"))
+    {
+        g_free (precedence);
         return 1;
-
+    }
+    g_free (precedence);
     return 2;
 }
 
