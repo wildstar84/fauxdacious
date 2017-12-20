@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>  /* for GKeyFile */
+extern "C" {
+#include <sys/stat.h>
+}
 
 #include "audstrings.h"
 #include "i18n.h"
@@ -102,7 +105,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
         {
             ++end;
         }
-        ext = str_printf ("%.*s", end - urlmime, urlmime);
+        ext = str_printf ("%.*s", (int)(end - urlmime), urlmime);
         for (PluginHandle * plugin : list)
         {
             if (! aud_plugin_get_enabled (plugin))
@@ -188,7 +191,9 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * tagdata_filename, Tuple & tuple)
 {
     GKeyFile * rcfile = g_key_file_new ();
-    StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
+    StringBuf filename = (! strncmp (tagdata_filename, "file://", 7))
+            ? str_printf ("%s", tagdata_filename + 7)
+            : filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
     if (! g_key_file_load_from_file (rcfile, filename, G_KEY_FILE_NONE, nullptr))
     {
@@ -273,18 +278,42 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     if (! open_input_file (filename, "r", ip, file, error))
         return false;
 
-    Tuple file_tuple, new_tuple;
-    new_tuple.set_filename (filename);
+    Tuple file_tuple, loclfile_tuple, new_tuple;
+    Tuple * which_tuple;
     int fromfile = 0;
+    int fromlocalfile = 0;
+    bool usrtag = aud_get_bool (nullptr, "user_tag_data");
+    String local_tag_file = String ("");
+    String filename_only = String ("");
 
-    /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, new_tuple, image)) */
-    if (! strncmp (filename, "stdin://", 8) || (fromfile = aud_read_tag_from_tagfile (filename, 
-        "user_tag_data", file_tuple)) < 0 || ip->read_tag (filename, file, new_tuple, image))
+    new_tuple.set_filename (filename);
+    if (usrtag && ! strncmp (filename, "file://", 7))
     {
+        const char * filenamechar = filename + 7;
+        StringBuf path = filename_get_parent (filenamechar);
+        filename_only = String (filename_get_base (filenamechar));
+        local_tag_file = String (str_concat ({"file://", (const char *)path, "/user_tag_data.tag"}));
+    }
+    /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, new_tuple, image)) */
+    if (! strncmp (filename, "stdin://", 8) 
+            || (local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *)filename_only, local_tag_file, loclfile_tuple)) < 0) 
+            || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0) 
+            || ip->read_tag (filename, file, new_tuple, image))
+    {
+        which_tuple = &file_tuple;
+        if (local_tag_file[0] && fromlocalfile)  //JWT:WE GOT TAGS FROM A LOCAL (DIRECTORY-BASEED) user_tag_data.tag FILE.
+        {
+            if (fromlocalfile < 2 || (! fromfile || fromfile == 2))
+            {
+                fromfile = fromlocalfile;
+                which_tuple = &loclfile_tuple;
+            }
+        }
+
         // cleanly replace existing tuple
         new_tuple.set_state (Tuple::Valid);
         if (fromfile < 0)  //ONLY - GOT DATA FROM FILE, ONLY USE THAT (MAY NOT WORK)!
-            tuple = std::move (file_tuple);
+            tuple = std::move (*which_tuple);
         else if (fromfile > 0)
         {
             int i_tfld;
@@ -292,28 +321,28 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             tuple = std::move (new_tuple);
             if (fromfile == 1)  //OVERRIDE - USE FILE DATA, ONLY FILLING IN FIELDS NOT IN FILE W/TAGS DATA:
             {
-                tfld = (const char *) file_tuple.get_str (Tuple::Title);
+                tfld = (const char *) which_tuple->get_str (Tuple::Title);
                 if (tfld)
                     tuple.set_str (Tuple::Title, tfld);
-                tfld = (const char *) file_tuple.get_str (Tuple::Artist);
+                tfld = (const char *) which_tuple->get_str (Tuple::Artist);
                 if (tfld)
                     tuple.set_str (Tuple::Artist, tfld);
-                tfld = (const char *) file_tuple.get_str (Tuple::Album);
+                tfld = (const char *) which_tuple->get_str (Tuple::Album);
                 if (tfld)
                     tuple.set_str (Tuple::Album, tfld);
-                tfld = (const char *) file_tuple.get_str (Tuple::AlbumArtist);
+                tfld = (const char *) which_tuple->get_str (Tuple::AlbumArtist);
                 if (tfld)
                     tuple.set_str (Tuple::AlbumArtist, tfld);
-                tfld = (const char *) file_tuple.get_str (Tuple::Comment);
+                tfld = (const char *) which_tuple->get_str (Tuple::Comment);
                 if (tfld)
                     tuple.set_str (Tuple::Comment, tfld);
-                tfld = (const char *) file_tuple.get_str (Tuple::Genre);
+                tfld = (const char *) which_tuple->get_str (Tuple::Genre);
                 if (tfld)
                     tuple.set_str (Tuple::Genre, tfld);
-                i_tfld = file_tuple.get_int (Tuple::Year);
+                i_tfld = which_tuple->get_int (Tuple::Year);
                 if (i_tfld && i_tfld > 0)
                     tuple.set_int (Tuple::Year, i_tfld);
-                i_tfld = file_tuple.get_int (Tuple::Track);
+                i_tfld = which_tuple->get_int (Tuple::Track);
                 if (i_tfld && i_tfld > 0)
                     tuple.set_int (Tuple::Track, i_tfld);
             }
@@ -322,56 +351,56 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 tfld = (const char *) new_tuple.get_str (Tuple::Title);
                 if (! tfld)
                 {
-                    tfld = (const char *) file_tuple.get_str (Tuple::Title);
+                    tfld = (const char *) which_tuple->get_str (Tuple::Title);
                     if (tfld)
                         tuple.set_str (Tuple::Title, tfld);
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Artist);
                 if (! tfld)
                 {
-                    tfld = (const char *) file_tuple.get_str (Tuple::Artist);
+                    tfld = (const char *) which_tuple->get_str (Tuple::Artist);
                     if (tfld)
                         tuple.set_str (Tuple::Artist, tfld);
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Album);
                 if (! tfld)
                 {
-                    tfld = (const char *) file_tuple.get_str (Tuple::Album);
+                    tfld = (const char *) which_tuple->get_str (Tuple::Album);
                     if (tfld)
                         tuple.set_str (Tuple::Album, tfld);
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::AlbumArtist);
                 if (! tfld)
                 {
-                    tfld = (const char *) file_tuple.get_str (Tuple::AlbumArtist);
+                    tfld = (const char *) which_tuple->get_str (Tuple::AlbumArtist);
                     if (tfld)
                         tuple.set_str (Tuple::AlbumArtist, tfld);
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Comment);
                 if (! tfld)
                 {
-                    tfld = (const char *) file_tuple.get_str (Tuple::Comment);
+                    tfld = (const char *) which_tuple->get_str (Tuple::Comment);
                     if (tfld)
                         tuple.set_str (Tuple::Comment, tfld);
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Genre);
                 if (! tfld)
                 {
-                    tfld = (const char *) file_tuple.get_str (Tuple::Genre);
+                    tfld = (const char *) which_tuple->get_str (Tuple::Genre);
                     if (tfld)
                         tuple.set_str (Tuple::Genre, tfld);
                 }
                 i_tfld = new_tuple.get_int (Tuple::Year);
                 if (i_tfld <= 0)
                 {
-                    i_tfld = file_tuple.get_int (Tuple::Year);
+                    i_tfld = which_tuple->get_int (Tuple::Year);
                     if (i_tfld)
                         tuple.set_int (Tuple::Year, i_tfld);
                 }
                 i_tfld = new_tuple.get_int (Tuple::Track);
                 if (i_tfld <= 0)
                 {
-                    i_tfld = file_tuple.get_int (Tuple::Track);
+                    i_tfld = which_tuple->get_int (Tuple::Track);
                     if (i_tfld)
                         tuple.set_int (Tuple::Track, i_tfld);
                 }
@@ -398,44 +427,64 @@ EXPORT bool aud_file_can_write_tuple (const char * filename, PluginHandle * deco
 EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & tuple)
 {
     GKeyFile * rcfile = g_key_file_new ();
-    StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), "user_tag_data"});
+    String local_tag_fid = String ("");
+    String song_key = String (song_filename);
+    bool localtagfileexists = false;
+    if (! strncmp (song_filename, "file://", 7))
+    {
+        struct stat statbuf;
+        const char * filenamechar = song_filename + 7;
+        StringBuf path = filename_get_parent (filenamechar);
+        local_tag_fid = String (str_concat ({(const char *)path, "/user_tag_data.tag"})); 
+        if (! stat ((const char *)local_tag_fid, &statbuf))  // ART IMAGE FILE DOESN'T EXIST:
+        {
+            localtagfileexists = true;
+            song_key = String (filename_get_base (filenamechar));
+        }
+    }
+
+    StringBuf filename = localtagfileexists ? str_printf ("%s", (const char *)local_tag_fid)
+            : filename_build ({aud_get_path (AudPath::UserDir), "user_tag_data"});
 
     if (! g_key_file_load_from_file (rcfile, filename, 
             (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))
         AUDDBG ("w:aud_write_tag_to_tagfile: error opening key file (%s), assuming we're creating a new one.",
             (const char *) filename);
 
-    char * precedence = g_key_file_get_string (rcfile, song_filename, "Precedence", nullptr);
+    const char * song_key_const = (const char *)song_key;
+    char * precedence = g_key_file_get_string (rcfile, song_key_const, "Precedence", nullptr);
     if (! precedence)
-        g_key_file_set_string (rcfile, song_filename, "Precedence", "DEFAULT");
+        g_key_file_set_string (rcfile, song_key_const, "Precedence", "DEFAULT");
+
     g_free (precedence);
+
     const char * tfld;
     int i_tfld;
 
     tfld = (const char *) tuple.get_str (Tuple::Title);
     if (tfld)
-        g_key_file_set_string (rcfile, song_filename, "Title", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "Title", tfld);
     tfld = (const char *) tuple.get_str (Tuple::Artist);
     if (tfld)
-        g_key_file_set_string (rcfile, song_filename, "Artist", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "Artist", tfld);
     tfld = (const char *) tuple.get_str (Tuple::Album);
     if (tfld)
-        g_key_file_set_string (rcfile, song_filename, "Album", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "Album", tfld);
     tfld = (const char *) tuple.get_str (Tuple::AlbumArtist);
     if (tfld)
-        g_key_file_set_string (rcfile, song_filename, "AlbumArtist", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "AlbumArtist", tfld);
     tfld = (const char *) tuple.get_str (Tuple::Comment);
     if (tfld)
-        g_key_file_set_string (rcfile, song_filename, "Comment", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "Comment", tfld);
     tfld = (const char *) tuple.get_str (Tuple::Genre);
     if (tfld)
-        g_key_file_set_string (rcfile, song_filename, "Genre", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "Genre", tfld);
     i_tfld = tuple.get_int (Tuple::Year);
     if (i_tfld)
-        g_key_file_set_double (rcfile, song_filename, "Year", i_tfld);
+        g_key_file_set_double (rcfile, song_key_const, "Year", i_tfld);
     i_tfld = tuple.get_int (Tuple::Track);
     if (i_tfld)
-        g_key_file_set_double (rcfile, song_filename, "Track", i_tfld);
+        g_key_file_set_double (rcfile, song_key_const, "Track", i_tfld);
 
     size_t len;
     char * data = g_key_file_to_data (rcfile, & len, nullptr);
