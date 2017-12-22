@@ -60,12 +60,7 @@ BEGIN
 }
 use strict;
 use LWP::Simple qw();
-my $haveTuneinStreams = 0;
-my $haveIheartRadioStreams = 0;
-my $haveYoutubeDownload = 0;
-eval 'use Tunein::Streams; $haveTuneinStreams = 1; 1';
-eval 'use IHeartRadio::Streams; $haveIheartRadioStreams = 1; 1';
-eval 'use WWW::YouTube::Download; $haveYoutubeDownload = 1; 1';
+use StreamFinder;
 
 die "..usage: $0 url\n"  unless ($ARGV[0]);
 my $configPath = '';
@@ -76,81 +71,32 @@ my $newPlaylistURL = '';
 my $title = $ARGV[0];
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
-if ($haveYoutubeDownload && ($ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*youtu(?:be)?\.# 
-		|| $ARGV[0] =~ m#^http[s]?\:\/\/\w*\.*vimeo\.#)) {   #HANDLE Youtube/Vimeo URLS:
-	my $client = WWW::YouTube::Download->new;
-	my $meta_data = '';
-	eval "\$meta_data = \$client->prepare_download(\$ARGV[0]);";
-	my %metadata;
-	if ($meta_data) {
-		foreach my $name (qw(video_id title user)) {
-			eval "\$metadata{$name} = \$client->get_$name(\$ARGV[0]);";
+
+my $client = new StreamFinder($ARGV[0]);
+die "f:Could not open streamfinder or no streams found!"  unless ($client);
+
+$newPlaylistURL = $client->getURL();
+die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
+$title = $client->getTitle();
+my $art_url = $client->getIconURL();
+my $stationID = $client->getID();
+my $comment = "Album=$ARGV[0]\n";
+$comment .= "Artist=".$client->{artist}."\n"  if (defined $client->{artist});
+if ($art_url) {
+	my ($image_ext, $art_image) = $client->getIconData;
+	if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
+		binmode IMGOUT;
+		print IMGOUT $art_image;
+		close IMGOUT;
+		my $path = $configPath;
+		if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+			$path =~ s#^(\w)\:#\/$1\%3A#;
+			$path =~ s#\\#\/#g;
 		}
+		$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
 	}
-	$title = $metadata{title};
-	my $comment = "Album=$ARGV[0]\n";
-	$comment .= "Artist=$metadata{user}\n"  if ($metadata{user});
-	$_ = `youtube-dl --get-url --get-thumbnail -f mp4 $ARGV[0]`;
-	my @urls = split(/\r?\n/);
-	while (@urls && $urls[0] !~ m#\:\/\/#o) {
-		shift @urls;
-	}
-	$newPlaylistURL = $urls[0];
-	my $art_url = ($#urls >= 1) ? $urls[$#urls] : '';
-	if ($configPath) {
-		my $art_image = $art_url ? LWP::Simple::get($art_url) : '';
-		if ($art_image) {
-			(my $image_ext = $art_url) =~ s/^.+\.//;
-			if (open IMGOUT, ">/tmp/$metadata{video_id}.$image_ext") {
-				binmode IMGOUT;
-				print IMGOUT $art_image;
-				close IMGOUT;
-				if ($configPath =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
-					$comment .= "Comment=file:///C%3A/tmp/$metadata{video_id}.$image_ext\n";
-				} else {
-					$comment .= "Comment=file:///tmp/$metadata{video_id}.$image_ext\n";
-				}
-			}
-		}
-	}
-	chomp $newPlaylistURL;
-	die "f:No valid video stream found!\n"  unless ($newPlaylistURL);
-	&writeTagData($comment);
-} elsif (($haveTuneinStreams && $ARGV[0] =~ m#\:\/\/tunein\.com\/#)
-		|| ($haveIheartRadioStreams && $ARGV[0] =~ m#\:\/\/www\.iheart\.com\/#)) {   #HANDLE tunein.com & iheart.com STATION URLS:
-	my $isTunein = ($ARGV[0] =~ /tunein\./) ? 1 : 0;
-	my $station = $isTunein ? new Tunein::Streams($ARGV[0])
-			: new IHeartRadio::Streams($ARGV[0], 'secure_shoutcast', 'secure', 'any', '!rtmp');
-	die "f:Invalid URL($ARGV[0]) or no streams!\n"  unless ($station);
-	$newPlaylistURL = $isTunein ? $station->getBest('Url') : $station->getStream();
-	die "f:No streams for $ARGV[0]!\n"  unless ($newPlaylistURL);
-	
-	my $art_url = $station->getIconURL();
-	my $stationID = $isTunein ? $station->getStationID() : $station->getFccID();
-	$title = $station->getStationTitle();
-	my $comment = "Album=$ARGV[0]\n";
-	if ($art_url) {
-		my $art_image = $art_url ? LWP::Simple::get($art_url) : '';
-		my $image_ext = $art_url;
-		if ($isTunein) {
-			$image_ext =~ s/^.+\.//;
-		} else {
-			$image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'png';
-		}
-		if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
-			binmode IMGOUT;
-			print IMGOUT $art_image;
-			close IMGOUT;
-			my $path = $configPath;
-			if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
-				$path =~ s#^(\w)\:#\/$1\%3A#;
-				$path =~ s#\\#\/#g;
-			}
-			$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
-		}
-	}
-	&writeTagData($comment);
 }
+&writeTagData($comment);
 #END USER-DEFINED PATTERN-MATCHING CODE.
 exit (0)  unless ($newPlaylistURL);
 
