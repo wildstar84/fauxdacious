@@ -1,3 +1,50 @@
+Version 3.9-beta1
+
+* Added support for using user-created custom tag files for CDs, and 
+directories.  This permits the user to create a tag file for his own 
+"mash" CDs (ones that obviously aren't going to have track metadata or 
+cover art available for lookup online using CDDB, etc.  A new option under 
+cdaudio plugin options is "Allow Custom Tag-files" and, if checked, One can play the CD and, while playing, use a text editor open 
+~/.config/audacious[_instance]/user_tag_data to grab all the paragraphs that 
+begin with "[cdda://?...]", save that to a custom text-based tag file called 
+~/.config/audacious[_instance]/<disk-id>.tag (disk-id is the calculated 
+freedb disk-id for the disk).  The next time the CD is played, the tag 
+metadata for the tracks will be fetched from this file.  A custom cover-art image can be stored under 
+~/.config/audacious[_instance]/<disk-id>.{ping|jpg|jpeg} and used as the 
+cover art image for the CD.  
+
+To create a custom tag-file for a music directory (ie. for *.wav files, etc. 
+that don't support tags, one can create a tag file, similar to 
+~/.config/audacious[_instance]/user_tag_data in a given music directory 
+named:  /path/to/your/music/directory/user_tag_data.tag.  Within this file, 
+the music file-name keys are specified as just the file name (without the 
+"file:///path/.../" part since the tag file only refers to the files 
+in that directory.  This can prevent excess clutter in your main 
+user_tag_data file!  I created this so when I burn a "mash" CD, I put the 
+*.wav track files into a subdirectory and on my computer to save wear and 
+tear on the CD drive, I listen to the tracks from the .wav files on my 
+hard drive, and wanted to have the track metadata and cover art associated 
+with them then!
+
+* New cover-art helper script ("FauxdaciousCoverArtHelper.pl") which can 
+be used by Fauxdacious when playing a CD or DVD to attempt to fetch 
+cover-art (and for CDs: any missing track metadata) from the web.  
+Add the line "cover_helper=/usr/local/bin/FauxdaciousCoverArtHelper.pl" 
+to your ~/.config/audacious[_instance]/config file.
+
+* Catch up w/Audacious 3.91 GIT by merging all commits through a78fd24 and 
+plugin commits through .  Rejected plugin commit:  957d460 (we handle the 
+recording gui slighly differently.  Plugin commit a39bfd7 (Adplug) is on hold 
+pending further testing and review, and a patch from us is awaiting review 
+by the Audacious team.
+
+* Audacious commit a117aba: "sndfile: Don't try to seek beyond end of file. 
+(closes Audacious bug #756).
+
+* Merged Fauxdacious commits:  45f08c5-541bf73 and plugin commits: 641d553-7fe3c80
+
+* Fix rare sigfault when switching back to an aac stream (commit: cba8621)
+
 (06/01/2017) Version 3.83-final
 
 * FIXED filewriter plugin to "fail over" to "unknown" for the filename if the playing filename is too long or invalid (needed for youtube streams, etc.).  Also fixed a potential null-pointer reference.
