@@ -301,7 +301,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             || ip->read_tag (filename, file, new_tuple, image))
     {
         which_tuple = &file_tuple;
-        if (local_tag_file[0] && fromlocalfile)  //JWT:WE GOT TAGS FROM A LOCAL (DIRECTORY-BASEED) user_tag_data.tag FILE.
+        if (local_tag_file[0] && fromlocalfile)  //JWT:WE GOT TAGS FROM A LOCAL (DIRECTORY-BASED) user_tag_data.tag FILE.
         {
             if (fromlocalfile < 2 || (! fromfile || fromfile == 2))
             {
@@ -436,7 +436,7 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
         const char * filenamechar = song_filename + 7;
         StringBuf path = filename_get_parent (filenamechar);
         local_tag_fid = String (str_concat ({(const char *)path, "/user_tag_data.tag"})); 
-        if (! stat ((const char *)local_tag_fid, &statbuf))  // ART IMAGE FILE DOESN'T EXIST:
+        if (! stat ((const char *)local_tag_fid, &statbuf))  // LOCAL TAG FILE DOESN'T EXIST:
         {
             localtagfileexists = true;
             song_key = String (filename_get_base (filenamechar));
