@@ -26,7 +26,7 @@ install-extra:
 			${INSTALL_FAILED}; \
 		fi; \
 	done
-	for i in audacious.desktop; do \
+	for i in fauxdacious.desktop; do \
 		${INSTALL_STATUS}; \
 		if ${MKDIR_P} ${DESTDIR}${datarootdir}/applications && ${INSTALL} -m 644 $$i ${DESTDIR}${datarootdir}/applications/$$i; then \
 			${INSTALL_OK}; \
