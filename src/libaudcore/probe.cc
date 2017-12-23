@@ -192,15 +192,15 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
 {
     GKeyFile * rcfile = g_key_file_new ();
     StringBuf filename = (! strncmp (tagdata_filename, "file://", 7))
-            ? str_printf ("%s", tagdata_filename + 7)
+            ? uri_to_filename (tagdata_filename)
             : filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
-    if (! g_key_file_load_from_file (rcfile, filename, G_KEY_FILE_NONE, nullptr))
+    //JWT:TAG FILENAME NEVER HAS "file://" IN FRONT OF IT IF SO, IT'S STRIPPED OFF!:
+    if (! g_key_file_load_from_file (rcfile, (const char *)filename, G_KEY_FILE_NONE, nullptr))
     {
         g_key_file_free (rcfile);
         return 0;
     }
-
     char * precedence = g_key_file_get_string (rcfile, song_filename, "Precedence", nullptr);
     if (! precedence)
     {
@@ -289,10 +289,10 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     new_tuple.set_filename (filename);
     if (usrtag && ! strncmp (filename, "file://", 7))
     {
-        const char * filenamechar = filename + 7;
-        StringBuf path = filename_get_parent (filenamechar);
-        filename_only = String (filename_get_base (filenamechar));
-        local_tag_file = String (str_concat ({"file://", (const char *)path, "/user_tag_data.tag"}));
+        StringBuf tag_fid = uri_to_filename (filename);
+        StringBuf path = filename_get_parent ((const char *)tag_fid);
+        filename_only = String (filename_get_base ((const char *)tag_fid));
+        local_tag_file = String (filename_to_uri (str_concat ({(const char *)path, "/user_tag_data.tag"})));
     }
     /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, new_tuple, image)) */
     if (! strncmp (filename, "stdin://", 8) 
@@ -430,22 +430,23 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
     String local_tag_fid = String ("");
     String song_key = String (song_filename);
     bool localtagfileexists = false;
-    if (! strncmp (song_filename, "file://", 7))
+    if (! strncmp (song_filename, "file://", 7))  //JWT:ONLY LOOK FOR A LOCAL TAG FILE IF WE'RE PLAYING A "FILE"!:
     {
         struct stat statbuf;
-        const char * filenamechar = song_filename + 7;
-        StringBuf path = filename_get_parent (filenamechar);
-        local_tag_fid = String (str_concat ({(const char *)path, "/user_tag_data.tag"})); 
+        StringBuf song_fid = uri_to_filename (song_filename);
+        StringBuf path = filename_get_parent ((const char *)song_fid);
+        local_tag_fid = String (filename_normalize (str_concat ({(const char *)path, "/user_tag_data.tag"}))); 
         if (! stat ((const char *)local_tag_fid, &statbuf))  // LOCAL TAG FILE DOESN'T EXIST:
         {
             localtagfileexists = true;
-            song_key = String (filename_get_base (filenamechar));
+            song_key = String (filename_get_base ((const char *)song_fid));
         }
     }
 
-    StringBuf filename = localtagfileexists ? str_printf ("%s", (const char *)local_tag_fid)
+    StringBuf filename = localtagfileexists ? str_copy ((const char *)local_tag_fid)
             : filename_build ({aud_get_path (AudPath::UserDir), "user_tag_data"});
 
+    //JWT: filename DOES NOT HAVE file:// PREFIX AND IS THE TAG DATA FILE (LOCAL OR GLOBAL):
     if (! g_key_file_load_from_file (rcfile, filename, 
             (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))
         AUDDBG ("w:aud_write_tag_to_tagfile: error opening key file (%s), assuming we're creating a new one.",
