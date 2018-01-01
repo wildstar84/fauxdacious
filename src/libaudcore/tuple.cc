@@ -642,7 +642,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                 if (artlen > 0 && (! tupletitle || strncmp ((const char *)val, tupletitle, artlen)))
                 {
                     set_str (Title, str_printf ("%.*s - %.*s", artlen,
-                            (const char *)val, (endquote-ttloffset9), ttloffset9));
+                            (const char *)val, (int)(endquote-ttloffset9), ttloffset9));
                     set_str (Artist, str_printf ("%.*s", artlen, (const char *)val));
                     updated = true;
                 }
