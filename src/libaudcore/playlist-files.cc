@@ -32,8 +32,10 @@
 EXPORT bool aud_filename_is_playlist (const char * filename)
 {
     bool userurl2playlist = false;
-    if (strstr (filename, "://") && ! strstr (filename, "file:/")
-            && ! strstr (filename, "cdda:/") && ! strstr (filename, "dvd:/"))  //JWT:WE'RE SOME KIND OF URL:
+
+    if (strstr (filename, "://") && strncmp (filename, "file://", 7)
+            && strncmp (filename, "cdda://", 7) && strncmp (filename, "dvd://", 6)
+            && strncmp (filename, "stdin://", 8))  //JWT:WE'RE SOME KIND OF URL:
     {
         String url_helper = aud_get_str ("audacious", "url_helper");
     	   StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
