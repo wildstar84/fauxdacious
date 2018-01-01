@@ -8,11 +8,11 @@ implement:
 * A "visualization" option for displaying the video of ffmpeg files 
 and streams that contain both an audio and a video stream!
 * User-customizable URL-preprocessing script option (Youtube.com, iheart.com, 
-and tunein.com url-handling already included).  Users can add more!
+et. al. url-handling already included).  Users can add more!
 (Included script Requires Perl, but user can choose own scripting language).
 * User-savable metadata for streams, and media codecs that don't support it.
-* Restoration of XMMS "preset" equalization button for song-specific and 
-cuesheet-specific equalization.
+* Restoration of XMMS "preset" equalization button for song-specific, 
+directory-specific, and cuesheet-specific equalization.
 * Option to divert audio output to stdout in the user's choice of selected audio 
 formats for further processing by another program.
 * Piping through stdin input for playlists as well as most media formats.
@@ -21,6 +21,7 @@ continues to play, allowing you to listen to something else in another instance
 (see next feature).
 * Multiple named instances with command-line option to specify alternate 
 configurations and audtool instances.
+* Option to fetch and store cover-art for CDs and DVDs (requires Perl).
 * Additional command-line options!
 * Most new Audacious features / fixes merged in in a timely manner!
 * Cool new name, logo and skins! :D

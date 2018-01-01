@@ -86,11 +86,6 @@ static pthread_cond_t cond_minor = PTHREAD_COND_INITIALIZER;
 
 short pausemuted = 0;   /* JWT:ADDED FOR ALLOWING PAUSE TO CONTINUE READING STREAMS, ONLY PAUSING OUTPUT! */
 static bool s_songautoeq; /* JWT:ADDED TO ALLOW SONG/STREAM-SPECIFIC EQUALIZATION. */
-#ifdef _WIN32
-    static const char * path_sep = "\\";
-#else
-    static const char * path_sep = "/";
-#endif
 
 static OutputPlugin * cop; /* current (primary) output plugin */
 static OutputPlugin * sop; /* secondary output plugin */
@@ -464,38 +459,28 @@ static void do_save_eq_file (StringBuf filename)
         aud_save_preset_file (preset, file);
 }
 
-static void do_load_eq_file (StringBuf filename, bool load_songautoeq)
+static bool do_load_eq_file (StringBuf filename, bool save_prev_preset_as_default, bool chk_cuefile)
 {
+    bool loadedit = false;
+    struct stat statbuf;
     EqualizerPreset preset;
-    bool havesongeqfile = true;
 
-    const char * filenamechar = (const char *) filename + 7;
-    if (filenamechar)
-    {
-        struct stat statbuf;
-        if (stat (filenamechar, &statbuf))
-                havesongeqfile = false;   /* (*->N) SONG HAS NO SONG-SPECIFIC PRESET FILE, SO DO NOTHING. */
-        filename = filename_to_uri (filenamechar);
-    }
-    else
-        havesongeqfile = false;
+    StringBuf filename_local = uri_to_filename (filename);
+    bool havesongeqfile = ! (stat ((const char *) filename_local, &statbuf));   /* (*->N) SONG HAS NO SONG-SPECIFIC PRESET FILE, SO DO NOTHING. */
 
-    if (! havesongeqfile)
+    if (! havesongeqfile && chk_cuefile)
     {
         /* JWT:SEE IF WE ARE REALLY A CUESHEET, IF SO, LOOK FOR A PRESET FOR THAT CUESHEET: */
         String cue_suffix = in_tuple.get_str (Tuple::Suffix);
         if (cue_suffix && cue_suffix[0] && strstr ((const char *) cue_suffix, "cue"))
         {
-            filename = filename_build ({aud_get_path (AudPath::UserDir), 
-                    in_tuple.get_str (Tuple::Basename)});
-            filename = str_concat ({"file://", filename, ".", (const char *)cue_suffix,
-                    ".preset"});
-            const char * filenamechar = (const char *) filename + 7;
-            if (filenamechar)
-            {
-                struct stat statbuf;
-                havesongeqfile = ! (stat (filenamechar, &statbuf));
-            }
+            StringBuf path = filename_get_parent ((const char *) filename_local);
+            filename = filename_normalize (str_concat ({(const char *) path, "/", in_tuple.get_str (Tuple::Basename),
+                    ".", (const char *) cue_suffix, ".preset"}));
+            const char * filenamechar = (const char *) filename;
+            havesongeqfile = ! (stat (filenamechar, &statbuf));
+            if (havesongeqfile)
+                filename = filename_to_uri (filenamechar);
         }
     }
     if (havesongeqfile)
@@ -505,19 +490,14 @@ static void do_load_eq_file (StringBuf filename, bool load_songautoeq)
         {
             /* JWT: (N->P) IF LOADING SONG-SPECIFIC PRESETS AND WE DON'T HAVE SONG-SPECIFIC ONES IN EFFECT NOW, THEN SAVE
                 THE CURRENT PRESETS OUT AS THE "DEFAULT" FOR LATER RESTORATION ON NEXT SONG W/O SONG-SPECIFIC PRESETS */
-            if (load_songautoeq && ! s_songautoeq)
-                do_save_eq_file (filename_to_uri ((const char *) String (str_printf ("%s%s%s", 
-            aud_get_path (AudPath::UserDir), path_sep, "_nonauto.preset"))));
-
+            if (save_prev_preset_as_default && ! s_songautoeq)
+                do_save_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/_nonauto.preset"})));
             aud_eq_apply_preset (preset);   /* (*->P) APPLY THE SONG-SPECIFIC PRESET FILE AND NOTE THAT WE DID THAT! */
-            aud_set_bool(nullptr, "equalizer_songauto", load_songautoeq);
-            s_songautoeq = load_songautoeq;
+            loadedit = true;
         }
-        else  /* (*->N) */
-            s_songautoeq = false;
     }
-    else  /* (*->N) */
-        s_songautoeq = false;
+
+    return loadedit;
 }
 
 bool output_open_audio (const String & filename, const Tuple & tuple,
@@ -553,8 +533,8 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
     setup_output (true);
     setup_secondary (true);
     /* JWT:NEXT CONDITION BLOCK ADDED TO ALLOW SONG/STREAM-SPECIFIC EQUALIZATION IF [Autoload].
-       4 possible scenarios when opening:  (N=CURRENT ENTRY HAS NO AUTO-PRESET FILE, P=ENTRY HAS PRESET FILE):
-       BASED ON PREV. ENTRY PLAYED:  (NOTE: WE HANDLE P->N REGARDLESS OF [Autoload] STATE!)
+       4 possible scenarios when opening:  (N=ENTRY HAS NO AUTO-PRESET FILE, P=ENTRY HAS PRESET FILE):
+       BASED ON PREV. ENTRY PLAYED (PREV->CURRENT):  (NOTE: WE HANDLE P->N REGARDLESS OF [Autoload] STATE!)
        1) N->N:  Do nothing with equalizer.
        2) N->P:  (IF [Autoload]) Save current EQ settings as "default", then load entry's auto-preset file.
        3) P->P:  (IF [Autoload]) Load entry's auto-preset file.
@@ -562,12 +542,17 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
        IF [Autoload] IS OFF, THEN THE ONLY 2 POSSIBLE STATES ARE N->N AND P->N SINCE NO 
        SONG-SPECIFIC PRESET FILE IS CHECKED FOR, MUCH LESS LOADED.
     */
+    if (strncmp (filename, "cdda://", 7) && strncmp (filename, "dvd://", 6))
+        aud_set_str (nullptr, "playingdiskid", "");  // JWT: WE'RE NOT (NO LONGER) PLAYING A DISK!
     if (aud_get_bool (nullptr, "equalizer_autoload"))
     {
+        bool have_valid_filename = false;
+        bool found_songpreset = false;
         const char * slash;
         const char * base;
         const char * dross = aud_get_bool (nullptr, "eqpreset_nameonly") ? strstr (filename, "?") : nullptr;
         int ln = -1;
+        /* JWT: EXTRACT JUST THE "NAME" PART (URLs MAY END W/"/") TO USE TO NAME THE EQ. FILE: */
         slash = filename ? strrchr (filename, '/') : nullptr;
         if (slash && dross)
         {
@@ -580,7 +565,7 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
                 slash = nullptr;
         }        	   	   
         base = slash ? slash + 1 : nullptr;
-        if (slash && (!base || base[0] == '\0')) // FILENAME ENDS IN A "/"!
+        if (slash && (!base || base[0] == '\0'))  // FILENAME (PBLY. A URL) ENDS IN A "/", SO BACK UP A BIT!
         {
             do
             {
@@ -589,28 +574,62 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
             } while (slash && slash > filename && slash[0] != '/');
             base = slash ? slash + 1 : nullptr;
             if (ln > 0)
-                    do_load_eq_file (str_printf("%s%s%s%s%s", "file://",
-                    aud_get_path (AudPath::UserDir), path_sep, (const char *) str_encode_percent (base, ln),
-            ".preset"), true);
+                have_valid_filename = true;
         }
-        else if (base && base[0] != '\0' && strncmp (base, "-.", 2))
+        else if (base && base[0] != '\0' && strncmp (base, "-.", 2))  // NOT AN EMPTY "NAME" OR stdin!
         {
-            int ln = dross ? dross - base : -1;
-            do_load_eq_file (str_printf("%s%s%s%s%s", "file://",
-                    aud_get_path (AudPath::UserDir), path_sep, (const char *) str_encode_percent (base, ln),
-            ".preset"), true);
+            ln = dross ? dross - base : -1;
+            have_valid_filename = true;
         }
+        if (have_valid_filename)
+        {
+
+            /* JWT:IF WE'RE A "FILE", FIRST CHECK LOCAL DIRECTORY FOR A SONG PRESET FILE: */
+            if (! strncmp ((const char *) filename, "file://", 7))
+            {
+                StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
+                found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({(const char *) path, "/", 
+                        (const char *) str_encode_percent (base, ln), ".preset"})), true, true);
+            }
+            /* JWT:NOT A FILE, OR NOT FOUND, SO NOW CHECK THE GLOBAL CONFIG PATH FOR A SONG PRESET FILE: */
+            if (! found_songpreset)
+                found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/", 
+                        (const char *) str_encode_percent (base, ln), ".preset"})), true, true);
+        }
+        if (! found_songpreset)
+        {
+            /* JWT:NO SONG-PRESET: SEE IF IT IS A "FILE" AND, IF SO, CHECK IT'S DIRECTORY FOR A PRESET: 
+                OR MAYBE WE'RE PLAYING A DISK, CHECK FOR PRESET BY DISK-ID / DVD TITLE: */
+            if (! strncmp (filename, "file://", 7))  // LOOK FOR A DIRECTORY PRESET FILE (LIKE XMMS DOES):
+            {
+                String eqpreset_default_file = aud_get_str (nullptr, "eqpreset_default_file");
+                if (eqpreset_default_file[0])
+                {
+                    StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
+                    found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({(const char *) path, "/", 
+                            (const char *) eqpreset_default_file})), true, false);
+                }
+            }
+            else if (! strncmp (filename, "cdda://", 7) || ! strncmp (filename, "dvd://", 6))
+            {
+                String playingdiskid = aud_get_str (nullptr, "playingdiskid");
+                if (playingdiskid[0])
+                    found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/", 
+                            (const char *) playingdiskid, ".preset"})), true, false);
+            }
+        }
+        s_songautoeq = found_songpreset;
     }
     else
         s_songautoeq = false;
 
-    /* JWT: (P->N) IF PREV. SONG LOADED IT'S OWN PRESETS, BUT THE CURRENT SONG DOES NOT
-       HAVE IT'S OWN, THEN RESTORE THE "DEFAULT" (LAST KNOWN NON SONG-SPECIFIC) ONES
+    /* JWT: (P->N) IF PREV. SONG LOADED EQ-AUTO PRESETS, BUT THE CURRENT SONG DID NOT
+       THEN RESTORE THE "DEFAULT" (LAST KNOWN NON EQ-AUTO) PRESETS
        THIS IS DONE REGUARDLESS OF [Autoload] STATE SINCE [Autoload] MAY'VE BEEN TURNED
        OFF DURING PREV. SONG AND CURRENT SONG WILL NOT'VE BEEN CHECKED FOR A PRESET FILE. */
-    if (prev_songautoeq && !s_songautoeq)
-        do_load_eq_file (str_printf("%s%s%s%s", "file://",
-    	           aud_get_path (AudPath::UserDir), path_sep, "_nonauto.preset"), false);
+    if (prev_songautoeq && ! s_songautoeq)
+        do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/_nonauto.preset"})), 
+                false, false);
 
     UNLOCK_ALL;
 

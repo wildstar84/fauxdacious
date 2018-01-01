@@ -1,4 +1,24 @@
-Version 3.9-beta1
+Version 3.9-beta2
+
+* Added support for directory-specific equalizer-preset files (like XMMS):
+Use new config option:  "eqpreset_default_file=<filename>.preset".  The 
+XMMS default for this is "dir_default.preset".  This new option must be 
+actually set for directory-specific presets to work (along with the option: 
+"equalizer_autoload=TRUE".  The preset file with the specific name must 
+exist in the same directory as the song, and does not apply to subdirectories.
+Presets will be searched for:  1) the song directory (<songfile>.preset, then 
+the ~/.config/audacious[_instancename]/<songfile>.preset (as before), then 
+the song directory (<eqpreset_default_file>), then last (as before):
+~/.config/audacious[_instancename]/eq.preset.  Does not apply to streams, 
+URLs, disks, or other songs that are not files on the local file system.  
+(Cue-sheet files are still treated as files though).
+
+* Added support for CD / DVD - specific equalizer-preset files (name the 
+preset file name the disk-ID (CDs) or the disk title (DVDs) and saved in 
+as ~/.config/audacious[_instancename]/<disk-id>.preset.  
+(the config option: "equalizer_autoload=TRUE" must also be specified).
+
+(12/25/2017) Version 3.9-beta1
 
 * Added support for using user-created custom tag files for CDs, and 
 directories.  This permits the user to create a tag file for his own 
