@@ -130,6 +130,16 @@ static void text_changed ()
     gtk_widget_set_sensitive (add, (bool) name[0]);
 }
 
+static void localsave_toggled (GtkToggleButton * button)
+{
+    aud_set_bool (nullptr, "try_local_preset_files", gtk_toggle_button_get_active (button));
+}
+
+static void nameonly_toggled (GtkToggleButton * button)
+{
+    aud_set_bool (nullptr, "eqpreset_nameonly", gtk_toggle_button_get_active (button));
+}
+
 static void add_from_entry ()
 {
     const char * name = gtk_entry_get_text ((GtkEntry *) entry);
@@ -262,6 +272,28 @@ static GtkWidget * create_eq_preset_window ()
 
     g_signal_connect (entry, "activate", (GCallback) add_from_entry, nullptr);
     g_signal_connect (entry, "changed", (GCallback) text_changed, nullptr);
+
+    GtkWidget * hbox1a = gtk_hbox_new (false, 6);
+    gtk_box_pack_start ((GtkBox *) vbox, hbox1a, false, false, 0);
+    GtkWidget * localsave_checkbox = gtk_check_button_new ();
+    gtk_box_pack_start ((GtkBox *) hbox1a, localsave_checkbox, true, true, 0);
+    g_signal_connect (localsave_checkbox, "toggled", (GCallback) localsave_toggled, nullptr);
+    gtk_widget_set_sensitive (localsave_checkbox, true);
+    gtk_button_set_label ((GtkButton *) localsave_checkbox,
+            _("Use entry's local directory for preset files, if possible."));
+    if (aud_get_bool (nullptr, "try_local_preset_files"))
+        gtk_toggle_button_set_active ((GtkToggleButton *) localsave_checkbox, true);
+
+    GtkWidget * hbox1b = gtk_hbox_new (false, 6);
+    gtk_box_pack_start ((GtkBox *) vbox, hbox1b, false, false, 0);
+    GtkWidget * nameonly_checkbox = gtk_check_button_new ();
+    gtk_box_pack_start ((GtkBox *) hbox1b, nameonly_checkbox, true, true, 0);
+    g_signal_connect (nameonly_checkbox, "toggled", (GCallback) nameonly_toggled, nullptr);
+    gtk_widget_set_sensitive (nameonly_checkbox, true);
+    gtk_button_set_label ((GtkButton *) nameonly_checkbox,
+            _("Exclude arg. lists from urls to create preset filename."));
+    if (aud_get_bool (nullptr, "eqpreset_nameonly"))
+        gtk_toggle_button_set_active ((GtkToggleButton *) nameonly_checkbox, true);
 
     GtkWidget * scrolled = gtk_scrolled_window_new (nullptr, nullptr);
     gtk_scrolled_window_set_shadow_type ((GtkScrolledWindow *) scrolled, GTK_SHADOW_IN);
