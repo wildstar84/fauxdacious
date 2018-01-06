@@ -29,7 +29,7 @@
 #include "libaudgui-gtk.h"
 
 static const char about_text[] = "<big><b>Fauxdacious " VERSION "</b></big>\n" COPYRIGHT;
-static const char website[] = "http://audacious-media-player.org";
+static const char website[] = "https://wildstar84.wordpress.com/fauxdacious";
 
 static GtkWidget * create_credits_notebook (const char * credits, const char * license)
 {

@@ -13,6 +13,8 @@ et. al. url-handling already included).  Users can add more!
 * User-savable metadata for streams, and media codecs that don't support it.
 * Restoration of XMMS "preset" equalization button for song-specific, 
 directory-specific, and cuesheet-specific equalization.
+* Option to save active Effects plugin list with custom equalizer presets for 
+song/stream/disk/directory-specific Effects setup.
 * Option to divert audio output to stdout in the user's choice of selected audio 
 formats for further processing by another program.
 * Piping through stdin input for playlists as well as most media formats.

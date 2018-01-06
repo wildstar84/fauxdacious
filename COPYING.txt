@@ -1,6 +1,6 @@
 Fauxdacious for Windows
 
-    https://wildstar84.wordpress.com/2015/11/25/fauxdacious-media-player-for-linux-released/
+    https://wildstar84.wordpress.com/fauxdacious
     http://audacious-media-player.org
 
 Fauxdacious / Audacious are free and open source software.  

@@ -146,7 +146,6 @@ SEE ALSO
        audtool(1)
 
 WEBSITE
-       https://wildstar84.wordpress.com/2015/11/25/fauxdacious-media-player-
-       for-linux-released/ http://audacious-media-player.org
+       https://wildstar84.wordpress.com/fauxdacious http://audacious-media-player.org
 
 Version 3.7-beta1                  May 2016                     FAUXDACIOUS(1)

@@ -4,7 +4,7 @@
 #define MyAppName "Fauxdacious"
 #define MyAppVersion "3.83-beta3"
 #define MyAppPublisher "Jim Turner"
-#define MyAppURL "https://wildstar84.wordpress.com/2015/11/25/fauxdacious-media-player-for-linux-released/"
+#define MyAppURL "https://wildstar84.wordpress.com/fauxdacious"
 #define MyAppExeName "fauxdacious.exe"
 
 [Setup]
