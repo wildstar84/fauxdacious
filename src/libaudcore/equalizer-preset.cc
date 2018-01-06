@@ -27,6 +27,9 @@
 #include "audstrings.h"
 #include "runtime.h"
 #include "vfs.h"
+#include <libaudcore/plugin.h>
+#include <libaudcore/plugins.h>
+#include <libaudcore/plugins-internal.h>
 
 EXPORT Index<EqualizerPreset> aud_eq_read_presets (const char * basename)
 {
@@ -161,6 +164,17 @@ EXPORT bool aud_save_preset_file (const EqualizerPreset & preset, VFSFile & file
         g_key_file_set_double (rcfile, "Equalizer preset",
          str_printf ("Band%d", i), preset.bands[i]);
 
+    if (aud_get_bool (nullptr, "eqpreset_save_effects"))
+    {
+        /* JWT:IF USER WANTS, WE ALSO SAVE EFFECTS (STATUS OF EACH EFFECTS PLUGIN) IN PRESET FILE: */
+        g_key_file_set_double (rcfile, "Effects preset", "effects_set", 1);
+        for (PluginHandle * plugin : aud_plugin_list (PluginType::Effect))
+        {
+            g_key_file_set_double (rcfile, "Effects preset", aud_plugin_get_basename (plugin), 
+                    (aud_plugin_get_enabled (plugin) ? 1 : 0));
+        }
+    }
+
     size_t len;
     CharPtr data (g_key_file_to_data (rcfile, & len, nullptr));
 
@@ -189,7 +203,33 @@ EXPORT bool aud_load_preset_file (EqualizerPreset & preset, VFSFile & file)
 
     for (int i = 0; i < AUD_EQ_NBANDS; i ++)
         preset.bands[i] = g_key_file_get_double (rcfile, "Equalizer preset",
-         str_printf ("Band%d", i), nullptr);
+                str_printf ("Band%d", i), nullptr);
+
+    if (aud_get_bool(nullptr, "eqpreset_use_effects")
+            && g_key_file_get_double (rcfile, "Effects preset", "effects_set", nullptr) == 1)
+    {
+        /* JWT:LOAD UP EFFECTS (STATUS OF EACH EFFECTS PLUGIN) IN PRESET FILE: */
+        double enable_toggle;
+        bool is_enabled;
+        bool sumpin_changed = false;
+        for (PluginHandle * plugin : aud_plugin_list (PluginType::Effect))
+        {
+            enable_toggle = g_key_file_get_double (rcfile, "Effects preset", 
+                    aud_plugin_get_basename (plugin), nullptr);
+            is_enabled = aud_plugin_get_enabled (plugin);
+            if (enable_toggle && ! is_enabled)
+            {
+                plugin_set_enabled (plugin, PluginEnabled::Primary);
+                sumpin_changed = true;
+            }
+            else if (! enable_toggle && is_enabled)
+            {
+                plugin_set_enabled (plugin, PluginEnabled::Disabled);
+                sumpin_changed = true;
+            }
+        }
+        aud_set_bool (nullptr, "_autoeffects_loaded", sumpin_changed);
+    }
 
     g_key_file_free (rcfile);
 

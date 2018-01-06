@@ -140,6 +140,11 @@ static void nameonly_toggled (GtkToggleButton * button)
     aud_set_bool (nullptr, "eqpreset_nameonly", gtk_toggle_button_get_active (button));
 }
 
+static void save_effects2_toggled (GtkToggleButton * button)
+{
+    aud_set_bool (nullptr, "eqpreset_save_effects", gtk_toggle_button_get_active (button));
+}
+
 static void add_from_entry ()
 {
     const char * name = gtk_entry_get_text ((GtkEntry *) entry);
@@ -294,6 +299,22 @@ static GtkWidget * create_eq_preset_window ()
             _("Exclude arg. lists from urls to create preset filename."));
     if (aud_get_bool (nullptr, "eqpreset_nameonly"))
         gtk_toggle_button_set_active ((GtkToggleButton *) nameonly_checkbox, true);
+
+    if (aud_get_bool(nullptr, "eqpreset_use_effects"))
+    {
+        GtkWidget * hbox1c = gtk_hbox_new (false, 6);
+        gtk_box_pack_start ((GtkBox *) vbox, hbox1c, false, false, 0);
+        GtkWidget * save_effects2_checkbox = gtk_check_button_new ();
+        gtk_box_pack_start ((GtkBox *) hbox1c, save_effects2_checkbox, true, true, 0);
+        g_signal_connect (save_effects2_checkbox, "toggled", (GCallback) save_effects2_toggled, nullptr);
+        gtk_widget_set_sensitive (save_effects2_checkbox, true);
+        gtk_button_set_label ((GtkButton *) save_effects2_checkbox,
+                _("Save Effects (plugins) with presets."));
+        if (aud_get_bool (nullptr, "eqpreset_save_effects"))
+            gtk_toggle_button_set_active ((GtkToggleButton *) save_effects2_checkbox, true);
+    }
+    else
+        aud_set_bool (nullptr, "eqpreset_save_effects", false);
 
     GtkWidget * scrolled = gtk_scrolled_window_new (nullptr, nullptr);
     gtk_scrolled_window_set_shadow_type ((GtkScrolledWindow *) scrolled, GTK_SHADOW_IN);

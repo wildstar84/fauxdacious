@@ -485,13 +485,27 @@ static bool do_load_eq_file (StringBuf filename, bool save_prev_preset_as_defaul
     }
     if (havesongeqfile)
     {
+        if (save_prev_preset_as_default && s_songautoeq && aud_get_bool (nullptr, "_autoeffects_loaded")
+                && aud_get_bool(nullptr, "eqpreset_use_effects"))
+        {
+            /* RESTORE NON-AUTO EFFECTS PRESETS (P(e)=>P(*)) SINCE SONG MAY NOT HAVE EFFECTS SAVED! */
+            do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/_nonauto.preset"})), 
+                    false, false);
+            aud_set_bool (nullptr, "_autoeffects_loaded", false);
+        }
         VFSFile file (filename, "r");
-        if (file && aud_load_preset_file (preset, file))  /* (*->P) SONG HAS A PRESET FILE! */
+        if (file)  /* (*->P) SONG HAS A PRESET FILE! */
         {
             /* JWT: (N->P) IF LOADING SONG-SPECIFIC PRESETS AND WE DON'T HAVE SONG-SPECIFIC ONES IN EFFECT NOW, THEN SAVE
                 THE CURRENT PRESETS OUT AS THE "DEFAULT" FOR LATER RESTORATION ON NEXT SONG W/O SONG-SPECIFIC PRESETS */
             if (save_prev_preset_as_default && ! s_songautoeq)
+            {
+                bool saveopt = aud_get_bool (nullptr, "eqpreset_save_effects");  // IGNORE USER-SET SAVE OPT FOR DEFAULT PRESET!:
+                aud_set_bool (nullptr, "eqpreset_save_effects", aud_get_bool(nullptr, "eqpreset_use_effects"));
                 do_save_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/_nonauto.preset"})));
+                aud_set_bool (nullptr, "eqpreset_save_effects", saveopt);
+            }
+            aud_load_preset_file (preset, file);
             aud_eq_apply_preset (preset);   /* (*->P) APPLY THE SONG-SPECIFIC PRESET FILE AND NOTE THAT WE DID THAT! */
             loadedit = true;
         }
@@ -628,8 +642,11 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
        THIS IS DONE REGUARDLESS OF [Autoload] STATE SINCE [Autoload] MAY'VE BEEN TURNED
        OFF DURING PREV. SONG AND CURRENT SONG WILL NOT'VE BEEN CHECKED FOR A PRESET FILE. */
     if (prev_songautoeq && ! s_songautoeq)
+    {
         do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/_nonauto.preset"})), 
                 false, false);
+        aud_set_bool (nullptr, "_autoeffects_loaded", false);
+    }
 
     UNLOCK_ALL;
 
