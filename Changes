@@ -1,5 +1,17 @@
 Version 3.9-beta2
 
+* Added support for custom effects settings in the equalizer-preset files.
+This option allows the current list of active effects plugins to be 
+customized and saved for specific songs, streams, directories and disks!
+For example if a specific disk, song, or stream requires the "Dynamic Range 
+Compressor plugin" to be used to sound properly, one can now have it 
+automatically activated for that entry but off or others so one no longer 
+need to manually turn it on for playing that entry!  The new config option 
+to enable this feature is:  audacious:eqpreset_use_effects=TRUE.  A 
+new checkbox appears when saving equalizer presets (GTK/Winamp-GTK only) to 
+save the current effects plugin status in the equalizer preset file (.preset 
+only).  The "Auto" button must also be on in the Equalizer window.
+
 * Added support for directory-specific equalizer-preset files (like XMMS):
 Use new config option:  "eqpreset_default_file=<filename>.preset".  The 
 XMMS default for this is "dir_default.preset".  This new option must be 
