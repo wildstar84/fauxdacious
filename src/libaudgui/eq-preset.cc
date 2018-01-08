@@ -300,7 +300,7 @@ static GtkWidget * create_eq_preset_window ()
     if (aud_get_bool (nullptr, "eqpreset_nameonly"))
         gtk_toggle_button_set_active ((GtkToggleButton *) nameonly_checkbox, true);
 
-    if (aud_get_bool(nullptr, "eqpreset_use_effects"))
+    if (aud_get_bool (nullptr, "eqpreset_use_effects"))
     {
         GtkWidget * hbox1c = gtk_hbox_new (false, 6);
         gtk_box_pack_start ((GtkBox *) vbox, hbox1c, false, false, 0);

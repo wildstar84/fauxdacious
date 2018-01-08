@@ -27,9 +27,8 @@
 #include "audstrings.h"
 #include "runtime.h"
 #include "vfs.h"
-#include <libaudcore/plugin.h>
-#include <libaudcore/plugins.h>
-#include <libaudcore/plugins-internal.h>
+#include "plugin.h"
+#include "plugins-internal.h"
 
 EXPORT Index<EqualizerPreset> aud_eq_read_presets (const char * basename)
 {
@@ -205,7 +204,7 @@ EXPORT bool aud_load_preset_file (EqualizerPreset & preset, VFSFile & file)
         preset.bands[i] = g_key_file_get_double (rcfile, "Equalizer preset",
                 str_printf ("Band%d", i), nullptr);
 
-    if (aud_get_bool(nullptr, "eqpreset_use_effects")
+    if (aud_get_bool (nullptr, "eqpreset_use_effects")
             && g_key_file_get_double (rcfile, "Effects preset", "effects_set", nullptr) == 1)
     {
         /* JWT:LOAD UP EFFECTS (STATUS OF EACH EFFECTS PLUGIN) IN PRESET FILE: */
