@@ -20,10 +20,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <locale.h>
 
 #include "audtool.h"
-#include <string.h>
 
 static char * which_instance;
 
@@ -162,30 +162,14 @@ static void audtool_connect (void)
         exit (EXIT_FAILURE);
     }
 
+    char instname [111];
     if (which_instance)
-    {
-        char instname [100];
-        char instpath [100];
-        strcpy(instname, "org.atheme.");
-        strcpy(instpath, "/org/atheme/");
-        int maxstrsz = 88;
-        if (strlen (which_instance) < 88)
-            maxstrsz = strlen (which_instance);
-        if (which_instance[0] >= '0' && which_instance[0] <= '9') /* IF THEY INSIST ON USING NUMBERS, WE HAVE TO APPEND AN UNDERSCORE! */
-        {
-        	   strncat (instname, "_", 1);
-        	   strncat (instpath, "_", 1);
-        }
-        strncat(instname, which_instance, maxstrsz);
-        strncat(instpath, which_instance, maxstrsz);
-        dbus_proxy = obj_audacious_proxy_new_sync (connection, 0,
-         instname, instpath, NULL, & error);
-    }
+        sprintf (instname, "org.atheme.audacious_%s", which_instance);
     else
-    {
-        dbus_proxy = obj_audacious_proxy_new_sync (connection, 0,
-         "org.atheme.audacious", "/org/atheme/audacious", NULL, & error);
-    }
+        strcpy (instname, "org.atheme.audacious");
+
+    dbus_proxy = obj_audacious_proxy_new_sync (connection, 0,
+            instname, "/org/atheme/audacious", NULL, & error);
 
     if (! dbus_proxy)
     {
@@ -218,21 +202,32 @@ int main (int argc, char * * argv)
 
     for (j = 1; j < argc; j ++)
     {
-        if ((! g_ascii_strcasecmp ("instance", argv[j]) ||
-         ! g_ascii_strcasecmp ("--instance", argv[j])) 
-         && g_ascii_strcasecmp ("<sep>", "instance"))
+        if ((! g_ascii_strcasecmp ("instance", argv[j]) 
+                || ! g_ascii_strcasecmp ("--instance", argv[j])) 
+                && g_ascii_strcasecmp ("<sep>", "instance"))
         {
+            /* HANDLE "[--]instance <name>" ARGUMENTS: */
             int numargs = 2 < argc - j ? 3 : argc - j;
             set_instance_tag (numargs, & argv[j]);
             j += 1;
             if (j >= argc)
                 break;
         }
-        else if (! g_ascii_strcasecmp ("help", argv[j]) ||  /* JWT:DON'T THROW DBUS ERROR WHEN NOT CONNECTED & JUST ASKING FOR HELP! */
-         ! g_ascii_strcasecmp ("--help", argv[j]) || ! g_ascii_strcasecmp ("-h", argv[j]))
+        else if (argc >= 2 && argv[j][0] == '-' && argv[j][1] >= '1' && argv[j][1] <= '9' && ! argv[j][2])
         {
-        	   get_handlers_list (1, & argv[j]);
-        	   exit (0);
+            /* HANDLE AUDACIOUS-ISH NUMERIC INSTANCE ARGUMENT (-#): */
+            int numargs = 2 < argc - j ? 3 : argc - j;
+            set_instance_tag (numargs, & argv[j-1]);
+            j += 1;
+            if (j >= argc)
+                break;
+        }
+        else if (! g_ascii_strcasecmp ("help", argv[j]) ||  /* JWT:DON'T THROW DBUS ERROR WHEN NOT CONNECTED & JUST ASKING FOR HELP! */
+                ! g_ascii_strcasecmp ("--help", argv[j]) || ! g_ascii_strcasecmp ("-h", argv[j]))
+        {
+            /* HANDLE EVERYTHING ELSE (EXCEPT [--]h[elp], WHICH IS TREATED SAME AS DEFAULT (noop)): */
+            get_handlers_list (1, & argv[j]);
+            exit (0);
         }
     }
 
@@ -242,9 +237,9 @@ int main (int argc, char * * argv)
     {
         for (i = 0; handlers[i].name != NULL; i++)
         {
-            if ((! g_ascii_strcasecmp (handlers[i].name, argv[j]) ||
-             ! g_ascii_strcasecmp (g_strconcat ("--", handlers[i].name, NULL),
-             argv[j])) && g_ascii_strcasecmp ("<sep>", handlers[i].name))
+            if ((! g_ascii_strcasecmp (handlers[i].name, argv[j]) 
+                    || ! g_ascii_strcasecmp (g_strconcat ("--", handlers[i].name, NULL), argv[j])) 
+                    && g_ascii_strcasecmp ("<sep>", handlers[i].name))
             {
             	   if (! g_ascii_strcasecmp (handlers[i].name, "instance"))
             	       continue;
@@ -271,5 +266,5 @@ int main (int argc, char * * argv)
 
 void set_instance_tag (int argc, char * * argv)
 {
-	which_instance = argv[1];
+	which_instance = (argv[1][0] == '-' && argv[1][1]) ? argv[1]+1 : argv[1];
 }

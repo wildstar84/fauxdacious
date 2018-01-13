@@ -32,7 +32,7 @@ enum class StartupType {
 };
 
 StringBuf dbus_server_name ();
-StartupType dbus_server_init (char *, char *);
+StartupType dbus_server_init (bool);
 void dbus_server_cleanup ();
 
 #endif

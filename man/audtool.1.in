@@ -19,11 +19,13 @@ current song.
 \fIinstance\fR may be given as \fBinstance-name\fR to specify which instance 
 of Fauxdacious to control when multiple instances have been started 
 (with \fB--new=instance-name\fR).  The \fBinstance-name\fR will also be the 
-name of the config file (created first time the instance is started, if not 
-already existing) in ~/.config/audacious/.  (The default config file name is 
-\fBconfig\fR).  New unnamed instances (created with just \fB-n\fR) can not be 
-manipulated with audtool.  \fBinstance-name\fR is just a user-selected 
-unique string of characters constituting a valid file name.
+name of the config directory (created first time the instance is started, if not 
+already existing) as ~/.config/audacious[_instancename]/.  (The default config 
+file instance name is \faudacious\fR), but the default config directory is 
+~/.config/audacious, not ~/.config/audacious_audacious).  New unnamed 
+instances (created with just \fB-n\fR) can not be manipulated with audtool.  
+\fBinstance-name\fR is just a user-selected unique string of characters (or 
+single-digit number).  No spaces may be used.
 
 .SH COMMANDS
 .SS Current song information:

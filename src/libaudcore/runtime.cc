@@ -82,6 +82,20 @@ EXPORT void aud_set_headless_mode (bool headless)
 EXPORT bool aud_get_headless_mode ()
     { return headless_mode; }
 
+EXPORT void aud_set_instancename (char * strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
+{
+    strcpy (instancename, strarg);
+}
+
+EXPORT char * aud_get_instancename ()
+{
+    if (strlen (instancename) > 0)
+        return instancename;
+
+    static char litstr [] = "audacious";
+    return litstr;
+}
+
 EXPORT void aud_set_mainloop_type (MainloopType type)
     { mainloop_type = type; }
 EXPORT MainloopType aud_get_mainloop_type ()
@@ -97,20 +111,6 @@ EXPORT void aud_set_pausemute_mode (bool pausemute_mode)  /* JWT:NEXT 2 TO ADD P
 EXPORT bool aud_get_pausemute_mode ()
 {
     return MuteInLieuOfPause;
-}
-
-EXPORT void aud_set_instancename (char * strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
-{
-    strcpy (instancename, strarg);
-}
-
-EXPORT char * aud_get_instancename ()
-{
-    if (strlen (instancename) > 0)
-        return instancename;
-
-    static char litstr [] = "audacious";
-    return litstr;
 }
 
 EXPORT void aud_set_fudge_gain (int fg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING FUDGE-GAIN */
@@ -269,8 +269,8 @@ static void set_install_paths ()
 static void set_config_paths ()
 {
     const char * xdg_config_home = g_get_user_config_dir ();
-    StringBuf namebuf = (! strcmp (aud_get_instancename (), "") || ! strcmp (aud_get_instancename (), "audacious")) 
-            ? str_copy ("audacious") : str_printf ("audacious_%s", aud_get_instancename ());
+    StringBuf namebuf = (! strcmp (aud_get_instancename (), "audacious") 
+            ? str_copy ("audacious") : str_printf ("audacious_%s", aud_get_instancename ()));
 
     aud_paths[AudPath::UserDir] = String (filename_build ({xdg_config_home, namebuf}));
     aud_paths[AudPath::PlaylistDir] = String (filename_build

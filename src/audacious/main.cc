@@ -24,7 +24,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#define SDL_MAIN_HANDLED
+
 #include "SDL.h"
 
 #define AUD_GLIB_INTEGRATION
@@ -45,9 +45,9 @@
 #include "main.h"
 #include "util.h"
 
-bool jwt_norepeat = false;    /* JWT:SAVE PRE-CONFIGURED STATES IF WE OR CMD-LINES ALTER (MAKE ONE-SHOT ONLY) */
-bool resetEqState;
-bool resetRepeatToOn;
+bool jwt_norepeat = false;  /* JWT:SAVE PRE-CONFIGURED STATES IF WE OR CMD-LINES ALTER (MAKE ONE-SHOT ONLY). */
+bool resetEqState;          /* JWT:SAVE EQUALIZER STATE FOR RESET IF USER FORCES IT TEMPORARILY ON. */
+bool resetRepeatToOn;       /* JWT:SAVE REPEAT STATUS FOR RESET IF STDIN-PIPING FORCES IT TEMPORARILY OFF. */
 
 static struct {
     int help, version;
@@ -82,11 +82,10 @@ static const struct {
     {"headless", 'H', & options.headless, N_("Start without a graphical interface")},
     {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window")},
     {"show-main-window", 'm', & options.mainwin, N_("Display the main window")},
-    {"new", 'n', & options.newinstance, N_("New Instance no. or name (ie: -1 | -n | --new=name)")}, 
+    {"new", 'n', & options.newinstance, N_("New Instance:  number, name, or unnamed (ie: -# | --new=name | -n)")}, 
     {"play", 'p', & options.play, N_("Start playback")},
     {"pause-mute", 'P', & options.pauseismute, N_("Pause mutes instead of pausing")},  /* JWT:ADD PAUSEMUTE OPTION */
     {"quit-after-play", 'q', & options.quit_after_play, N_("Quit on playback stop")},
-    {"verbose", 'V', & options.verbose, N_("Print debugging messages (may be used twice)")},
 #if defined(USE_QT) && defined(USE_GTK)
     {"qt", 'Q', & options.qt, N_("Run in Qt mode")},
 #endif
@@ -132,8 +131,7 @@ static bool parse_options (int argc, char * * argv)
             else
                 uri = String (filename_to_uri (filename_build ({cur, arg})));
 
-            if (uri)
-                filenames.append (uri);
+            filenames.append (uri);
         }
         else if (! arg[1])       /* "-" (standard input) */
         {
@@ -195,11 +193,11 @@ static bool parse_options (int argc, char * * argv)
                 {
                     if (arg[c] >= '0' && arg[c] <= '9')  /* digit (instance number) found */
                     {
-                        if (arg[c] > '0')  /* new instance number (0 == default: no new instance) */
+                        if (arg[c] > '0')  /* new (Audacious-style) instance number (0 == default: no new instance) */
                         {
-                            options.newinstance = 1;
                             strncpy (instancename, arg + c, 1);
                             instancename[1] = '\0';
+                            options.newinstance = 1;
                         }
                     }
                     else
@@ -223,6 +221,7 @@ static bool parse_options (int argc, char * * argv)
         aud_set_pausemute_mode (true);
     else
         aud_set_pausemute_mode (false);
+
     if (options.qt)
         aud_set_mainloop_type (MainloopType::Qt);
 
@@ -253,38 +252,14 @@ static void do_remote ()
     g_type_init ();
 #endif
 
-    /* check whether the selected instance is running */
-    /* JWT:REPLACED BY NEXT 17: if (options.newinstance || dbus_server_init () != StartupType::Client) */
-    char instname [111];
-    char instpath [112];
-    strcpy (instname, "org.atheme.");
-    strcpy (instpath, "/org/atheme/");
-    if (options.newinstance)
-    {
-        int maxstrsz = 88;
-        if (strlen (instancename) < 88)
-            maxstrsz = strlen (instancename);
-        aud_set_instancename (instancename);   /* TRY SETTING EARLY SINCE instancename GETS BLANKED?! */
-        if (instancename[0] >= '1' && instancename[0] <= '9') /* IF THEY INSIST ON USING NUMBERS, WE HAVE TO APPEND AN UNDERSCORE! */
-        {
-            strncat (instname, "_", 1);
-            strncat (instpath, "_", 1);
-        }
-        strncat (instname, instancename, maxstrsz);
-        strncat (instpath, instancename, maxstrsz);
-    }
-    else
-    {
-        strncat (instname, "audacious", 9);
-        strncat (instpath, "audacious", 9);
-        aud_set_instancename (instancename);   /* TRY SETTING EARLY SINCE instancename GETS BLANKED?! */
-    }
-    if (dbus_server_init (instname, instpath) != StartupType::Client)
+    aud_set_instancename (instancename);   /* TRY SETTING EARLY SINCE instancename GETS BLANKED?! */
+    /* check whether the selected instance is running. */
+    if (dbus_server_init (options.newinstance) != StartupType::Client)
         return;
 
     if (! (bus = g_bus_get_sync (G_BUS_TYPE_SESSION, nullptr, & error)) ||
-        ! (obj = obj_audacious_proxy_new_sync (bus, (GDBusProxyFlags) 0,
-        instname, instpath, nullptr, & error)))
+            ! (obj = obj_audacious_proxy_new_sync (bus, (GDBusProxyFlags) 0,
+            dbus_server_name (), "/org/atheme/audacious", nullptr, & error)))
     {
         AUDERR ("D-Bus error: %s\n", error->message);
         g_error_free (error);
@@ -500,9 +475,7 @@ int main (int argc, char * * argv)
     bool sdl_initialized = false;  // TRUE IF SDL (VIDEO) IS SUCCESSFULLY INITIALIZED.
     SDL_SetMainReady ();
     if (SDL_InitSubSystem (SDL_INIT_VIDEO) < 0)
-    {
         AUDERR ("e:Failed to init SDL in main(): (no video playing): %s.\n", SDL_GetError ());
-    }
     else
         sdl_initialized = true;
 

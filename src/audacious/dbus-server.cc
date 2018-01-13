@@ -818,10 +818,10 @@ static void name_lost (GDBusConnection *, const char * name, void *)
 StringBuf dbus_server_name ()
 {
     return (! strcmp_safe (aud_get_instancename (), "", -1) || ! strcmp_safe (aud_get_instancename (), "audacious", -1)) 
-            ? str_printf ("%s", "org.atheme.audacious") : str_printf ("org.atheme.audacious_%s", aud_get_instancename ());
+            ? str_copy ("org.atheme.audacious") : str_printf ("org.atheme.audacious_%s", aud_get_instancename ());
 }
 
-StartupType dbus_server_init (char * dbusname, char * dbuspath)
+StartupType dbus_server_init (bool newinstance)
 {
     auto startup = StartupType::Unknown;
 
@@ -837,15 +837,16 @@ StartupType dbus_server_init (char * dbusname, char * dbuspath)
     for (auto & handler : handlers)
         g_signal_connect (skeleton, handler.signal, handler.callback, nullptr);
 
-    if (! strcmp (dbuspath, "/org/atheme/") || ! g_dbus_interface_skeleton_export (skeleton, bus, dbuspath, & error))
+    if ((newinstance && ! strcmp (aud_get_instancename (), "audacious")) 
+            || ! g_dbus_interface_skeleton_export (skeleton, bus, "/org/atheme/audacious", & error))
         goto ERROR;
 
     context = g_main_context_new ();
     g_main_context_push_thread_default (context);
 
-    AUDDBG ("DBUS INIT: PATH=%s= NAME=%s=\n", dbuspath, dbusname);
-    owner_id = g_bus_own_name (G_BUS_TYPE_SESSION, dbusname,
-     (GBusNameOwnerFlags) 0, nullptr, name_acquired, name_lost, nullptr, nullptr);
+    AUDDBG ("DBUS INIT: NAME=%s= INSTANCE=%s=\n", (const char *) dbus_server_name (), aud_get_instancename ());
+    owner_id = g_bus_own_name (G_BUS_TYPE_SESSION, dbus_server_name (),
+            (GBusNameOwnerFlags) 0, nullptr, name_acquired, name_lost, nullptr, nullptr);
     AUDDBG ("DBUS OWNERID=%d=\n", owner_id);
 
     mainloop = g_main_loop_new (context, true);
@@ -854,12 +855,7 @@ StartupType dbus_server_init (char * dbusname, char * dbuspath)
     mainloop = nullptr;
 
     if (owner_id)
-    {
         startup = StartupType::Server;
-        short st = (dbusname[11] == '_') ? 12 : 11;
-        char * instancename = dbusname + st;
-        aud_set_instancename (instancename);
-    }
     else
         startup = StartupType::Client;
 
