@@ -215,7 +215,7 @@ void eq_preset_save_file ()
                     StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
                     aud_set_str (nullptr, "_preset_dir", (const char *) path);
                 }
-                if (iscue)  // WE'RE A CUE-SHEET FILE:
+                if (iscue && base[0] != '?')  // WE'RE A CUE-SHEET FILE:
                 {
                     /* JWT:SONGS FROM CUE FILES HAVE A TRAILING "?<cue#>" THAT'S NOT ON THE FILENAME IN output.cc 
                         SO WE HAVE TO STRIP IT OFF THE "filename" HERE, BUT ONLY IF WE'RE A "file://..." SCHEME, 
