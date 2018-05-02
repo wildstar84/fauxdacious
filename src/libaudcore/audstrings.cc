@@ -1173,3 +1173,19 @@ EXPORT StringBuf str_format_time (int64_t milliseconds)
         return str_printf (zero ? "%s%02d:%02d" : "%s%d:%02d", neg ? "- " : "", minutes, seconds);
     }
 }
+
+/* JWT:RETURN ONLY FIRST "LINE" OF A MULTI-LINE STRING (USED FOR TITLES ON WINDOW TITLEBARS! */
+EXPORT StringBuf str_get_first_line (const char * instr)
+{
+    int len = strlen (instr);
+    for (int i=0; i<len; i++)
+    {
+        if (instr[i] == '\r' || instr[i] == '\n')
+        {
+            len = i;
+            break;
+        }
+    }
+
+    return str_printf (_("%.*s"), len, instr);
+}
