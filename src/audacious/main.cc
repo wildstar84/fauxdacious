@@ -334,10 +334,22 @@ static void do_commands ()
             {
                 aud_playlist_delete(i);
             }
-            /* JWT:ADDED TO REMOVE YOUTUBE-DL TAG FILE (TO KEEP IT FROM FILLING UP W/NOW USELESS ENTRIES: */
-            StringBuf tagdata_filename = filename_build ({aud_get_path (AudPath::UserDir), "youtubedl_tag_data"});
-            if (! remove ((const char *) tagdata_filename))
-                AUDINFO ("removed youtubedl_tag_data tag file.\n");
+            /* JWT:ADDED TO REMOVE THE TEMPORARY TAG FILE CREATED BY URL-HELPER SCRIPT FOR YOUTUBE VIDEOS AND 
+               THE YOUTUBEDL PLUGIN (TO KEEP IT FROM FILLING UP W/NOW USELESS ENTRIES): */
+            if (aud_get_bool (nullptr, "user_tag_data"))
+            {
+                String cover_helper = aud_get_str ("audacious", "cover_helper");
+                if (cover_helper[0])  //JWT:WE HAVE A PERL HELPER, LESSEE IF IT CAN FIND/DOWNLOAD A COVER IMAGE FOR US:
+                {
+                    AUDINFO ("----HELPER FOUND: WILL DO (%s)\n", (const char *)str_concat ({cover_helper, " DELETE COVERART ", 
+                          aud_get_path (AudPath::UserDir)}));
+                    system ((const char *) str_concat ({cover_helper, " DELETE COVERART ", 
+                          aud_get_path (AudPath::UserDir)}));
+                }
+                StringBuf tagdata_filename = filename_build ({aud_get_path (AudPath::UserDir), "tmp_tag_data"});
+                if (! remove ((const char *) tagdata_filename))
+                    AUDINFO ("..tmp_tag_data tag file found and removed.\n");
+            }
         }
     }
 
