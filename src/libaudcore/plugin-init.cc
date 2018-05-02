@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "hook.h"
 #include "interface.h"
@@ -190,6 +191,15 @@ void start_plugins_one ()
     start_plugins (PluginType::Input);
     start_plugins (PluginType::Effect);
     start_plugins (PluginType::Output);
+
+    /* JWT:ADDED NEXT 7 TO ENSURE BOTH Adplug PLUGINS AREN'T ON AT THE SAME TIME! */
+    PluginHandle * adplugHandle = aud_plugin_lookup_basename ("adplug");
+    if (adplugHandle)
+    {
+        PluginHandle * aud_adplugHandle = aud_plugin_lookup_basename ("aud_adplug");
+        if (aud_adplugHandle && aud_plugin_get_enabled (adplugHandle))
+            aud_plugin_enable (aud_adplugHandle, false);  // DISABLE "CLASSIC" AdPlug!
+    }
 }
 
 void start_plugins_two ()
@@ -314,6 +324,23 @@ EXPORT bool aud_plugin_enable (PluginHandle * plugin, bool enable)
         return enable_single (type, plugin);
     }
 
+    /* JWT:ADDED NEXT 15 TO TOGGLE BETWEEN BOTH Adplug PLUGINS SINCE WE DON'T WANT BOTH ON AT SAME TIME! */
+    const char * plugin_desc = aud_plugin_get_name (plugin);
+    if (enable)
+    {
+        if (! strcmp (plugin_desc, "AdPlug (AdLib Player)"))
+        {
+            PluginHandle * other_adlib = aud_plugin_lookup_basename ("aud_adplug");
+            if (other_adlib)
+                aud_plugin_enable (other_adlib, false);  // DISABLE "CLASSIC" AdPlug!
+        }
+        else if (! strcmp (plugin_desc, "AdPlug Classic (AdLib Player)"))
+        {
+            PluginHandle * other_adlib = aud_plugin_lookup_basename ("adplug");
+            if (other_adlib)
+                aud_plugin_enable (other_adlib, false);  // DISABLE "STANDARD" AdPlug!
+        }
+    }
     return enable_multi (type, plugin, enable);
 }
 

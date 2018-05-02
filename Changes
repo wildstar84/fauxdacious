@@ -1,5 +1,50 @@
 Version 3.9-beta2
 
+* Set up configuration to install the new modern libadplug-based version 
+of the AdPlug plugin (Audacious plugin commit# a39bfd7) BUT retain and 
+rename the old Audacious-based local version to "AdPlug Classic" (audadplug) 
+resulting in having BOTH the old and new versions installed due to some 
+64 bit linux versions requiring a PATCH to libadplug that's not included 
+on some distro's current package versions.  The patch prevents Fauxdacious 
+from CRASHING whilst probing some streams - See Audacious bug#759.  Since 
+Debian Buster, in particular, had drug their heels on updating libadplug 
+for MONTHS now, I've given up waiting and just include both versions for 
+the time being.
+
+* Abbreviate "multi-line" song titles to only display the first line in 
+the window titlebars and the "skins" versions of the playlist to stop 
+garbling up the playlist and the window title-bars.
+
+* Add config option to restore Fauxdacious's pretty (pre-v3.9b2) icons in 
+the Preferences Window (and may effect other icons in future) as Audacious 
+has removed many of their icons in favor of "themed" system-based icons, 
+which, at least on my system look flat, colorless, ugly, and inconsistant 
+with icons elsewhere in Fauxdacious.  The new option is:
+[audacious].use_classic_icons (boolean, default FALSE).  If set to TRUE, 
+Fauxdacious uses it's classic icons, otherwise, the ugly new ones.  This 
+currently only affects the [Settings] - Preference window, but will likely 
+affect others in the future.
+
+* Merge in all of Audacious's massive redux of it's icons, QT-stuff, and 
+numerous other changes since January that I delayed implementing since it 
+required massive time and labor to merge while providing little if any new 
+functionality (and made the icons ugly too). :(  We are now "caught up" with 
+them as of the end of April except for a couple of things, namely their new 
+"object-oriented" playlist system (would require tremendous labor to change 
+over half the source files in the system with no gain in functionality).
+
+* Set up new "tmp_tag_file" for tags and cover-art for "temporary, one-off" 
+video streams (Youtube and Facebook), which "expire" and have to be re-
+downloaded if played more than a few hours later.  This permits us to avoid 
+having to periodically manually delete the build up of useless cover-art 
+images and cruft in our permanent "user_tag_data" file for what are (usually) 
+one-off viewing.  This new "tmp_tag_file" (and the cover-art files it 
+references) are deleted when playlists are cleared (fauxdacious is started 
+with the "-D" option).
+
+* Fixed Audacious-created bug that caused directories to be added as 
+invalid items in playlists when option to not unroll subdirectories was set.
+
 * Added support for custom effects settings in the equalizer-preset files.
 This option allows the current list of active effects plugins to be 
 customized and saved for specific songs, streams, directories and disks!
