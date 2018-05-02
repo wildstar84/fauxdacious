@@ -1,6 +1,6 @@
 /*
  * prefs-window.cc
- * Copyright 2006-2014 William Pitcock, Tomasz Moń, Michael Färber, and
+ * Copyright 2006-2018 William Pitcock, Tomasz Moń, Michael Färber, and
  *                     John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ enum CategoryViewCols {
 };
 
 struct Category {
-    const char * icon_path;
+    const char * icon;
     const char * name;
 };
 
@@ -77,7 +77,17 @@ enum {
     CATEGORY_ADVANCED
 };
 
-static const Category categories[] = {
+/* keep this in sync with the list in load_fallback_icons (init.cc) */
+static const Category categories[] = {   // Modern GTK-Themed icons (default)
+    { "applications-graphics", N_("Appearance") },
+    { "audio-volume-medium", N_("Audio") },
+    { "applications-internet", N_("Network") },
+    { "audio-x-generic", N_("Playlist")} ,
+    { "dialog-information", N_("Song Info") },
+    { "applications-system", N_("Plugins") },
+    { "preferences-system", N_("Advanced") }
+};
+static const Category classic_categories[] = {   // Classic Audacious icons
     { "appearance.png", N_("Appearance") },
     { "audio.png", N_("Audio") },
     { "connectivity.png", N_("Network") },
@@ -304,8 +314,6 @@ static const PreferencesWidget playlist_page_widgets[] = {
         WidgetBool (0, "clear_playlist")),
     WidgetCheck (N_("Open files in a temporary playlist"),
         WidgetBool (0, "open_to_temporary")),
-    WidgetCheck (N_("Do not load files from subfolders"),
-        WidgetBool (0, "no_subdirs")),
     WidgetLabel (N_("<b>Song Display</b>")),
     WidgetCheck (N_("Show song numbers"),
         WidgetBool (0, "show_numbers_in_pl", send_title_change)),
@@ -350,6 +358,11 @@ static const PreferencesWidget advanced_page_widgets[] = {
     WidgetCheck (N_("Interpret \\ (backward slash) as a folder delimiter"),
         WidgetBool (0, "convert_backslash")),
     WidgetTable ({{chardet_elements}}),
+    WidgetLabel (N_("<b>Playlist</b>")),
+    WidgetCheck (N_("Add folders recursively"),
+        WidgetBool (0, "recurse_folders")),
+    WidgetCheck (N_("Add folders nested within playlist files"),
+        WidgetBool (0, "folders_in_playlist")),
     WidgetLabel (N_("<b>Metadata</b>")),
     WidgetCheck (N_("Guess missing metadata from file path"),
         WidgetBool (0, "metadata_fallbacks")),
@@ -490,23 +503,49 @@ static void fill_category_list (GtkTreeView * treeview, GtkNotebook * notebook)
      GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
     gtk_tree_view_set_model (treeview, (GtkTreeModel *) store);
 
-    const char * data_dir = aud_get_path (AudPath::DataDir);
+    int icon_size = audgui_to_native_dpi (48);
 
-    for (const Category & category : categories)
+    if (aud_get_bool(nullptr, "use_classic_icons"))
     {
-        if (& category == & categories[CATEGORY_APPEARANCE] && aud_get_headless_mode ())
-            continue;
+        const char * data_dir = aud_get_path (AudPath::DataDir);
 
-        GtkTreeIter iter;
-        gtk_list_store_append (store, & iter);
-        gtk_list_store_set (store, & iter, CATEGORY_VIEW_COL_NAME,
-         gettext (category.name), -1);
+        for (const Category & category : classic_categories)
+        {
+            if (& category == & classic_categories[CATEGORY_APPEARANCE] && aud_get_headless_mode ())
+                continue;
 
-        StringBuf path = filename_build ({data_dir, "images", category.icon_path});
-        AudguiPixbuf img (gdk_pixbuf_new_from_file (path, nullptr));
+            GtkTreeIter iter;
+            gtk_list_store_append (store, & iter);
+            gtk_list_store_set (store, & iter, CATEGORY_VIEW_COL_NAME,
+             gettext (category.name), -1);
 
-        if (img)
-            gtk_list_store_set (store, & iter, CATEGORY_VIEW_COL_ICON, img.get (), -1);
+            StringBuf path = filename_build ({data_dir, "images", category.icon});
+            AudguiPixbuf img (gdk_pixbuf_new_from_file (path, nullptr));
+
+            if (img)
+                gtk_list_store_set (store, & iter, CATEGORY_VIEW_COL_ICON, img.get (), -1);
+        }
+    }
+    else
+    {
+        GtkIconTheme * icon_theme = gtk_icon_theme_get_default ();
+
+        for (const Category & category : categories)
+        {
+            if (& category == & categories[CATEGORY_APPEARANCE] && aud_get_headless_mode ())
+                continue;
+
+            GtkTreeIter iter;
+            gtk_list_store_append (store, & iter);
+            gtk_list_store_set (store, & iter, CATEGORY_VIEW_COL_NAME,
+             gettext (category.name), -1);
+
+            AudguiPixbuf img (gtk_icon_theme_load_icon (icon_theme,
+             category.icon, icon_size, (GtkIconLookupFlags) 0, nullptr));
+
+            if (img)
+                gtk_list_store_set (store, & iter, CATEGORY_VIEW_COL_ICON, img.get (), -1);
+        }
     }
 
     g_object_unref (store);

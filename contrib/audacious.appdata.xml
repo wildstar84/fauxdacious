@@ -4,12 +4,12 @@
   <id>audacious.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>BSD-2-Clause</project_license>
-  <name>Audacious</name>
+  <name>Fauxdacious</name>
   <summary>Lightweight audio player</summary>
   <description>
     <p>
-      Audacious is an open source audio player. Originally a descendant of XMMS,
-      Audacious plays your music how you want it, without stealing away your
+      Fauxdacious is an open source media player.  A fork of Audacious,
+      Fauxdacious plays your music and videos how you want, without stealing away your
       computer’s resources from other tasks.
     </p>
     <p>
@@ -22,10 +22,10 @@
       lyrics for your music, to set an alarm in the morning, and more.
     </p>
   </description>
-  <url type="homepage">http://audacious-media-player.org</url>
+  <url type="homepage">https://wildstar84.wordpress.com/fauxdacious/</url>
   <screenshots>
-    <screenshot type="default">http://audacious-media-player.org/images/gtk-interface.png</screenshot>
-    <screenshot>http://audacious-media-player.org/images/winamp-interface.png</screenshot>
-    <screenshot>http://audacious-media-player.org/images/settings-window.png</screenshot>
+    <screenshot type="default">https://audacious-media-player.org/images/gtk-interface.png</screenshot>
+    <screenshot>https://wildstar84.files.wordpress.com/2015/11/fauxdaciousvideoscreenshot.png</screenshot>
+    <screenshot>https://audacious-media-player.org/images/settings-window.png</screenshot>
   </screenshots>
 </component>
