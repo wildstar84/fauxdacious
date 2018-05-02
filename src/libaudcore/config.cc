@@ -39,6 +39,7 @@ static const char * const core_defaults[] = {
  "always_resume_paused", "TRUE",
  "clear_playlist", "TRUE",
  "open_to_temporary", "TRUE",
+ "recurse_folders", "TRUE",
  "resume_playback_on_startup", "TRUE",
  "show_interface", "TRUE",
 
@@ -95,6 +96,7 @@ static const char * const core_defaults[] = {
  "convert_backslash", "FALSE",
 #endif
  "export_relative_paths", "FALSE",
+ "folders_in_playlist", "FALSE",
  "generic_title_format", "${?artist:${artist} - }${?album:${album} - }${title}",
  "leading_zero", "FALSE",
  "show_hours", "TRUE",
@@ -267,12 +269,15 @@ void config_save ()
 
     Index<ConfigItem> list;
 
-    s_config.iterate ([&] (ConfigNode * node) {
+    auto add_to_list = [&] (ConfigNode * node) {
         list.append (* node);
-
-        s_modified = false;  // must be inside MultiHash lock
         return false;
-    });
+    };
+    auto finish = [] () {
+        s_modified = false;  // must be inside MultiHash lock
+    };
+
+    s_config.iterate (add_to_list, finish);
 
     list.sort ([] (const ConfigItem & a, const ConfigItem & b) {
         if (a.section == b.section)
