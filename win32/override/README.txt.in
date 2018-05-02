@@ -1,9 +1,10 @@
-Audacious @PACKAGE_VERSION@ for Windows
+Fauxdacious @PACKAGE_VERSION@ for Windows
 
-    http://audacious-media-player.org
+    https://wildstar84.wordpress.com/fauxdacious/
 
-Audacious is free and open source software.  By installing Audacious, you agree
-to be bound by various licenses governing its use and redistribution.
+Fauxdacious is free and open source software forked from Audacious audio-player.
+By installing Fauxdacious, you agree to be bound by various licenses governing 
+its use and redistribution.
 
 Build ID: @BUILDSTAMP@
 
@@ -27,18 +28,19 @@ from the use of this software.
 
 EXCEPTIONS
 
-Other than the Audacious logo itself, the images included with Audacious are
-either based on the Tango Icon Library (public domain) or the GNOME Icon Theme
-(CC BY-SA 3.0; see https://creativecommons.org/licenses/by-sa/3.0/us/).
+Fauxdacious includes icons adapted from the Paper Icon Set by Sam Hewitt.  These
+icons are distributed under the Creative Commons Attribution-ShareAlike 4.0
+license (see https://creativecommons.org/licenses/by-sa/4.0/).
 
-Please note that many of the plugins distributed with Audacious are under
+Please note that many of the plugins distributed with Fauxdacious are under
 different licenses, whose full text may be found either in the "About" window
 of each plugin or in the source code.
 
-Audacious would not exist without the efforts of numerous other free and open
-source software projects, which are listed below.  By installing Audacious, you
-also agree to all relevant licenses governing these projects.  The source code
-and license of each project can be found on the Internet.
+Fauxdacious would not exist without Audacious, and the efforts of the 
+Audacious developers, and numerous other free and open source software projects, 
+which are listed below.  By installing Fauxdacious, you also agree to all 
+relevant licenses governing these projects.  The source code and license 
+of each project can be found on the Internet.
 
     Project          Website
     -------          -------
@@ -83,6 +85,7 @@ and license of each project can be found on the Internet.
     FluidSynth       http://fluidsynth.org
 
 If you are an author of one of these projects and do not wish your software
-included with Audacious in binary form, please contact us via the support forum:
+included with Fauxdacious in binary form, please contact us via the support forum:
 
-    http://redmine.audacious-media-player.org/projects/audacious/boards
+    mailto:turnerjw784@yahoo.com
+    https://redmine.audacious-media-player.org/projects/audacious/boards
