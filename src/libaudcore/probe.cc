@@ -61,6 +61,32 @@ InputPlugin * load_input_plugin (PluginHandle * decoder, String * error)
     return ip;
 }
 
+/* figure out some basic info without opening the file */
+int probe_by_filename (const char * filename)
+{
+    int flags = 0;
+    auto & list = aud_plugin_list (PluginType::Input);
+
+    StringBuf scheme = uri_get_scheme (filename);
+    StringBuf ext = uri_get_extension (filename);
+
+    for (PluginHandle * plugin : list)
+    {
+        if (! aud_plugin_get_enabled (plugin))
+            continue;
+
+        if ((scheme && input_plugin_has_key (plugin, InputKey::Scheme, scheme)) ||
+            (ext && input_plugin_has_key (plugin, InputKey::Ext, ext)))
+        {
+            flags |= PROBE_FLAG_HAS_DECODER;
+            if (input_plugin_has_subtunes (plugin))
+                flags |= PROBE_FLAG_MIGHT_HAVE_SUBTUNES;
+        }
+    }
+
+    return flags;
+}
+
 EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
  VFSFile & file, String * error)
 {
@@ -121,7 +147,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
         }
     }
 
-    if (fast && (! ext_matches.len () || ! strncmp (filename, "stdin://", 8)))
+    if (fast && ! ext_matches.len ())
         return nullptr;
 
     AUDDBG ("Opening %s.\n", filename);
@@ -199,6 +225,7 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
     if (! g_key_file_load_from_file (rcfile, (const char *)filename, G_KEY_FILE_NONE, nullptr))
     {
         g_key_file_free (rcfile);
+
         return 0;
     }
     char * precedence = g_key_file_get_string (rcfile, song_filename, "Precedence", nullptr);
@@ -280,6 +307,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
 
     Tuple file_tuple, loclfile_tuple, new_tuple;
     Tuple * which_tuple;
+    int fromtempfile = 0;
     int fromfile = 0;
     int fromlocalfile = 0;
     bool usrtag = aud_get_bool (nullptr, "user_tag_data");
@@ -295,14 +323,19 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
         local_tag_file = String (filename_to_uri (str_concat ({(const char *)path, "/user_tag_data.tag"})));
     }
     /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, new_tuple, image)) */
+    /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS TRUE!: 
+       WHEN SUCCESSFUL FETCHING FROM TAG FILE, IT RETURNS TRUE ONLY IF THE "PRECEDENCE" == "ONLY" (-1),
+       OTHERWISE, WE KEEP PROCESSING THE CONDITIONS UNTIL AT LAST WE FETCH (ANY UNSET) TAGS FROM THE FILE ITSELF. */
     if (! strncmp (filename, "stdin://", 8) 
             || (local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *)filename_only, local_tag_file, loclfile_tuple)) < 0) 
+            || (usrtag && (fromtempfile = aud_read_tag_from_tagfile (filename, "tmp_tag_data", file_tuple)) < 0)
             || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0) 
             || ip->read_tag (filename, file, new_tuple, image))
     {
         which_tuple = &file_tuple;
         if (local_tag_file[0] && fromlocalfile)  //JWT:WE GOT TAGS FROM A LOCAL (DIRECTORY-BASED) user_tag_data.tag FILE.
         {
+            /* USE THE "LOCAL" TAGFILE'S TAGS IFF "ONLY" OR "OVERRIDE" AND GLOBAL TAG FILE FAILED OR IS "DEFAULT". */
             if (fromlocalfile < 2 || (! fromfile || fromfile == 2))
             {
                 fromfile = fromlocalfile;
@@ -312,14 +345,19 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
 
         // cleanly replace existing tuple
         new_tuple.set_state (Tuple::Valid);
-        if (fromfile < 0)  //ONLY - GOT DATA FROM FILE, ONLY USE THAT (MAY NOT WORK)!
+        if (fromtempfile && ! fromfile)  // WE FOUND TAGS IN tmp_tag_data, BUT NOT IN usr_tag_data.
+            fromfile = fromtempfile;
+        if (fromfile < 0)  // ONLY - GOT DATA FROM FILE, ONLY USE THAT (MAY NOT WORK, IE. LENGTH MISSING)!
+        {
+            which_tuple->set_state (Tuple::Valid);
             tuple = std::move (*which_tuple);
-        else if (fromfile > 0)
+        }
+        else if (fromfile > 0)  // DEFAULT OR OVERRIDE
         {
             int i_tfld;
             const char * tfld;
             tuple = std::move (new_tuple);
-            if (fromfile == 1)  //OVERRIDE - USE FILE DATA, ONLY FILLING IN FIELDS NOT IN FILE W/TAGS DATA:
+            if (fromfile == 1)  // OVERRIDE - USE FILE DATA, ONLY FILLING IN FIELDS NOT IN FILE W/TAGS DATA:
             {
                 tfld = (const char *) which_tuple->get_str (Tuple::Title);
                 if (tfld)
@@ -406,7 +444,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 }
             }
         }
-        else
+        else  // NO TAG FILE DATA FOUND, ALL WE HAVE IS WHAT'S IN THE PLAYING FILE ITSELF.
             tuple = std::move (new_tuple);
 
         return true;
@@ -424,7 +462,7 @@ EXPORT bool aud_file_can_write_tuple (const char * filename, PluginHandle * deco
 }
 
 /* JWT: NEW FUNCTION TO WRITE TAG METADATA TO USER-CREATED TEXT FILE: */
-EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & tuple)
+EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & tuple, const char * tagdata_filename)
 {
     GKeyFile * rcfile = g_key_file_new ();
     String local_tag_fid = String ("");
@@ -444,7 +482,7 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
     }
 
     StringBuf filename = localtagfileexists ? str_copy ((const char *)local_tag_fid)
-            : filename_build ({aud_get_path (AudPath::UserDir), "user_tag_data"});
+            : filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
     //JWT: filename DOES NOT HAVE file:// PREFIX AND IS THE TAG DATA FILE (LOCAL OR GLOBAL):
     if (! g_key_file_load_from_file (rcfile, filename, 
@@ -533,7 +571,7 @@ EXPORT bool aud_file_write_tuple (const char * filename,
     }
     /* JWT:IF CAN'T SAVE TAGS TO FILE (IE. STREAM), TRY SAVING TO USER'S CONFIG: */
     if (! success && aud_get_bool (nullptr, "user_tag_data"))
-        success = aud_write_tag_to_tagfile (filename, tuple);
+        success = aud_write_tag_to_tagfile (filename, tuple, "user_tag_data");
 
     if (success)
         aud_playlist_rescan_file (filename);
@@ -542,10 +580,10 @@ EXPORT bool aud_file_write_tuple (const char * filename,
 }
 
 /* JWT: NEW FUNCTION TO REMOVE A TITLE FROM THE TAG FILE: */
-EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename)
+EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename, const char * tagdata_filename)
 {
     GKeyFile * rcfile = g_key_file_new ();
-    StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), "user_tag_data"});
+    StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
     if (! g_key_file_load_from_file (rcfile, filename, 
             (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))

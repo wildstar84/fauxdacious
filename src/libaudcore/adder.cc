@@ -135,15 +135,23 @@ static void status_done_locked ()
 }
 
 static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
- void * user, AddResult * result, bool validate)
+ void * user, AddResult * result, bool skip_invalid)
 {
     AUDINFO ("Adding file: %s\n", (const char *) item.filename);
     status_update (item.filename, result->items.len ());
 
-    /* If the item doesn't already have a valid tuple, and isn't a subtune
-     * itself, then probe it to expand any subtunes.  The "validate" check (used
-     * to skip non-audio files when adding folders) is also nested within this
-     * block; note that "validate" is always false for subtunes. */
+    /*
+     * If possible, we'll wait until the file is added to the playlist to probe
+     * it.  There are a couple of reasons why we might need to probe it now:
+     *
+     * 1. We're adding a folder, and need to skip over non-audio files (the
+     *    "skip invalid" flag indicates this case).
+     * 2. The file might have subtunes, which we need to expand in order to add
+     *    them to the playlist correctly.
+     *
+     * If we already have metadata, or the file is itself a subtune, then
+     * neither of these reasons apply.
+     */
     if (! item.tuple.valid () && ! is_subtune (item.filename))
     {
         /* JWT:ADDED TO HANDLE SPECIAL YOUTUBE-DL CASE: */
@@ -153,9 +161,9 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
     	       if (metadata_helper[0])
             {
                 Tuple file_tuple = Tuple ();
-                if (! aud_read_tag_from_tagfile (item.filename, "youtubedl_tag_data", file_tuple))
-        	       {
-        	           StringBuf tagdata_filename = filename_build ({aud_get_path (AudPath::UserDir), "youtubedl_tag_data"});
+                if (! aud_read_tag_from_tagfile (item.filename, "tmp_tag_data", file_tuple))
+                {
+                    StringBuf tagdata_filename = filename_build ({aud_get_path (AudPath::UserDir), "tmp_tag_data"});
                     AUDDBG ("i:invoking metadata helper=%s=\n", (const char *) str_concat ({metadata_helper, " ", item.filename, " ", tagdata_filename}));
                     system ((const char *) str_concat ({metadata_helper, " ", item.filename, " ", tagdata_filename}));
                 }
@@ -163,16 +171,44 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
             else
                 aud_set_bool (nullptr, "youtubedl_tag_data", false);  /* NO YOUTUBE-DL TAG DATA FILE W/O HELPER! */
         }
+        /* If we open the file to identify the decoder, we can re-use the same
+         * handle to read metadata. */
         VFSFile file;
 
         if (! item.decoder)
         {
-            bool fast = ! aud_get_bool (nullptr, "slow_probe");
-            item.decoder = aud_file_find_decoder (item.filename, fast, file);
-            if (validate && ! item.decoder)
-                return;
+            if (aud_get_bool (nullptr, "slow_probe"))
+            {
+                /* The slow path.  User settings dictate that we should try to
+                 * find a decoder even if we don't recognize the file extension. */
+                item.decoder = aud_file_find_decoder (item.filename, false, file);
+                if (skip_invalid && ! item.decoder)
+                    return;
+            }
+            else
+            {
+                /* The fast path.  First see whether any plugins recognize the
+                 * file extension.  Note that it's possible for multiple plugins
+                 * to recognize the same extension (.ogg, for example). */
+                int flags = probe_by_filename (item.filename);
+                if (skip_invalid && ! (flags & PROBE_FLAG_HAS_DECODER))
+                    return;
+
+                if ((flags & PROBE_FLAG_MIGHT_HAVE_SUBTUNES))
+                {
+                    /* At least one plugin recognized the file extension and
+                     * indicated that there might be subtunes.  Figure out for
+                     * sure which decoder we need to use for this file. */
+                    item.decoder = aud_file_find_decoder (item.filename, true, file);
+                    if (skip_invalid && ! item.decoder)
+                        return;
+                }
+            }
         }
 
+        /* At this point we've either identified the decoder or determined that
+         * the file doesn't have any subtunes.  If the former, read the tag so
+         * so we can expand any subtunes we find. */
         if (item.decoder && input_plugin_has_subtunes (item.decoder))
             aud_file_read_tag (item.filename, item.decoder, file, item.tuple);
     }
@@ -283,8 +319,6 @@ static void add_cuesheets (Index<String> & files, PlaylistFilterFunc filter,
 static void add_folder (const char * filename, PlaylistFilterFunc filter,
  void * user, AddResult * result, bool save_title)
 {
-    bool nosubdirs = aud_get_bool (nullptr, "no_subdirs");
-
     AUDINFO ("Adding folder: %s\n", filename);
     status_update (filename, result->items.len ());
 
@@ -309,6 +343,8 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
     // sort file list in natural order (must come after add_cuesheets)
     files.sort (str_compare_encoded);
 
+    bool recurse_folders = aud_get_bool (nullptr, "recurse_folders");
+
     for (const char * file : files)
     {
         if (filter && ! filter (file, user))
@@ -329,7 +365,7 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
 
         if (mode & VFS_IS_REGULAR)
             add_file ({String (file)}, filter, user, result, true);
-        else if (! nosubdirs && (mode & VFS_IS_DIR))
+        else if (recurse_folders && (mode & VFS_IS_DIR))
             add_folder (file, filter, user, result, false);
     }
 }
@@ -356,16 +392,20 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
         add_file (std::move (item), filter, user, result, false);
     else
     {
-        String error;
-        VFSFileTest mode = VFSFile::test_file (item.filename,
-         VFSFileTest (VFS_IS_DIR | VFS_NO_ACCESS), error);
+        int tests = 0;
+        if (! from_playlist)
+            tests |= VFS_NO_ACCESS;
+        tests |= VFS_IS_DIR;
 
-        if ((! from_playlist) && (mode & VFS_NO_ACCESS))
+        String error;
+        VFSFileTest mode = VFSFile::test_file (item.filename, (VFSFileTest) tests, error);
+        if ((mode & VFS_NO_ACCESS))
             aud_ui_show_error (str_printf (_("Error reading %s:\n%s"),
              (const char *) item.filename, (const char *) error));
         else if (mode & VFS_IS_DIR)
         {
-            add_folder (item.filename, filter, user, result, save_title);
+            if (! from_playlist || aud_get_bool (nullptr, "folders_in_playlist"))
+                add_folder (item.filename, filter, user, result, save_title);
             result->saw_folder = true;
         }
         else if ((! from_playlist) && aud_filename_is_playlist (item.filename))
@@ -442,7 +482,9 @@ static void add_finish (void * unused)
         {
             String old_title = aud_playlist_get_title (playlist);
 
+/* JWT:REMOVED TO PLAYLIST FILES LOADED BY THEMSELVES WILL NAME THE PLAYLIST TAB!
             if (! strcmp (old_title, N_("New Playlist")))
+*/
                 aud_playlist_set_title (playlist, result->title);
         }
 

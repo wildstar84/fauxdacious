@@ -86,9 +86,9 @@ bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
  String * error = nullptr);
 
 bool aud_file_can_write_tuple (const char * filename, PluginHandle * decoder);
-int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & tuple);
+int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & tuple, const char * tagdata_filename);
 bool aud_file_write_tuple (const char * filename, PluginHandle * decoder, const Tuple & tuple);
-bool aud_delete_tag_from_tagfile (const char * song_filename);
+bool aud_delete_tag_from_tagfile (const char * song_filename, const char * tagdata_filename);
 bool aud_custom_infowin (const char * filename, PluginHandle * decoder);
 
 #endif

@@ -234,13 +234,19 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
             if (aud_get_bool (nullptr, "youtubedl_tag_data") && ! strncmp (file, "ytdl://", 7))
             {
                 Tuple img_tuple = Tuple ();
-                if (aud_read_tag_from_tagfile (file, "youtubedl_tag_data", img_tuple))
+                if (aud_read_tag_from_tagfile (file, "tmp_tag_data", img_tuple))
                     item->art_file = img_tuple.get_str (Tuple::Comment);
             }
             else if (aud_get_bool (nullptr, "user_tag_data"))
             {
                 Tuple img_tuple = Tuple ();
-                if (aud_read_tag_from_tagfile (file, "user_tag_data", img_tuple))
+                if (aud_read_tag_from_tagfile (file, "tmp_tag_data", img_tuple))
+                {
+                    String tfld = img_tuple.get_str (Tuple::Comment);
+                    if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
+                        item->art_file = tfld;
+                }
+                else if (aud_read_tag_from_tagfile (file, "user_tag_data", img_tuple))
                 {
                     String tfld = img_tuple.get_str (Tuple::Comment);
                     if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
