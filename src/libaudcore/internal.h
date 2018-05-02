@@ -103,6 +103,10 @@ bool open_input_file (const char * filename, const char * mode,
  InputPlugin * ip, VFSFile & file, String * error = nullptr);
 InputPlugin * load_input_plugin (PluginHandle * decoder, String * error = nullptr);
 
+#define PROBE_FLAG_HAS_DECODER         (1 << 0)
+#define PROBE_FLAG_MIGHT_HAVE_SUBTUNES (1 << 1)
+int probe_by_filename (const char * filename);
+
 /* runtime.cc */
 extern size_t misc_bytes_allocated;
 
@@ -127,6 +131,18 @@ StringBuf strip_subtune (const char * filename);
 
 unsigned int32_hash (unsigned val);
 unsigned ptr_hash (const void * ptr);
+
+struct IntHashKey
+{
+    int val;
+
+    constexpr IntHashKey (int val) :
+        val (val) {}
+    operator int () const
+        { return val; }
+    unsigned hash () const
+        { return int32_hash (val); }
+};
 
 /* vis-runner.cc */
 void vis_runner_start_stop (bool playing, bool paused);
