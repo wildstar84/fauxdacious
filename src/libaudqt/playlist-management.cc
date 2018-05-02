@@ -59,10 +59,12 @@ static QDialog * buildRenameDialog (int playlist)
     auto layout = make_vbox (dialog);
     layout->addWidget (prompt);
     layout->addWidget (entry);
+    layout->addStretch (1);
     layout->addWidget (buttonbox);
 
     dialog->setWindowTitle (_("Rename Playlist"));
     dialog->setContentsMargins (margins.EightPt);
+
     entry->selectAll ();
 
     return dialog;
@@ -83,8 +85,8 @@ static QDialog * buildDeleteDialog (int playlist)
     dialog->addButton (remove, QMessageBox::AcceptRole);
     dialog->addButton (cancel, QMessageBox::RejectRole);
 
-    remove->setIcon (QIcon::fromTheme ("edit-delete"));
-    cancel->setIcon (QIcon::fromTheme ("process-stop"));
+    remove->setIcon (audqt::get_icon ("edit-delete"));
+    cancel->setIcon (audqt::get_icon ("process-stop"));
 
     QObject::connect (skip_prompt, & QCheckBox::stateChanged, [] (int state) {
         aud_set_bool ("audgui", "no_confirm_playlist_delete", (state == Qt::Checked));

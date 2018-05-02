@@ -1,12 +1,13 @@
 SHARED_LIB = ${LIB_PREFIX}audqt${LIB_SUFFIX}
 LIB_MAJOR = 2
-LIB_MINOR = 0
+LIB_MINOR = 1
 
 SRCS = about-qt.cc \
        art-qt.cc \
        audqt.cc \
        equalizer-qt.cc \
        fileopener.cc \
+       images.cc \
        infowin-qt.cc \
        info-widget.cc \
        log-inspector.cc \
@@ -20,6 +21,7 @@ SRCS = about-qt.cc \
        prefs-pluginlist-model.cc \
        queue-manager-qt.cc \
        url-opener-qt.cc \
+       util-qt.cc \
        volumebutton.cc
 
 INCLUDES = export.h \
@@ -46,5 +48,5 @@ LIBS := -L../libaudcore -laudcore \
         ${LIBS} -lm \
         ${QT_LIBS}
 
-%.moc: %.h
-	moc $< -o $@
+images.cc: images.qrc
+	${QT_BINPATH}/rcc images.qrc -o images.cc
