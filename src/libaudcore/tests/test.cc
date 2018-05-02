@@ -62,11 +62,11 @@ static void test_audio_conversion ()
 
 static void test_case_conversion ()
 {
-    const char in[]        = "AÄaäEÊeêIÌiìOÕoõUÚuú";
-    const char low_ascii[] = "aÄaäeÊeêiÌiìoÕoõuÚuú";
-    const char low_utf8[]  = "aäaäeêeêiìiìoõoõuúuú";
-    const char hi_ascii[]  = "AÄAäEÊEêIÌIìOÕOõUÚUú";
-    const char hi_utf8[]   = "AÄAÄEÊEÊIÌIÌOÕOÕUÚUÚ";
+    const char in[]        = "AÃ„aÃ¤EÃŠeÃªIÃŒiÃ¬OÃ•oÃµUÃšuÃº";
+    const char low_ascii[] = "aÃ„aÃ¤eÃŠeÃªiÃŒiÃ¬oÃ•oÃµuÃšuÃº";
+    const char low_utf8[]  = "aÃ¤aÃ¤eÃªeÃªiÃ¬iÃ¬oÃµoÃµuÃºuÃº";
+    const char hi_ascii[]  = "AÃ„AÃ¤EÃŠEÃªIÃŒIÃ¬OÃ•OÃµUÃšUÃº";
+    const char hi_utf8[]   = "AÃ„AÃ„EÃŠEÃŠIÃŒIÃŒOÃ•OÃ•UÃšUÃš";
 
     assert (! strcmp (low_ascii, str_tolower (in)));
     assert (! strcmp (low_utf8, str_tolower_utf8 (in)));
@@ -96,28 +96,28 @@ static void test_case_conversion ()
     assert (! strcmp_nocase (in, hi_ascii));
     assert (strcmp_nocase (in, hi_utf8));
 
-    assert (str_has_prefix_nocase (low_ascii, "AÄaä"));
-    assert (! str_has_prefix_nocase (low_utf8, "AÄaä"));
-    assert (str_has_prefix_nocase (hi_ascii, "AÄaä"));
-    assert (! str_has_prefix_nocase (hi_utf8, "AÄaä"));
+    assert (str_has_prefix_nocase (low_ascii, "AÃ„aÃ¤"));
+    assert (! str_has_prefix_nocase (low_utf8, "AÃ„aÃ¤"));
+    assert (str_has_prefix_nocase (hi_ascii, "AÃ„aÃ¤"));
+    assert (! str_has_prefix_nocase (hi_utf8, "AÃ„aÃ¤"));
 
-    assert (str_has_suffix_nocase (low_ascii, "UÚuú"));
-    assert (! str_has_suffix_nocase (low_utf8, "UÚuú"));
-    assert (str_has_suffix_nocase (hi_ascii, "UÚuú"));
-    assert (! str_has_suffix_nocase (hi_utf8, "UÚuú"));
+    assert (str_has_suffix_nocase (low_ascii, "UÃšuÃº"));
+    assert (! str_has_suffix_nocase (low_utf8, "UÃšuÃº"));
+    assert (str_has_suffix_nocase (hi_ascii, "UÃšuÃº"));
+    assert (! str_has_suffix_nocase (hi_utf8, "UÃšuÃº"));
 
     assert (! str_has_suffix_nocase ("abc", "abcd"));
 
-    assert (! strcmp (strstr_nocase (low_ascii, "OÕoõ"), "oÕoõuÚuú"));
-    assert (strstr_nocase (low_utf8, "OÕoõ") == nullptr);
-    assert (! strcmp (strstr_nocase (hi_ascii, "OÕoõ"), "OÕOõUÚUú"));
-    assert (strstr_nocase (hi_utf8, "OÕoõ") == nullptr);
+    assert (! strcmp (strstr_nocase (low_ascii, "OÃ•oÃµ"), "oÃ•oÃµuÃšuÃº"));
+    assert (strstr_nocase (low_utf8, "OÃ•oÃµ") == nullptr);
+    assert (! strcmp (strstr_nocase (hi_ascii, "OÃ•oÃµ"), "OÃ•OÃµUÃšUÃº"));
+    assert (strstr_nocase (hi_utf8, "OÃ•oÃµ") == nullptr);
 
-    assert (! strcmp (strstr_nocase_utf8 (low_ascii, "OÕoõ"), "oÕoõuÚuú"));
-    assert (! strcmp (strstr_nocase_utf8 (low_utf8, "OÕoõ"), "oõoõuúuú"));
+    assert (! strcmp (strstr_nocase_utf8 (low_ascii, "OÃ•oÃµ"), "oÃ•oÃµuÃšuÃº"));
+    assert (! strcmp (strstr_nocase_utf8 (low_utf8, "OÃ•oÃµ"), "oÃµoÃµuÃºuÃº"));
     assert (strstr_nocase_utf8 (low_utf8, "OOoo") == nullptr);
-    assert (! strcmp (strstr_nocase_utf8 (hi_ascii, "OÕoõ"), "OÕOõUÚUú"));
-    assert (! strcmp (strstr_nocase_utf8 (hi_utf8, "OÕoõ"), "OÕOÕUÚUÚ"));
+    assert (! strcmp (strstr_nocase_utf8 (hi_ascii, "OÃ•oÃµ"), "OÃ•OÃµUÃšUÃº"));
+    assert (! strcmp (strstr_nocase_utf8 (hi_utf8, "OÃ•oÃµ"), "OÃ•OÃ•UÃšUÃš"));
     assert (strstr_nocase_utf8 (hi_utf8, "OOoo") == nullptr);
 }
 
@@ -462,10 +462,8 @@ static StringBuf str_recursive_insert (const char * str, int level)
     if (level == 1)
         return buf;
 
-    // don't do this yet, it leaves the stack fragmented
-    // return str_recursive_insert (buf, level - 1);
-    buf = str_recursive_insert (buf, level - 1);
-    return buf;
+    // intentionally causing fragmentation here
+    return str_recursive_insert (buf, level - 1);
 }
 
 static StringBuf str_repeated_nest (const char * str, int level)
@@ -479,7 +477,7 @@ static StringBuf str_repeated_nest (const char * str, int level)
         buf2.insert (buf2.len () / 2, buf1);
     }
 
-    // this leaves lots of fragmentation
+    // intentionally causing fragmentation here
     return buf2;
 }
 
@@ -487,7 +485,7 @@ static void test_stringbuf ()
 {
     char expect[262145];
 
-    StringBuf str1 = str_recursive_insert ("ab", 17);
+    StringBuf str1 = str_recursive_insert ("ab", 17).settle ();
 
     memset (expect, 'a', 121393);
     memset (expect + 121393, 'b', 121393);
