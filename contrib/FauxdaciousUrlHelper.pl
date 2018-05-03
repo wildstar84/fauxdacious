@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #MUST INSTALL youtube-dl FOR Youtube to work!
-#pp -o FauxdaciousUrlHelper.exe -M StreamFinder::Facebook -M StreamFinder::IHeartRadio -M StreamFinder::Radionomy -M StreamFinder::Reciva -M StreamFinder::Youtube -M WWW::YouTube::Download -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
+#pp -o FauxdaciousUrlHelper.exe -M Tunein::Streams -M IHeartRadio::Streams -M WWW::YouTube::Download -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
 #FAUXDACIOUS "HELPER" SCRIPT TO HANDLE URLS THAT FAUXDACIOUS CAN'T PLAY DIRECTLY:
 
@@ -61,6 +61,9 @@ BEGIN
 use strict;
 use LWP::Simple qw();
 use StreamFinder;
+my $haveTuneinStreams = 1;
+my $haveIheartRadioStreams = 1;
+my $haveYoutubeDownload = 1;
 
 die "..usage: $0 url\n"  unless ($ARGV[0]);
 my $configPath = '';
@@ -69,34 +72,39 @@ if ($ARGV[1]) {
 }
 my $newPlaylistURL = '';
 my $title = $ARGV[0];
+my $comment = '';
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-my $client = new StreamFinder($ARGV[0]);
-die "f:Could not open streamfinder or no streams found!"  unless ($client);
+#NAAAH - TURN OFF m3u PLUGIN TO LOAD FIRST TIME. - if ($ARGV[0] =~ /^http/ && $ARGV[0] =~ /\.m3u8?\b/i) {
+#	$newPlaylistURL = $ARGV[0];  #FORCE FAUXDACIOUS TO HANDLE http://url.m3u[8] AS A STREAM, *NOT* A PLAYLIST!:
+#} else {
+	my $client = new StreamFinder($ARGV[0]);
+	die "f:Could not open streamfinder or no streams found!"  unless ($client);
 
-$newPlaylistURL = $client->getURL();
-die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
-$title = $client->getTitle();
-my $art_url = $client->getIconURL();
-my $stationID = $client->getID();
-my $comment = "Album=$ARGV[0]\n";
-$comment .= "Artist=".$client->{artist}."\n"  if (defined $client->{artist});
-if ($art_url) {
-	my ($image_ext, $art_image) = $client->getIconData;
-	if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
-		binmode IMGOUT;
-		print IMGOUT $art_image;
-		close IMGOUT;
-		my $path = $configPath;
-		if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
-			$path =~ s#^(\w)\:#\/$1\%3A#;
-			$path =~ s#\\#\/#g;
+	$newPlaylistURL = $client->getURL();
+	die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
+	$title = $client->getTitle();
+	my $art_url = $client->getIconURL();
+	my $stationID = $client->getID();
+	$comment = "Album=$ARGV[0]\n";
+	$comment .= "Artist=".$client->{artist}."\n"  if (defined $client->{artist});
+	if ($art_url) {
+		my ($image_ext, $art_image) = $client->getIconData;
+		if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
+			binmode IMGOUT;
+			print IMGOUT $art_image;
+			close IMGOUT;
+			my $path = $configPath;
+			if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+				$path =~ s#^(\w)\:#\/$1\%3A#;
+				$path =~ s#\\#\/#g;
+			}
+			$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
 		}
-		$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
 	}
-}
-&writeTagData($comment);
+#}
+&writeTagData($client, $comment);
 #END USER-DEFINED PATTERN-MATCHING CODE.
 exit (0)  unless ($newPlaylistURL);
 
@@ -117,9 +125,13 @@ close PLAYLISTOUT;
 exit(0);
 
 sub writeTagData {
+	my $client = shift;
 	my $comment = shift || '';
 	my @tagdata = ();
-	if (open TAGDATA, "<${configPath}/user_tag_data") {
+	# WE WRITE Facebook/Youtube VIDEOS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
+	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!:
+	my $tagfid = ($client && $client->getType() =~ /(?:Facebook|Youtube)/i) ? 'tmp_tag_data' : 'user_tag_data';
+	if (open TAGDATA, "<${configPath}/$tagfid") {
 		my $omit = 0;
 		while (<TAGDATA>) {
 			$omit = 1  if (/^\[$newPlaylistURL\]/);
@@ -130,7 +142,7 @@ sub writeTagData {
 		}
 		close TAGDATA;
 	}
-	if (open TAGDATA, ">${configPath}/user_tag_data") {
+	if (open TAGDATA, ">${configPath}/$tagfid") {
 		while (@tagdata) {
 			print TAGDATA shift(@tagdata);
 		}

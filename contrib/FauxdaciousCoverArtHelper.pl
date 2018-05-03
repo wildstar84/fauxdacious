@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 #pp -o FauxdaciousCoverArtHelper.exe -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousCoverArtHelper.pl
 
@@ -63,7 +63,7 @@ use HTML::Entities ();
 use LWP::UserAgent ();
 my $haveCurl = 0;
 
-die "..usage: $0 {CD[T] diskID | DVD title} [configpath]\n"  unless ($ARGV[0] && $ARGV[1]);
+die "..usage: $0 {CD[T] diskID | DVD title} [configpath] | DELETE COVERART configpath\n"  unless ($ARGV[0] && $ARGV[1]);
 my $configPath = '';
 if ($ARGV[1]) {
 	($configPath = $ARGV[2]) =~ s#^file:\/\/##;
@@ -72,12 +72,32 @@ if ($ARGV[1]) {
 my $html = '';
 my $title = '';
 my $comment = '';
-my $DEBUG = 0;
+my $DEBUG=1;
 my $ua = LWP::UserAgent->new;		
 $ua->timeout(10);
 $ua->cookie_jar({});
 $ua->env_proxy;
-if ($ARGV[0] =~ /^CD/i) {  #WE'RE AN AUDIO-CD: LOOK UP DISK-ID ON Musicbrainz.com:
+if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE REMOVING ALL OLD COVERART IMAGE FILES:
+	if (open TAGDATA, "<${configPath}/tmp_tag_data") {
+		my $fid;
+		while (<TAGDATA>) {
+			if (m#^Comment\=file\:\/\/\/(.+)#o) {  #THIS ELIMINATES ANY EXISTING CD TAGS (WILL ALL BE REPLACED!):
+				$fid = $1;
+				next  if ($fid =~ /[\*\?]/o);  #GUARD AGAINST WILDCARDS, ETC!!
+				next  unless ($fid =~ /(?:png|jpe?g|gif)$/io);  #MAKE SURE WE ONLY DELETE IMAGE FILES!
+				$fid =~ s/^(\w)\%3A/$1\:/;
+				if ($fid =~ /^\w\:/) {   #BUMMER, WE'RE ON WINDOWS:
+					$fid =~ s#\/#\\#go;  #MAY NOT BE NECESSARY?
+				} else {
+					$fid = '/' . $fid  unless ($fid =~ m#^\/#o);
+				}
+				print STDERR "i:$0: DELETED temp. image file ($fid)!\n";
+				unlink $fid;
+			}
+		}
+		close TAGDATA;
+	}	
+} elsif ($ARGV[0] =~ /^CD/i) {  #WE'RE AN AUDIO-CD: LOOK UP DISK-ID ON Musicbrainz.com:
 	print STDERR "-0(CD): URL=https://musicbrainz.org/otherlookup/freedbid?other-lookup.freedbid=$ARGV[1]\n"  if ($DEBUG);
 	my $response = $ua->get("https://musicbrainz.org/otherlookup/freedbid?other-lookup.freedbid=$ARGV[1]");
 	if ($response->is_success) {
@@ -89,33 +109,28 @@ if ($ARGV[0] =~ /^CD/i) {  #WE'RE AN AUDIO-CD: LOOK UP DISK-ID ON Musicbrainz.co
 	my $url2 = '';
 	my $artist = '';
 	my ($tmpurl2, $tmptitle, $tmpartist);
-
 	while ($html)  #MAY BE MULTIPLE MATCHES, TRY TO FIND ONE THAT'S A "CD" (VS. A "DVD", ETC.):
 	{
 		$html =~ s#^.*?\<tr[^\>]*\>##is;
 		if ($html =~ s#^.*?\<a\s+href\=\"([^\"]+)\"\>\s*\<bdi\>([^\<]+)\<\/bdi\>##is) {
 			$tmpurl2 = $1;
 			$tmptitle = $2;
-			print STDERR "---NEW URL=$tmpurl2= TITLE=$tmptitle=\n";
 			if ($html =~ s#^.*?\<bdi\>([^\<]+)\<\/bdi\>##is)
 			{
 				$tmpartist = $1;
 				print "-1a: artist=$tmpartist= url=$tmpurl2= title=$tmptitle=\n"  if ($DEBUG);
 				$html =~ s#^.*?\<td\>##is;
-				print STDERR "-------HTML=".substr($html,0,30)."=\n"  if ($DEBUG);
 				if ($html =~ s#^CD\<\/td\>##is) {   #FOUND A DEFINITE "CD" (GRAB & QUIT!):
 					$url2 = $tmpurl2;   #URL OF PAGE CONTAINING DETAILS FOR THE PARTICULAR CD:
 					$title = HTML::Entities::decode_entities($tmptitle);
 					$artist = HTML::Entities::decode_entities($tmpartist);
-					print STDERR "-1a: CD url=$url2= title=$title= artist=$artist=\n";
+					print STDERR "-1a: CD url=$url2= title=$title= artist=$artist=\n"  if ($DEBUG);
 					last;
 				} elsif ($html =~ s#^([^C]+CD|\(unknown\))\<\/td\>##is) {  #FOUND WHAT MIGHT BE A CD, KEEP LOOKING:
-					print STDERR "---CASE 2($1)\n"  if ($DEBUG);
 					$url2 = $tmpurl2;
 					$title = HTML::Entities::decode_entities($tmptitle);
 					$artist = HTML::Entities::decode_entities($tmpartist);
 				} else {    #SKIP THIS ROW:
-					print STDERR "---CASE 3\n"  if ($DEBUG);
 					$html =~ s#^[^\<]*\<\/td\>##is;
 				}
 				next;
@@ -156,7 +171,7 @@ if ($ARGV[0] =~ /^CD/i) {  #WE'RE AN AUDIO-CD: LOOK UP DISK-ID ON Musicbrainz.co
 			$html =~ s#\<span class\=\"name\-variation\"\>##gs;
 			while ($html =~ s#\<a\s+href\=\"https\:\/\/musicbrainz\.org\/track\/[^\"]+\"\>(\d+)\<\/a\>\s+\<\/td\>[^\<]+\<td\>\<[^\<]+\<bdi>([^\<]+)\<\/bdi\>##) {
 				my $t = HTML::Entities::decode_entities($2);  #WE MUST DE-HTML & MAKE ALL-ASCII FOR Fauxdacious:
-				print "--track$trk($1)=$t=\n"  if ($DEBUG);   #WE MAKE ASCII BY REMOVING ALL ACCENTS!:
+				print STDERR "--track$trk($1)=$t=\n"  if ($DEBUG);   #WE MAKE ASCII BY REMOVING ALL ACCENTS!:
 				$t =~ tr/ŠšžŸÀÁÂÃÅÄÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðñòóôõöùúüûýø×°/SszYAAAAAACEEEEIIIIDNOOOOOUUUUYaaaaaaceeeeiiiionooooouuuuy0x /;
 				$t =~ s/[\x80-\xff]//g;
 			    $tracktitle[$trk++] = $t;
@@ -208,11 +223,6 @@ if ($ARGV[0] =~ /^CD/i) {  #WE'RE AN AUDIO-CD: LOOK UP DISK-ID ON Musicbrainz.co
 	eval "use LWP::Curl; \$haveCurl = 1; 1";   #MUST USE CURL ON Dvdcover.com - THEY CHECK FOR AD-BLOCKERZ:
 	(my $argv1clean = $ARGV[1]) =~ s/[\x00-\x1f]//g;
 	my $art_url = '';
-	if ($DEBUG && open (DBG, ">/tmp/x.dbg")) {
-		print STDERR "-1a: TITLE NOT CLEAN!\n"  unless ($argv1clean eq $ARGV[1]);
-		print DBG $ARGV[1];
-		close DBG;
-	}
 
 	if ($haveCurl) {   #FIRST, TRY TO FETCH FROM Dvdcover.com:
 		print STDERR "-1a: URL=https://dvdcover.com/?s=$argv1clean=\n"  if ($DEBUG);
@@ -274,7 +284,7 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 	}
 	print STDERR "-4: title=$title= cover url=$art_url=\n"  if ($DEBUG);
 	die "f:No cover art url found!\n"  unless ($art_url);
-#x	$comment = "Album=$title\n";
+
 	if ($art_url) {   #GOT AN IMAGE LINK TO (HOPEFULLY THE RIGHT) COVER-ART IMAGE:
 		my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
 		my $art_image = '';
@@ -312,8 +322,8 @@ sub writeTagData {   #FOR CDs:  WRITE ALL TAG-DATA FOUND FOR EACH TRACK TO user_
 	my @tagdata = ();
 	(my $nocomment = $comment) =~ s/Comment\=\S*//gs;  #CON'T INCLUDE COVER-ART FILE IN CUSTOM-FILE COMMENTS (REDUNDANT!)
 	my $trktitle = ($#{$tracktitles} >= 0) ? shift (@{$tracktitles}) : $title;
-	print STDERR "-7: comment=$comment= tagfid=${configPath}/user_tag_data=\n"  if ($DEBUG);
-	if (open TAGDATA, "<${configPath}/user_tag_data") {  #MUST FIRST FETCH EXISTING user_tag_data SINCE WE'LL OVERWRITE IT:
+	print STDERR "-7: comment=$comment= tagfid=${configPath}/tmp_tag_data=\n"  if ($DEBUG);
+	if (open TAGDATA, "<${configPath}/tmp_tag_data") {  #MUST FIRST FETCH EXISTING user_tag_data SINCE WE'LL OVERWRITE IT:
 		my $omit = 0;
 		while (<TAGDATA>) {
 			$omit = 1  if (/^\[cdda\:/);  #THIS ELIMINATES ANY EXISTING CD TAGS (WILL ALL BE REPLACED!):
@@ -326,13 +336,13 @@ sub writeTagData {   #FOR CDs:  WRITE ALL TAG-DATA FOUND FOR EACH TRACK TO user_
 	}
 	#NOW REPLACE user_tag_data APPENDING OUR CURRENT CD TAGS:
 	my $customAlso = (($ARGV[0] =~ /^CDT/i) && open CUSTOM, ">${configPath}/$ARGV[1].tag");
-	if (open TAGDATA, ">${configPath}/user_tag_data") {
+	if (open TAGDATA, ">${configPath}/tmp_tag_data") {
 		while (@tagdata) {
 			print TAGDATA shift(@tagdata);
 		}
 		# USER:CHANGE "DEFAULT" TO "OVERRIDE" BELOW TO KEEP STATION TITLE FROM BEING OVERWRITTEN BY CURRENT SONG TITLE:
 		my $trk = 1;
-		while ($#{$tracktitles} >= 0) {
+		while (1) {
 			print TAGDATA <<EOF;
 [cdda://?$trk]
 Precedence=OVERRIDE
@@ -352,6 +362,7 @@ $nocomment
 EOF
 
 			}
+			last  unless (@{$tracktitles});
 			$trktitle = shift (@{$tracktitles});
 			++$trk;
 		}
