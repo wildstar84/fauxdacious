@@ -2,7 +2,16 @@ SUBDIRS = src man images po
 
 DISTCLEAN = ${GENERATED_FILES} config.h config.log config.status
 
-DATA = AUTHORS COPYING
+DATA = AUTHORS \
+       COPYING \
+       images/about-logo.png \
+       images/appearance.png \
+       images/audio.png \
+       images/connectivity.png \
+       images/playlist.png \
+       images/info.png \
+       images/plugins.png \
+       images/advanced.png
  
 include buildsys.mk
 include extra.mk

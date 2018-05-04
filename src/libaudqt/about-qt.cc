@@ -54,6 +54,9 @@ static QTabWidget * buildCreditsNotebook (QWidget * parent)
 
 static QDialog * buildAboutWindow ()
 {
+// JWT:FIXME: RETAINED NEXT 2 FOR OUR LOGO TO WORK:
+    const char * data_dir = aud_get_path (AudPath::DataDir);
+    const char * logo_path = filename_build ({data_dir, "images", "about-logo.png"});
     const char * about_text = "<big><b>Fauxdacious " VERSION "</b></big><br>" COPYRIGHT;
     const char * website = "https://wildstar84.wordpress.com/fauxdacious";
 
@@ -61,8 +64,11 @@ static QDialog * buildAboutWindow ()
     window->setWindowTitle (_("About Fauxdacious"));
 
     auto logo = new QLabel (window);
-    int logo_size = audqt::to_native_dpi (400);
-    logo->setPixmap (QIcon (":/about-logo.svg").pixmap (logo_size, logo_size));
+    logo->setPixmap (QPixmap (logo_path));
+// JWT:FIXME: REVERTED NEXT 2 PREV. 1 SINCE SVG VSN. OF OUR LOGO DOESN'T WORK
+// IN QT AND I DON'T KNOW HOW TO PROPERLY CONVERT IT TO QT'S LIKING?!
+//    int logo_size = audqt::to_native_dpi (400);
+//    logo->setPixmap (QIcon (":/about-logo.svg").pixmap (logo_size, logo_size));
     logo->setAlignment (Qt::AlignHCenter);
 
     auto text = new QLabel (about_text, window);
