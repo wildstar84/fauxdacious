@@ -1,5 +1,16 @@
 Version 3.9-beta2
 
+* Added feature where if one selects a song in the playlist while another 
+song is playing, advancing to the next song will jump directly to that song.
+
+* Added "Random Skin on Play" option (Audacious. feature# 755) to Winamp 
+Skins interfaces (Gtk & QT) so that when set, the playlist advances, skin 
+theme changes to random installed skin.  Also added new preference checkbox 
+in Settings.Appearance window to contol (Default: unchecked (false)).
+NOTE:  Skin does NOT change when just song-title changes in streams.
+Care was taken to ensure the same skin does not come up twice in a row.
+Feature only happens if there are at least 2 skins installed.
+
 * Set up configuration to install the new modern libadplug-based version 
 of the AdPlug plugin (Audacious plugin commit# a39bfd7) BUT retain and 
 rename the old Audacious-based local version to "AdPlug Classic" (audadplug) 

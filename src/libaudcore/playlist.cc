@@ -2191,7 +2191,33 @@ bool playlist_next_song (int playlist_num, bool repeat)
 
     int hint = playlist->position ? playlist->position->number + 1 : 0;
 
-    if (! next_song_locked (playlist, repeat, hint))
+    // JWT:ADDED NEXT CONDITION TO JUMP TO NEXT SELECTED SONG, IF ONE'S SELECTED:
+    // THIS PERMITS US TO "SELECT" THE NEXT SONG TO PLAY.
+    if (hint && playlist->selected_count > 0 && ! playlist->position->selected)
+    {
+        int entries = playlist->entries.len ();
+        bool saveshuffle = aud_get_bool (nullptr, "shuffle");
+        Entry * entry = lookup_entry (playlist, hint);
+        if (saveshuffle)
+            aud_set_bool (nullptr, "shuffle", false); // TEMPORARILY TURN SHUFFLE OFF.
+        while (1)
+        {
+            if (entry && entry->selected)
+                break;
+            if (++hint >= entries)
+                hint = 0;
+            entry = lookup_entry (playlist, hint);
+        }
+        if (! next_song_locked (playlist, repeat, hint))
+        {
+            if (saveshuffle)
+                aud_set_bool (nullptr, "shuffle", true);
+            RETURN (false);
+        }
+        else if (saveshuffle)
+            aud_set_bool (nullptr, "shuffle", true);
+    }
+    else if (! next_song_locked (playlist, repeat, hint))
         RETURN (false);
 
     PlaybackChange change = change_playback (playlist);
