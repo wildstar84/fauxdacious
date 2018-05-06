@@ -35,16 +35,16 @@ EXPORT bool aud_filename_is_playlist (const char * filename)
 
     if (strstr (filename, "://") && strncmp (filename, "file://", 7)
             && strncmp (filename, "cdda://", 7) && strncmp (filename, "dvd://", 6)
-            && strncmp (filename, "stdin://", 8))  //JWT:WE'RE SOME KIND OF URL:
+            && strncmp (filename, "stdin://", 8))  // JWT:WE'RE SOME KIND OF URL:
     {
         String url_helper = aud_get_str ("audacious", "url_helper");
     	   StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
     	   remove ((const char *) temp_playlist_filename);
-        if (url_helper[0])  //JWT:WE HAVE A PERL HELPER, LESSEE IF IT RECOGNIZES & CONVERTS IT (ie. tunein.com, youtube, etc):
+        if (url_helper[0])  // JWT:WE HAVE A PERL HELPER, LESSEE IF IT RECOGNIZES & CONVERTS IT (ie. tunein.com, youtube, etc):
         {
             StringBuf filenameBuf = strstr (filename, "&")
                 ? index_to_str_list (str_list_to_index (filename, "&"), "\\&") 
-                : str_printf (filename);  //JWT:MUST ESCAPE AMPRESANDS ELSE system TRUNCATES URL AT FIRST AMPRESAND!
+                : str_copy (filename);  // JWT:MUST ESCAPE AMPRESANDS ELSE system TRUNCATES URL AT FIRST AMPRESAND!
 
             system ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf, " ", aud_get_path (AudPath::UserDir)}));    
             if (access((const char *) temp_playlist_filename, F_OK ) != -1 )

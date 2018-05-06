@@ -339,7 +339,7 @@ static void do_commands ()
             if (aud_get_bool (nullptr, "user_tag_data"))
             {
                 String cover_helper = aud_get_str ("audacious", "cover_helper");
-                if (cover_helper[0])  //JWT:WE HAVE A PERL HELPER, LESSEE IF IT CAN FIND/DOWNLOAD A COVER IMAGE FOR US:
+                if (cover_helper[0])  // JWT:WE HAVE A PERL HELPER, SO WE'LL USE IT TO DELETE TEMP. COVER-ART FILES IT CREATED:
                 {
                     AUDINFO ("----HELPER FOUND: WILL DO (%s)\n", (const char *)str_concat ({cover_helper, " DELETE COVERART ", 
                           aud_get_path (AudPath::UserDir)}));

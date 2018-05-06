@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #MUST INSTALL youtube-dl FOR Youtube to work!
-#pp -o FauxdaciousUrlHelper.exe -M Tunein::Streams -M IHeartRadio::Streams -M WWW::YouTube::Download -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
+#pp -o FauxdaciousUrlHelper.exe -M IHeartRadio::Streams -M WWW::YouTube::Download -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
 #FAUXDACIOUS "HELPER" SCRIPT TO HANDLE URLS THAT FAUXDACIOUS CAN'T PLAY DIRECTLY:
 
