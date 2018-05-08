@@ -50,6 +50,9 @@ static const char * const core_defaults[] = {
  "equalizer_autoload", "FALSE",
  "equalizer_bands", "0,0,0,0,0,0,0,0,0,0",
  "equalizer_preamp", "0",
+ "eqpreset_save_effects", "TRUE",
+ "eqpreset_use_effects", "TRUE",
+ "try_local_preset_files", "TRUE",
 
  /* info popup / info window */
  "cover_name_exclude", "back",
