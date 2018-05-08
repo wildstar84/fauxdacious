@@ -1,5 +1,30 @@
 Version 3.9-beta2
 
+* Added feature to stdin-piping to now allow the direct piping in of 
+a text list of playlist entries WITHOUT the previously-required extension 
+("-.m3u", "-.txt", etc., but rather now just "-", same as when piping in 
+media streams.  Fauxdacious supports two ways of stdin-piping due to the 
+fact that this feature predates Audacious's current way of doing it.  The 
+"old way" involved specifying the media type via extension, ie. 
+cat song.mp3 | fauxdacious stdin://-.mp3 (or fauxdacious -.mp3).  This 
+still works, even for piping in playlists or queuesheets.  The new way 
+Audacious does it is without the extension ie. cat song.mp3 | audacious -).
+Fauxdacious now supports both methods for media, but still requires the 
+matching extension hit for cuesheets and playlists (other than text/m3u).
+
+* Cleaned up some issues with stdin-piping of adplug and ffmpeg media.
+(We now also open stdin as a VFS file when "Matched by extension" (the 
+"old" way) so as to work more like it now does when matching by content 
+(ie. when no extension is specified with the "-" (the "new" way).
+
+* Eliminated the now-depreciated "youtubedl" plugin.  This plugin was my 
+rough first attempt at playing Youtube videos in Fauxdacious, but is now 
+depreciated, as Youtube (and other) videos are now much better supported 
+via the FauxdaciousURLHelper.pl "helper" script which uses the Perl library: 
+StreamFinder::Youtube.  Videos played via the youtubedl plugin were NOT 
+even seekable, and the ffaudio plugin can now be saved, thus fully 
+eliminating the need for youtubedl!
+
 * Added feature where if one selects a song in the playlist while another 
 song is playing, advancing to the next song will jump directly to that song.
 
