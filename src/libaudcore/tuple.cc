@@ -788,8 +788,6 @@ static const char * find_domain (const char * name)
         return name + 8;
     if (! strncmp (name, "mms://", 6))
         return name + 6;
-    if (! strncmp (name, "ytdl://", 7))
-        return name + 7;
 
     return nullptr;
 }

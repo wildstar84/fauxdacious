@@ -227,17 +227,10 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
 
     if (format & AUD_ART_DATA)
     {
-        /* JWT:IF WE'RE A YOUTUBE-DL STREAM, LOOK FOR IMAGE IN TAG DATA FILE UNDER 
-           "Comment" FROM youtubedl_metadatahelper.pl: */
+        /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
         if (! item->data.len () && ! item->art_file)
         {
-            if (aud_get_bool (nullptr, "youtubedl_tag_data") && ! strncmp (file, "ytdl://", 7))
-            {
-                Tuple img_tuple = Tuple ();
-                if (aud_read_tag_from_tagfile (file, "tmp_tag_data", img_tuple))
-                    item->art_file = img_tuple.get_str (Tuple::Comment);
-            }
-            else if (aud_get_bool (nullptr, "user_tag_data"))
+            if (aud_get_bool (nullptr, "user_tag_data"))
             {
                 Tuple img_tuple = Tuple ();
                 if (aud_read_tag_from_tagfile (file, "tmp_tag_data", img_tuple))
