@@ -36,6 +36,8 @@
 #include "tuple.h"
 #include "interface.h"
 #include "vfs.h"
+#include "playlist.h"
+#include "plugin.h"
 
 // regrettably, strcmp_nocase can't be used directly as a
 // callback for Index::sort due to taking a third argument;
@@ -154,23 +156,6 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
      */
     if (! item.tuple.valid () && ! is_subtune (item.filename))
     {
-        /* JWT:ADDED TO HANDLE SPECIAL YOUTUBE-DL CASE: */
-        if (strstr(item.filename, "ytdl://"))
-        {
-    	       String metadata_helper = aud_get_str("youtubedl", "metadata_helper");
-    	       if (metadata_helper[0])
-            {
-                Tuple file_tuple = Tuple ();
-                if (! aud_read_tag_from_tagfile (item.filename, "tmp_tag_data", file_tuple))
-                {
-                    StringBuf tagdata_filename = filename_build ({aud_get_path (AudPath::UserDir), "tmp_tag_data"});
-                    AUDDBG ("i:invoking metadata helper=%s=\n", (const char *) str_concat ({metadata_helper, " ", item.filename, " ", tagdata_filename}));
-                    system ((const char *) str_concat ({metadata_helper, " ", item.filename, " ", tagdata_filename}));
-                }
-            }
-            else
-                aud_set_bool (nullptr, "youtubedl_tag_data", false);  /* NO YOUTUBE-DL TAG DATA FILE W/O HELPER! */
-        }
         /* If we open the file to identify the decoder, we can re-use the same
          * handle to read metadata. */
         VFSFile file;
@@ -191,7 +176,7 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
                  * file extension.  Note that it's possible for multiple plugins
                  * to recognize the same extension (.ogg, for example). */
                 int flags = probe_by_filename (item.filename);
-                if (skip_invalid && ! (flags & PROBE_FLAG_HAS_DECODER))
+                if (skip_invalid && ! (flags & PROBE_FLAG_HAS_DECODER) && strcmp (item.filename, N_("stdin://")))
                     return;
 
                 if ((flags & PROBE_FLAG_MIGHT_HAVE_SUBTUNES))
@@ -212,7 +197,6 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
         if (item.decoder && input_plugin_has_subtunes (item.decoder))
             aud_file_read_tag (item.filename, item.decoder, file, item.tuple);
     }
-
     int n_subtunes = item.tuple.get_n_subtunes ();
 
     if (n_subtunes)
@@ -411,7 +395,8 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
         else if ((! from_playlist) && aud_filename_is_playlist (item.filename))
             add_playlist (item.filename, filter, user, result, save_title);
         else
-            add_file (std::move (item), filter, user, result, false);
+            // JWT:CHGD. TO NEXT TO AVOID JUNK:  add_file (std::move (item), filter, user, result, false);
+            add_file (std::move (item), filter, user, result, true);
     }
 }
 

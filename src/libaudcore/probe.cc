@@ -113,13 +113,16 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
             ext_matches.append (plugin);
     }
 
-    if (ext_matches.len () == 1)
+    if (ext_matches.len () == 1 || (ext_matches.len () > 1 && ! strncmp (filename, "stdin://", 8)))
     {
         AUDINFO ("Matched %s by extension.\n", aud_plugin_get_name (ext_matches[0]));
+        if (! strncmp (filename, "stdin://", 8) && ! open_input_file (filename, "r", nullptr, file, error))
+            AUDINFO ("w:STDIN Open failed, see if plugin will still handle stdin://-.ext the old Fauxdacious way?...\n");
+
         return ext_matches[0];
     }
 
-    AUDDBG ("Matched %d plugins by extension.\n", ext_matches.len ());
+    AUDINFO ("Matched %d plugins by extension.\n", ext_matches.len ());
 
     /* JWT:SPECIAL CHECK FOR YOUTUBE STREAMS: CHECK URL FOR EMBEDDED MIME-TYPE (SINCE BY-CONTENT SOMETIMES FAILS): */
     const char * urlmime = strstr(filename, "&mime=video%2F");
@@ -206,6 +209,34 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
         }
     }
 
+    /* JWT:SECTION ADDED TO TREAT stdin ("-") AS A TEXT PLAYLIST (LIST OF ENTRIES TO PLAY) IF NO 
+       OTHER MEDIA INPUT PLUGIN RECOGNIZES IT, THIS WAY WE CAN PIPE A LIST OF ENTRIES INTO 
+       FAUXDACIOUS VIA stdin NOW *WITHOUT* HAVING TO APPEND THE ".m3u" EXTENSION, IE. "-.m3u".
+       IF IT'S NOT A VALID TEXT LIST, NOTHING WILL BE ADDED AND IT WILL FAIL SAME AS BEFORE
+       ("File format not recognized" ERROR POPUP).
+    */
+    if (! strcmp (filename, N_("stdin://")))
+        for (PluginHandle * plugin : aud_plugin_list (PluginType::Playlist))
+        {
+            if (aud_plugin_get_enabled (plugin) && playlist_plugin_has_ext (plugin, "txt"))
+            {
+                String title;
+                auto pp = (PlaylistPlugin *) aud_plugin_get_header (plugin);
+                if (! pp)
+                    break;
+
+                Index<PlaylistAddItem> incoming_items;
+
+                if (pp->load (filename, file, title, incoming_items))
+                {
+                    if (incoming_items.len () > 0)
+                    {
+                        aud_playlist_entry_insert_batch (aud_playlist_get_active (), 0, std::move (incoming_items), true);
+                        error = nullptr;
+                    }
+                }
+            }
+        }
     if (error)
         * error = String (_("File format not recognized"));
 
@@ -326,11 +357,10 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS TRUE!: 
        WHEN SUCCESSFUL FETCHING FROM TAG FILE, IT RETURNS TRUE ONLY IF THE "PRECEDENCE" == "ONLY" (-1),
        OTHERWISE, WE KEEP PROCESSING THE CONDITIONS UNTIL AT LAST WE FETCH (ANY UNSET) TAGS FROM THE FILE ITSELF. */
-    if (! strncmp (filename, "stdin://", 8) 
-            || (local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *)filename_only, local_tag_file, loclfile_tuple)) < 0) 
+    if ((local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *)filename_only, local_tag_file, loclfile_tuple)) < 0) 
             || (usrtag && (fromtempfile = aud_read_tag_from_tagfile (filename, "tmp_tag_data", file_tuple)) < 0)
-            || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0) 
-            || ip->read_tag (filename, file, new_tuple, image))
+            || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0)
+            || (file && ip->read_tag (filename, file, new_tuple, image)))
     {
         which_tuple = &file_tuple;
         if (local_tag_file[0] && fromlocalfile)  //JWT:WE GOT TAGS FROM A LOCAL (DIRECTORY-BASED) user_tag_data.tag FILE.
