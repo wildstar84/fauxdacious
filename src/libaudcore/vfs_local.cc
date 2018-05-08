@@ -216,7 +216,7 @@ int64_t LocalFile::fwrite (const void * ptr, int64_t size, int64_t nitems)
 int LocalFile::fseek (int64_t offset, VFSSeekType whence)
 {
     int result = fseeko (m_stream, offset, from_vfs_seek_type (whence));
-    if (result < 0)
+    if (result < 0 && m_stream != stdin)  // JWT:DON'T BOTHER REPORTING ILLEGAL SEEKS FOR STDIN!
         perror (m_path);
 
     if (result == 0)
