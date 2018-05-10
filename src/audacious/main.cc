@@ -473,6 +473,11 @@ static void do_commands ()
         else if (aud_drct_get_paused ())
             aud_drct_pause ();
     }
+
+    if (options.pauseismute) /* JWT: ADDED 20100205 "-P" COMMAND-LINE OPTION TO ALLOW MUTING OF OUTPUT ON PAUSE (INPUT CONTINUES)! */
+        aud_set_pausemute_mode (true);
+    else
+        aud_set_pausemute_mode (false);
 }
 
 static void do_commands_at_idle (void *)
@@ -612,6 +617,8 @@ int main (int argc, char * * argv)
         aud_set_bool (nullptr, "repeat", resetRepeatToOn);
     if (options.outstd)
         aud_set_int (nullptr, "stdout_fmt", 0);
+    /* JWT:PAUSEMUTE SHOULD ALWAYS DEFAULT TO OFF ON STARTUP UNLESS -P SPECIFIED!: */
+    aud_set_bool (nullptr, "_pausedoesmute", false);  /* JWT:RESET PAUSEMUTE OFF, IN CASE TURNED ON DURING PLAY. */
 
     aud_cleanup ();
     initted = false;

@@ -1,5 +1,11 @@
 Version 3.9-beta2
 
+* Add checkbox for "PauseMute" (-P command-line option) to the 
+[Settings].[Playlist] options screen (both GTK & QT) to allow toggling 
+this option while running.  Changes are lost on restart as the -P option 
+(or lack thereof) still sets the (default) state on startup (this is 
+intentional).
+
 * Make piping to stdout actually useful:  Add a -o / --out=<ext> command-
 line option to force Fauxdacious to launch with the Filewriter plugin 
 selected for output and temporarily configured to write to stdout.  This 

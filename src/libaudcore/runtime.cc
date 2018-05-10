@@ -111,10 +111,15 @@ EXPORT MainloopType aud_get_mainloop_type ()
 EXPORT void aud_set_pausemute_mode (bool pausemute_mode)  /* JWT:NEXT 2 TO ADD PAUSEMUTE OPTION */
 {
     MuteInLieuOfPause = pausemute_mode;
+if (pausemute_mode) AUDERR("--aud_set_pausemute_mode(TRUE/ON)\n"); else AUDERR("--aud_set_pausemute_mode(FALSE/OFF)\n");
+    aud_set_bool (nullptr, "_pausedoesmute", pausemute_mode);  /* JWT:NEEDED BY PREFS-WINDOW WIDGET */
 }
 
 EXPORT bool aud_get_pausemute_mode ()
 {
+if (MuteInLieuOfPause) AUDERR("--aud_get_pausemute WAS(TRUE/ON)\n"); else AUDERR("--aud_get_pausemute WAS(FALSE/OFF)\n");
+    MuteInLieuOfPause = aud_get_bool (nullptr, "_pausedoesmute");  /* JWT:NEEDED BY PREFS-WINDOW WIDGET */
+if (MuteInLieuOfPause) AUDERR("--aud_get_pausemute NOW(TRUE/ON)\n"); else AUDERR("--aud_get_pausemute NOW(FALSE/OFF)\n");
     return MuteInLieuOfPause;
 }
 
