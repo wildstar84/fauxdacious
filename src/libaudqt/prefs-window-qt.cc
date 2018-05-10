@@ -753,7 +753,7 @@ void PrefsWindow::record_update ()
 {
     auto p = aud_drct_get_record_plugin ();
 
-    if (p)
+    if (p && ! aud_get_stdout_fmt ())  // JWT:MAKE SURE WE DON'T HAVE FILEWRITER AS PRIMARY!
     {
         bool enabled = aud_drct_get_record_enabled ();
         auto text = str_printf (_("Record audio stream using %s"), aud_plugin_get_name (p));

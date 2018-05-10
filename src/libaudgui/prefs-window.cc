@@ -791,7 +791,7 @@ static void record_update (void * = nullptr, void * = nullptr)
 {
     auto p = aud_drct_get_record_plugin ();
 
-    if (p)
+    if (p && ! aud_get_stdout_fmt ())  // JWT:MAKE SURE WE DON'T HAVE FILEWRITER AS PRIMARY!
     {
         bool enabled = aud_drct_get_record_enabled ();
 

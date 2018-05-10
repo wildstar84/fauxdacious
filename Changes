@@ -1,5 +1,25 @@
 Version 3.9-beta2
 
+* Make piping to stdout actually useful:  Add a -o / --out=<ext> command-
+line option to force Fauxdacious to launch with the Filewriter plugin 
+selected for output and temporarily configured to write to stdout.  This 
+is then reset back to the original user-configured output plugin and 
+recording options on exit.  If "headless" (-H option) is also specified, 
+then "-q" (--quit-after-play) is also implied and Fauxdacious exits when 
+EOF is encountered on stdin.  This makes it easy to do conversion piping, 
+like:  "fauxdacious -DcH --out=mp3 [stuff-to-play] >new_file.mp3" WITHOUT 
+having to first start up, set the recording options to stdout, etc., exit, 
+then run to pipe to stdout!  This option long ago existed in my earliest 
+Audacious hacks but had since been removed when I remerged my changes to 
+Audacious v3.6.
+
+* Had to (re)-add a separate "--" stdin argument for loading a list 
+of files EARLY (before fauxdacious can transfer itself to an existing 
+remote session) to restore the (apparently lost) ability to append 
+additional files via stdin to a running session (also still works for 
+new sessions too though).  Example:  "ls somefiles | fauxdacious -Dc --"
+-then, later: "ls somemorefiles | fauxdacious -e --".
+
 * Added feature to stdin-piping to now allow the direct piping in of 
 a text list of playlist entries WITHOUT the previously-required extension 
 ("-.m3u", "-.txt", etc., but rather now just "-", same as when piping in 

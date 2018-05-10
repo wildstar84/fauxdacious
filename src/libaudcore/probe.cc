@@ -42,7 +42,7 @@ bool open_input_file (const char * filename, const char * mode,
         return true;
 
     /* already open? */
-    if (file && file.fseek (0, VFS_SEEK_SET) == 0)
+    if (file && (file.fseek (0, VFS_SEEK_SET) == 0 || ! strncmp (filename, "stdin://", 8)))
         return true;
 
     file = VFSFile (filename, mode);
@@ -231,7 +231,8 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
                 {
                     if (incoming_items.len () > 0)
                     {
-                        aud_playlist_entry_insert_batch (aud_playlist_get_active (), 0, std::move (incoming_items), true);
+                        aud_playlist_entry_insert_filtered (aud_playlist_get_active (), -1, std::move (incoming_items), 
+                                nullptr, nullptr, true);
                         error = nullptr;
                     }
                 }
@@ -577,9 +578,6 @@ EXPORT bool aud_file_write_tuple (const char * filename,
     auto ip = (InputPlugin *) aud_plugin_get_header (decoder);
     if (! ip)
         //return false;
-        success = false;
-
-    if (strstr(filename, "ytdl://"))
         success = false;
 
     if (success)

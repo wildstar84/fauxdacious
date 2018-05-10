@@ -159,7 +159,6 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
         /* If we open the file to identify the decoder, we can re-use the same
          * handle to read metadata. */
         VFSFile file;
-
         if (! item.decoder)
         {
             if (aud_get_bool (nullptr, "slow_probe"))
@@ -167,17 +166,19 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
                 /* The slow path.  User settings dictate that we should try to
                  * find a decoder even if we don't recognize the file extension. */
                 item.decoder = aud_file_find_decoder (item.filename, false, file);
-                if (skip_invalid && ! item.decoder)
-                    return;
+                if ((skip_invalid || ! strcmp (item.filename, N_("file://"))) && ! item.decoder
+                        && strncmp (item.filename, N_("stdin://"), 8))
+                    return;  // if (skipjunk || local-file) && no decoder && NOT stdin://!
             }
             else
             {
                 /* The fast path.  First see whether any plugins recognize the
                  * file extension.  Note that it's possible for multiple plugins
                  * to recognize the same extension (.ogg, for example). */
-                int flags = probe_by_filename (item.filename);
-                if (skip_invalid && ! (flags & PROBE_FLAG_HAS_DECODER) && strcmp (item.filename, N_("stdin://")))
-                    return;
+                int flags = probe_by_filename (item.filename); // CHECK SCHEME OR EXTENTION.
+                if ((skip_invalid || ! strncmp (item.filename, N_("file://"), 7))
+                        && ! (flags & PROBE_FLAG_HAS_DECODER) && strncmp (item.filename, N_("stdin://"), 8))
+                    return;  // if (skipjunk || local-file) && no decoder && NOT stdin://!
 
                 if ((flags & PROBE_FLAG_MIGHT_HAVE_SUBTUNES))
                 {
@@ -395,8 +396,7 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
         else if ((! from_playlist) && aud_filename_is_playlist (item.filename))
             add_playlist (item.filename, filter, user, result, save_title);
         else
-            // JWT:CHGD. TO NEXT TO AVOID JUNK:  add_file (std::move (item), filter, user, result, false);
-            add_file (std::move (item), filter, user, result, true);
+            add_file (std::move (item), filter, user, result, false);
     }
 }
 

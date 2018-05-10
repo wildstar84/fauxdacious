@@ -123,6 +123,18 @@ static void start_required (PluginType type)
     PluginHandle * sel;
     if ((sel = find_selected (type, PluginEnabled::Primary)))
     {
+        /* JWT:IF "--out=<ext>" SPECIFIED ON COMMAND-LINE, SAVE "SELECTED" PLUGIN NAME AND START FILEWRITER! */
+        if (type == PluginType::Output && aud_get_stdout_fmt ())
+        {
+            PluginHandle * FilewriterHandle = aud_plugin_lookup_basename ("filewriter");
+            if (FilewriterHandle)
+            {
+                aud_set_str (nullptr, "_prev_outputplugin", aud_plugin_get_basename (sel));
+                sel = FilewriterHandle;
+            }
+            else
+                aud_set_stdout_fmt (0);
+        }
         AUDINFO ("Starting selected %s plugin %s.\n", table[type].name,
          aud_plugin_get_name (sel));
 
@@ -217,10 +229,22 @@ static void stop_plugins (PluginType type)
         AUDINFO ("Shutting down %s.\n", aud_plugin_get_name (p));
         table[type].f.s.set_current (nullptr);
 
-        if (type == PluginType::Output && (p = output_plugin_get_secondary ()))
+        if (type == PluginType::Output)
         {
-            AUDINFO ("Shutting down %s.\n", aud_plugin_get_name (p));
-            output_plugin_set_secondary (nullptr);
+            if (aud_get_stdout_fmt ())
+            {
+                /* JWT:RESET THE SAVED OUTPUT PLUGIN AS THE SELECTED ONE FOR NEXT STARTUP! */
+                PluginHandle * p_prev = aud_plugin_lookup_basename (aud_get_str (nullptr, "_prev_outputplugin"));
+                if (p_prev)
+                    plugin_set_enabled (p_prev, PluginEnabled::Primary);
+                aud_set_stdout_fmt (0);
+                aud_set_str (nullptr, "_prev_outputplugin", "");
+            }
+            if ((p = output_plugin_get_secondary ()))
+            {
+                AUDINFO ("Shutting down %s.\n", aud_plugin_get_name (p));
+                output_plugin_set_secondary (nullptr);
+            }
         }
     }
     else if (table[type].f.m.stop)

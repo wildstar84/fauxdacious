@@ -37,6 +37,8 @@
 #include <libaudcore/playlist.h>
 #include <libaudcore/runtime.h>
 #include <libaudcore/tuple.h>
+#include <libaudcore/audstrings.h>
+#include <libaudcore/vfs.h>
 
 #ifdef USE_DBUS
 #include "aud-dbus.h"
@@ -58,13 +60,15 @@ static struct {
     int verbose;
     int qt;
     int clearplaylist, newinstance, pauseismute, forcenoequalizer, forcenogainchg, deleteallplaylists,
-            force_recording;  /* JWT:NEW COMMAND-LINE OPTIONS */
+            force_recording, outstd;  /* JWT:NEW COMMAND-LINE OPTIONS */
 } options;
 
 static bool initted = false;
 static Index<PlaylistAddItem> filenames;
 static int starting_gain = 0;           /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
 char instancename[100];                 /* JWT:ADD OPTIONAL INSTANCE NAME */
+// JWT:SOMEDAY!: String instancename;                 /* JWT:ADD OPTIONAL INSTANCE NAME */
+String out_ext = String ();             /* JWT:ADD OPTIONAL STDOUT (FILEWRITER) EXTENSION FOR STDOUT */
 
 static const struct {
     const char * long_arg;
@@ -83,6 +87,7 @@ static const struct {
     {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window")},
     {"show-main-window", 'm', & options.mainwin, N_("Display the main window")},
     {"new", 'n', & options.newinstance, N_("New Instance:  number, name, or unnamed (ie: -# | --new=name | -n)")}, 
+    {"out", 'o', & options.outstd, N_("Output to stdout (extension)")},  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
     {"play", 'p', & options.play, N_("Start playback")},
     {"pause-mute", 'P', & options.pauseismute, N_("Pause mutes instead of pausing")},  /* JWT:ADD PAUSEMUTE OPTION */
     {"quit-after-play", 'q', & options.quit_after_play, N_("Quit on playback stop")},
@@ -99,10 +104,50 @@ static const struct {
     {"no-equalizer", 'z', & options.forcenoequalizer, N_("Force Equalizer Off")},
 };
 
+/* JWT:ADDED TO ALLOW A LIST OF FILES TO BE PIPED IN VIA STDIN *VERY EARLY* (BEFORE DBUS CAN REDIRECT
+   TO ANY REMOTE (ALREADY-RUNNING) SESSION), OTHERWISE, STDIN IS LOST!  THIS PERMITS APPENDING
+   (ENQUEUEING) ADDITIONAL FILES VIA STDIN TO AN ALREADY RUNNING SESSION!  THIS IS ACCOMPLISHED BY:
+   EXAMPLE:  ls somefiles | fauxdacious -Dc -- & #THEN LATER: ls somemorefiles | fauxdacious -e --
+*/
+static void get_files_from_stdin ()
+{
+    VFSFile file;
+    file = VFSFile ("stdin://", "r");
+    if (file)
+    {
+        Index<char> text = file.read_all ();
+        if (text.len ())
+        {
+            text.append (0);  /* null-terminate */
+            Index<String> inlines = str_list_to_index ((const char *) text.begin (), "\n");
+            int linecnt = inlines.len ();
+            if (linecnt > 0)
+            {
+                String uri;
+                CharPtr cur (g_get_current_dir ());
+                for (int i = 0; i < linecnt; i ++)
+                {
+                    if (strstr (inlines[i], "://"))
+                        uri = String (inlines[i]);
+                    else if (g_path_is_absolute (inlines[i]))
+                        uri = String (filename_to_uri (inlines[i]));
+                    else
+                        uri = String (filename_to_uri (filename_build ({cur, inlines[i]})));
+
+                    if (uri)
+                        filenames.append (uri);
+                }
+            }
+        }
+    }
+};
+
 static bool parse_options (int argc, char * * argv)
 {
     CharPtr cur (g_get_current_dir ());
+// JWT:SOMEDAY!:     instancename = String ();
     memset (instancename, '\0', sizeof (instancename));
+    out_ext = String ();
 
 #ifdef _WIN32
     Index<String> args = get_argv_utf8 ();
@@ -123,8 +168,17 @@ static bool parse_options (int argc, char * * argv)
             if (strstr (arg, "://"))  /* uri */
             {
                 uri = String (arg);
-                if (strstr (arg, "stdin://"))   /* JWT:FORCE REPEAT OFF IF STREAMING FROM stdin, SINCE IMPOSSIBLE TO REWIND! */
-                    jwt_norepeat = true;
+                if (strstr (arg, "stdin://"))  /* we're stdin */
+                {
+                    if (! strncmp (arg, "stdin://--", 10))  /* we're stdin://-- (EARLY file load) */
+                        get_files_from_stdin ();
+                    else
+                    {
+                        if (strncmp (arg, "stdin://-.", 10))  /* we're NOT stdin://-.<ext> ("OLD Way"), so */
+                            uri = String ("stdin://");  /* must be "stdin://-" ("NEW Way"): convert to "stdin://" */
+                        jwt_norepeat = true;
+                    }
+                }
             }
             else if (g_path_is_absolute (arg))
                 uri = String (filename_to_uri (arg));
@@ -133,55 +187,63 @@ static bool parse_options (int argc, char * * argv)
 
             filenames.append (uri);
         }
-        else if (! arg[1])       /* "-" (standard input) */
+        else if (! arg[1])       /* "-" (standard input - "NEW Way") */
         {
             filenames.append (String ("stdin://"));
             jwt_norepeat = true;
         }
-        else if (arg[1] == '.')  /* "-.ext (standard input w/extension) */
+        else if (arg[1] == '.')  /* "-.<ext> (standard input w/extension) ("OLD Way") */
         {
             filenames.append (String (str_concat ({"stdin://", arg})));
             jwt_norepeat = true;
         }
         else if (arg[1] == '-')  /* --long option */
         {
-            bool found = false;
-
-            for (auto & arg_info : arg_map)
-            {
-                /* JWT:REPLACED BY NEXT 12 TO ALLOW LONG OPTIONS TO INCLUDE ARGUMENT:  if (! strcmp (arg + 2, arg_info.long_arg)) */
-                if (! strncmp (arg + 2, arg_info.long_arg, strlen (arg_info.long_arg)))
-                {
-                    (* arg_info.value) ++;
-                    found = true;
-                    const char * parmpos = strstr (arg + 2, "=");
-                    if ( parmpos )
-                    {
-                        ++parmpos;
-                        if (! strcmp (arg_info.long_arg, "new"))           /* JWT:ADD OPTIONAL INSTANCE NAME */
-                            strcpy (instancename, parmpos);
-                        else if (! strcmp (arg_info.long_arg, "no-gain"))  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
-                            starting_gain = atoi (parmpos);
-                    }
-                    break;
-                }
-            }
-
-            if (! found)
-            {
-                fprintf (stderr, _("Unknown option: %s\n"), arg);
-                return false;
-            }
-        }
-        else  /* -short option list (single letters and/or digit) */
-        {
-            for (int c = 1; arg[c]; c ++)
+            if (! arg[2])        /* "--" - Get list of files from stdin EARLY! */
+                get_files_from_stdin ();
+            else                 /* "--<option>[=value]" (long option) */
             {
                 bool found = false;
 
                 for (auto & arg_info : arg_map)
                 {
-                    if (arg[c] == arg_info.short_arg)  /* valid option letter found */
+                    /* JWT:REPLACED BY NEXT 12 TO ALLOW LONG OPTIONS TO INCLUDE ARGUMENT:  if (! strcmp (arg + 2, arg_info.long_arg)) */
+                    if (! strncmp (arg + 2, arg_info.long_arg, strlen (arg_info.long_arg)))
+                    {
+                        (* arg_info.value) ++;
+                        found = true;
+                        const char * parmpos = strstr (arg + 2, "=");
+                        if ( parmpos )
+                        {
+                            ++parmpos;
+                            if (! strcmp (arg_info.long_arg, "new"))           /* JWT:ADD OPTIONAL INSTANCE NAME */
+                                strcpy (instancename, parmpos);
+// JWT:SOMEDAY!:                instancename = String (parmpos);
+                            else if (! strcmp (arg_info.long_arg, "out"))      /* JWT:ADD OPTIONAL STDOUT OUTPUT */
+                                out_ext = String (parmpos);
+                            else if (! strcmp (arg_info.long_arg, "gain"))  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
+                                starting_gain = atoi (parmpos);
+                        }
+                        break;
+                    }
+                }
+
+                if (! found)
+                {
+                    fprintf (stderr, _("Unknown option: %s\n"), arg);
+                    return false;
+                }
+            }
+        }
+        else  /* -short option list (single letters and/or digit) */
+        {
+            for (int c = 1; arg[c]; c ++)  /* loop to check each character in the option string */
+            {
+                bool found = false;
+
+                for (auto & arg_info : arg_map)  /* See if we're a valid option letter */
+                {
+                    if (arg[c] == arg_info.short_arg)  /* ("-<alpha>") valid option letter found */
                     {
                         (* arg_info.value) ++;
                         found = true;
@@ -189,14 +251,15 @@ static bool parse_options (int argc, char * * argv)
                     }
                 }
 
-                if (! found)
+                if (! found)   /* we're not a valid letter, see if we're a digit?: */
                 {
-                    if (arg[c] >= '0' && arg[c] <= '9')  /* digit (instance number) found */
+                    if (arg[c] >= '0' && arg[c] <= '9')  /* ("-#") digit (instance number) found */
                     {
                         if (arg[c] > '0')  /* new (Audacious-style) instance number (0 == default: no new instance) */
                         {
                             strncpy (instancename, arg + c, 1);
                             instancename[1] = '\0';
+                            // JWT:SOMEDAY!: instancename = String (str_copy (arg + c, 1));
                             options.newinstance = 1;
                         }
                     }
@@ -233,6 +296,7 @@ static void print_help ()
     static const char pad[21] = "                    ";
 
     fprintf (stderr, "%s", _("Usage: fauxdacious [OPTION] ... [FILE] ...\n\n"));
+    fprintf (stderr, "%s", _("FILE can be: local-file, url, -|--|-.ext (stdin).\n\n"));
     for (auto & arg_info : arg_map)
         fprintf (stderr, "  -%c, --%s%.*s%s\n", arg_info.short_arg,
          arg_info.long_arg, (int) (20 - strlen (arg_info.long_arg)), pad,
@@ -341,7 +405,7 @@ static void do_commands ()
                 String cover_helper = aud_get_str ("audacious", "cover_helper");
                 if (cover_helper[0])  // JWT:WE HAVE A PERL HELPER, SO WE'LL USE IT TO DELETE TEMP. COVER-ART FILES IT CREATED:
                 {
-                    AUDINFO ("----HELPER FOUND: WILL DO (%s)\n", (const char *)str_concat ({cover_helper, " DELETE COVERART ", 
+                    AUDINFO ("----HELPER FOUND: WILL DO (%s)\n", (const char *) str_concat ({cover_helper, " DELETE COVERART ", 
                           aud_get_path (AudPath::UserDir)}));
                     system ((const char *) str_concat ({cover_helper, " DELETE COVERART ", 
                           aud_get_path (AudPath::UserDir)}));
@@ -360,8 +424,28 @@ static void do_commands ()
             aud_playlist_delete(playlist_count-1);
     }
 
-    if (options.force_recording)
-        aud_drct_enable_record (1);  //JWT:USER WANTS TO START WITH RECORDING ON (GREAT FOR RECORDING FROM STDIN!)!
+    if (options.outstd)
+    {
+        if (options.headless)  // JWT:IF HEADLESS AND PIPING TO STDOUT, THEN QUIT WHEN DONE!
+            options.quit_after_play = 1;
+        if (out_ext[0])
+        {
+            int outstd = aud_get_int ("filewriter", (const char *) str_concat ({"have_", (const char *) out_ext}));
+            if (outstd > 0)
+                aud_set_stdout_fmt (outstd);
+            else
+            {
+                AUDERR ("w:%s is not a recognized format, using wav format.\n", (const char *) out_ext);
+                aud_set_stdout_fmt (1);
+            }
+            out_ext = String();
+        }
+        else
+            aud_set_stdout_fmt (1);
+    }
+
+    if (options.force_recording && !options.outstd)
+        aud_drct_enable_record (1);  // JWT:USER WANTS TO START WITH RECORDING ON (GREAT FOR RECORDING FROM STDIN!)!
 
     if (filenames.len ())
     {
@@ -471,6 +555,9 @@ int main (int argc, char * * argv)
         return EXIT_SUCCESS;
     }
 
+    if (options.outstd)
+        aud_set_stdout_fmt (1);
+
 #ifdef USE_DBUS
     do_remote (); /* may exit */
 #endif
@@ -514,7 +601,7 @@ int main (int argc, char * * argv)
     if (sdl_initialized)
         SDL_QuitSubSystem (SDL_INIT_VIDEO);
 
-    aud_drct_enable_record (0);  //JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
+    aud_drct_enable_record (0);  // JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
 #ifdef USE_DBUS
     dbus_server_cleanup ();
 #endif
@@ -523,6 +610,8 @@ int main (int argc, char * * argv)
         aud_set_bool (nullptr, "equalizer_active", resetEqState);
     if (jwt_norepeat)
         aud_set_bool (nullptr, "repeat", resetRepeatToOn);
+    if (options.outstd)
+        aud_set_int (nullptr, "stdout_fmt", 0);
 
     aud_cleanup ();
     initted = false;

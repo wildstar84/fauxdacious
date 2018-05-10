@@ -94,6 +94,8 @@ const char * aud_get_path (AudPath id);
 
 void aud_set_headless_mode (bool headless);
 bool aud_get_headless_mode ();
+void aud_set_stdout_fmt (int fmt);
+int aud_get_stdout_fmt ();
 
 EXPORT void aud_set_pausemute_mode (bool pausemute_mode);  /* JWT:NEXT 2 TO ADD PAUSEMUTE OPTION */
 EXPORT bool aud_get_pausemute_mode ();

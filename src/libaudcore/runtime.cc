@@ -66,8 +66,9 @@ size_t misc_bytes_allocated;
 
 static bool headless_mode;
 static bool MuteInLieuOfPause;   /* JWT */
-static char instancename [100];
-static int fudge_gain;
+static char instancename [100];  /* JWT */
+static int fudge_gain;           /* JWT */
+static int stdout_fmt;           /* JWT */
 
 #if defined(USE_QT) && ! defined(USE_GTK)
 static MainloopType mainloop_type = MainloopType::Qt;
@@ -81,6 +82,10 @@ EXPORT void aud_set_headless_mode (bool headless)
     { headless_mode = headless; }
 EXPORT bool aud_get_headless_mode ()
     { return headless_mode; }
+EXPORT void aud_set_stdout_fmt (int fmt)
+    { stdout_fmt = fmt; }
+EXPORT int aud_get_stdout_fmt ()
+    { return stdout_fmt; }
 
 EXPORT void aud_set_instancename (char * strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
 {
