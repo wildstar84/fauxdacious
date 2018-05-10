@@ -67,7 +67,7 @@ static bool initted = false;
 static Index<PlaylistAddItem> filenames;
 static int starting_gain = 0;           /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
 char instancename[100];                 /* JWT:ADD OPTIONAL INSTANCE NAME */
-// JWT:SOMEDAY!: String instancename;                 /* JWT:ADD OPTIONAL INSTANCE NAME */
+// JWT:SOMEDAY!: String instancename;   /* JWT:ADD OPTIONAL INSTANCE NAME */
 String out_ext = String ();             /* JWT:ADD OPTIONAL STDOUT (FILEWRITER) EXTENSION FOR STDOUT */
 
 static const struct {
@@ -87,7 +87,7 @@ static const struct {
     {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window")},
     {"show-main-window", 'm', & options.mainwin, N_("Display the main window")},
     {"new", 'n', & options.newinstance, N_("New Instance:  number, name, or unnamed (ie: -# | --new=name | -n)")}, 
-    {"out", 'o', & options.outstd, N_("Output to stdout (extension)")},  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
+    {"out", 'o', & options.outstd, N_("Output to stdout (extension)")},  /* JWT:FORCE PIPING TO STDOUT, (default "wav"). */
     {"play", 'p', & options.play, N_("Start playback")},
     {"pause-mute", 'P', & options.pauseismute, N_("Pause mutes instead of pausing")},  /* JWT:ADD PAUSEMUTE OPTION */
     {"quit-after-play", 'q', & options.quit_after_play, N_("Quit on playback stop")},
@@ -280,10 +280,8 @@ static bool parse_options (int argc, char * * argv)
     else if (options.verbose)
         audlog::set_stderr_level (audlog::Info);
 
-    if (options.pauseismute) /* JWT: ADDED 20100205 "-P" COMMAND-LINE OPTION TO ALLOW MUTING OF OUTPUT ON PAUSE (INPUT CONTINUES)! */
-        aud_set_pausemute_mode (true);
-    else
-        aud_set_pausemute_mode (false);
+    /* JWT:DON'T DO ANYTHING HERE THAT CALLS aud_set_<type> () AND FRIENDS - CAUSES "LEAK" ERRORS WHEN 
+       REMOTE SESSION IS ALREADY RUNNING! */
 
     if (options.qt)
         aud_set_mainloop_type (MainloopType::Qt);
@@ -388,15 +386,15 @@ static void do_commands ()
 
     if (options.deleteallplaylists)  /* JWT */
     {
-        const char *playlist_dir = aud_get_path(AudPath::PlaylistDir);
-        if (strstr(playlist_dir, "config"))
+        const char *playlist_dir = aud_get_path (AudPath::PlaylistDir);
+        if (strstr (playlist_dir, "config"))
         {   /* PREVENT POTENTIAL ACCIDENTAL DELETE AGONY IF playlist WAS SOMEHOW EMPTY!!! */
-            AUDINFO("-D2:DELETING ALL PLAYLISTS (DIR=%s)!", playlist_dir);
+            AUDINFO ("-D2:DELETING ALL PLAYLISTS (DIR=%s)!", playlist_dir);
             int i;
-            int playlist_count = aud_playlist_count();
+            int playlist_count = aud_playlist_count ();
             for (i=playlist_count;i>=0;i--)
             {
-                aud_playlist_delete(i);
+                aud_playlist_delete (i);
             }
             /* JWT:ADDED TO REMOVE THE TEMPORARY TAG FILE CREATED BY URL-HELPER SCRIPT FOR YOUTUBE VIDEOS AND 
                THE YOUTUBEDL PLUGIN (TO KEEP IT FROM FILLING UP W/NOW USELESS ENTRIES): */
@@ -419,9 +417,9 @@ static void do_commands ()
 
     if (options.clearplaylist)   /* JWT */
     {
-        int playlist_count = aud_playlist_count();
+        int playlist_count = aud_playlist_count ();
         if (playlist_count > 0)
-            aud_playlist_delete(playlist_count-1);
+            aud_playlist_delete (playlist_count-1);
     }
 
     if (options.outstd)
@@ -438,7 +436,7 @@ static void do_commands ()
                 AUDERR ("w:%s is not a recognized format, using wav format.\n", (const char *) out_ext);
                 aud_set_stdout_fmt (1);
             }
-            out_ext = String();
+            out_ext = String ();
         }
         else
             aud_set_stdout_fmt (1);
@@ -617,8 +615,6 @@ int main (int argc, char * * argv)
         aud_set_bool (nullptr, "repeat", resetRepeatToOn);
     if (options.outstd)
         aud_set_int (nullptr, "stdout_fmt", 0);
-    /* JWT:PAUSEMUTE SHOULD ALWAYS DEFAULT TO OFF ON STARTUP UNLESS -P SPECIFIED!: */
-    aud_set_bool (nullptr, "_pausedoesmute", false);  /* JWT:RESET PAUSEMUTE OFF, IN CASE TURNED ON DURING PLAY. */
 
     aud_cleanup ();
     initted = false;
