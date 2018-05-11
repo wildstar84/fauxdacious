@@ -1,5 +1,7 @@
 Version 3.9-beta2
 
+* Replaced some very old and primitive C-code.
+
 * Add checkbox for "PauseMute" (-P command-line option) to the 
 [Settings].[Playlist] options screen (both GTK & QT) to allow toggling 
 this option while running.  Changes are lost on restart as the -P option 
@@ -12,7 +14,7 @@ selected for output and temporarily configured to write to stdout.  This
 is then reset back to the original user-configured output plugin and 
 recording options on exit.  If "headless" (-H option) is also specified, 
 then "-q" (--quit-after-play) is also implied and Fauxdacious exits when 
-EOF is encountered on stdin.  This makes it easy to do conversion piping, 
+playback stops.  This makes it easy to do conversion piping, 
 like:  "fauxdacious -DcH --out=mp3 [stuff-to-play] >new_file.mp3" WITHOUT 
 having to first start up, set the recording options to stdout, etc., exit, 
 then run to pipe to stdout!  This option long ago existed in my earliest 

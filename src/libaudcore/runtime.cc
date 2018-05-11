@@ -66,7 +66,7 @@ size_t misc_bytes_allocated;
 
 static bool headless_mode;
 static bool MuteInLieuOfPause;   /* JWT */
-static char instancename [100];  /* JWT */
+static String instancename;      /* JWT */
 static int fudge_gain;           /* JWT */
 static int stdout_fmt;           /* JWT */
 
@@ -87,18 +87,18 @@ EXPORT void aud_set_stdout_fmt (int fmt)
 EXPORT int aud_get_stdout_fmt ()
     { return stdout_fmt; }
 
-EXPORT void aud_set_instancename (char * strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
+EXPORT void aud_set_instancename (String strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
 {
-    strcpy (instancename, strarg);
+    instancename = (strarg && strarg[0]) ? strarg : String ("");
 }
 
-EXPORT char * aud_get_instancename ()
+EXPORT String aud_get_instancename ()
 {
-    if (strlen (instancename) > 0)
+    if (instancename && instancename[0])
         return instancename;
 
-    static char litstr [] = "audacious";
-    return litstr;
+    instancename = String ("audacious");
+    return instancename;
 }
 
 EXPORT void aud_set_mainloop_type (MainloopType type)
@@ -276,8 +276,9 @@ static void set_install_paths ()
 static void set_config_paths ()
 {
     const char * xdg_config_home = g_get_user_config_dir ();
-    StringBuf namebuf = (! strcmp (aud_get_instancename (), "audacious") 
-            ? str_copy ("audacious") : str_printf ("audacious_%s", aud_get_instancename ()));
+    StringBuf namebuf = (! strcmp ((const char *) aud_get_instancename (), "audacious") 
+            ? str_copy ("audacious")
+            : str_printf ("audacious_%s", (const char *) aud_get_instancename ()));
 
     aud_paths[AudPath::UserDir] = String (filename_build ({xdg_config_home, namebuf}));
     aud_paths[AudPath::PlaylistDir] = String (filename_build
@@ -399,6 +400,8 @@ EXPORT void aud_leak_check ()
 {
     for (String & path : aud_paths)
         path = String ();
+
+    instancename = String ();  // JWT:PREVENT "LEAK" MESSAGES (FREE)!
 
     string_leak_check ();
 

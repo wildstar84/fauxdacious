@@ -103,8 +103,8 @@ EXPORT bool aud_get_pausemute_mode ();
 // Note that the UserDir and PlaylistDir paths vary depending on the instance
 // number.  Therefore, calling aud_set_instance() after these paths have been
 // referenced, or after aud_init(), is an error.
-EXPORT void aud_set_instancename (char *);  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE NAME */
-EXPORT char * aud_get_instancename ();
+EXPORT void aud_set_instancename (String);  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE NAME */
+EXPORT String aud_get_instancename ();
 
 EXPORT void aud_set_fudge_gain (int);  /* JWT:NEXT 2 TO ALLOW SPECIFYING FUDGE-GAIN */
 EXPORT int aud_get_fudge_gain ();

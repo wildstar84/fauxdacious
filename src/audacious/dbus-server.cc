@@ -818,7 +818,7 @@ static void name_lost (GDBusConnection *, const char * name, void *)
 StringBuf dbus_server_name ()
 {
     return (! strcmp_safe (aud_get_instancename (), "", -1) || ! strcmp_safe (aud_get_instancename (), "audacious", -1)) 
-            ? str_copy ("org.atheme.audacious") : str_printf ("org.atheme.audacious_%s", aud_get_instancename ());
+            ? str_copy ("org.atheme.audacious") : str_printf ("org.atheme.audacious_%s", (const char *) aud_get_instancename ());
 }
 
 StartupType dbus_server_init (bool newinstance)
@@ -844,7 +844,8 @@ StartupType dbus_server_init (bool newinstance)
     context = g_main_context_new ();
     g_main_context_push_thread_default (context);
 
-    AUDDBG ("DBUS INIT: NAME=%s= INSTANCE=%s=\n", (const char *) dbus_server_name (), aud_get_instancename ());
+    AUDDBG ("DBUS INIT: NAME=%s= INSTANCE=%s=\n", (const char *) dbus_server_name (),
+            (const char *) aud_get_instancename ());
     owner_id = g_bus_own_name (G_BUS_TYPE_SESSION, dbus_server_name (),
             (GBusNameOwnerFlags) 0, nullptr, name_acquired, name_lost, nullptr, nullptr);
     AUDDBG ("DBUS OWNERID=%d=\n", owner_id);

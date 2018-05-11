@@ -66,8 +66,7 @@ static struct {
 static bool initted = false;
 static Index<PlaylistAddItem> filenames;
 static int starting_gain = 0;           /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
-char instancename[100];                 /* JWT:ADD OPTIONAL INSTANCE NAME */
-// JWT:SOMEDAY!: String instancename;   /* JWT:ADD OPTIONAL INSTANCE NAME */
+String instancename = String ();        /* JWT:ADD OPTIONAL INSTANCE NAME */
 String out_ext = String ();             /* JWT:ADD OPTIONAL STDOUT (FILEWRITER) EXTENSION FOR STDOUT */
 
 static const struct {
@@ -145,9 +144,6 @@ static void get_files_from_stdin ()
 static bool parse_options (int argc, char * * argv)
 {
     CharPtr cur (g_get_current_dir ());
-// JWT:SOMEDAY!:     instancename = String ();
-    memset (instancename, '\0', sizeof (instancename));
-    out_ext = String ();
 
 #ifdef _WIN32
     Index<String> args = get_argv_utf8 ();
@@ -217,8 +213,7 @@ static bool parse_options (int argc, char * * argv)
                         {
                             ++parmpos;
                             if (! strcmp (arg_info.long_arg, "new"))           /* JWT:ADD OPTIONAL INSTANCE NAME */
-                                strcpy (instancename, parmpos);
-// JWT:SOMEDAY!:                instancename = String (parmpos);
+                                instancename = String (parmpos);
                             else if (! strcmp (arg_info.long_arg, "out"))      /* JWT:ADD OPTIONAL STDOUT OUTPUT */
                                 out_ext = String (parmpos);
                             else if (! strcmp (arg_info.long_arg, "gain"))  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
@@ -257,9 +252,7 @@ static bool parse_options (int argc, char * * argv)
                     {
                         if (arg[c] > '0')  /* new (Audacious-style) instance number (0 == default: no new instance) */
                         {
-                            strncpy (instancename, arg + c, 1);
-                            instancename[1] = '\0';
-                            // JWT:SOMEDAY!: instancename = String (str_copy (arg + c, 1));
+                            instancename = String (str_copy (arg + c, 1));
                             options.newinstance = 1;
                         }
                     }
@@ -315,6 +308,7 @@ static void do_remote ()
 #endif
 
     aud_set_instancename (instancename);   /* TRY SETTING EARLY SINCE instancename GETS BLANKED?! */
+    instancename = String ();  // JWT:PREVENT "LEAK" MESSAGES (FREE)!
     /* check whether the selected instance is running. */
     if (dbus_server_init (options.newinstance) != StartupType::Client)
         return;
@@ -436,7 +430,7 @@ static void do_commands ()
                 AUDERR ("w:%s is not a recognized format, using wav format.\n", (const char *) out_ext);
                 aud_set_stdout_fmt (1);
             }
-            out_ext = String ();
+            out_ext = String ();  // JWT:PREVENT "LEAK" MESSAGES (FREE)!
         }
         else
             aud_set_stdout_fmt (1);
