@@ -335,6 +335,8 @@ static const PreferencesWidget song_info_page_widgets[] = {
     WidgetEntry (0, WidgetString (0, "cover_name_include")),
     WidgetLabel (N_("Exclude images matching these words (comma-separated):")),
     WidgetEntry (0, WidgetString (0, "cover_name_exclude")),
+    WidgetLabel (N_("Default cover image file?:")),
+    WidgetEntry (0, WidgetString (0, "default_cover_file")),
     WidgetCheck (N_("Search for images matching song file name"),
         WidgetBool (0, "use_file_cover")),
     WidgetCheck (N_("Search recursively"),

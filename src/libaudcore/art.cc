@@ -247,6 +247,18 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
                 }
             }
         }
+        /* JWT:DO WE HAVE A "DEFAULT" COVER ART FILE? */
+        if (! item->data.len () && ! item->art_file)
+        {
+            String artdefault = aud_get_str(nullptr, "default_cover_file");
+            if (artdefault && artdefault[0])
+            {
+                item->art_file = String (filename_to_uri ((const char *) artdefault));
+                VFSFile file (item->art_file, "r");
+                if (file)
+                    item->data = file.read_all ();
+            }
+        }
         /* load data from external image file */
         if (! item->data.len () && item->art_file)
         {
