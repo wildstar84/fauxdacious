@@ -5,13 +5,14 @@ fauxdacious \- an advanced fork of the Audacious audio player.
 
 .SH SYNOPSIS
 .B fauxdacious
-[\fIoption\fR ...] [\fIfile\fR ...]
+[\fIoption\fR ...] [\fIfile | url\fR ...]
 
 .SH DESCRIPTION
-Fauxdacious is a free advanced audio player for Linux and many other
-UNIX-compatible systems.  It focuses on low resource usage, high audio quality,
-and support for a wide range of audio formats.  It was originally based on Beep
-Media Player, which was in turn based on XMMS.
+Fauxdacious is a free advanced media player for Linux and many other 
+UNIX-compatible systems.  Fauxdacious is a fork of the Audacious media 
+player and adds many new features including video and DVD play, 
+restoration of XMMS file and song-specific equalizer presets and 
+effects plugins, full piping support for stdin and stdout, and much more!
 
 .SH OPTIONS
 .SS Getting help:
@@ -89,7 +90,14 @@ Print debugging output while running (may be used twice for even more output).
 Starts a new instance.  The new instance started may be controlled with 
 \fBaudtool instance instancename.  Copy .config/audacious/config to 
 \f.config/audacious/instancename and edit to taylor configuration.
-\b-n creates a new unnamed instance that can not be controlled by audtool.
+\f-n creates a new unnamed instance that can not be controlled by audtool.
+\fNew instances can also be created the Audacious way with numbers (1-9), 
+\fie. -1.
+.TP
+.B -o, --out=ext
+Starts Fauxdacious with Filewriter as the output plugin and sends audio to 
+\fstdout using the format specified by the extension ("ext"), which can be 
+\f"wav", "mp3", "ogg", or "flac".  If just -o is given, then "wav" is used.
 .TP
 .B -z, --no-equalizer
 Force Equalizer Off on startup.
