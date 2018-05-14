@@ -1,0 +1,73 @@
+NOTE:  You must first uninstall all audacious packages, including libaudcore, 
+libaudgui*, libaudtag*, etc.  IF you wish to keep BOTH your existing Audacious 
+installed AND install Fauxdacious (assuming it's in /usr/bin/), you must 
+first do:
+
+(Change "/usr/local" everywhere below to where you want to install Fauxdacious):
+$ export LD_LIBRARY_PATH=/usr/local/lib   <=== NEEDED WHENEVER RUNNING (/usr/local/bin/fauxdacious)!
+$ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+$ export CPLUS_INCLUDE_PATH=/usr/local/include
+$ export C_INCLUDE_PATH=/usr/local/include
+
+
+If running a current 64-bit Debian stable installation or equivalent, you can 
+try simply running:
+
+	make install
+
+after untarring the tarballs, as the objects (compiled for that system) are 
+already built and included.  If not, you'll need to build from scratch:
+
+from:  http://redmine.audacious-media-player.org/boards/1/topics/788?r=1762#message-1762
+
+Dependencies:
+
+sudo apt-get install git automake build-essential libasound2-dev \
+libavformat-dev libbinio-dev libbs2b-dev libcddb2-dev libcdio-cdda-dev \
+libcue-dev libcurl4-gnutls-dev libdbus-glib-1-dev libfaad-dev libflac-dev \
+libfluidsynth-dev libgl1-mesa-dev-lts-utopic libgtk2.0-dev libguess-dev \
+libjack-jackd2-dev liblircclient-dev libmms-dev libmodplug-dev libmp3lame-dev \
+libmpg123-dev libneon27-gnutls-dev libnotify-dev libpulse-dev \
+libsamplerate0-dev libsdl2-dev libsidplayfp-dev libsndfile1-dev libsoxr-dev \
+libvorbis-dev libwavpack-dev libxml2-dev
+
+After installing any missing from the above list of dependencies, if you 
+untarred the tarballs, THEN:
+
+	cd fauxdacious-plugins
+	sudo make distclean
+	cd ../fauxdacious
+	sudo make distclean
+
+OTHERWISE (download and install from Github):
+
+	cd /tmp
+	mkdir fauxdacious
+	mkdir fauxdacious-plugins
+	git clone git://github.com/wildstar84/fauxdacious.git fauxdacious
+	git clone git://github.com/wildstar84/fauxdacious-plugins.git audacious-plugins
+
+NOW, regardless of whether installing from the tarballs OR from Github:
+
+	cd fauxdacious
+	./autogen.sh
+	./configure --prefix=/usr/local [--enable-qt] --with-buildstamp=Fauxdacious
+	make
+	sudo make install
+	cd ../fauxdacious-plugins
+	./autogen.sh
+	./configure --prefix=/usr/local [--enable-qt]
+	make
+	sudo make install
+	cd /usr/local/bin
+	sudo ln -s audacious fauxdacious
+	sudo update-desktop-database
+	sudo update-icon-caches /usr/share/icons/hicolor
+
+Now run fauxdacious:
+
+	fauxdacious -Dc &
+
+Fauxdacious should now start up with an empty playlist.  Enjoy!
+Read the Changes file for the latest Fauxdacious features, fixes, and changes, 
+and how to configure to take best advantage of them!
