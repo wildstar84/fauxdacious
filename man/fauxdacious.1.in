@@ -1,18 +1,18 @@
-.TH FAUXDACIOUS "1" "October 2016" "Version @PACKAGE_VERSION@" "Fauxdacious"
+.TH FAUXDACIOUS "1" "May 2018" "Version @PACKAGE_VERSION@" "Fauxdacious"
 
 .SH NAME
-fauxdacious \- an advanced fork of the Audacious audio player.
+fauxdacious \- a fork of the Audacious audio player.
 
 .SH SYNOPSIS
 .B fauxdacious
 [\fIoption\fR ...] [\fIfile | url\fR ...]
 
 .SH DESCRIPTION
-Fauxdacious is a free advanced media player for Linux and many other 
-UNIX-compatible systems.  Fauxdacious is a fork of the Audacious media 
-player and adds many new features including video and DVD play, 
-restoration of XMMS file and song-specific equalizer presets and 
-effects plugins, full piping support for stdin and stdout, and much more!
+Fauxdacious is a free advanced media player for Linux and many other
+UNIX-compatible systems.  Fauxdacious is a fork of the Audacious media
+player and adds many new features including video and DVD play,
+restoration of XMMS file and song-specific equalizer presets and effects
+plugins, full Unix-ish piping support for stdin and stdout, and much more!
 
 .SH OPTIONS
 .SS Getting help:
@@ -36,9 +36,9 @@ playback.
 Start up with empty current playlist.
 .TP
 .B -D, --delete
-Delete all playlists - particularly useful when using the Winamp Skin 
-\finterface, which only shows a single playlist so that no hidden ones remain. 
-\fThis ensures starting up with no hidden playlists!
+Delete all playlists - particularly useful when using the Winamp Skin
+interface, which only shows a single playlist so that no hidden ones remain.
+This ensures starting up with no hidden playlists!
 
 .SS Controlling playback:
 
@@ -87,17 +87,17 @@ Print version information and exit.
 Print debugging output while running (may be used twice for even more output).
 .TP
 .B -n, --new=instancename
-Starts a new instance.  The new instance started may be controlled with 
-\fBaudtool instance instancename.  Copy .config/audacious/config to 
-\f.config/audacious/instancename and edit to taylor configuration.
-\f-n creates a new unnamed instance that can not be controlled by audtool.
-\fNew instances can also be created the Audacious way with numbers (1-9), 
-\fie. -1.
+Starts a new instance.  The new instance started may be controlled with
+Baudtool instance instancename.  Copy .config/audacious/config to
+.config/audacious/instancename and edit to taylor configuration.
+-n creates a new unnamed instance that can not be controlled by audtool.
+New instances can also be created the Audacious way with numbers (1-9),
+ie. -1.
 .TP
 .B -o, --out=ext
-Starts Fauxdacious with Filewriter as the output plugin and sends audio to 
-\fstdout using the format specified by the extension ("ext"), which can be 
-\f"wav", "mp3", "ogg", or "flac".  If just -o is given, then "wav" is used.
+Starts Fauxdacious with Filewriter as the output plugin and sends audio to
+stdout using the format specified by the extension ("ext"), which can be
+"wav", "mp3", "ogg", or "flac".  If just -o is given, then "wav" is used.
 .TP
 .B -z, --no-equalizer
 Force Equalizer Off on startup.

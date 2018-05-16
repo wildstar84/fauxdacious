@@ -9,7 +9,7 @@ configure
 extra.mk
 audacious.pc
 audclient.pc
-man/audacious.1
+man/fauxdacious.1
 man/audtool.1
 src/audacious/audacious
 src/audtool/audtool
