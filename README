@@ -1,21 +1,12 @@
-NOTE:  You must first uninstall all audacious packages, including libfauxdcore, 
-libfauxdgui*, libfauxdtag*, etc.  IF you wish to keep BOTH your existing Audacious 
-installed AND install Fauxdacious (assuming it's in /usr/bin/), you must 
-first do:
-
-(Change "/usr/local" everywhere below to where you want to install Fauxdacious):
-$ export LD_LIBRARY_PATH=/usr/local/lib   <=== NEEDED WHENEVER RUNNING (/usr/local/bin/fauxdacious)!
-$ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-$ export CPLUS_INCLUDE_PATH=/usr/local/include
-$ export C_INCLUDE_PATH=/usr/local/include
-
+NOTE:  You NO LONGER NEED to uninstall all audacious packages, including libfauxdcore, 
+libfauxdgui*, libfauxdtag*, etc.  
 
 If running a current 64-bit Debian stable installation or equivalent, you can 
-try simply running:
+try simply untarring the tarballs and running:
 
-	make install
+	(sudo) make install
 
-after untarring the tarballs, as the objects (compiled for that system) are 
+since the objects (compiled for that system) are 
 already built and included.  If not, you'll need to build from scratch:
 
 from:  http://redmine.audacious-media-player.org/boards/1/topics/788?r=1762#message-1762
@@ -35,17 +26,17 @@ After installing any missing from the above list of dependencies, if you
 untarred the tarballs, THEN:
 
 	cd fauxdacious-plugins
-	sudo make distclean
+	(sudo) make distclean
 	cd ../fauxdacious
-	sudo make distclean
+	(sudo) make distclean
 
 OTHERWISE (download and install from Github):
 
 	cd /tmp
 	mkdir fauxdacious
 	mkdir fauxdacious-plugins
-	git clone git://github.com/wildstar84/fauxdacious.git fauxdacious
-	git clone git://github.com/wildstar84/fauxdacious-plugins.git audacious-plugins
+	git clone -b independence --single-branch git://github.com/wildstar84/fauxdacious.git fauxdacious
+	git clone -b independence --single-branch git://github.com/wildstar84/fauxdacious-plugins.git audacious-plugins
 
 NOW, regardless of whether installing from the tarballs OR from Github:
 
@@ -54,15 +45,18 @@ NOW, regardless of whether installing from the tarballs OR from Github:
 	./configure --prefix=/usr/local [--enable-qt] --with-buildstamp=Fauxdacious
 	make
 	sudo make install
+
 	cd ../fauxdacious-plugins
 	./autogen.sh
 	./configure --prefix=/usr/local [--enable-qt]
 	make
 	sudo make install
-	cd /usr/local/bin
-	sudo ln -s audacious fauxdacious
+
 	sudo update-desktop-database
 	sudo update-icon-caches /usr/share/icons/hicolor
+
+	OPTIONAL:  cd ~/.config; mkdir fauxdacious; cp -R audacious/. fauxdacious
+	# This copies your previous default instance profile to the new (Fauxdacious) location.
 
 Now run fauxdacious:
 
