@@ -1,0 +1,17 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+datarootdir=@datarootdir@
+data_dir=@datadir@/fauxdacious
+
+version=@PACKAGE_VERSION@
+include_dir=@includedir@
+fauxdacious_include_dir=@includedir@
+lib_dir=@libdir@
+
+plugin_dir=@plugindir@
+
+Name: Audacious
+Description: Audacious is a versatile and handy multi platform media player
+Version: @PACKAGE_VERSION@
+Libs: -L${lib_dir} -lfauxdcore
+Cflags: -I${fauxdacious_include_dir}

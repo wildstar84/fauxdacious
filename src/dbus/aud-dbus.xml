@@ -22,7 +22,7 @@
 
 <node name="/">
     <!-- Fauxdacious General Information -->
-    <interface name="org.atheme.audacious">
+    <interface name="org.atheme.fauxdacious">
         <!-- Fauxdacious version -->
         <method name="Version">
             <arg type="s" direction="out" name="version"/>

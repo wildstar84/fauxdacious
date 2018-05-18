@@ -1,33 +1,33 @@
 include ../extra.mk
 
-SUBDIRS := audacious libaudcore libaudtag libguess
+SUBDIRS := fauxdacious libfauxdcore libfauxdtag libguess
 
 ifeq ($(USE_GTK),yes)
-SUBDIRS += libaudgui
+SUBDIRS += libfauxdgui
 endif
 
 ifeq ($(USE_QT),yes)
-SUBDIRS += libaudqt
+SUBDIRS += libfauxdqt
 endif
 
 ifeq ($(USE_DBUS),yes)
-SUBDIRS := dbus audtool ${SUBDIRS}
+SUBDIRS := dbus fauxdtool ${SUBDIRS}
 endif
 
 include ../buildsys.mk
 
-audacious: libaudcore
-libaudcore: libguess
-libaudtag: libaudcore
+fauxdacious: libfauxdcore
+libfauxdcore: libguess
+libfauxdtag: libfauxdcore
 
 ifeq ($(USE_GTK),yes)
-libaudgui: libaudcore
+libfauxdgui: libfauxdcore
 endif
 
 ifeq ($(USE_QT),yes)
-libaudqt: libaudcore
+libfauxdqt: libfauxdcore
 endif
 
 ifeq ($(USE_DBUS),yes)
-audacious audtool: dbus
+fauxdacious fauxdtool: dbus
 endif

@@ -1,5 +1,5 @@
-NOTE:  You must first uninstall all audacious packages, including libaudcore, 
-libaudgui*, libaudtag*, etc.  IF you wish to keep BOTH your existing Audacious 
+NOTE:  You must first uninstall all audacious packages, including libfauxdcore, 
+libfauxdgui*, libfauxdtag*, etc.  IF you wish to keep BOTH your existing Audacious 
 installed AND install Fauxdacious (assuming it's in /usr/bin/), you must 
 first do:
 

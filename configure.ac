@@ -6,7 +6,7 @@ dnl Initialize
 dnl ==========
 
 AC_PREREQ([2.59])
-AC_INIT([audacious], [3.9-beta2])
+AC_INIT([fauxdacious], [3.9-beta3])
 AC_COPYRIGHT([Copyright (C) 2001-2018 Audacious developers and others])
 
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE_NAME", [Name of package])
@@ -93,7 +93,7 @@ AC_SUBST([VALGRIND_FRIENDLY])
 dnl Paths
 dnl =====
 
-plugindir="$libdir/audacious"
+plugindir="$libdir/fauxdacious"
 AC_SUBST([plugindir])
 
 localedir="$datarootdir/locale"
@@ -108,14 +108,14 @@ CPPFLAGS="$CPPFLAGS -include config.h"
 dnl Output configuration files
 dnl ==========================
 define(GENERATED_FILES,
-       audacious.pc
+       fauxdacious.pc
        buildsys.mk
        extra.mk
-       man/audtool.1
-       man/audacious.1
-       src/libaudcore/audio.h
-       src/libaudcore/tinylock.h
-       win32/audacious.nsi
+       man/fauxdtool.1
+       man/fauxdacious.1
+       src/libfauxdcore/audio.h
+       src/libfauxdcore/tinylock.h
+       win32/fauxdacious.nsi
        win32/override/README.txt)
 
 [GENERATED_FILES]="m4_normalize(GENERATED_FILES)"

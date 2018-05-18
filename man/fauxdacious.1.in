@@ -160,13 +160,13 @@ Shift + Control + l	Display Add URL dialog
 .SH FILES
 
 .TP
-~/.config/audacious/config
+~/.config/fauxdacious/config
 User's Fauxdacious configuration.
 .TP
-~/.config/audacious/playlists
+~/.config/fauxdacious/playlists
 Folder in which playlists are stored.
 .TP
-~/.local/share/audacious/Skins, @datarootdir@/share/audacious/Skins
+~/.local/share/fauxdacious/Skins, @datarootdir@/share/fauxdacious/Skins
 Default locations where Fauxdacious should look for skin files.
 
 .SH ENVIRONMENT
@@ -183,7 +183,7 @@ unpacking gzip and bzip2 compressed skins.  Default is \fItar\fP.
 Command for decompressing zip files (skins).  Default is \fIunzip\fP.
 
 .SH "SEE ALSO"
-.BR audtool (1)
+.BR fauxdtool (1)
 
 .SH WEBSITE
 .I https://wildstar84.wordpress.com/fauxdacious

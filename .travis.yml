@@ -10,6 +10,6 @@ script:
   - ./autogen.sh
   - ./configure --prefix=/opt/aud --enable-qt
   - make
-  - cd src/libaudcore/tests
+  - cd src/libfauxdcore/tests
   - make test
   - ./test

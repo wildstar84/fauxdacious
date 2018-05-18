@@ -46,9 +46,9 @@ Source: "C:\libs\bin\avfilter-6.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\avformat-57.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\avutil-55.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\bin\libatk-1.0-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-;Source: "C:\libs\bin\libaudcore.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-;Source: "C:\libs\bin\libaudgui.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-;Source: "C:\libs\bin\libaudtag.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+;Source: "C:\libs\bin\libfauxdcore.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+;Source: "C:\libs\bin\libfauxdgui.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+;Source: "C:\libs\bin\libfauxdtag.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libbs2b-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\bin\libcairo-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\bin\libcairo-gobject-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -117,7 +117,7 @@ Source: "C:\GTK\lib\gtk-2.0\*"; DestDir: "{app}\lib\gtk-2.0"; Flags: ignoreversi
 ;Source: "C:\GTK\etc\gtk-2.0\*"; DestDir: "{app}\etc\gtk-2.0"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "C:\pango\modules\basic\.libs\pango-basic-win32.dll"; DestDir: "{app}\lib\pango\1.8.0\modules\pango-basic-win32.dll"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\aud\bin\audacious.exe"; DestDir: "{app}\bin"; DestName: "fauxdacious.exe"; Flags: ignoreversion
-Source: "C:\aud\bin\audtool.exe"; DestDir: "{app}\bin"; DestName: "fauxdtool.exe"; Flags: ignoreversion
+Source: "C:\aud\bin\fauxdtool.exe"; DestDir: "{app}\bin"; DestName: "fauxdtool.exe"; Flags: ignoreversion
 ;Source: "C:\aud\bin\getTuneinStream.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\aud\bin\FauxdaciousUrlHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\aud\*"; DestDir: "{app}"; Excludes: "*.exe"; Flags: ignoreversion recursesubdirs createallsubdirs

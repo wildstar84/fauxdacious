@@ -118,50 +118,50 @@ msgstr ""
 msgid "Select instance to run/control"
 msgstr ""
 
-#: src/audacious/main.cc:366 src/libaudqt/util.cc:54
+#: src/audacious/main.cc:366 src/libfauxdqt/util.cc:54
 msgid "Audacious"
 msgstr "Audacious"
 
-#: src/libaudcore/adder.cc:86
+#: src/libfauxdcore/adder.cc:86
 #, c-format
 msgid "%d file found"
 msgid_plural "%d files found"
 msgstr[0] "%d 個のファイルが見つかりました"
 
-#: src/libaudcore/adder.cc:263 src/libaudcore/adder.cc:325
+#: src/libfauxdcore/adder.cc:263 src/libfauxdcore/adder.cc:325
 #, c-format
 msgid ""
 "Error reading %s:\n"
 "%s"
 msgstr ""
 
-#: src/libaudcore/adder.cc:382
+#: src/libfauxdcore/adder.cc:382
 #, fuzzy
 msgid "No files found."
 msgstr "%d 個のファイルが見つかりました"
 
-#: src/libaudcore/adder.cc:406 src/libaudcore/playlist.cc:147
+#: src/libfauxdcore/adder.cc:406 src/libfauxdcore/playlist.cc:147
 msgid "New Playlist"
 msgstr "新規プレイリスト"
 
-#: src/libaudcore/audstrings.cc:603 src/libaudcore/tuple.cc:520
+#: src/libfauxdcore/audstrings.cc:603 src/libfauxdcore/tuple.cc:520
 msgid "Standard input"
 msgstr "標準入力"
 
-#: src/libaudcore/audstrings.cc:605
+#: src/libfauxdcore/audstrings.cc:605
 #, c-format
 msgid "Audio CD, track %s"
 msgstr "オーディオ CD、トラック %s"
 
-#: src/libaudcore/audstrings.cc:609 src/libaudcore/tuple.cc:496
+#: src/libfauxdcore/audstrings.cc:609 src/libfauxdcore/tuple.cc:496
 msgid "(character encoding error)"
 msgstr "(文字のエンコーディングエラー)"
 
-#: src/libaudcore/output.cc:197 src/libaudcore/output.cc:250
+#: src/libfauxdcore/output.cc:197 src/libfauxdcore/output.cc:250
 msgid "Error opening output stream"
 msgstr ""
 
-#: src/libaudcore/playback.cc:367
+#: src/libfauxdcore/playback.cc:367
 #, c-format
 msgid ""
 "Error playing %s:\n"
@@ -170,21 +170,21 @@ msgstr ""
 "%s の再生中に次のエラーが発生しました\n"
 "%s"
 
-#: src/libaudcore/playback.cc:369
+#: src/libfauxdcore/playback.cc:369
 msgid ""
 "Unknown playback error (check the console for detailed error information)"
 msgstr ""
 "原因不明の再生エラー (エラーの詳細情報についてはコンソールを確認して下さい)"
 
-#: src/libaudcore/playback.cc:499
+#: src/libfauxdcore/playback.cc:499
 msgid "Invalid audio format"
 msgstr "無効なオーディオ形式"
 
-#: src/libaudcore/playlist.cc:148
+#: src/libfauxdcore/playlist.cc:148
 msgid "Now Playing"
 msgstr "再生中"
 
-#: src/libaudcore/playlist.cc:1705
+#: src/libfauxdcore/playlist.cc:1705
 msgid ""
 "The playlist cannot be sorted because metadata scanning is still in progress "
 "(or has been disabled)."
@@ -192,8 +192,8 @@ msgstr ""
 "メタデータのスキャンが進行中、または無効になっているため、プレイリストをソー"
 "トできません。"
 
-#: src/libaudcore/playlist-files.cc:69 src/libaudgui/infowin.cc:488
-#: src/libaudqt/infowin.cc:144
+#: src/libfauxdcore/playlist-files.cc:69 src/libfauxdgui/infowin.cc:488
+#: src/libfauxdqt/infowin.cc:144
 #, c-format
 msgid ""
 "Error opening %s:\n"
@@ -202,1128 +202,1128 @@ msgstr ""
 "%s を開く際にエラー:\n"
 "%s"
 
-#: src/libaudcore/playlist-files.cc:83
+#: src/libfauxdcore/playlist-files.cc:83
 #, c-format
 msgid "Error loading %s."
 msgstr "%s の読込みエラー"
 
-#: src/libaudcore/playlist-files.cc:85
+#: src/libfauxdcore/playlist-files.cc:85
 #, c-format
 msgid "Cannot load %s: unsupported file name extension."
 msgstr "%s を読込めません: 対応していないファイル拡張子です。"
 
-#: src/libaudcore/playlist-files.cc:151
+#: src/libfauxdcore/playlist-files.cc:151
 #, c-format
 msgid "Cannot save %s: unsupported file name extension."
 msgstr "%s を保存することができません: 対応していないファイル拡張子です。"
 
-#: src/libaudcore/probe.cc:54
+#: src/libfauxdcore/probe.cc:54
 msgid "Error loading plugin"
 msgstr "プラグインのロードエラー"
 
-#: src/libaudcore/probe.cc:145
+#: src/libfauxdcore/probe.cc:145
 msgid "Seek error"
 msgstr "シークエラー"
 
-#: src/libaudcore/probe.cc:153
+#: src/libfauxdcore/probe.cc:153
 msgid "File format not recognized"
 msgstr "ファイル形式を認識することができません"
 
-#: src/libaudcore/probe.cc:181
+#: src/libfauxdcore/probe.cc:181
 msgid "Error reading metadata"
 msgstr "メタデータを読込む際にエラー"
 
-#: src/libaudcore/tuple.cc:550
+#: src/libfauxdcore/tuple.cc:550
 msgid "Mono"
 msgstr "モノラル"
 
-#: src/libaudcore/tuple.cc:552
+#: src/libfauxdcore/tuple.cc:552
 msgid "Stereo"
 msgstr "ステレオ"
 
-#: src/libaudcore/tuple.cc:554
+#: src/libfauxdcore/tuple.cc:554
 #, c-format
 msgid "%d channel"
 msgid_plural "%d channels"
 msgstr[0] "%d チャンネル"
 
-#: src/libaudcore/tuple.cc:742
+#: src/libfauxdcore/tuple.cc:742
 msgid "Audio CD"
 msgstr "オーディオ CD"
 
-#: src/libaudcore/tuple.cc:824
+#: src/libfauxdcore/tuple.cc:824
 #, c-format
 msgid "Track %d"
 msgstr "トラック %d"
 
-#: src/libaudcore/tuple.cc:829
+#: src/libfauxdcore/tuple.cc:829
 msgid "(unknown title)"
 msgstr "(不明なタイトル)"
 
-#: src/libaudcore/vfs.cc:47
+#: src/libfauxdcore/vfs.cc:47
 msgid "Invalid URI"
 msgstr "無効な URI"
 
-#: src/libaudcore/vfs.cc:85
+#: src/libfauxdcore/vfs.cc:85
 msgid "Unknown URI scheme"
 msgstr "不明な URI スキーマ"
 
-#: src/libaudcore/vfs_local.cc:85 src/libaudcore/vfs_local.cc:330
-#: src/libaudcore/vfs_local.cc:385
+#: src/libfauxdcore/vfs_local.cc:85 src/libfauxdcore/vfs_local.cc:330
+#: src/libfauxdcore/vfs_local.cc:385
 msgid "Invalid file name"
 msgstr "無効なファイル名"
 
-#: src/libaudcore/vfs_local.cc:132
+#: src/libfauxdcore/vfs_local.cc:132
 msgid "Invalid access mode"
 msgstr "アクセスモードが無効です"
 
-#: src/libaudgui/about.cc:35 src/libaudqt/about.cc:37
+#: src/libfauxdgui/about.cc:35 src/libfauxdqt/about.cc:37
 msgid "Credits"
 msgstr "クレジット"
 
-#: src/libaudgui/about.cc:35 src/libaudqt/about.cc:37
+#: src/libfauxdgui/about.cc:35 src/libfauxdqt/about.cc:37
 msgid "License"
 msgstr "ライセンス"
 
-#: src/libaudgui/about.cc:71 src/libaudqt/about.cc:88
+#: src/libfauxdgui/about.cc:71 src/libfauxdqt/about.cc:88
 msgid "About Audacious"
 msgstr "Audacious について"
 
-#: src/libaudgui/confirm.cc:51 src/libaudqt/playlist-management.cc:79
+#: src/libfauxdgui/confirm.cc:51 src/libfauxdqt/playlist-management.cc:79
 #, c-format
 msgid "Do you want to permanently remove “%s”?"
 msgstr "\"%s\" を完全に削除しますか？"
 
-#: src/libaudgui/confirm.cc:55 src/libaudqt/playlist-management.cc:74
+#: src/libfauxdgui/confirm.cc:55 src/libfauxdqt/playlist-management.cc:74
 msgid "_Remove"
 msgstr "削除(_R)"
 
-#: src/libaudgui/confirm.cc:57 src/libaudgui/confirm.cc:88
-#: src/libaudgui/jump-to-time.cc:48 src/libaudgui/playlists.cc:95
-#: src/libaudgui/playlists.cc:195 src/libaudgui/plugin-prefs.cc:160
-#: src/libaudgui/url-opener.cc:76 src/libaudqt/playlist-management.cc:43
-#: src/libaudqt/playlist-management.cc:75 src/libaudqt/prefs-plugin.cc:133
-#: src/libaudqt/url-opener.cc:64
+#: src/libfauxdgui/confirm.cc:57 src/libfauxdgui/confirm.cc:88
+#: src/libfauxdgui/jump-to-time.cc:48 src/libfauxdgui/playlists.cc:95
+#: src/libfauxdgui/playlists.cc:195 src/libfauxdgui/plugin-prefs.cc:160
+#: src/libfauxdgui/url-opener.cc:76 src/libfauxdqt/playlist-management.cc:43
+#: src/libfauxdqt/playlist-management.cc:75 src/libfauxdqt/prefs-plugin.cc:133
+#: src/libfauxdqt/url-opener.cc:64
 msgid "_Cancel"
 msgstr "キャンセル(_C)"
 
-#: src/libaudgui/confirm.cc:60 src/libaudqt/playlist-management.cc:78
+#: src/libfauxdgui/confirm.cc:60 src/libfauxdqt/playlist-management.cc:78
 msgid "Remove Playlist"
 msgstr "プレイリストを削除"
 
-#: src/libaudgui/confirm.cc:62 src/libaudqt/playlist-management.cc:73
+#: src/libfauxdgui/confirm.cc:62 src/libfauxdqt/playlist-management.cc:73
 msgid "_Don’t ask again"
 msgstr "再び表示しない(_D)"
 
-#: src/libaudgui/confirm.cc:87 src/libaudqt/playlist-management.cc:42
+#: src/libfauxdgui/confirm.cc:87 src/libfauxdqt/playlist-management.cc:42
 msgid "_Rename"
 msgstr "名前を変更(_R)"
 
-#: src/libaudgui/confirm.cc:91 src/libaudqt/playlist-management.cc:64
+#: src/libfauxdgui/confirm.cc:91 src/libfauxdqt/playlist-management.cc:64
 msgid "Rename Playlist"
 msgstr "プレイリストをリネーム"
 
-#: src/libaudgui/confirm.cc:91 src/libaudqt/playlist-management.cc:40
+#: src/libfauxdgui/confirm.cc:91 src/libfauxdqt/playlist-management.cc:40
 msgid "What would you like to call this playlist?"
 msgstr "プレイリストの名前を入力して下さい。"
 
-#: src/libaudgui/eq-preset.cc:208 src/libaudgui/eq-preset.cc:215
+#: src/libfauxdgui/eq-preset.cc:208 src/libfauxdgui/eq-preset.cc:215
 msgid "Preset File ..."
 msgstr "プリセットファイル ..."
 
-#: src/libaudgui/eq-preset.cc:209 src/libaudgui/eq-preset.cc:216
+#: src/libfauxdgui/eq-preset.cc:209 src/libfauxdgui/eq-preset.cc:216
 msgid "EQF File ..."
 msgstr "EQF ファイル ..."
 
-#: src/libaudgui/eq-preset.cc:211
+#: src/libfauxdgui/eq-preset.cc:211
 msgid "Winamp Presets ..."
 msgstr "Winamp のプリセット ..."
 
-#: src/libaudgui/eq-preset.cc:220
+#: src/libfauxdgui/eq-preset.cc:220
 msgid "Import"
 msgstr "インポート"
 
-#: src/libaudgui/eq-preset.cc:221
+#: src/libfauxdgui/eq-preset.cc:221
 msgid "Export"
 msgstr "エクスポート"
 
-#: src/libaudgui/eq-preset.cc:236
+#: src/libfauxdgui/eq-preset.cc:236
 msgid "Equalizer Presets"
 msgstr "イコライザーのプリセット"
 
-#: src/libaudgui/eq-preset.cc:258
+#: src/libfauxdgui/eq-preset.cc:258
 msgid "Save Preset"
 msgstr "プリセットの保存"
 
-#: src/libaudgui/eq-preset.cc:280
+#: src/libfauxdgui/eq-preset.cc:280
 msgid "Delete Selected"
 msgstr "プリセットの削除"
 
-#: src/libaudgui/eq-preset.cc:284
+#: src/libfauxdgui/eq-preset.cc:284
 msgid "Revert Changes"
 msgstr "変更を元に戻す"
 
-#: src/libaudgui/equalizer.cc:45 src/libaudqt/equalizer.cc:114
+#: src/libfauxdgui/equalizer.cc:45 src/libfauxdqt/equalizer.cc:114
 msgid "_Enable"
 msgstr "有効(_E)"
 
-#: src/libaudgui/equalizer.cc:124 src/libaudqt/equalizer.cc:116
+#: src/libfauxdgui/equalizer.cc:124 src/libfauxdqt/equalizer.cc:116
 msgid "31 Hz"
 msgstr "31 Hz"
 
-#: src/libaudgui/equalizer.cc:124 src/libaudqt/equalizer.cc:116
+#: src/libfauxdgui/equalizer.cc:124 src/libfauxdqt/equalizer.cc:116
 msgid "63 Hz"
 msgstr "63 Hz"
 
-#: src/libaudgui/equalizer.cc:125 src/libaudqt/equalizer.cc:117
+#: src/libfauxdgui/equalizer.cc:125 src/libfauxdqt/equalizer.cc:117
 msgid "125 Hz"
 msgstr "125 Hz"
 
-#: src/libaudgui/equalizer.cc:125 src/libaudqt/equalizer.cc:117
+#: src/libfauxdgui/equalizer.cc:125 src/libfauxdqt/equalizer.cc:117
 msgid "250 Hz"
 msgstr "250 Hz"
 
-#: src/libaudgui/equalizer.cc:125 src/libaudqt/equalizer.cc:117
+#: src/libfauxdgui/equalizer.cc:125 src/libfauxdqt/equalizer.cc:117
 msgid "500 Hz"
 msgstr "500 Hz"
 
-#: src/libaudgui/equalizer.cc:125 src/libaudqt/equalizer.cc:117
+#: src/libfauxdgui/equalizer.cc:125 src/libfauxdqt/equalizer.cc:117
 msgid "1 kHz"
 msgstr "1 kHz"
 
-#: src/libaudgui/equalizer.cc:125 src/libaudqt/equalizer.cc:117
+#: src/libfauxdgui/equalizer.cc:125 src/libfauxdqt/equalizer.cc:117
 msgid "2 kHz"
 msgstr "2 kHz"
 
-#: src/libaudgui/equalizer.cc:126 src/libaudqt/equalizer.cc:118
+#: src/libfauxdgui/equalizer.cc:126 src/libfauxdqt/equalizer.cc:118
 msgid "4 kHz"
 msgstr "4 kHz"
 
-#: src/libaudgui/equalizer.cc:126 src/libaudqt/equalizer.cc:118
+#: src/libfauxdgui/equalizer.cc:126 src/libfauxdqt/equalizer.cc:118
 msgid "8 kHz"
 msgstr "8 kHz"
 
-#: src/libaudgui/equalizer.cc:126 src/libaudqt/equalizer.cc:118
+#: src/libfauxdgui/equalizer.cc:126 src/libfauxdqt/equalizer.cc:118
 msgid "16 kHz"
 msgstr "16 kHz"
 
-#: src/libaudgui/equalizer.cc:129 src/libaudqt/equalizer.cc:141
+#: src/libfauxdgui/equalizer.cc:129 src/libfauxdqt/equalizer.cc:141
 msgid "Equalizer"
 msgstr "イコライザー"
 
-#: src/libaudgui/equalizer.cc:143
+#: src/libfauxdgui/equalizer.cc:143
 msgid "Presets ..."
 msgstr "プリセット ..."
 
-#: src/libaudgui/equalizer.cc:147
+#: src/libfauxdgui/equalizer.cc:147
 msgid "Reset to Zero"
 msgstr "ゼロにリセット"
 
-#: src/libaudgui/equalizer.cc:154 src/libaudqt/equalizer.cc:123
+#: src/libfauxdgui/equalizer.cc:154 src/libfauxdqt/equalizer.cc:123
 msgid "Preamp"
 msgstr "プリアンプ"
 
-#: src/libaudgui/file-opener.cc:80 src/libaudqt/fileopener.cc:39
+#: src/libfauxdgui/file-opener.cc:80 src/libfauxdqt/fileopener.cc:39
 msgid "Open Files"
 msgstr "ファイルを開く"
 
-#: src/libaudgui/file-opener.cc:81 src/libaudgui/url-opener.cc:50
-#: src/libaudqt/url-opener.cc:42
+#: src/libfauxdgui/file-opener.cc:81 src/libfauxdgui/url-opener.cc:50
+#: src/libfauxdqt/url-opener.cc:42
 msgid "_Open"
 msgstr "開く(_O)"
 
-#: src/libaudgui/file-opener.cc:83
+#: src/libfauxdgui/file-opener.cc:83
 msgid "Close _dialog on open"
 msgstr "開いたらダイアログを閉じる(_D)"
 
-#: src/libaudgui/file-opener.cc:88 src/libaudqt/fileopener.cc:41
+#: src/libfauxdgui/file-opener.cc:88 src/libfauxdqt/fileopener.cc:41
 msgid "Add Files"
 msgstr "ファイルの追加"
 
-#: src/libaudgui/file-opener.cc:89 src/libaudgui/url-opener.cc:56
-#: src/libaudqt/url-opener.cc:48
+#: src/libfauxdgui/file-opener.cc:89 src/libfauxdgui/url-opener.cc:56
+#: src/libfauxdqt/url-opener.cc:48
 msgid "_Add"
 msgstr "追加(_A)"
 
-#: src/libaudgui/file-opener.cc:91
+#: src/libfauxdgui/file-opener.cc:91
 msgid "Close _dialog on add"
 msgstr "追加したらダイアログを閉じる(_D)"
 
-#: src/libaudgui/file-opener.cc:130 src/libaudgui/infowin.cc:394
-#: src/libaudgui/jump-to-track.cc:309 src/libaudgui/plugin-prefs.cc:166
-#: src/libaudgui/prefs-window.cc:850 src/libaudgui/queue-manager.cc:194
-#: src/libaudgui/util.cc:324 src/libaudqt/infowin.cc:74
-#: src/libaudqt/prefs-plugin.cc:143 src/libaudqt/prefs-window.cc:635
-#: src/libaudqt/queue-manager.cc:161 src/libaudqt/util.cc:130
+#: src/libfauxdgui/file-opener.cc:130 src/libfauxdgui/infowin.cc:394
+#: src/libfauxdgui/jump-to-track.cc:309 src/libfauxdgui/plugin-prefs.cc:166
+#: src/libfauxdgui/prefs-window.cc:850 src/libfauxdgui/queue-manager.cc:194
+#: src/libfauxdgui/util.cc:324 src/libfauxdqt/infowin.cc:74
+#: src/libfauxdqt/prefs-plugin.cc:143 src/libfauxdqt/prefs-window.cc:635
+#: src/libfauxdqt/queue-manager.cc:161 src/libfauxdqt/util.cc:130
 msgid "_Close"
 msgstr "閉じる(_C)"
 
-#: src/libaudgui/infopopup.cc:193 src/libaudgui/infowin.cc:348
-#: src/libaudgui/prefs-window.cc:100 src/libaudqt/info-widget.cc:42
-#: src/libaudqt/prefs-window.cc:104
+#: src/libfauxdgui/infopopup.cc:193 src/libfauxdgui/infowin.cc:348
+#: src/libfauxdgui/prefs-window.cc:100 src/libfauxdqt/info-widget.cc:42
+#: src/libfauxdqt/prefs-window.cc:104
 msgid "Title"
 msgstr "タイトル"
 
-#: src/libaudgui/infopopup.cc:194 src/libaudgui/infowin.cc:351
-#: src/libaudgui/prefs-window.cc:98 src/libaudqt/info-widget.cc:40
-#: src/libaudqt/prefs-window.cc:102
+#: src/libfauxdgui/infopopup.cc:194 src/libfauxdgui/infowin.cc:351
+#: src/libfauxdgui/prefs-window.cc:98 src/libfauxdqt/info-widget.cc:40
+#: src/libfauxdqt/prefs-window.cc:102
 msgid "Artist"
 msgstr "アーティスト"
 
-#: src/libaudgui/infopopup.cc:195 src/libaudgui/infowin.cc:354
-#: src/libaudgui/prefs-window.cc:99 src/libaudqt/info-widget.cc:41
-#: src/libaudqt/prefs-window.cc:103
+#: src/libfauxdgui/infopopup.cc:195 src/libfauxdgui/infowin.cc:354
+#: src/libfauxdgui/prefs-window.cc:99 src/libfauxdqt/info-widget.cc:41
+#: src/libfauxdqt/prefs-window.cc:103
 msgid "Album"
 msgstr "アルバム名"
 
-#: src/libaudgui/infopopup.cc:196 src/libaudgui/infowin.cc:364
-#: src/libaudgui/prefs-window.cc:102 src/libaudqt/info-widget.cc:44
-#: src/libaudqt/prefs-window.cc:106
+#: src/libfauxdgui/infopopup.cc:196 src/libfauxdgui/infowin.cc:364
+#: src/libfauxdgui/prefs-window.cc:102 src/libfauxdqt/info-widget.cc:44
+#: src/libfauxdqt/prefs-window.cc:106
 msgid "Genre"
 msgstr "ジャンル"
 
-#: src/libaudgui/infopopup.cc:197 src/libaudgui/infowin.cc:367
-#: src/libaudgui/prefs-window.cc:106 src/libaudqt/prefs-window.cc:110
+#: src/libfauxdgui/infopopup.cc:197 src/libfauxdgui/infowin.cc:367
+#: src/libfauxdgui/prefs-window.cc:106 src/libfauxdqt/prefs-window.cc:110
 msgid "Year"
 msgstr "制作年"
 
-#: src/libaudgui/infopopup.cc:198
+#: src/libfauxdgui/infopopup.cc:198
 msgid "Track"
 msgstr "トラック"
 
-#: src/libaudgui/infopopup.cc:199 src/libaudqt/info-widget.cc:54
+#: src/libfauxdgui/infopopup.cc:199 src/libfauxdqt/info-widget.cc:54
 msgid "Length"
 msgstr "長さ"
 
-#: src/libaudgui/infowin.cc:50
+#: src/libfauxdgui/infowin.cc:50
 msgid "Format:"
 msgstr "形式:"
 
-#: src/libaudgui/infowin.cc:51
+#: src/libfauxdgui/infowin.cc:51
 msgid "Quality:"
 msgstr "音質:"
 
-#: src/libaudgui/infowin.cc:52
+#: src/libfauxdgui/infowin.cc:52
 msgid "Bitrate:"
 msgstr "ビットレート:"
 
-#: src/libaudgui/infowin.cc:85
+#: src/libfauxdgui/infowin.cc:85
 msgid "Acid Jazz"
 msgstr "アシッドジャズ"
 
-#: src/libaudgui/infowin.cc:86
+#: src/libfauxdgui/infowin.cc:86
 msgid "Acid Rock"
 msgstr "アシッドロック"
 
-#: src/libaudgui/infowin.cc:87
+#: src/libfauxdgui/infowin.cc:87
 msgid "Ambient"
 msgstr "アンビエント"
 
-#: src/libaudgui/infowin.cc:88
+#: src/libfauxdgui/infowin.cc:88
 msgid "Bebop"
 msgstr "ビバップ"
 
-#: src/libaudgui/infowin.cc:89
+#: src/libfauxdgui/infowin.cc:89
 msgid "Bluegrass"
 msgstr "ブルーグラス"
 
-#: src/libaudgui/infowin.cc:90
+#: src/libfauxdgui/infowin.cc:90
 msgid "Blues"
 msgstr "ブルース"
 
-#: src/libaudgui/infowin.cc:91
+#: src/libfauxdgui/infowin.cc:91
 msgid "Chamber Music"
 msgstr "チェインバーミュージック"
 
-#: src/libaudgui/infowin.cc:92
+#: src/libfauxdgui/infowin.cc:92
 msgid "Classical"
 msgstr "クラシカル"
 
-#: src/libaudgui/infowin.cc:93
+#: src/libfauxdgui/infowin.cc:93
 msgid "Country"
 msgstr "カントリー"
 
-#: src/libaudgui/infowin.cc:94
+#: src/libfauxdgui/infowin.cc:94
 msgid "Death Metal"
 msgstr "デスメタル"
 
-#: src/libaudgui/infowin.cc:95
+#: src/libfauxdgui/infowin.cc:95
 msgid "Disco"
 msgstr "ディスコ"
 
-#: src/libaudgui/infowin.cc:96
+#: src/libfauxdgui/infowin.cc:96
 msgid "Easy Listening"
 msgstr "イージーリスニング"
 
-#: src/libaudgui/infowin.cc:97
+#: src/libfauxdgui/infowin.cc:97
 msgid "Folk"
 msgstr "フォーク"
 
-#: src/libaudgui/infowin.cc:98
+#: src/libfauxdgui/infowin.cc:98
 msgid "Funk"
 msgstr "ファンク"
 
-#: src/libaudgui/infowin.cc:99
+#: src/libfauxdgui/infowin.cc:99
 msgid "Gangsta Rap"
 msgstr "ギャングスタラップ"
 
-#: src/libaudgui/infowin.cc:100
+#: src/libfauxdgui/infowin.cc:100
 msgid "Gospel"
 msgstr "ゴスペル"
 
-#: src/libaudgui/infowin.cc:101
+#: src/libfauxdgui/infowin.cc:101
 msgid "Grunge"
 msgstr "グランジ"
 
-#: src/libaudgui/infowin.cc:102
+#: src/libfauxdgui/infowin.cc:102
 msgid "Hard Rock"
 msgstr "ハードロック"
 
-#: src/libaudgui/infowin.cc:103
+#: src/libfauxdgui/infowin.cc:103
 msgid "Heavy Metal"
 msgstr "ヘヴィメタル"
 
-#: src/libaudgui/infowin.cc:104
+#: src/libfauxdgui/infowin.cc:104
 msgid "Hip-hop"
 msgstr "ヒップホップ"
 
-#: src/libaudgui/infowin.cc:105
+#: src/libfauxdgui/infowin.cc:105
 msgid "House"
 msgstr "ハウス"
 
-#: src/libaudgui/infowin.cc:106
+#: src/libfauxdgui/infowin.cc:106
 msgid "Jazz"
 msgstr "ジャズ"
 
-#: src/libaudgui/infowin.cc:107
+#: src/libfauxdgui/infowin.cc:107
 msgid "Jungle"
 msgstr "ジャングル"
 
-#: src/libaudgui/infowin.cc:108
+#: src/libfauxdgui/infowin.cc:108
 msgid "Metal"
 msgstr "メタル"
 
-#: src/libaudgui/infowin.cc:109
+#: src/libfauxdgui/infowin.cc:109
 msgid "New Age"
 msgstr "ニューエイジ"
 
-#: src/libaudgui/infowin.cc:110
+#: src/libfauxdgui/infowin.cc:110
 msgid "New Wave"
 msgstr "ニューウェーブ"
 
-#: src/libaudgui/infowin.cc:111
+#: src/libfauxdgui/infowin.cc:111
 msgid "Noise"
 msgstr "ノイズ"
 
-#: src/libaudgui/infowin.cc:112
+#: src/libfauxdgui/infowin.cc:112
 msgid "Pop"
 msgstr "ポップ"
 
-#: src/libaudgui/infowin.cc:113
+#: src/libfauxdgui/infowin.cc:113
 msgid "Punk Rock"
 msgstr "パンクロック"
 
-#: src/libaudgui/infowin.cc:114
+#: src/libfauxdgui/infowin.cc:114
 msgid "Rap"
 msgstr "ラップ"
 
-#: src/libaudgui/infowin.cc:115
+#: src/libfauxdgui/infowin.cc:115
 msgid "Reggae"
 msgstr "レゲエ"
 
-#: src/libaudgui/infowin.cc:116
+#: src/libfauxdgui/infowin.cc:116
 msgid "Rock"
 msgstr "ロック"
 
-#: src/libaudgui/infowin.cc:117
+#: src/libfauxdgui/infowin.cc:117
 msgid "Rock and Roll"
 msgstr "ロックンロール"
 
-#: src/libaudgui/infowin.cc:118
+#: src/libfauxdgui/infowin.cc:118
 msgid "Rhythm and Blues"
 msgstr "R&B"
 
-#: src/libaudgui/infowin.cc:119
+#: src/libfauxdgui/infowin.cc:119
 msgid "Ska"
 msgstr "スカ"
 
-#: src/libaudgui/infowin.cc:120
+#: src/libfauxdgui/infowin.cc:120
 msgid "Soul"
 msgstr "ソウル"
 
-#: src/libaudgui/infowin.cc:121
+#: src/libfauxdgui/infowin.cc:121
 msgid "Swing"
 msgstr "スウィング"
 
-#: src/libaudgui/infowin.cc:122
+#: src/libfauxdgui/infowin.cc:122
 msgid "Techno"
 msgstr "テクノ"
 
-#: src/libaudgui/infowin.cc:123
+#: src/libfauxdgui/infowin.cc:123
 msgid "Trip-hop"
 msgstr "トリップホップ"
 
-#: src/libaudgui/infowin.cc:216
+#: src/libfauxdgui/infowin.cc:216
 msgid "Save successful"
 msgstr "保存が完了しました"
 
-#: src/libaudgui/infowin.cc:220
+#: src/libfauxdgui/infowin.cc:220
 msgid "Save error"
 msgstr "保存に失敗しました"
 
-#: src/libaudgui/infowin.cc:303 src/libaudgui/prefs-window.cc:84
-#: src/libaudqt/infowin.cc:63 src/libaudqt/prefs-window.cc:88
+#: src/libfauxdgui/infowin.cc:303 src/libfauxdgui/prefs-window.cc:84
+#: src/libfauxdqt/infowin.cc:63 src/libfauxdqt/prefs-window.cc:88
 msgid "Song Info"
 msgstr "曲の情報"
 
-#: src/libaudgui/infowin.cc:357 src/libaudqt/info-widget.cc:46
+#: src/libfauxdgui/infowin.cc:357 src/libfauxdqt/info-widget.cc:46
 msgid "Album Artist"
 msgstr "アルバムアーティスト"
 
-#: src/libaudgui/infowin.cc:360 src/libaudgui/prefs-window.cc:107
-#: src/libaudqt/info-widget.cc:45 src/libaudqt/prefs-window.cc:111
+#: src/libfauxdgui/infowin.cc:360 src/libfauxdgui/prefs-window.cc:107
+#: src/libfauxdqt/info-widget.cc:45 src/libfauxdqt/prefs-window.cc:111
 msgid "Comment"
 msgstr "コメント"
 
-#: src/libaudgui/infowin.cc:370 src/libaudqt/info-widget.cc:43
+#: src/libfauxdgui/infowin.cc:370 src/libfauxdqt/info-widget.cc:43
 msgid "Track Number"
 msgstr "トラック番号"
 
-#: src/libaudgui/infowin.cc:377
+#: src/libfauxdgui/infowin.cc:377
 msgid "Clea_r fields when moving to next song"
 msgstr "次の曲に移る際にフィールドをクリアする(_R)"
 
-#: src/libaudgui/infowin.cc:391 src/libaudqt/infowin.cc:73
+#: src/libfauxdgui/infowin.cc:391 src/libfauxdqt/infowin.cc:73
 msgid "_Save"
 msgstr "保存(_S)"
 
-#: src/libaudgui/infowin.cc:397
+#: src/libfauxdgui/infowin.cc:397
 msgid "_Next"
 msgstr "次の曲へ(_N)"
 
-#: src/libaudgui/infowin.cc:444
+#: src/libfauxdgui/infowin.cc:444
 #, c-format
 msgid "%d kb/s"
 msgstr "%d kb/s"
 
-#: src/libaudgui/infowin.cc:449
+#: src/libfauxdgui/infowin.cc:449
 msgid "N/A"
 msgstr "N/A"
 
-#: src/libaudgui/jump-to-time.cc:47 src/libaudgui/jump-to-track.cc:314
+#: src/libfauxdgui/jump-to-time.cc:47 src/libfauxdgui/jump-to-track.cc:314
 msgid "_Jump"
 msgstr "ジャンプ(_J)"
 
-#: src/libaudgui/jump-to-time.cc:51
+#: src/libfauxdgui/jump-to-time.cc:51
 msgid "Jump to Time"
 msgstr "指定した時間へジャンプ"
 
-#: src/libaudgui/jump-to-time.cc:51
+#: src/libfauxdgui/jump-to-time.cc:51
 msgid "Enter time (minutes:seconds):"
 msgstr "時間を入力してください (分:秒):"
 
-#: src/libaudgui/jump-to-track.cc:95 src/libaudgui/jump-to-track.cc:103
-#: src/libaudgui/jump-to-track.cc:305
+#: src/libfauxdgui/jump-to-track.cc:95 src/libfauxdgui/jump-to-track.cc:103
+#: src/libfauxdgui/jump-to-track.cc:305
 msgid "_Queue"
 msgstr "キューに追加(_Q)"
 
-#: src/libaudgui/jump-to-track.cc:101
+#: src/libfauxdgui/jump-to-track.cc:101
 msgid "Un_queue"
 msgstr "キューから外す(_U)"
 
-#: src/libaudgui/jump-to-track.cc:240
+#: src/libfauxdgui/jump-to-track.cc:240
 msgid "Jump to Song"
 msgstr "指定した曲にジャンプ"
 
-#: src/libaudgui/jump-to-track.cc:265
+#: src/libfauxdgui/jump-to-track.cc:265
 msgid "Filter: "
 msgstr "フィルター:"
 
-#: src/libaudgui/jump-to-track.cc:266
+#: src/libfauxdgui/jump-to-track.cc:266
 msgid "_Filter:"
 msgstr "フィルター(_F):"
 
-#: src/libaudgui/jump-to-track.cc:298
+#: src/libfauxdgui/jump-to-track.cc:298
 msgid "C_lose on jump"
 msgstr "ジャンプしたらダイアログを閉じる(_L)"
 
-#: src/libaudgui/playlists.cc:94
+#: src/libfauxdgui/playlists.cc:94
 msgid "_Overwrite"
 msgstr "上書き保存(_O)"
 
-#: src/libaudgui/playlists.cc:98
+#: src/libfauxdgui/playlists.cc:98
 msgid "Confirm Overwrite"
 msgstr "上書きする"
 
-#: src/libaudgui/playlists.cc:98
+#: src/libfauxdgui/playlists.cc:98
 #, c-format
 msgid "Overwrite %s?"
 msgstr "%s を上書きしてもよろしいですか？"
 
-#: src/libaudgui/playlists.cc:127
+#: src/libfauxdgui/playlists.cc:127
 msgid ""
 "Please type a filename extension or select a format from the drop-down list."
 msgstr ""
 "ファイルの拡張子を入力するか、ドロップダウンリストからフォーマットを選んでく"
 "ださい"
 
-#: src/libaudgui/playlists.cc:146
+#: src/libfauxdgui/playlists.cc:146
 msgid "Select Format by Extension"
 msgstr "拡張子でフォーマットを選択"
 
-#: src/libaudgui/playlists.cc:173
+#: src/libfauxdgui/playlists.cc:173
 msgid "Export Playlist"
 msgstr "プレイリストを出力"
 
-#: src/libaudgui/playlists.cc:174
+#: src/libfauxdgui/playlists.cc:174
 msgid "_Export"
 msgstr "エクスポート(_E)"
 
-#: src/libaudgui/playlists.cc:180
+#: src/libfauxdgui/playlists.cc:180
 msgid "Import Playlist"
 msgstr "プレイリストを読み込み"
 
-#: src/libaudgui/playlists.cc:181
+#: src/libfauxdgui/playlists.cc:181
 msgid "_Import"
 msgstr "インポート(_I)"
 
-#: src/libaudgui/plugin-menu.cc:40
+#: src/libfauxdgui/plugin-menu.cc:40
 msgid "_Plugins ..."
 msgstr "プラグイン(_P)"
 
-#: src/libaudgui/plugin-prefs.cc:109 src/libaudqt/prefs-plugin.cc:56
+#: src/libfauxdgui/plugin-prefs.cc:109 src/libfauxdqt/prefs-plugin.cc:56
 #, c-format
 msgid "About %s"
 msgstr "%s について"
 
-#: src/libaudgui/plugin-prefs.cc:155 src/libaudqt/prefs-plugin.cc:118
+#: src/libfauxdgui/plugin-prefs.cc:155 src/libfauxdqt/prefs-plugin.cc:118
 #, c-format
 msgid "%s Settings"
 msgstr "%s の設定"
 
-#: src/libaudgui/plugin-prefs.cc:159 src/libaudqt/prefs-plugin.cc:132
+#: src/libfauxdgui/plugin-prefs.cc:159 src/libfauxdqt/prefs-plugin.cc:132
 msgid "_Set"
 msgstr "設定(_S)"
 
-#: src/libaudgui/plugin-view.cc:235 src/libaudgui/prefs-window.cc:672
-#: src/libaudgui/prefs-window.cc:712 src/libaudqt/prefs-window.cc:495
+#: src/libfauxdgui/plugin-view.cc:235 src/libfauxdgui/prefs-window.cc:672
+#: src/libfauxdgui/prefs-window.cc:712 src/libfauxdqt/prefs-window.cc:495
 msgid "_Settings"
 msgstr "設定(_S)"
 
-#: src/libaudgui/plugin-view.cc:242 src/libaudgui/prefs-window.cc:686
-#: src/libaudgui/prefs-window.cc:724 src/libaudqt/prefs-window.cc:509
+#: src/libfauxdgui/plugin-view.cc:242 src/libfauxdgui/prefs-window.cc:686
+#: src/libfauxdgui/prefs-window.cc:724 src/libfauxdqt/prefs-window.cc:509
 msgid "_About"
 msgstr "情報(_A)"
 
-#: src/libaudgui/prefs-widget.cc:277
+#: src/libfauxdgui/prefs-widget.cc:277
 msgid "Choose File"
 msgstr ""
 
-#: src/libaudgui/prefs-widget.cc:281
+#: src/libfauxdgui/prefs-widget.cc:281
 msgid "Choose Folder"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:80 src/libaudqt/prefs-window.cc:84
+#: src/libfauxdgui/prefs-window.cc:80 src/libfauxdqt/prefs-window.cc:84
 msgid "Appearance"
 msgstr "外見"
 
-#: src/libaudgui/prefs-window.cc:81 src/libaudqt/prefs-window.cc:85
+#: src/libfauxdgui/prefs-window.cc:81 src/libfauxdqt/prefs-window.cc:85
 msgid "Audio"
 msgstr "オーディオ"
 
-#: src/libaudgui/prefs-window.cc:82 src/libaudqt/prefs-window.cc:86
+#: src/libfauxdgui/prefs-window.cc:82 src/libfauxdqt/prefs-window.cc:86
 msgid "Network"
 msgstr "ネットワーク"
 
-#: src/libaudgui/prefs-window.cc:83 src/libaudgui/prefs-window.cc:93
-#: src/libaudqt/prefs-window.cc:87 src/libaudqt/prefs-window.cc:97
+#: src/libfauxdgui/prefs-window.cc:83 src/libfauxdgui/prefs-window.cc:93
+#: src/libfauxdqt/prefs-window.cc:87 src/libfauxdqt/prefs-window.cc:97
 msgid "Playlist"
 msgstr "プレイリスト"
 
-#: src/libaudgui/prefs-window.cc:85 src/libaudqt/prefs-window.cc:89
+#: src/libfauxdgui/prefs-window.cc:85 src/libfauxdqt/prefs-window.cc:89
 msgid "Plugins"
 msgstr "プラグイン"
 
-#: src/libaudgui/prefs-window.cc:89 src/libaudqt/prefs-window.cc:93
+#: src/libfauxdgui/prefs-window.cc:89 src/libfauxdqt/prefs-window.cc:93
 msgid "General"
 msgstr "一般"
 
-#: src/libaudgui/prefs-window.cc:90 src/libaudqt/prefs-window.cc:94
+#: src/libfauxdgui/prefs-window.cc:90 src/libfauxdqt/prefs-window.cc:94
 msgid "Effect"
 msgstr "エフェクト"
 
-#: src/libaudgui/prefs-window.cc:91 src/libaudqt/prefs-window.cc:95
+#: src/libfauxdgui/prefs-window.cc:91 src/libfauxdqt/prefs-window.cc:95
 msgid "Visualization"
 msgstr "視覚化"
 
-#: src/libaudgui/prefs-window.cc:92 src/libaudqt/prefs-window.cc:96
+#: src/libfauxdgui/prefs-window.cc:92 src/libfauxdqt/prefs-window.cc:96
 msgid "Input"
 msgstr "インプット"
 
-#: src/libaudgui/prefs-window.cc:94 src/libaudqt/prefs-window.cc:98
+#: src/libfauxdgui/prefs-window.cc:94 src/libfauxdqt/prefs-window.cc:98
 msgid "Transport"
 msgstr "トランスポート"
 
-#: src/libaudgui/prefs-window.cc:101 src/libaudqt/prefs-window.cc:105
+#: src/libfauxdgui/prefs-window.cc:101 src/libfauxdqt/prefs-window.cc:105
 msgid "Track number"
 msgstr "トラック番号"
 
-#: src/libaudgui/prefs-window.cc:103 src/libaudqt/prefs-window.cc:107
+#: src/libfauxdgui/prefs-window.cc:103 src/libfauxdqt/prefs-window.cc:107
 msgid "File name"
 msgstr "ファイル名"
 
-#: src/libaudgui/prefs-window.cc:104 src/libaudqt/prefs-window.cc:108
+#: src/libfauxdgui/prefs-window.cc:104 src/libfauxdqt/prefs-window.cc:108
 msgid "File path"
 msgstr "ファイルパス"
 
-#: src/libaudgui/prefs-window.cc:105 src/libaudqt/prefs-window.cc:109
+#: src/libfauxdgui/prefs-window.cc:105 src/libfauxdqt/prefs-window.cc:109
 msgid "Date"
 msgstr "日付"
 
-#: src/libaudgui/prefs-window.cc:108 src/libaudqt/info-widget.cc:55
-#: src/libaudqt/prefs-window.cc:112
+#: src/libfauxdgui/prefs-window.cc:108 src/libfauxdqt/info-widget.cc:55
+#: src/libfauxdqt/prefs-window.cc:112
 msgid "Codec"
 msgstr "コーデック"
 
-#: src/libaudgui/prefs-window.cc:109 src/libaudqt/info-widget.cc:56
-#: src/libaudqt/prefs-window.cc:113
+#: src/libfauxdgui/prefs-window.cc:109 src/libfauxdqt/info-widget.cc:56
+#: src/libfauxdqt/prefs-window.cc:113
 msgid "Quality"
 msgstr "音質"
 
-#: src/libaudgui/prefs-window.cc:113 src/libaudqt/prefs-window.cc:117
+#: src/libfauxdgui/prefs-window.cc:113 src/libfauxdqt/prefs-window.cc:117
 msgid "None"
 msgstr "なし"
 
-#: src/libaudgui/prefs-window.cc:114 src/libaudqt/prefs-window.cc:118
+#: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/prefs-window.cc:118
 msgid "Arabic"
 msgstr "アラビア語"
 
-#: src/libaudgui/prefs-window.cc:115 src/libaudqt/prefs-window.cc:119
+#: src/libfauxdgui/prefs-window.cc:115 src/libfauxdqt/prefs-window.cc:119
 msgid "Baltic"
 msgstr "バルト諸語"
 
-#: src/libaudgui/prefs-window.cc:116 src/libaudqt/prefs-window.cc:120
+#: src/libfauxdgui/prefs-window.cc:116 src/libfauxdqt/prefs-window.cc:120
 msgid "Chinese"
 msgstr "簡体中国語"
 
-#: src/libaudgui/prefs-window.cc:117 src/libaudqt/prefs-window.cc:121
+#: src/libfauxdgui/prefs-window.cc:117 src/libfauxdqt/prefs-window.cc:121
 msgid "Greek"
 msgstr "ギリシア語"
 
-#: src/libaudgui/prefs-window.cc:118 src/libaudqt/prefs-window.cc:122
+#: src/libfauxdgui/prefs-window.cc:118 src/libfauxdqt/prefs-window.cc:122
 msgid "Hebrew"
 msgstr "ヘブライ語"
 
-#: src/libaudgui/prefs-window.cc:119 src/libaudqt/prefs-window.cc:123
+#: src/libfauxdgui/prefs-window.cc:119 src/libfauxdqt/prefs-window.cc:123
 msgid "Japanese"
 msgstr "日本語"
 
-#: src/libaudgui/prefs-window.cc:120 src/libaudqt/prefs-window.cc:124
+#: src/libfauxdgui/prefs-window.cc:120 src/libfauxdqt/prefs-window.cc:124
 msgid "Korean"
 msgstr "韓国語"
 
-#: src/libaudgui/prefs-window.cc:121 src/libaudqt/prefs-window.cc:125
+#: src/libfauxdgui/prefs-window.cc:121 src/libfauxdqt/prefs-window.cc:125
 msgid "Polish"
 msgstr "ポーランド語"
 
-#: src/libaudgui/prefs-window.cc:122 src/libaudqt/prefs-window.cc:126
+#: src/libfauxdgui/prefs-window.cc:122 src/libfauxdqt/prefs-window.cc:126
 msgid "Russian"
 msgstr "ロシア語"
 
-#: src/libaudgui/prefs-window.cc:123 src/libaudqt/prefs-window.cc:127
+#: src/libfauxdgui/prefs-window.cc:123 src/libfauxdqt/prefs-window.cc:127
 msgid "Taiwanese"
 msgstr "繁体中国語"
 
-#: src/libaudgui/prefs-window.cc:124 src/libaudqt/prefs-window.cc:128
+#: src/libfauxdgui/prefs-window.cc:124 src/libfauxdqt/prefs-window.cc:128
 msgid "Turkish"
 msgstr "トルコ語"
 
-#: src/libaudgui/prefs-window.cc:128 src/libaudqt/prefs-window.cc:132
+#: src/libfauxdgui/prefs-window.cc:128 src/libfauxdqt/prefs-window.cc:132
 msgid "Automatic"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:132 src/libaudqt/prefs-window.cc:136
+#: src/libfauxdgui/prefs-window.cc:132 src/libfauxdqt/prefs-window.cc:136
 msgid "Floating point"
 msgstr "浮動小数点"
 
-#: src/libaudgui/prefs-window.cc:136
+#: src/libfauxdgui/prefs-window.cc:136
 msgid "As decoded"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:137
+#: src/libfauxdgui/prefs-window.cc:137
 msgid "After applying ReplayGain"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:138
+#: src/libfauxdgui/prefs-window.cc:138
 msgid "After applying effects"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:139
+#: src/libfauxdgui/prefs-window.cc:139
 msgid "After applying equalization"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:151 src/libaudqt/prefs-window.cc:148
+#: src/libfauxdgui/prefs-window.cc:151 src/libfauxdqt/prefs-window.cc:148
 msgid "<b>Interface Settings</b>"
 msgstr "<b>インターフェイスの設定</b>"
 
-#: src/libaudgui/prefs-window.cc:152 src/libaudqt/prefs-window.cc:149
+#: src/libfauxdgui/prefs-window.cc:152 src/libfauxdqt/prefs-window.cc:149
 msgid "Interface plugin:"
 msgstr "インターフェイスプラグイン: "
 
-#: src/libaudgui/prefs-window.cc:170 src/libaudqt/prefs-window.cc:167
+#: src/libfauxdgui/prefs-window.cc:170 src/libfauxdqt/prefs-window.cc:167
 msgid "Output plugin:"
 msgstr "出力プラグイン:"
 
-#: src/libaudgui/prefs-window.cc:191 src/libaudqt/prefs-window.cc:175
+#: src/libfauxdgui/prefs-window.cc:191 src/libfauxdqt/prefs-window.cc:175
 msgid "Amplify all files:"
 msgstr "すべてのファイルを増幅する:"
 
-#: src/libaudgui/prefs-window.cc:193 src/libaudgui/prefs-window.cc:197
-#: src/libaudqt/prefs-window.cc:177 src/libaudqt/prefs-window.cc:181
+#: src/libfauxdgui/prefs-window.cc:193 src/libfauxdgui/prefs-window.cc:197
+#: src/libfauxdqt/prefs-window.cc:177 src/libfauxdqt/prefs-window.cc:181
 msgid "dB"
 msgstr "dB"
 
-#: src/libaudgui/prefs-window.cc:195 src/libaudqt/prefs-window.cc:179
+#: src/libfauxdgui/prefs-window.cc:195 src/libfauxdqt/prefs-window.cc:179
 msgid "Amplify untagged files:"
 msgstr "タグづけされていないファイルを増幅する:"
 
-#: src/libaudgui/prefs-window.cc:202 src/libaudqt/prefs-window.cc:186
+#: src/libfauxdgui/prefs-window.cc:202 src/libfauxdqt/prefs-window.cc:186
 msgid "<b>Output Settings</b>"
 msgstr "<b>出力の設定</b>"
 
-#: src/libaudgui/prefs-window.cc:204 src/libaudqt/prefs-window.cc:188
+#: src/libfauxdgui/prefs-window.cc:204 src/libfauxdqt/prefs-window.cc:188
 msgid "Bit depth:"
 msgstr "ビット深度:"
 
-#: src/libaudgui/prefs-window.cc:207 src/libaudgui/prefs-window.cc:251
-#: src/libaudqt/prefs-window.cc:191 src/libaudqt/prefs-window.cc:230
+#: src/libfauxdgui/prefs-window.cc:207 src/libfauxdgui/prefs-window.cc:251
+#: src/libfauxdqt/prefs-window.cc:191 src/libfauxdqt/prefs-window.cc:230
 msgid "Buffer size:"
 msgstr "バッファーサイズ:"
 
-#: src/libaudgui/prefs-window.cc:209 src/libaudqt/prefs-window.cc:193
+#: src/libfauxdgui/prefs-window.cc:209 src/libfauxdqt/prefs-window.cc:193
 msgid "ms"
 msgstr "ms"
 
-#: src/libaudgui/prefs-window.cc:210 src/libaudqt/prefs-window.cc:194
+#: src/libfauxdgui/prefs-window.cc:210 src/libfauxdqt/prefs-window.cc:194
 msgid "Soft clipping"
 msgstr "ソフトクリッピング"
 
-#: src/libaudgui/prefs-window.cc:212 src/libaudqt/prefs-window.cc:196
+#: src/libfauxdgui/prefs-window.cc:212 src/libfauxdqt/prefs-window.cc:196
 msgid "Use software volume control (not recommended)"
 msgstr "ソフトウェアの音量コントロールを使う (非推奨)"
 
-#: src/libaudgui/prefs-window.cc:214
+#: src/libfauxdgui/prefs-window.cc:214
 msgid "<b>Recording Settings</b>"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:218
+#: src/libfauxdgui/prefs-window.cc:218
 msgid "Record stream:"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:221 src/libaudqt/prefs-window.cc:198
+#: src/libfauxdgui/prefs-window.cc:221 src/libfauxdqt/prefs-window.cc:198
 msgid "<b>ReplayGain</b>"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:222 src/libaudqt/prefs-window.cc:199
+#: src/libfauxdgui/prefs-window.cc:222 src/libfauxdqt/prefs-window.cc:199
 msgid "Enable ReplayGain"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:224 src/libaudqt/prefs-window.cc:201
+#: src/libfauxdgui/prefs-window.cc:224 src/libfauxdqt/prefs-window.cc:201
 msgid "Album mode"
 msgstr "アルバムモード"
 
-#: src/libaudgui/prefs-window.cc:227 src/libaudqt/prefs-window.cc:204
+#: src/libfauxdgui/prefs-window.cc:227 src/libfauxdqt/prefs-window.cc:204
 msgid "Prevent clipping (recommended)"
 msgstr "クリッピングを防ぐ (非推奨)"
 
-#: src/libaudgui/prefs-window.cc:235 src/libaudqt/prefs-window.cc:214
+#: src/libfauxdgui/prefs-window.cc:235 src/libfauxdqt/prefs-window.cc:214
 msgid "Proxy hostname:"
 msgstr "プロキシのホスト名:"
 
-#: src/libaudgui/prefs-window.cc:237 src/libaudqt/prefs-window.cc:216
+#: src/libfauxdgui/prefs-window.cc:237 src/libfauxdqt/prefs-window.cc:216
 msgid "Proxy port:"
 msgstr "プロキシのポート:"
 
-#: src/libaudgui/prefs-window.cc:242 src/libaudqt/prefs-window.cc:221
+#: src/libfauxdgui/prefs-window.cc:242 src/libfauxdqt/prefs-window.cc:221
 msgid "Proxy username:"
 msgstr "プロキシのユーザ名:"
 
-#: src/libaudgui/prefs-window.cc:244 src/libaudqt/prefs-window.cc:223
+#: src/libfauxdgui/prefs-window.cc:244 src/libfauxdqt/prefs-window.cc:223
 msgid "Proxy password:"
 msgstr "プロキシのパスワード:"
 
-#: src/libaudgui/prefs-window.cc:250 src/libaudqt/prefs-window.cc:229
+#: src/libfauxdgui/prefs-window.cc:250 src/libfauxdqt/prefs-window.cc:229
 msgid "<b>Network Settings</b>"
 msgstr "<b>ネットワークの設定</b>"
 
-#: src/libaudgui/prefs-window.cc:253 src/libaudqt/prefs-window.cc:232
+#: src/libfauxdgui/prefs-window.cc:253 src/libfauxdqt/prefs-window.cc:232
 msgid "KiB"
 msgstr "KiB"
 
-#: src/libaudgui/prefs-window.cc:254 src/libaudqt/prefs-window.cc:233
+#: src/libfauxdgui/prefs-window.cc:254 src/libfauxdqt/prefs-window.cc:233
 msgid "<b>Proxy Configuration</b>"
 msgstr "<b>プロキシの設定</b>"
 
-#: src/libaudgui/prefs-window.cc:255 src/libaudqt/prefs-window.cc:234
+#: src/libfauxdgui/prefs-window.cc:255 src/libfauxdqt/prefs-window.cc:234
 msgid "Enable proxy usage"
 msgstr "プロキシの使用を有効にする"
 
-#: src/libaudgui/prefs-window.cc:259 src/libaudqt/prefs-window.cc:238
+#: src/libfauxdgui/prefs-window.cc:259 src/libfauxdqt/prefs-window.cc:238
 msgid "Use authentication with proxy"
 msgstr "プロキシの認証を行う"
 
-#: src/libaudgui/prefs-window.cc:266 src/libaudqt/prefs-window.cc:245
+#: src/libfauxdgui/prefs-window.cc:266 src/libfauxdqt/prefs-window.cc:245
 msgid "Auto character encoding detector for:"
 msgstr "文字コードの自動検出対象言語:"
 
-#: src/libaudgui/prefs-window.cc:269 src/libaudqt/prefs-window.cc:248
+#: src/libfauxdgui/prefs-window.cc:269 src/libfauxdqt/prefs-window.cc:248
 msgid "Fallback character encodings:"
 msgstr "検出失敗時に試行する文字コード:"
 
-#: src/libaudgui/prefs-window.cc:277 src/libaudqt/prefs-window.cc:257
+#: src/libfauxdgui/prefs-window.cc:277 src/libfauxdqt/prefs-window.cc:257
 msgid "<b>Behavior</b>"
 msgstr "<b>動作</b>"
 
-#: src/libaudgui/prefs-window.cc:278 src/libaudqt/prefs-window.cc:258
+#: src/libfauxdgui/prefs-window.cc:278 src/libfauxdqt/prefs-window.cc:258
 msgid "Resume playback on startup"
 msgstr "起動時に再生を再開する"
 
-#: src/libaudgui/prefs-window.cc:280 src/libaudqt/prefs-window.cc:260
+#: src/libfauxdgui/prefs-window.cc:280 src/libfauxdqt/prefs-window.cc:260
 msgid "Pause instead of resuming immediately"
 msgstr "再生せずに一時停止状態で起動"
 
-#: src/libaudgui/prefs-window.cc:283 src/libaudqt/prefs-window.cc:263
+#: src/libfauxdgui/prefs-window.cc:283 src/libfauxdqt/prefs-window.cc:263
 msgid "Advance when the current song is deleted"
 msgstr "現在の曲が削除された時に次の曲を再生する"
 
-#: src/libaudgui/prefs-window.cc:285 src/libaudqt/prefs-window.cc:265
+#: src/libfauxdgui/prefs-window.cc:285 src/libfauxdqt/prefs-window.cc:265
 msgid "Clear the playlist when opening files"
 msgstr "ファイルを開く時にプレイリストをクリアする"
 
-#: src/libaudgui/prefs-window.cc:287 src/libaudqt/prefs-window.cc:267
+#: src/libfauxdgui/prefs-window.cc:287 src/libfauxdqt/prefs-window.cc:267
 msgid "Open files in a temporary playlist"
 msgstr "ファイルを一時プレイリストで開く"
 
-#: src/libaudgui/prefs-window.cc:289 src/libaudqt/prefs-window.cc:271
+#: src/libfauxdgui/prefs-window.cc:289 src/libfauxdqt/prefs-window.cc:271
 msgid "<b>Song Display</b>"
 msgstr "<b>曲の表示</b>"
 
-#: src/libaudgui/prefs-window.cc:290 src/libaudqt/prefs-window.cc:272
+#: src/libfauxdgui/prefs-window.cc:290 src/libfauxdqt/prefs-window.cc:272
 msgid "Show song numbers"
 msgstr "曲番号の表示"
 
-#: src/libaudgui/prefs-window.cc:292 src/libaudqt/prefs-window.cc:274
+#: src/libfauxdgui/prefs-window.cc:292 src/libfauxdqt/prefs-window.cc:274
 msgid "Show leading zeroes (02:00 vs. 2:00)"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:294 src/libaudqt/prefs-window.cc:276
+#: src/libfauxdgui/prefs-window.cc:294 src/libfauxdqt/prefs-window.cc:276
 msgid "Show hours separately (1:30:00 vs. 90:00)"
 msgstr ""
 
-#: src/libaudgui/prefs-window.cc:297 src/libaudqt/prefs-window.cc:279
+#: src/libfauxdgui/prefs-window.cc:297 src/libfauxdqt/prefs-window.cc:279
 msgid "<b>Compatibility</b>"
 msgstr "<b>互換性</b>"
 
-#: src/libaudgui/prefs-window.cc:298 src/libaudqt/prefs-window.cc:280
+#: src/libfauxdgui/prefs-window.cc:298 src/libfauxdqt/prefs-window.cc:280
 msgid "Interpret \\ (backward slash) as a folder delimiter"
 msgstr "\\ (バックスラッシュ) をフォルダーの区切り文字として解釈する"
 
-#: src/libaudgui/prefs-window.cc:304 src/libaudqt/prefs-window.cc:286
+#: src/libfauxdgui/prefs-window.cc:304 src/libfauxdqt/prefs-window.cc:286
 msgid "<b>Album Art</b>"
 msgstr "<b>アルバムアート</b>"
 
-#: src/libaudgui/prefs-window.cc:305 src/libaudqt/prefs-window.cc:287
+#: src/libfauxdgui/prefs-window.cc:305 src/libfauxdqt/prefs-window.cc:287
 msgid "Search for images matching these words (comma-separated):"
 msgstr "次の単語にマッチする画像を検索する (コンマで区切る):"
 
-#: src/libaudgui/prefs-window.cc:307 src/libaudqt/prefs-window.cc:289
+#: src/libfauxdgui/prefs-window.cc:307 src/libfauxdqt/prefs-window.cc:289
 msgid "Exclude images matching these words (comma-separated):"
 msgstr "次の単語にマッチする画像を除外する (コンマで区切る):"
 
-#: src/libaudgui/prefs-window.cc:309 src/libaudqt/prefs-window.cc:291
+#: src/libfauxdgui/prefs-window.cc:309 src/libfauxdqt/prefs-window.cc:291
 msgid "Search for images matching song file name"
 msgstr "曲のファイル名にマッチする画像を検索する"
 
-#: src/libaudgui/prefs-window.cc:311 src/libaudqt/prefs-window.cc:293
+#: src/libfauxdgui/prefs-window.cc:311 src/libfauxdqt/prefs-window.cc:293
 msgid "Search recursively"
 msgstr "再帰的に検索する"
 
-#: src/libaudgui/prefs-window.cc:313 src/libaudqt/prefs-window.cc:295
+#: src/libfauxdgui/prefs-window.cc:313 src/libfauxdqt/prefs-window.cc:295
 msgid "Search depth:"
 msgstr "検索の深さ:"
 
-#: src/libaudgui/prefs-window.cc:317 src/libaudqt/prefs-window.cc:299
+#: src/libfauxdgui/prefs-window.cc:317 src/libfauxdqt/prefs-window.cc:299
 msgid "<b>Popup Information</b>"
 msgstr "<b>ポップアップ情報</b>"
 
-#: src/libaudgui/prefs-window.cc:318 src/libaudqt/prefs-window.cc:300
+#: src/libfauxdgui/prefs-window.cc:318 src/libfauxdqt/prefs-window.cc:300
 msgid "Show popup information"
 msgstr "ポップアップ情報を表示する"
 
-#: src/libaudgui/prefs-window.cc:320 src/libaudqt/prefs-window.cc:302
+#: src/libfauxdgui/prefs-window.cc:320 src/libfauxdqt/prefs-window.cc:302
 msgid "Popup delay (tenths of a second):"
 msgstr "ポップアップの遅れ (10秒単位):"
 
-#: src/libaudgui/prefs-window.cc:324 src/libaudqt/prefs-window.cc:306
+#: src/libfauxdgui/prefs-window.cc:324 src/libfauxdqt/prefs-window.cc:306
 msgid "Show time scale for current song"
 msgstr "現在の曲のタイムスケールを表示する"
 
-#: src/libaudgui/prefs-window.cc:327 src/libaudqt/prefs-window.cc:309
+#: src/libfauxdgui/prefs-window.cc:327 src/libfauxdqt/prefs-window.cc:309
 msgid "<b>Advanced</b>"
 msgstr "<b>高度な設定</b>"
 
-#: src/libaudgui/prefs-window.cc:328 src/libaudqt/prefs-window.cc:310
+#: src/libfauxdgui/prefs-window.cc:328 src/libfauxdqt/prefs-window.cc:310
 msgid "Guess missing metadata from file path"
 msgstr "メタデータがないときにファイルパスから推定"
 
-#: src/libaudgui/prefs-window.cc:330 src/libaudqt/prefs-window.cc:269
-#: src/libaudqt/prefs-window.cc:312
+#: src/libfauxdgui/prefs-window.cc:330 src/libfauxdqt/prefs-window.cc:269
+#: src/libfauxdqt/prefs-window.cc:312
 msgid "Do not load metadata for songs until played"
 msgstr "再生が終わるまで曲のメタデータを読み込まない"
 
-#: src/libaudgui/prefs-window.cc:332 src/libaudqt/prefs-window.cc:314
+#: src/libfauxdgui/prefs-window.cc:332 src/libfauxdqt/prefs-window.cc:314
 msgid "Probe content of files with no recognized file name extension"
 msgstr "ファイル拡張子が未知のときにはファイル内容を精査する"
 
-#: src/libaudgui/prefs-window.cc:350 src/libaudqt/prefs-window.cc:332
+#: src/libfauxdgui/prefs-window.cc:350 src/libfauxdqt/prefs-window.cc:332
 msgid "TITLE"
 msgstr "タイトル"
 
-#: src/libaudgui/prefs-window.cc:351 src/libaudqt/prefs-window.cc:333
+#: src/libfauxdgui/prefs-window.cc:351 src/libfauxdqt/prefs-window.cc:333
 msgid "TITLE - ARTIST"
 msgstr "タイトル - アーティスト"
 
-#: src/libaudgui/prefs-window.cc:352 src/libaudqt/prefs-window.cc:334
+#: src/libfauxdgui/prefs-window.cc:352 src/libfauxdqt/prefs-window.cc:334
 msgid "TITLE - ARTIST - ALBUM"
 msgstr "タイトル - アーティスト - アルバム"
 
-#: src/libaudgui/prefs-window.cc:353 src/libaudqt/prefs-window.cc:335
+#: src/libfauxdgui/prefs-window.cc:353 src/libfauxdqt/prefs-window.cc:335
 msgid "ARTIST - TITLE"
 msgstr "アーティスト - タイトル"
 
-#: src/libaudgui/prefs-window.cc:354 src/libaudqt/prefs-window.cc:336
+#: src/libfauxdgui/prefs-window.cc:354 src/libfauxdqt/prefs-window.cc:336
 msgid "ARTIST - ALBUM - TITLE"
 msgstr "アーティスト - アルバム - タイトル"
 
-#: src/libaudgui/prefs-window.cc:355 src/libaudqt/prefs-window.cc:337
+#: src/libfauxdgui/prefs-window.cc:355 src/libfauxdqt/prefs-window.cc:337
 msgid "ARTIST - ALBUM - TRACK. TITLE"
 msgstr "アーティスト - アルバム - トラック. タイトル"
 
-#: src/libaudgui/prefs-window.cc:356 src/libaudqt/prefs-window.cc:338
+#: src/libfauxdgui/prefs-window.cc:356 src/libfauxdqt/prefs-window.cc:338
 msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
 msgstr "アーティスト [ アルバム ] - トラック. タイトル"
 
-#: src/libaudgui/prefs-window.cc:357 src/libaudqt/prefs-window.cc:339
+#: src/libfauxdgui/prefs-window.cc:357 src/libfauxdqt/prefs-window.cc:339
 msgid "ALBUM - TITLE"
 msgstr "アルバム - タイトル"
 
-#: src/libaudgui/prefs-window.cc:451
+#: src/libfauxdgui/prefs-window.cc:451
 msgid "Category"
 msgstr "カテゴリー"
 
-#: src/libaudgui/prefs-window.cc:517 src/libaudqt/prefs-window.cc:355
+#: src/libfauxdgui/prefs-window.cc:517 src/libfauxdqt/prefs-window.cc:355
 msgid "Custom"
 msgstr "カスタム"
 
-#: src/libaudgui/prefs-window.cc:535 src/libaudqt/prefs-window.cc:347
+#: src/libfauxdgui/prefs-window.cc:535 src/libfauxdqt/prefs-window.cc:347
 msgid "Title format:"
 msgstr "タイトルの書式:"
 
-#: src/libaudgui/prefs-window.cc:539 src/libaudqt/prefs-window.cc:358
+#: src/libfauxdgui/prefs-window.cc:539 src/libfauxdqt/prefs-window.cc:358
 msgid "Custom string:"
 msgstr "カスタム文字列:"
 
-#: src/libaudgui/prefs-window.cc:738
+#: src/libfauxdgui/prefs-window.cc:738
 #, c-format
 msgid "Record audio stream using %s"
 msgstr "%s を使ってオーディオストリームを録音する"
 
-#: src/libaudgui/prefs-window.cc:747
+#: src/libfauxdgui/prefs-window.cc:747
 msgid "No audio recording plugin available"
 msgstr "オーディオ録音プラグインを利用できません"
 
-#: src/libaudgui/prefs-window.cc:800 src/libaudqt/prefs-window.cc:605
+#: src/libfauxdgui/prefs-window.cc:800 src/libfauxdqt/prefs-window.cc:605
 msgid "Audacious Settings"
 msgstr "Audacious の設定"
 
-#: src/libaudgui/preset-browser.cc:50 src/libaudgui/util.cc:174
+#: src/libfauxdgui/preset-browser.cc:50 src/libfauxdgui/util.cc:174
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/libaudgui/preset-browser.cc:51
+#: src/libfauxdgui/preset-browser.cc:51
 msgid "Save"
 msgstr "保存"
 
-#: src/libaudgui/preset-browser.cc:51
+#: src/libfauxdgui/preset-browser.cc:51
 msgid "Load"
 msgstr "読み込み"
 
-#: src/libaudgui/preset-browser.cc:77
+#: src/libfauxdgui/preset-browser.cc:77
 msgid "Load Preset File"
 msgstr "プリセットファイルを読込む"
 
-#: src/libaudgui/preset-browser.cc:94
+#: src/libfauxdgui/preset-browser.cc:94
 msgid "Load EQF File"
 msgstr "EQF ファイルを読込む"
 
-#: src/libaudgui/preset-browser.cc:109
+#: src/libfauxdgui/preset-browser.cc:109
 msgid "Save Preset File"
 msgstr "プリセットファイルを保存"
 
-#: src/libaudgui/preset-browser.cc:109
+#: src/libfauxdgui/preset-browser.cc:109
 msgid "<name>.preset"
 msgstr "<name>.preset"
 
-#: src/libaudgui/preset-browser.cc:127
+#: src/libfauxdgui/preset-browser.cc:127
 msgid "Save EQF File"
 msgstr "EQF ファイルを保存"
 
-#: src/libaudgui/preset-browser.cc:127
+#: src/libfauxdgui/preset-browser.cc:127
 msgid "<name>.eqf"
 msgstr "<name>.eqf"
 
-#: src/libaudgui/preset-browser.cc:141
+#: src/libfauxdgui/preset-browser.cc:141
 msgid "Import Winamp Presets"
 msgstr "Winamp のプリセットをインポート"
 
-#: src/libaudgui/queue-manager.cc:175 src/libaudqt/queue-manager.cc:178
+#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager.cc:178
 msgid "Queue Manager"
 msgstr "キューマネージャー"
 
-#: src/libaudgui/queue-manager.cc:193 src/libaudqt/queue-manager.cc:160
+#: src/libfauxdgui/queue-manager.cc:193 src/libfauxdqt/queue-manager.cc:160
 msgid "_Unqueue"
 msgstr "キューからはずす(_U)"
 
-#: src/libaudgui/status.cc:36
+#: src/libfauxdgui/status.cc:36
 msgid "Working ..."
 msgstr "処理中 ..."
 
-#: src/libaudgui/status.cc:85 src/libaudqt/log-inspector.cc:191
+#: src/libfauxdgui/status.cc:85 src/libfauxdqt/log-inspector.cc:191
 msgid "Error"
 msgstr "エラー"
 
-#: src/libaudgui/status.cc:90
+#: src/libfauxdgui/status.cc:90
 msgid "Information"
 msgstr ""
 
-#: src/libaudgui/url-opener.cc:49 src/libaudqt/url-opener.cc:41
+#: src/libfauxdgui/url-opener.cc:49 src/libfauxdqt/url-opener.cc:41
 msgid "Open URL"
 msgstr "URL を開く"
 
-#: src/libaudgui/url-opener.cc:55 src/libaudqt/url-opener.cc:47
+#: src/libfauxdgui/url-opener.cc:55 src/libfauxdqt/url-opener.cc:47
 msgid "Add URL"
 msgstr "URL を追加"
 
-#: src/libaudgui/url-opener.cc:79 src/libaudqt/url-opener.cc:56
+#: src/libfauxdgui/url-opener.cc:79 src/libfauxdqt/url-opener.cc:56
 msgid "Enter URL:"
 msgstr "URL を入力:"
 
-#: src/libaudgui/util.cc:174 src/libaudqt/fileopener.cc:46
-#: src/libaudqt/fileopener.cc:47
+#: src/libfauxdgui/util.cc:174 src/libfauxdqt/fileopener.cc:46
+#: src/libfauxdqt/fileopener.cc:47
 msgid "Open"
 msgstr "開く"
 
-#: src/libaudgui/util.cc:309
+#: src/libfauxdgui/util.cc:309
 msgid ""
 "\n"
 "(Further messages have been hidden.)"
@@ -1331,94 +1331,94 @@ msgstr ""
 "\n"
 "(追加のメッセージが隠れているかもしれません。)"
 
-#: src/libaudqt/fileopener.cc:40
+#: src/libfauxdqt/fileopener.cc:40
 msgid "Open Folder"
 msgstr "フォルダーを開く"
 
-#: src/libaudqt/fileopener.cc:42
+#: src/libfauxdqt/fileopener.cc:42
 msgid "Add Folder"
 msgstr "フォルダーを追加"
 
-#: src/libaudqt/fileopener.cc:48 src/libaudqt/fileopener.cc:49
+#: src/libfauxdqt/fileopener.cc:48 src/libfauxdqt/fileopener.cc:49
 msgid "Add"
 msgstr "追加"
 
-#: src/libaudqt/info-widget.cc:39
+#: src/libfauxdqt/info-widget.cc:39
 msgid "Metadata"
 msgstr "メタデータ"
 
-#: src/libaudqt/info-widget.cc:47
+#: src/libfauxdqt/info-widget.cc:47
 msgid "Composer"
 msgstr "作曲者"
 
-#: src/libaudqt/info-widget.cc:48
+#: src/libfauxdqt/info-widget.cc:48
 msgid "Performer"
 msgstr "演者"
 
-#: src/libaudqt/info-widget.cc:49
+#: src/libfauxdqt/info-widget.cc:49
 msgid "Recording Year"
 msgstr "制作年"
 
-#: src/libaudqt/info-widget.cc:50
+#: src/libfauxdqt/info-widget.cc:50
 msgid "Recording Date"
 msgstr "制作日"
 
-#: src/libaudqt/info-widget.cc:53
+#: src/libfauxdqt/info-widget.cc:53
 msgid "Technical"
 msgstr "技術情報"
 
-#: src/libaudqt/info-widget.cc:57
+#: src/libfauxdqt/info-widget.cc:57
 msgid "Bitrate"
 msgstr "ビットレート"
 
-#: src/libaudqt/log-inspector.cc:105
+#: src/libfauxdqt/log-inspector.cc:105
 msgid "Level"
 msgstr "レベル:"
 
-#: src/libaudqt/log-inspector.cc:106
+#: src/libfauxdqt/log-inspector.cc:106
 msgid "Filename"
 msgstr "ファイル名"
 
-#: src/libaudqt/log-inspector.cc:107
+#: src/libfauxdqt/log-inspector.cc:107
 msgid "Line"
 msgstr "ライン"
 
-#: src/libaudqt/log-inspector.cc:108
+#: src/libfauxdqt/log-inspector.cc:108
 msgid "Function"
 msgstr "機能"
 
-#: src/libaudqt/log-inspector.cc:109
+#: src/libfauxdqt/log-inspector.cc:109
 msgid "Message"
 msgstr "メッセージ"
 
-#: src/libaudqt/log-inspector.cc:174
+#: src/libfauxdqt/log-inspector.cc:174
 msgid "Log Inspector"
 msgstr "ログ検査"
 
-#: src/libaudqt/log-inspector.cc:185
+#: src/libfauxdqt/log-inspector.cc:185
 msgid "Log Level:"
 msgstr "ログレベル:"
 
-#: src/libaudqt/log-inspector.cc:188
+#: src/libfauxdqt/log-inspector.cc:188
 msgid "Debug"
 msgstr "デバッグ"
 
-#: src/libaudqt/log-inspector.cc:189
+#: src/libfauxdqt/log-inspector.cc:189
 msgid "Info"
 msgstr "情報"
 
-#: src/libaudqt/log-inspector.cc:190
+#: src/libfauxdqt/log-inspector.cc:190
 msgid "Warning"
 msgstr "警告"
 
-#: src/libaudqt/plugin-menu.cc:45
+#: src/libfauxdqt/plugin-menu.cc:45
 msgid "Plugins ..."
 msgstr "プラグイン ..."
 
-#: src/libaudqt/plugin-menu.cc:54
+#: src/libfauxdqt/plugin-menu.cc:54
 msgid "Services"
 msgstr "サービス"
 
-#: src/libaudqt/prefs-window.cc:207
+#: src/libfauxdqt/prefs-window.cc:207
 msgid "<b>Adjust Levels</b>"
 msgstr "<b>音量の調整</b>"

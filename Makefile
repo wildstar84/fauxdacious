@@ -17,7 +17,7 @@ include buildsys.mk
 include extra.mk
 
 install-extra:
-	for i in audacious.pc; do \
+	for i in fauxdacious.pc; do \
 	        ${INSTALL_STATUS}; \
 		if ${MKDIR_P} ${DESTDIR}${pkgconfigdir} && ${INSTALL} -m 644 $$i ${DESTDIR}${pkgconfigdir}/$$i; then \
 			${INSTALL_OK}; \
@@ -33,12 +33,12 @@ install-extra:
 			${INSTALL_FAILED}; \
 		fi \
 	done
-	if [ -f ${DESTDIR}${datadir}/audacious/Skins/Default/balance.png ]; then \
-		rm -f ${DESTDIR}${datadir}/audacious/Skins/Default/balance.png; \
+	if [ -f ${DESTDIR}${datadir}/fauxdacious/Skins/Default/balance.png ]; then \
+		rm -f ${DESTDIR}${datadir}/fauxdacious/Skins/Default/balance.png; \
 	fi
 
 uninstall-extra:
-	for i in audacious.pc; do \
+	for i in fauxdacious.pc; do \
 		if [ -f ${DESTDIR}${pkgconfigdir}/$$i ]; then \
 			if rm -f ${DESTDIR}${pkgconfigdir}/$$i; then \
 				${DELETE_OK}; \
@@ -47,7 +47,7 @@ uninstall-extra:
 			fi \
 		fi; \
 	done
-	for i in audacious.desktop; do \
+	for i in fauxdacious.desktop; do \
 		if test -f ${DESTDIR}${datarootdir}/applications/$$i; then \
 			if rm -f ${DESTDIR}${datarootdir}/applications/$$i; then \
 				${DELETE_OK}; \

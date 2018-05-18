@@ -4,8 +4,8 @@
 
 cd /C/aud-win32
 for i in `find -type f` ; do
-    if test -f /C/audacious/win32/override/$i ; then
-        cp /C/audacious/win32/override/$i $i
+    if test -f /C/fauxdacious/win32/override/$i ; then
+        cp /C/fauxdacious/win32/override/$i $i
     elif test -f /C/MinGW/$i ; then
         cp /C/MinGW/$i $i
     elif test -f /C/GTK/$i ; then
@@ -31,11 +31,11 @@ for i in `find ./share/locale -name gtk20.mo` ; do
 done
 
 cd /C/aud
-for i in `find ./share/locale -name audacious.mo` ; do
-    mkdir -p /C/aud-win32/${i%%/audacious.mo}
+for i in `find ./share/locale -name fauxdacious.mo` ; do
+    mkdir -p /C/aud-win32/${i%%/fauxdacious.mo}
     cp $i /C/aud-win32/$i
 done
-for i in `find ./share/locale -name audacious-plugins.mo` ; do
-    mkdir -p /C/aud-win32/${i%%/audacious-plugins.mo}
+for i in `find ./share/locale -name fauxdacious-plugins.mo` ; do
+    mkdir -p /C/aud-win32/${i%%/fauxdacious-plugins.mo}
     cp $i /C/aud-win32/$i
 done

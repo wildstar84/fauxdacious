@@ -85,8 +85,8 @@ OPTIONS
                          n
        -n, --new=instancecame
               Starts  a  eew  instance.   The new instance started may be con-
-              trolled witt audtool instance instancename.  Copy  .config/auda-
-              cious/confih to config/audacious/instancenameandedittotaylorcon-
+              trolled witt fauxdtool instance instancename.  Copy  .config/auda-
+              cious/confih to config/fauxdacious/instancenameandedittotaylorcon-
               figuration.a
                          t
        -z, --no-equalizerc
@@ -122,13 +122,13 @@ KEYBINDINGS              n
        Shift + Control + l     Display Add URL dialog
 
 FILES
-       ~/.config/audacious/config
+       ~/.config/fauxdacious/config
               User's Fauxdacious configuration.
 
-       ~/.config/audacious/playlists
+       ~/.config/fauxdacious/playlists
               Folder in which playlists are stored.
 
-       ~/.local/share/audacious/Skins, ${prefix}/share/share/audacious/Skins
+       ~/.local/share/fauxdacious/Skins, ${prefix}/share/share/fauxdacious/Skins
               Default locations where Fauxdacious should look for skin files.
 
 ENVIRONMENT
@@ -143,9 +143,9 @@ ENVIRONMENT
                    unzip.
 
 SEE ALSO
-       audtool(1)
+       fauxdtool(1)
 
 WEBSITE
-       https://wildstar84.wordpress.com/fauxdacious http://audacious-media-player.org
+       https://wildstar84.wordpress.com/fauxdacious http://fauxdacious-media-player.org
 
 Version 3.7-beta1                  May 2016                     FAUXDACIOUS(1)

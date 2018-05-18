@@ -1,4 +1,24 @@
-Version 3.9-beta2
+Version 3.9-final
+
+* Fauxdacous is now completely divorced from Audacious!  This means that the 
+two no longer share ANY library, include, binary, or configuration names, 
+and one can now install both Fauxdacious and Audacious on the same 
+system and even the same base directory location, ie. /usr/local/.  The 
+common library names, such as libaudcore, libaudgui, etc have all been 
+renamed libfauxdcore, libfauxdgui, etc.  User configurations are now 
+kept separate under ~/.config/fauxdacous*/ instead of ~/.config/audacous*/.
+Existing Fauxdacious users will need to copy (cp -R) their existing 
+configuration files over accordingly!  Users may also need to edit their 
+"user_tag_data" files that reference images in the prev. config directory!
+Manpages reflect the new (proper) names as well (fauxdacious and fauxdtool).
+NOTE:  Within "config" files, the secion "[audacious]" remains unchanged!
+
+* Add "close when recording stopped" and "use custom (directory) for 
+non-local directories" checkbox to Filewriter.
+The first causes stdout to be closed whenever recording stops (uncheck 
+for multiple recordings to stdout).  The second prevents error if 
+recording a streaming URL to "Orig. Directory" by saving the output to 
+the "custom" directory ($HOME if custom directory field empty).
 
 * Added option under [Settings].[Song Info] to set a "default" cover-art 
 file for use by entries for which Fauxdacious can not find a cover-art 

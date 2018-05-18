@@ -22,7 +22,7 @@ formats for further processing by another program.
 continues to play, allowing you to listen to something else in another instance 
 (see next feature).
 * Multiple named instances with command-line option to specify alternate 
-configurations and audtool instances.
+configurations and fauxdtool instances.
 * Option to fetch and store cover-art for CDs and DVDs (requires Perl).
 * Additional command-line options!
 * Most new Audacious features / fixes merged in in a timely manner!
