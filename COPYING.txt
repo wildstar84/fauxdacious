@@ -9,7 +9,7 @@ its use and redistribution.
 
 LICENSE
 
-Copyright ¬© 2001-2016 Audacious developers and others
+Copyright ¬© 2001-2018 Jim Turner, Audacious developers and others
 
 (A list of the copyright holders is provided in the AUTHORS file.)
 
@@ -64,8 +64,9 @@ libguess - a high-speed character set detection library
        used to endorse or promote products derived from this software without
        specific prior written permission.
 
-    This software is provided by the copyright holders and contributors "as is"ù.     and any express or implied warranties, including, but not limited to, the
-    Implied warranties of merchantability and fitness for a particular purpose
+    This software is provided by the copyright holders and contributors "as is"ù,
+    and any express or implied warranties, including, but not limited to, the
+    implied warranties of merchantability and fitness for a particular purpose
     are disclaimed.  In no event shall the copyright owner or contributors be
     liable for any direct, indirect, incidental, special, exemplary, or
     consequential damages (including, but not limited to, procurement of

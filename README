@@ -2,7 +2,9 @@ NOTE:  You NO LONGER NEED to uninstall all audacious packages, including libfaux
 libfauxdgui*, libfauxdtag*, etc.  
 
 If running a current 64-bit Debian stable installation or equivalent, you can 
-try simply untarring the tarballs and running:
+try simply untarring the tarballs and running ((sudo) in parenthesis means 
+that it depends on where you're installing to)  You can change "/usr/local" 
+EVERYWHERE below if installing somewhere else:
 
 	(sudo) make install
 
@@ -36,7 +38,7 @@ OTHERWISE (download and install from Github):
 	mkdir fauxdacious
 	mkdir fauxdacious-plugins
 	git clone -b independence --single-branch git://github.com/wildstar84/fauxdacious.git fauxdacious
-	git clone -b independence --single-branch git://github.com/wildstar84/fauxdacious-plugins.git audacious-plugins
+	git clone -b independence --single-branch git://github.com/wildstar84/fauxdacious-plugins.git fauxdacious-plugins
 
 NOW, regardless of whether installing from the tarballs OR from Github:
 
@@ -44,24 +46,26 @@ NOW, regardless of whether installing from the tarballs OR from Github:
 	./autogen.sh
 	./configure --prefix=/usr/local [--enable-qt] --with-buildstamp=Fauxdacious
 	make
-	sudo make install
+	(sudo) make install
+	sudo ldconfig
 
 	cd ../fauxdacious-plugins
 	./autogen.sh
 	./configure --prefix=/usr/local [--enable-qt]
 	make
-	sudo make install
+	(sudo) make install
 
 	sudo update-desktop-database
 	sudo update-icon-caches /usr/share/icons/hicolor
 
 	OPTIONAL:  cd ~/.config; mkdir fauxdacious; cp -R audacious/. fauxdacious
-	# This copies your previous default instance profile to the new (Fauxdacious) location.
+	# This copies your previous default instance profile to the new
+	# (Fauxdacious) location.
 
 Now run fauxdacious:
 
-	fauxdacious -Dc &
+	fauxdacious &
 
-Fauxdacious should now start up with an empty playlist.  Enjoy!
-Read the Changes file for the latest Fauxdacious features, fixes, and changes, 
+Fauxdacious should now start up.  Enjoy Fauxdacious!
+Read the "Changes" file for the latest Fauxdacious features, fixes, and changes,
 and how to configure to take best advantage of them!

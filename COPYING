@@ -1,6 +1,6 @@
 LICENSE
 
-Copyright © 2001-2018 Audacious developers and others
+Copyright © 2001-2018 Jim Turner, Audacious developers and others
 
 (A list of the copyright holders is provided in the AUTHORS file.)
 
@@ -20,11 +20,15 @@ Copyright © 2001-2018 Audacious developers and others
 
 EXCEPTIONS
 
-Audacious includes icons adapted from the Paper Icon Set by Sam Hewitt.  These
-icons are distributed under the Creative Commons Attribution-ShareAlike 4.0
-license (see https://creativecommons.org/licenses/by-sa/4.0/).
+The Fauxdacious logo was designed by (c 2015) Jim Turner.  All Fauxdacious changes 
+and patches, including plugin changes are copyright (c 2015) by Jim Turner,  with 
+all rights reserved.  You are free to use Fauxdacious subject to the same license 
+and terms as Audacious itself.  
 
-Please note that many of the plugins distributed with Audacious are under
+Other than the Fauxdacious and Audacious logos themselves, the images included with 
+Fauxdacious are based on the Tango Icon Library and are in the public domain.
+
+Please note that many of the plugins distributed with Fauxdacious / Audacious are under
 different licenses.
 
 THIRD-PARTY LICENSES
@@ -51,7 +55,7 @@ libguess - a high-speed character set detection library
        used to endorse or promote products derived from this software without
        specific prior written permission.
 
-    This software is provided by the copyright holders and contributors “as is”
+    This software is provided by the copyright holders and contributors "as is",
     and any express or implied warranties, including, but not limited to, the
     implied warranties of merchantability and fitness for a particular purpose
     are disclaimed.  In no event shall the copyright owner or contributors be
