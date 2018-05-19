@@ -37,8 +37,8 @@ OTHERWISE (download and install from Github):
 	cd /tmp
 	mkdir fauxdacious
 	mkdir fauxdacious-plugins
-	git clone -b independence --single-branch git://github.com/wildstar84/fauxdacious.git fauxdacious
-	git clone -b independence --single-branch git://github.com/wildstar84/fauxdacious-plugins.git fauxdacious-plugins
+	git clone --single-branch git://github.com/wildstar84/fauxdacious.git fauxdacious
+	git clone --single-branch git://github.com/wildstar84/fauxdacious-plugins.git fauxdacious-plugins
 
 NOW, regardless of whether installing from the tarballs OR from Github:
 
