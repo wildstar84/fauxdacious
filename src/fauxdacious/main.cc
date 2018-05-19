@@ -435,8 +435,7 @@ static void do_commands ()
         else
             aud_set_stdout_fmt (1);
     }
-
-    if (options.force_recording && !options.outstd)
+    else if (options.force_recording)
         aud_drct_enable_record (1);  // JWT:USER WANTS TO START WITH RECORDING ON (GREAT FOR RECORDING FROM STDIN!)!
 
     if (filenames.len ())
