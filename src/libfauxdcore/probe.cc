@@ -358,10 +358,11 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS TRUE!: 
        WHEN SUCCESSFUL FETCHING FROM TAG FILE, IT RETURNS TRUE ONLY IF THE "PRECEDENCE" == "ONLY" (-1),
        OTHERWISE, WE KEEP PROCESSING THE CONDITIONS UNTIL AT LAST WE FETCH (ANY UNSET) TAGS FROM THE FILE ITSELF. */
+    bool fileorNOTstdin = file || strncmp (filename, "stdin://", 8);  // JWT:IF stdin, MUST HAVE OPEN FILEHANDLE!
     if ((local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *)filename_only, local_tag_file, loclfile_tuple)) < 0) 
             || (usrtag && (fromtempfile = aud_read_tag_from_tagfile (filename, "tmp_tag_data", file_tuple)) < 0)
             || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0)
-            || (file && ip->read_tag (filename, file, new_tuple, image)))
+            || (fileorNOTstdin && ip->read_tag (filename, file, new_tuple, image)))
     {
         which_tuple = &file_tuple;
         if (local_tag_file[0] && fromlocalfile)  //JWT:WE GOT TAGS FROM A LOCAL (DIRECTORY-BASED) user_tag_data.tag FILE.

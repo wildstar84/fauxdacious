@@ -1,5 +1,5 @@
-NOTE:  You NO LONGER NEED to uninstall all audacious packages, including libfauxdcore, 
-libfauxdgui*, libfauxdtag*, etc.  
+NOTE:  You NO LONGER NEED to uninstall all audacious packages, 
+including libaudcore, libaudgui*, libaudtag*, etc.  
 
 If running a current 64-bit Debian stable installation or equivalent, you can 
 try simply untarring the tarballs and running ((sudo) in parenthesis means 
