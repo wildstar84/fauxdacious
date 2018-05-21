@@ -86,18 +86,20 @@ Print version information and exit.
 .B -V, --verbose
 Print debugging output while running (may be used twice for even more output).
 .TP
-.B -n, --new=instancename
-Starts a new instance.  The new instance started may be controlled with
-Baudtool instance instancename.  Copy .config/audacious/config to
-.config/audacious/instancename and edit to taylor configuration.
+.B -#, -n, --new=instancename
+Starts a new instance.  The new instance started may be controlled with:
+\fBfauxdtool instance instancename\fR.  Copy ~/.config/fauxdacious/config
+to ~/.config/fauxdacious/instancename and edit to tailor configuration.
 -n creates a new unnamed instance that can not be controlled by audtool.
-New instances can also be created the Audacious way with numbers (1-9),
-ie. -1.
+New instances can also be created and contolled the Audacious way with
+single-digit numbers (1-9), ie. -1, -2, etc.
 .TP
 .B -o, --out=ext
 Starts Fauxdacious with Filewriter as the output plugin and sends audio to
 stdout using the format specified by the extension ("ext"), which can be
 "wav", "mp3", "ogg", or "flac".  If just -o is given, then "wav" is used.
+After Fauxdacious exits, the audio output plugin and recording settings are
+restored to their previous (normal listening) values.
 .TP
 .B -z, --no-equalizer
 Force Equalizer Off on startup.

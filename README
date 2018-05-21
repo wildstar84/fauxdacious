@@ -1,5 +1,6 @@
-NOTE:  You NO LONGER NEED to uninstall all audacious packages, 
-including libaudcore, libaudgui*, libaudtag*, etc.  
+NOTE:  You NO LONGER NEED to uninstall Audacious and all audacious packages, 
+ie. libaudcore, libaudgui*, libaudtag*, etc.  before installing Fauxdacious!
+Both programs can now happily reside on the same system and root path.
 
 If running a current 64-bit Debian stable installation or equivalent, you can 
 try simply untarring the tarballs and running ((sudo) in parenthesis means 

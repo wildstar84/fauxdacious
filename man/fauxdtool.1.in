@@ -6,7 +6,7 @@
 
 .SH SYNOPSIS
 .B fauxdtool
-[-# | \fIinstance instance-name\fR] \fIcommand\fR [\fIparameter\fR ...] ...
+[-# | [--]\fBinstance\fR \fIinstance-name\fR] [--]\fBcommand\fR [\fIparameter\fR ...] ...
 
 .SH DESCRIPTION
 .B fauxdtool
@@ -16,8 +16,8 @@ It can send many common commands, such as to skip to the next song in the
 playlist, and can also print status information, such as the title of the
 current song.
 .PP
-\fIinstance\fR may be given as \fBinstance-name\fR to specify which instance
-of Fauxdacious to control when multiple instances have been started
+\fIinstance\fR may be given as \fB-#\fR or \fBinstance-name\fR to specify which
+instance of Fauxdacious to control when multiple instances have been started
 (with \fB--new=instance-name\fR).  The \fBinstance-name\fR will also be the
 name of the config directory (created first time the instance is started, if not
 already existing) as ~/.config/fauxdacious[_instancename]/.  (The default config
