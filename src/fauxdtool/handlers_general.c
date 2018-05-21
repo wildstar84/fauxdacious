@@ -129,7 +129,7 @@ void get_version (int argc, char * * argv)
     if (! version)
         exit (1);
 
-    fauxdtool_report ("Audacious %s", version);
+    fauxdtool_report ("Fauxdacious %s", version);
     g_free (version);
 }
 
