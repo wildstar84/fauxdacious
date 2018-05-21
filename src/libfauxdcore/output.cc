@@ -543,9 +543,6 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
     in_rate = rate;
     in_frames = 0;
 
-    setup_effects ();
-    setup_output (true);
-    setup_secondary (true);
     /* JWT:NEXT CONDITION BLOCK ADDED TO ALLOW SONG/STREAM-SPECIFIC EQUALIZATION IF [Autoload].
        4 possible scenarios when opening:  (N=ENTRY HAS NO AUTO-PRESET FILE, P=ENTRY HAS PRESET FILE):
        BASED ON PREV. ENTRY PLAYED (PREV->CURRENT):  (NOTE: WE HANDLE P->N REGARDLESS OF [Autoload] STATE!)
@@ -647,6 +644,9 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
                 false, false);
         aud_set_bool (nullptr, "_autoeffects_loaded", false);
     }
+    setup_effects ();
+    setup_output (true);
+    setup_secondary (true);
 
     UNLOCK_ALL;
 
