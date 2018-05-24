@@ -111,6 +111,16 @@
             <arg type="b" direction="out" name="is_recording"/>
         </method>
 
+        <!-- Set Pause to Mute -->
+        <method name="GetPausemute">
+            <arg type="b" direction="out" name="is_pausemute"/>
+        </method>
+
+        <!-- Is Pause set to Mute? -->
+        <method name="SetPausemute">
+            <arg type="b" direction="in" name="is_pausemute"/>
+        </method>
+
         <!-- What is the bitrate, frequency, and number of channels of the -->
         <!-- current audio format? -->
         <method name="Info">

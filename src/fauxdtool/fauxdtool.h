@@ -117,6 +117,8 @@ void playback_seek (int, char * *);
 void playback_seek_relative (int, char * *);
 void playback_record (int, char * *);
 void playback_recording (int, char * *);
+void playback_setpausemute (int, char * *);
+void playback_getpausemute (int, char * *);
 
 void mainwin_show (int, char * *);
 void show_preferences_window (int, char * *);

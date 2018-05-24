@@ -415,6 +415,19 @@ static gboolean do_recording (Obj * obj, Invoc * invoc)
     return true;
 }
 
+static gboolean do_get_pausemute (Obj * obj, Invoc * invoc)
+{
+    FINISH2 (get_pausemute, aud_get_pausemute_mode ());
+    return true;
+}
+
+static gboolean do_set_pausemute (Obj * obj, Invoc * invoc, unsigned pausemute)
+{
+    aud_set_pausemute_mode ((pausemute ? true : false));
+    FINISH (set_pausemute);
+    return true;
+}
+
 static gboolean do_repeat (Obj * obj, Invoc * invoc)
 {
     FINISH2 (repeat, aud_get_bool (nullptr, "repeat"));
@@ -759,6 +772,8 @@ handlers[] =
     {"handle-quit", (GCallback) do_quit},
     {"handle-recording", (GCallback) do_recording},
     {"handle-record", (GCallback) do_record},
+    {"handle-set-pausemute", (GCallback) do_set_pausemute},
+    {"handle-get-pausemute", (GCallback) do_get_pausemute},
     {"handle-repeat", (GCallback) do_repeat},
     {"handle-reverse", (GCallback) do_reverse},
     {"handle-seek", (GCallback) do_seek},

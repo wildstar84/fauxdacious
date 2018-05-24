@@ -1,5 +1,9 @@
 Version 3.9-final
 
+* Expose PauseMute option (-P option in Fauxdacious) to fauxdtool 
+("--playback-pausemute 0|1" to set and "--playback-doespausemute" to 
+fetch status - returned in $?).
+
 * Fauxdacous is now completely divorced from Audacious!  This means that the 
 two no longer share ANY library, include, binary, or configuration names, 
 and one can now install both Fauxdacious and Audacious on the same 
@@ -7,14 +11,16 @@ system and even the same base directory location, ie. /usr/local/.  The
 common library names, such as libaudcore, libaudgui, etc have all been 
 renamed libfauxdcore, libfauxdgui, etc.  User configurations are now 
 kept separate under ~/.config/fauxdacous*/ instead of ~/.config/audacous*/.
-Existing Fauxdacious users will need to copy (cp -R) their existing 
-configuration files over accordingly!  Users may also need to edit their 
-"user_tag_data" files that reference images in the prev. config directory!
-Manpages reflect the new (proper) names as well (fauxdacious and fauxdtool).
-NOTE:  Within "config" files, the secion "[audacious]" remains unchanged!
+Existing Fauxdacious / Audacious users will need to copy (cp -R) their 
+existing configuration files over accordingly!  Users may also need to 
+edit their "user_tag_data" files that reference images in the prev. config 
+directory!  Manpages reflect the new (proper) names as well (fauxdacious 
+and fauxdtool).
+NOTE:  Within "config" files themselves, the secion "[audacious]" remains 
+unchanged, so you shouldn't have to edit the file(s) themselves!
 
 * Add "close when recording stopped" and "use custom (directory) for 
-non-local directories" checkbox to Filewriter.
+non-local directories" checkboxes to Filewriter.
 The first causes stdout to be closed whenever recording stops (uncheck 
 for multiple recordings to stdout).  The second prevents error if 
 recording a streaming URL to "Orig. Directory" by saving the output to 
@@ -22,7 +28,7 @@ the "custom" directory ($HOME if custom directory field empty).
 
 * Added option under [Settings].[Song Info] to set a "default" cover-art 
 file for use by entries for which Fauxdacious can not find a cover-art 
-image for.  Default: none.
+image for.  Default: empty (no image).
 
 * Replaced some very old and primitive C-code.
 
@@ -60,18 +66,18 @@ Fauxdacious supports two ways of stdin-piping due to the fact that this
 feature predates Audacious's current way of doing it.  The (non-probing) 
 "old way" involves specifying the media type via extension, ie. 
 "cat song.mp3 | fauxdacious -.mp3".  This (and the even older "stdin://-.mp3")
-still works, even for piping in playlists or queuesheets.  The "new way" 
+still work, even for piping in playlists or queuesheets.  The "new way" 
 Audacious does it is without the extension ie. "cat song.mp3 | audacious -").
 Fauxdacious now supports both methods for media, but still requires the 
 matching extension hint for cuesheets and playlists (other than text/m3u), 
 since the underlying Audacious code does no probing for playlists, and 
 Audacious does NOT support piping in playlists or cue-sheet files anyway.
-(In other words, if it works in Audacious, it'l now work in Fauxdacious!)
+(In other words, if it works in Audacious, it should work in Fauxdacious!)
 If the media type is known, the "old way" is still preferred as it tells 
 Fauxdacious exactly what's coming in, and thus probing can be avoided!
 NOTE:  .mov files (and perhaps some others that require seeking to the end 
-of the file before playing), disks (CDs and DVDs), and streams, such as 
-Youtube, etc. which require transformation by the URL helper script, can NOT 
+of the file before playing), disks (CDs and DVDs), and streams that require 
+transformation by the URL helper script such as Youtube, etc. can NOT 
 be piped in via stdin!
 
 * Cleaned up some issues with stdin-piping of adplug and ffmpeg media.
@@ -84,13 +90,14 @@ rough first attempt at playing Youtube videos in Fauxdacious, but is now
 obsolete, as Youtube (and other) videos are now much better supported 
 via the FauxdaciousURLHelper.pl "helper" script which uses the Perl library: 
 StreamFinder::Youtube, and youtube-dl (the separate program).  Videos 
-played via the youtubedl plugin were NOT even seekable, and the ffaudio 
-plugin can now be saved, thus fully eliminating the need for youtubedl!
+played via the youtubedl plugin were NOT even seekable, and ffaudio now 
+has an option to save the video to a file while playing, thus fully 
+eliminating the need for youtubedl!
 
 * Added feature where if one selects a song in the playlist while another 
 song is playing, advancing to the next song will jump directly to that song.
 
-* Added "Random Skin on Play" option (Audacious. feature# 755) to Winamp 
+* Added "Random Skin on Play" option (Audacious. feature req# 755) to Winamp 
 Skins interfaces (Gtk & QT) so that when set, the playlist advances, skin 
 theme changes to random installed skin.  Also added new preference checkbox 
 in [Settings].[Appearance] window to contol (Default: unchecked (false)).
@@ -104,14 +111,14 @@ rename the old Audacious-based local version to "AdPlug Classic" (audadplug)
 resulting in having BOTH the old and new versions installed due to some 
 64 bit linux versions requiring a PATCH to libadplug that's not included 
 on some distro's current package versions.  The patch prevents Fauxdacious 
-from CRASHING whilst probing some streams - See Audacious bug#759.  Since 
+from CRASHING whilst probing some streams - See Audacious bug# 759.  Since 
 Debian Buster, in particular, has drug their heels on updating libadplug 
 for MONTHS now, I've given up waiting and just included both versions for 
 the time being.
 
 * Abbreviate "multi-line" song titles to only display the first line in 
 the window titlebars and the "skins" versions of the playlist to stop 
-garbling up the playlist and the window title-bars.
+"garbling up" the playlist lines and the window title-bars.
 
 * Add config option to restore Fauxdacious's pretty (pre-v3.9b2) icons in 
 the Preferences Window (and may effect other icons in future) as Audacious 

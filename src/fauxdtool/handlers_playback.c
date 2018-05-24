@@ -117,3 +117,19 @@ void playback_recording (int argc, char * * argv)
 
     exit (! recording);
 }
+
+void playback_setpausemute (int argc, char * * argv)
+{
+    gboolean pausemute = (argc < 2 || argv[1][0] == '1' || argv[1][0] == 't' ||
+            argv[1][0] == 'T' || argv[1][0] == 'y' || argv[1][0] == 'Y') ? TRUE : FALSE;
+    obj_fauxdacious_call_set_pausemute_sync (dbus_proxy, pausemute, NULL, NULL);
+}
+
+void playback_getpausemute (int argc, char * * argv)
+{
+    gboolean pausemute = FALSE;
+    obj_fauxdacious_call_get_pausemute_sync (dbus_proxy, & pausemute, NULL, NULL);
+
+    exit (pausemute);
+}
+

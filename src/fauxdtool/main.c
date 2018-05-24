@@ -60,6 +60,8 @@ const struct commandhandler handlers[] =
     {"playback-seek-relative", playback_seek_relative, "seek to relative time offset", 1},
     {"playback-record", playback_record, "toggle stream recording", 0},
     {"playback-recording", playback_recording, "exit code = 0 if recording", 0},
+    {"playback-pausemute", playback_setpausemute, "set pause to just mute", 1},
+    {"playback-doespausemute", playback_getpausemute, "exit code = 1 if pause set to just mute", 0},
 
     {"<sep>", NULL, "Playlist commands", 0},
     {"playlist-advance", playlist_advance, "skip to next song", 0},

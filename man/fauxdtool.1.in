@@ -121,6 +121,12 @@ Toggle stream recording (dubbing).
 .TP
 .B --playback-recording
 Return an exit code of 0 (true) if currently recording (dubbing).
+.TP
+.B --playback-pausemute [0|false|no | 1|true|yes]
+Set pause to just mute (True or False, default TRUE).
+.TP
+.B --playback-doespausemute
+Return an exit code of 1 (true) if pause is set to just mute.
 
 .SS Playlist commands:
 
