@@ -613,12 +613,12 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
                 OR MAYBE WE'RE PLAYING A DISK, CHECK FOR PRESET BY DISK-ID / DVD TITLE: */
             if (! strncmp (filename, "file://", 7))  // LOOK FOR A DIRECTORY PRESET FILE (LIKE XMMS DOES):
             {
-                String eqpreset_default_file = aud_get_str (nullptr, "eqpreset_default_file");
-                if (eqpreset_default_file[0])
+                String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
+                if (eqpreset_dir_default_file[0])
                 {
                     StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
                     found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({(const char *) path, "/", 
-                            (const char *) eqpreset_default_file})), true, false);
+                            (const char *) eqpreset_dir_default_file})), true, false);
                 }
             }
             else if (! strncmp (filename, "cdda://", 7) || ! strncmp (filename, "dvd://", 6))

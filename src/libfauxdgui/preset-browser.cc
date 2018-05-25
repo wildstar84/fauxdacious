@@ -169,6 +169,27 @@ void eq_preset_save_file ()
         int current_song = aud_playlist_get_position (current_playlist);
         if (current_song >= 0)
         {
+        	   if (aud_get_bool (nullptr, "try_local_preset_files") && aud_get_bool (nullptr, "_save_as_dirdefault"))
+        	   {
+                String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
+                if (eqpreset_dir_default_file && eqpreset_dir_default_file[0])
+                {
+                    filename = aud_playlist_entry_get_filename (current_playlist, current_song);
+                    StringBuf scheme = uri_get_scheme ((const char *) filename);
+                    if (! strcmp (scheme, "file"))  // JWT:WE'RE A "FILE" AND SAVE TO LOCAL DIR, AND SAVE AS DIR-PRESET:
+                    {
+                        StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
+                        aud_set_str (nullptr, "_preset_dir", (const char *) path);
+                        String preset_file_namepart = eqpreset_dir_default_file;
+                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
+                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
+                                (const char *) preset_file_namepart}))));
+                        show_preset_browser (_("Save Preset File"), true, preset_file_namepart, do_save_file);
+
+                        return;
+                    }
+                }
+            }
             const char * slash;
             const char * base;
             filename = aud_playlist_entry_get_filename (current_playlist, current_song);

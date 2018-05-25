@@ -44,8 +44,7 @@ static const char * const core_defaults[] = {
  "show_interface", "TRUE",
 
  /* equalizer */
- "eqpreset_default_file", "",
- "eqpreset_extension", "",
+ "eqpreset_dir_default_file", "dir_default.preset",
  "equalizer_active", "FALSE",
  "equalizer_autoload", "FALSE",
  "equalizer_bands", "0,0,0,0,0,0,0,0,0,0",
