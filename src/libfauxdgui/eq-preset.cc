@@ -135,6 +135,11 @@ static void localsave_toggled (GtkToggleButton * button)
     aud_set_bool (nullptr, "try_local_preset_files", gtk_toggle_button_get_active (button));
 }
 
+static void save_as_dirdefault_toggled (GtkToggleButton * button)
+{
+    aud_set_bool (nullptr, "_save_as_dirdefault", gtk_toggle_button_get_active (button));
+}
+
 static void nameonly_toggled (GtkToggleButton * button)
 {
     aud_set_bool (nullptr, "eqpreset_nameonly", gtk_toggle_button_get_active (button));
@@ -285,9 +290,27 @@ static GtkWidget * create_eq_preset_window ()
     g_signal_connect (localsave_checkbox, "toggled", (GCallback) localsave_toggled, nullptr);
     gtk_widget_set_sensitive (localsave_checkbox, true);
     gtk_button_set_label ((GtkButton *) localsave_checkbox,
-            _("Use entry's local directory for preset files, if possible."));
+            _("Use entry's local directory for preset files, if file."));
+
     if (aud_get_bool (nullptr, "try_local_preset_files"))
         gtk_toggle_button_set_active ((GtkToggleButton *) localsave_checkbox, true);
+
+    String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
+    if (eqpreset_dir_default_file && eqpreset_dir_default_file[0])
+    {
+        GtkWidget * hbox1a1 = gtk_hbox_new (false, 6);
+        gtk_box_pack_start ((GtkBox *) vbox, hbox1a1, false, false, 0);
+        GtkWidget * save_as_dirdefault_checkbox = gtk_check_button_new ();
+        gtk_box_pack_start ((GtkBox *) hbox1a1, save_as_dirdefault_checkbox, true, true, 0);
+        g_signal_connect (save_as_dirdefault_checkbox, "toggled", (GCallback) save_as_dirdefault_toggled, nullptr);
+        gtk_widget_set_sensitive (save_as_dirdefault_checkbox, true);
+        gtk_button_set_label ((GtkButton *) save_as_dirdefault_checkbox,
+                _("Save as Directory-wide Preset, if file & above box checked."));
+        if (aud_get_bool (nullptr, "_save_as_dirdefault"))
+            gtk_toggle_button_set_active ((GtkToggleButton *) save_as_dirdefault_checkbox, true);
+    }
+    else
+        aud_set_bool (nullptr, "_save_as_dirdefault", false);
 
     GtkWidget * hbox1b = gtk_hbox_new (false, 6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox1b, false, false, 0);
