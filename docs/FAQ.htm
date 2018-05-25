@@ -1,0 +1,303 @@
+<table style="background-color:#ffffff;color:#000000;" border="0" width="1060" cellspacing="20" cellpadding="0">
+<tbody>
+<tr>
+<td align="center" valign="middle" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:40px;font-weight:normal;">Frequently-asked Questions</span></td>
+</tr>
+<tr>
+<td align="center" valign="middle" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:40px;font-weight:normal;">This FAQ is for Fauxdacious and how to use it's extra features not found in Audacious.</span></td>
+</tr>
+
+
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">1) What is Fauxdacious?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Fauxdacious is a fork of the popular Audacious Audioplayer app. which adds many new features, but which retains nearly all the interface and features of Audacious.  Long-time Audacious users should find Fauxdacious a complete drop-in replacement for Audacious.  However, since it is now a completely separate program, Audacious users can install and try out Fauxdacious without any risk to their existing Audacious installation or configuration.  If you wish to copy your existing Audacious configuration for starters in Fauxdacious, simply:  (NOTE:  If you've started Fauxdacious at least once, then ~/.config/fauxdacious/ will already exist and you won't need to create it!)</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">cd ~/.config; mkdir fauxdacious; cp -R audacious/. fauxdacious/</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">2) Why Fauxdacious?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Fauxdacious has it's roots back around 2011 when I (the author) began experimenting with a few "hacks" to add some extra command-line options and tools to Audacious version 1.6 or so, which the Audacious team was not interested in including.  The real forkoff came in 2015 with Audacious v3.6 when I created a video-playing option for the ffmpeg plugin.  I felt that since Audacious included "visualization plugins" already, why not include one for actually displaying the video part of audio streams that contained video?  After much work to add video play, I submitted the patched plugin to Audacious as a patch, but the Audacious team made it clear that they were not interested in supporting / maintaining that feature.  They suggested using a video player such as VLC.  I, however, really like Audacious and it's audiophileish sound-improving effects plugins and Winamp Skins interface, much preferring Audacious to VLC, and preferred having a single "go-to" media player for playing all my media.  Therefore I decided to simply "fork" the code and maintain a separate Audacious branch that supported this along with it's growing list of feature patches, because I felt that other Audacious-lovers would also be interested in these new features.  I've also created new logos and and changed the branding to the new name "Fauxdacious".  I came up with this name by altering the name "Audacious" to have the French "Faux" like "Faux Pas" meaning "fake" or "not exactly the real thing" and liked the way it sounded!  It's pronounced either "Faw-d`&#230;-shuhs" (rhiming with Audacious) or "F&#333;-d`&#230;-shuhs".  I made the logo by using the basic "audacious" logo but adding a row of speakers instead of bubbles, a base ("F" cleff for the "F", and the slightly-rocked "X" from the default XMMS skin's logo in the lower right.  I made a separate logo for the Windows version replacing the rocked "X" with a rocked "MS-Windows flag logo" that contains a swirled "X".  The round icon replaces the "a" in a bubble with the aformentioned base-cleft "F".  NOTE:  I created this name and these logos and reserve all implied copyright rights to them as unique trademarks of "Fauxdacious"(tm).  They are not to be used for any other purpose without my explicit written permission.  The software code, a derived work, however is fully open-source" subject to the BSD license (the same license that Audacious uses) and you are free to use, modify and re-release your changes subject to those terms (so long as you change the name and logos).</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">3) How do I get and install Fauxdacious?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Download the latest source code for both Fauxdacious and the Fauxdacious Plugins from my official <a style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;color:#B0B0B0;text-decoration:underline;" href="https://github.com/wildstar84" target="altwindow" rel="nofollow">Github site</a>.  Then follow the instructons in the <a style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;color:#B0B0B0;text-decoration:underline;" href="https://raw.githubusercontent.com/wildstar84/fauxdacious/master/README" alt="README" target="altwindow" rel="nofollow">README</a> file.  See the <a style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;color:#B0B0B0;text-decoration:underline;" href="https://raw.githubusercontent.com/wildstar84/fauxdacious/master/Changes" alt="Change Log" target="altwindow" rel="nofollow">Latest Changes Here</a>).</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">4) Do you collaborate with the Audacious team or is your relationship with them adversarial?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Yes, while of course I have competitive juices and am proud of my work on Fauxdacious, I owe a great debt to the Audacious project for even making this possible.  My ultimate goal would be to see all of my work incorporated into mainline Audacious and for my project to simply disappear and be swallowed up by them.  However, I know that will not happen due to differences in philosophies and goals between our projects.  I continue to incorporate their development work into Fauxdacious and continue to share new ideas and development done here with them.  Sometimes they include some of my work into Audacious and other times not.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">5) Why is Fauxdacious not available prepackaged for my Linux distro like Audacious is.</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Because packaging for Debian is very difficult to do, but I am working on it!  Windows users can already download and install Fauxdacious for Windows using a built-in extractor / installer, however that version may be a release or two behind as I do not use Windows and it is a pain to have to boot up into Windows and rebuild everything.  If you use Fauxdacious on Windows, drop me an email letting me know.  If I find that people are actually USING it, I'll be more motivated to keep building it!</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">6) How do I play videos?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">For regular video files, ie. .avi, .mov, .mp4, .m4a, .flac, etc. Fauxdacious should now default to simply playing them just like any other audio stream.  If not, simply go to [Settings].[Plugins].[Input tab].[FFmpeg Plugin], click the [Settings] button, and check the box for "Play video stream in popup window...".
+If video seems "jittery", raise the "Video packet queue size" slightly.  If video and audio are noticably out of sync, lower this value and perhaps disable some of your "Effects" plugins.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">7) How do I play Youtube / Vimeo / Facebook videos?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">These video stream urls are not actually playable, but link to a temporary stream url that "times out" after a period of time and that to my knowledge, only "youtube-dl" knows how to extract.  Fauxdacious can play them however, but it requires "helpers":  a helper script written in Perl (included), but in Linux, you must copy it from the "contrib" directory to somewhere in your executable path (Windows users do not need to do this) ie. /usr/local/bin/.  Depending on your Linux system, you will likely also need to install some additional Perl modules from CPAN (http://www.cpan.org), which is usually not difficult to do.  The additional modules are:  "StreamFinder", "LWP::Simple", "LWP::UserAgent", "URI::Escape", and "WWW::YouTube::Download".  You will also need to install either the "youtube-dl" package for your distro or download and install it yourself.  "youtube-dl" is a separate program that handles the actual "downloading" of the video.  In the case of Fauxdacious, the video is not actually downloaded to a file on your hard disk, but simply translated into a playable stream and metadata and a "cover-art" image is downloaded.  You will also need to edit your ~/.config/fauxdacious[_instancename]/config file with your favorite text editor and add the line:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">url_helper=/usr/local/bin/FauxdaciousUrlHelper.pl</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">under the [Audacious] section.  Once these programs and modules are installed, Fauxdacious should automatically play Youtube and Vimeo, etc. video urls as if they were any other audio / video stream.
+
+In summary, before playing Youtube / Vimeo videos, do the following (one time):
+
+1) Install youtube-dl.
+2) Install Perl modules:  "StreamFinder", "LWP::Simple", "LWP::UserAgent", "URI::Escape", and "WWW::YouTube::Download".
+3) Copy [source-dir]/fauxdacious/contrib/*.pl /usr/local/bin
+4) Edit (ie. vi) ~/.config/fauxdacious/config and add the line "url_helper=/usr/local/bin/FauxdaciousUrlHelper.pl" under the [Audacious] section in that file.
+
+Then, to play a video:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdacious -e https://www.youtube.com/watch?v=#######</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Under the hood, Fauxdacious will create or add to a temporary file:  "~/.config/fauxdacious/tmp_tag_data" which will have the actual streaming url, something like "[https://r6---sn-q4fl6n7s.googlevideo.com/videoplayback...", a title line, etc. and a comment line containing the path to the downloaded "cover-art" file, ie.  Comment=file://$HOME/.config/fauxdacious/####.jpg.  This file and the downloaded cover-art file will be deleted when Fauxdacious is restarted with "-D".</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">8) How do I record a video, ie. save it to a file for future play?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">BEFORE starting playback, go to [Settings].[Plugins].[Input tab].[FFmpeg Plugin], Check the box for "Record video to file".  You can also change the default filename from "/tmp/lastvideo" to whatever you like.  Then, play the video all the way through but don't let Fauxdacious advance to another video entry, but stop play (An easy and handy way to do this is drag your Youtube video to the bottom of your playlist and turn [Repeat] OFF), then go back to [Settings].[Plugins].[Input tab].[FFmpeg Plugin], uncheck the "Record" box (to prevent overwriting), then you have the video in the file you chose (default "/tmp/lastvideo"), which you'll likely want to move and rename to something with a proper extension, ie. ".m4a" usually works.  
+After moving the saved video file to wherever you want it to permanently reside, if you want to save the metadata and cover-art file, you will need to edit both ~/.config/fauxdacious/tmp_tag_data and either ~/.config/fauxdacious/user_tag_data OR &lt;path to saved video file&gt;/user_tag_data.tag, and MOVE the lines starting with [https://r6---sn-q4fl6n7s.googlevideo...] and ending with a blank line from the "tmp_tag_data" file to one of the other file you opened.  Then change the "https://r6---sn-q4fl6n7s.googlevideo..." part to "file://&lt;path to your saved video file&gt;".  Save both files.  You can also move the cover-art image to there as well and edit the "Comment=" line to it's new location.  This saves your tag data and cover-art image for the new video file.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">9) How do I play DVDs?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">IF playing commercial (encrypted) DVDs (AND it is LEGAL for you to do so in your jurisdiction!), you'll will need to install "libdvdcss".  If you are already doing this in VLC or some other open-source video player on your machine, then you probably already have this installed.  Then, either start Fauxdacious with:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdacious dvd://</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">or open Fauxacous the usual way and go to [Services] menu and select either "Add DVD" or "Play DVD".  If you have trouble playing a specific DVD, you can adjust the settings in [Settings].[Plugins].[Input tab].[DVD Plugin].  If your dvd device is unusual, ie. something other than "/dev/dvd", change this box.  Make sure the "Play video stream in popup window..." box is checked (unless you just want audio).  You'll probably want the "Highlight menu buttons" box checked.  To avoid clutter in your playlist, most users will want "Only Title Track in Playlist" checked.  If the DVD menu doesn't seem to work (some DVDs just don't), you may want to also check the box "Only 1st track in Playlist" box, which is usually just the main feature movie).  If neither are checked, each "track" file on the DVD will appear in the playlist.  
+
+"Continue at end of menus" and "Skip Menus" should only be checked if a DVD's menus don't work otherwise, as this can cause some DVDs to crash Fauxdacious.  It's also helpful to have one or the other checked (experiment) if just playing audio (in which case there's no way for the user to interact with the DVD menus).
+
+To have Fauxdacious attempt to fetch the DVD's "cover" image from the internet, edit your ~/.config/fauxdacious/config file with your favorite text editor and add the line:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">cover_helper=/usr/local/bin/FauxdaciousCoverArtHelper.pl</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">to the [Audacious] section (and make sure the script file "FauxdaciousCoverArtHelper.pl" is in /usr/local/bin, otherwise specify it's location and make sure it's executable).  NOTE:  The cover-art helper script may not be able to fetch a proper art image for all DVDs, in which case, it will not have one.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">10) How do I use custom equalizer and / or effects plugin presets for specific songs, directories, disks, etc.?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">NOTE, this is NOT available (yet) in the Qt interfaces.  To set custom equalizer presets for a specific song, stream, or CD / DVD disk, first start playing it.  Then open up the Equalizer window and make sure both the [Auto] and [Equalizer] buttons (or checkboxes, depending on interface) are selected.  Then press the [Preset(s)] button.  A dialog window will pop up.  There are three additional checkboxes on this window:  "Use entry's local dir..." specifies try to save the presets in the same directory as the song file / cue-sheet file is in (only applicable if the song is a local file, not a disk or url).  Otherwise, the custom presets will be saved in the ~/.config/fauxdacious[_instancename]/ directory.  The "Exclude arg. lists from urls..." box only applies to URLs.  Checking this removes the "?..." crap off of the URL before naming the custom preset file.  This is useful if one doesn't want to create long nasty preset file names for every possible URL on the site, but can limit customization.  Experiment as ymmv.  Uncheck the "Save Effects..." checkbox if you only want to save equalizer presets for the song and not the current list of Effects plugins being used.
+
+Next, choose [Export], then [Preset File] from the menu.  A window should pop up with the proper name for the custom preset file filled in and the current directory set to either the local file's path or ~/.config/fauxdacious[_instancename]/ directory (depending on whether it's a local file and whether the "Use entry's local directory..." box is checked.  [Save] the preset file.  If instead, the filename says "&lt;name&gt;.preset", then either the song is NOT actually PLAYING, you selected "EQF file" instead of "Preset file", or Fauxdacious was unable to determine a valid name, ie. from a really ugly URL.  In this case try cancelling the file dialog window, toggle the "Exclude arg. lists from URLs" checkbox, and try the Export again.  Once saved and activated, the [Preset(s)] button should light up indicating that Fauxdacious is using a custom preset file for this song entry.  Now, adjust the equalizer how you want it for this song, and check / uncheck any Effects plugins you want on / off for it (if "Save Effects..." checked), then repeat the [Save] step to re-save the custom preset file with new values as the custom presets for this entry.  When the entry stops playing and Fauxdacious advances to the next song entry, the equalizer settings and Effects plugins selections should return automatically to the defaults (what they were before you saved the custom file the first time and adjusted them).  The [Preset(s)] button's light / indicator should go off as well.  NOTE:  The song entry must be actually PLAYING when all this is being done!</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">11) How to set custom presets for an entire subdirectory of song files (the way XMMS can) / OR use a custom directory preset file that was created in XMMS?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">"dir_default.preset" is the name XMMS (and Fauxdacious) uses to create custom directory presets.  If you haven't used XMMS to create them or don't want to use those, you can change this name to whatever you want by editing your ~/.config/fauxdacious[_instancename].config file with your favorite text editor and change "dir_default.preset" in the following line:<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">eqpreset_dir_default_file=dir_default.preset</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">to some other preset file name, OR remove the line if you don't want to allow for directory-based presets at all as an option.  Then with a song playing in the directory for which you wish to set a custom directory preset for, follow the same procedure outlined above for saving the custom preset file, but make sure the BOTH the "Use entry's local directory..." and "Save as Directory-wide..." boxes are checked, then when preparing to save the file, the song's filename part of the preset file name ("&lt;song-filename&gt;.preset") should read "dir_default.preset" or whatever you specified above, for "eqpreset_dir_default_file", and save the preset file.  This preset file will be used for equalizer and optionally Effects plugin settings for every song in this directory (but NOT subdirectories) EXCEPT for any that have a custom song-specific preset file saved for them.
+
+Fauxdacious searches for custom preset files in the following order:
+
+1) &lt;path-to-song-file&gt;/&lt;song-filename&gt;.preset
+2) ~/.config/fauxdacious[_instancename]/&lt;song-filename&gt;.preset
+3) &lt;path-to-song-file&gt;/dir_default.preset (if eqpreset_dir_default_file set)
+
+Only #2 is used for non-local file entries, ie. URLs, CDs, and DVDs.
+For CDs, the &lt;song-filename&gt; is the CD's disk-ID, for DVD's it's the DVD Title.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">12) How do I pipe media, cue-sheets, playlists, etc. into Fauxdacious from stdin?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">In addition to most media, Fauxdacious allows cue-sheets, playlists, and plain old text lists of entries to be piped into Fauxdacious via stdin.
+
+Fauxdacious originally did this but required the user to provide an extension as a "hint" so that it could determine what type of media was being piped in since probing to determine media type would read stdin and there was no way to rewind it to play.  For example:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">cat mysong.mp3 | fauxdacious -.mp3</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Audacious later added this ability (at my urging) along with some black buffering magic that allowed Audacious to first probe stdin and determine the media type, then play, thus not requiring or using the extension.  Fauxdacious now includes these improvements to Audacious so the extension hint is no longer required for most media (but is still allowed, see next paragraph and #1 below), ie.:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">cat mysong.mp3 | fauxdacious -</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">However, Fauxdacious permits non-media to also be piped in and the underlying Audacious code does not support "probing" for playlists and cue-sheets thus still REQUIRING the extension-hint for these types of input.  Therefore, we've retained the extension-hint (now optional for most media) for consistancy, but also to allow Fauxdacious to skip the overhead of probing when the media type is known by extension!  There are three exceptions:</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">1) Certain media files have been known to FAIL when piped in and probed thus still necessitating including the extension hint to get them to play via stdin.  A handful will work the new way but not the old too.</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">2) If no extension-hint is given and Fauxdacious fails to probe and find a suitable media plugin for the input, it will "fall back" by trying to treat the input stream as a text list (m3u) playlist and, if successful, load the playlist from stdin without the extension hint.  Cue-sheets and all other playlist types require the extension hint to load from stdin.</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">3) A special case for strictly text list input from stdin is provided by specifying a double-dash ("--") for stdin whicn, instead of loading the incoming list of entries as an m3u "playlist" will treat them as if entered on the command-line (much earlier in the program startup).  This way is necessary if attempting to load additional playlist entries to an already-running instance of Fauxdacious (since the additional files must be loaded BEFORE the second command hands off control to the running instance).  Example:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">ls -d A*.mp3 | fauxdacious -Dc - &amp;
+<BR>ls -d B*.mp3 | fauxdacious -e --</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">The second command will add (enqueue) all mp3 files in the current directory starting with "B" to the bottom of the playlist in the already-running instance of Fauxdacious started by the first command, then the 2nd command will exit.
+NOTE, it's not PLAYING the songs themselves here through stdin, but the playlist (list of entries), thus song-playing is seekable and replayable.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">13) How do I play media to stdout for post-processing instead of through my speakers?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">There are two ways of doing this:  1) The FileWriter plugin has an additional option to write it's output to stdout instead of to a named file.  This can be used by either selecting the FileWriter plugin or by using the "Record" option to dub (tee) output to FileWriter.  In either case, the FileWriter plugin must be set to write to stdout and Fauxdacious must be invoked from the command line with a target for stdout, ie:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdacious [stuff-to-play] >/tmp/outputfile.mp3
+<BR>fauxdacious [stuff-to-play] | mplayer -</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Otherwise, stdout will dump tons of "garbage" right out to your terminal (pretty useless)!</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">The second (new, easier) way is to add the "-o" or "--out=&lt;ext&gt;" command-line option to Fauxdacious when starting.  "&lt;ext&gt;" can be either "wav", "mp3", "ogg", or "flac".  If just "-o" is specified, it is the same as "--out=wav".</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">This method automatically directs Fauxdacious to send all output to stdout and in the format selected without having to specify "stdout" in the FileWriter options or reset anything when done.  Fauxdacious will remember which audio output plugin ("Alsa", "Pulseaudio", etc.) you were using and what options you had FileWriter set to for recording / dubbing, and reset everything back when done.  Here's a true Unix piping example to convert a bunch of files to a single .wav file in "headless" mode (no GUI).  This will run Fauxdacious to do the conversion, then exit and restore everything to normal:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">ls -d * | fauxdacious -DcHo - >/tmp/newfile.wav</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">If using the first way (FileWriter / Record), there are two additional plugin configuration options under stdout:  "close after song chg." and "close when recording stopped.".  They are useful when piping directly out to a stored file (as opposed to piping to another program downstream).  The first says to "close" (send an EOF, etc.) to stdout when the song changes (either by advancing to the next song entry or when title changes in a radio-station URL).  Use this when recording (dubbing) a song streaming stations, etc. as it will ensure a properly created song file of the LAST song recorded when recording is stopped (but any prev. song written out will be lost).  Unchecking ensures that everything written to stdout during the recording is included in the file produced by stdout as a single file.  However, stopping recording and starting a new recording will overwrite stdout with whatever's recorded by the second recording!  In order to create a continuous recording by stringing together everything from each recording (until Fauxdacious itself is stopped), uncheck the "close when recording stopped" box.  Also, uncheck both boxes if piping to another downstream program instead of a stored file.  Using the "-o/--out=&lt;ext&gt;" option will automatically toggle both these boxes off while piping, then reset them to their prev. values when Fauxdacious exits.  The tradeoff here though is that if both boxes are unchecked and you're piping to a stored file, the tag metadata from the first song is likely used for the file.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">14) How do I get Fauxdacious to just mute but continue streaming whenever paused - I want to mute commercials in my streaming radio station and either toggle over to another Fauxdacious instance where I have my music ready to play a couple songs -or- play a Facebook video in my web-browser during the break?  If I "pause" the station playing commercials, it'll resume at the BEGINNING of the commercials.</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Fauxdacious adds the "-P" option just for this annoying situation!  If Fauxdacious is started with "-P", pressing the [Pause] button will silence whatever's playing in that instance without changing or affecting your volume controls!  Pressing [Pause] again will restore playing volume at that point in play and the station will never know that you "skipped" all their commercials!</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">You can also now toggle this feature dynamically either by going to [Settings].[Playlist] and toggling the checkbox labeled "Pause mutes instead of pausing" OR using fauxdtool:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdtool [instance instancename] --playback-pausemute [0|1]
+<BR>
+<BR>"1", "T[rue]", "t[rue]", "Y[es]", "y[es]", or no argument turns Pausemute ON.
+<BR>"0", "F[alse]", "f[alse]", "N[o]", or "n[o]" turns it OFF.</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">To check the current status of PauseMute using fauxdtool in a batch file, do:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdtool playback-doespausemute
+<BR>if [ "X$?" = "X1" ]; then
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;echo "pause will just mute"
+<BR>else
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;echo "pause will pause"
+<BR>fi</code></td>
+</tr>
+<tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">15) When I start up Audacious from the command line with a list of stuff to play, Audacious creates a new "playlist", which is very annoying since I use the WinAmp Skins interface and don't see the previous ones it created, which gets annoying since I end up with a bunch of old, one-off playlists before I realise it!  How do I start up Fauxdacious with just a single playlist, or even just with the files I specified on the command line?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">To start up Fauxdacious with just a single playlist and discard any other existing ones, start with the "-D" (Delete playlists) option.  To clear the current playlist of any existing entries, start with the "-c" (Clear playlist) option.  To start Fauxdacious with a completely clean slate, start up with both "-D" and "-c" (or "-Dc").</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">16) How do I start up Fauxdacious with the equalizer turned OFF?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Start up Fauxdacious with the "-z" option.  Fauxdacious will remember whether it was on before you started up and restore that when exiting.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">17) How do I start up Fauxdacious with "Recording" (dubbing) turned ON?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Start up Fauxdacious with the "-R" option.
+NOTE:  This will be ignored if the "-o/--out=&lt;ext&gt;" option is also specified!</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">18) How do I start up a second "instance" of Fauxdacious or one that uses a configuration different than my normal "default" configuration?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">There are three different ways to start up multiple or different Fauxdacious instances:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">1) fauxdacious --new=instancename</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">This is the preferred way as it allows you to "name" your different configurations (configuration directories) in order to have Fauxdacious set up multiple ways for different scenarios.  "instancename" can be any string of letters and digits up to 40 characters.  To create a completely "new" instance that you've never used before, just specify any name you choose, and Fauxdacious will create a brand new "~/.config/fauxdacious_&lt;instancename&gt;/" directory along with a factory-default "config" file.  If the directory already exists (Fauxdacious has been started before with this instance name), that configuration directory will be used instead of the default one.  This way, unlike in Audacious, you can have more than nine different configurations named to where you can remember what they're for!</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">2) fauxdacious -#  (or fauxdacious --new=#)</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">This is the "Audacious way" of creating new instances is by specifying a single digit, which Fauxdacious will use as the instance "name".  NOTE:  Fauxdacious creates a corresponding "~/.config/fauxdacious_#/" if it does not already exist, just as if you'd given the instance an alphanumeric name.  NOTE the underscore ("_") instead of a dash ("-") in the directory name.  Audacious permits -1 .. -9, but -1 is the same as the default instance.  In Fauxdacious, -0 refers to the default instance and -1 .. -9 are separate instance names.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">3) fauxdacious -n</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">This creates a new, separate running (but unnamed) Fauxdacious instance using the default config directory ("~/.config/fauxdacious/").  I've never found this to be of much use, but for each multicharacter argument that takes a value, the code requires a corresponding single-character version with no arguments.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">19) How do I control different running Fauxdacious instances using the Fauxdtool?</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">To control the default instance:</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdtool [--command...]</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">To control a different instance name (--new=&lt;instancename&gt;):</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdtool instance &lt;instancename&gt; [--command...]</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">To control a numeric instance (created the Audacious way with -#):</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdtool -# [--command...]</code></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">One can not access or control an unnamed instance created with "-n" though.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">20) How do I get Fauxdacious to randomly change "skins" when the playlist entry changes (like the old XMMS "Random Skin on Play" option)?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Go to [Settings].[Appearance], switch Fauxdacious's "Interface" to the "Winamp Classic Interface", then check the box at the bottom of the window labeled "Random skin on play".  Fauxdacious will randomly change it's "skin" each time the playlist advances.  NOTE:  Streaming radio stations that change song titles between songs does NOT cause the skin to change, however.  I may look into adding that in the future if there is any demand for it.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">21) Why do I get a bunch of "dbus errors" when exiting Fauxdacious when using the Qt interface (Audacious doesn't do this), is it serious?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">This is due to a conflict between the SDL2 system library, which must be started up early in the "main()" program, Qt, and the DBus library.  I've tried everything I know to suppress / fix this but have been unsuccessful so far.  It seems to be harmless "spam" warnings that do not cause any known issues or produce a core dump and Fauxdacious still seems to exit normally and properly, so just ignore.  Also note (and the Audacious team will tell you this too) that the Qt interfaces are new and still under construction thus lacking some of the functionality of the traditional GTK interfaces.  Equalizer preset files are a glaring example omission!  Writing this is beyond my knowledge level, I don't use the Qt interface anyway, and, as soon as I could do one, I'm sure the Audacious team will release one making my efforts here wasted.  Just use WinAmp Skins (GTK version) or the GTK interface for best user-experience!  The only reason I see for using the Qt interface at the moment is the "Ampache" plugin, if you really need that.</span></td>
+</tr>
+</tbody>
+</table>

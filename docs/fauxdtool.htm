@@ -1,0 +1,556 @@
+Content-type: text/html; charset=UTF-8
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><HEAD><TITLE>Man page of FAUXDTOOL</TITLE>
+</HEAD><BODY>
+<H1>FAUXDTOOL</H1>
+Section: User Commands  (1)<BR>Updated: May 2018<BR><A HREF="#index">Index</A>
+<A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<P>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+<B>fauxdtool</B>
+
+- a small tool to control Fauxdacious from the command line.
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>fauxdtool</B>
+
+[-# | [--]<B>instance</B> <I>instance-name</I>] [--]<B>command</B> [<I>parameter</I> ...] ...
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<B>fauxdtool</B>
+
+sends commands to a running instance of Fauxdacious.
+<P>
+
+It can send many common commands, such as to skip to the next song in the
+playlist, and can also print status information, such as the title of the
+current song.
+<P>
+
+<I>instance</I> may be given as <B>-#</B> or <B>instance-name</B> to specify which
+instance of Fauxdacious to control when multiple instances have been started
+(with <B>--new=instance-name</B>).  The <B>instance-name</B> will also be the
+name of the config directory (created first time the instance is started, if not
+already existing) as ~/.config/fauxdacious[_instancename]/.  (The default config
+file instance name is <B>fauxdacious</B>), but the default config directory is
+~/.config/fauxdacious, not ~/.config/fauxdacious_fauxdacious).  New unnamed
+instances (created with just <B>-n</B>) can not be manipulated with fauxdtool.
+<B>instance-name</B> is just a user-selected unique string of characters (or
+single-digit number).  Instances can also be specified as single-digit numbers
+(-#) as is done in Audacious.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>COMMANDS</H2>
+
+<A NAME="lbAF">&nbsp;</A>
+<H3>Current song information:</H3>
+
+<P>
+<DL COMPACT>
+<DT><B>--current-song</B>
+
+<DD>
+Print the formatted title of the current song.  Depending on Fauxdacious
+settings, this may include information such as the artist and album name.  To
+print only the song title, use <B>--current-song-tuple-data title</B> instead.
+<DT><B>--current-song-filename</B>
+
+<DD>
+Print the file name (full path or URI) of the current song.
+<DT><B>--current-song-length</B>
+
+<DD>
+Print the length of the current song in M:SS format.
+<DT><B>--current-song-length-seconds</B>
+
+<DD>
+Print the length of the current song in seconds.
+<DT><B>--current-song-length-frames</B>
+
+<DD>
+Print the length of the current song in milliseconds.
+<DT><B>--current-song-output-length</B>
+
+<DD>
+Print the playback time counter in M:SS format.
+<DT><B>--current-song-output-length-seconds</B>
+
+<DD>
+Print the playback time counter in seconds.
+<DT><B>--current-song-output-length-frames</B>
+
+<DD>
+Print the playback time counter in milliseconds.
+<DT><B>--current-song-bitrate</B>
+
+<DD>
+Print the streaming bitrate in bits per second.
+<DT><B>--current-song-bitrate-kbps</B>
+
+<DD>
+Print the streaming bitrate in kilobits per second (1 kilobit = 1000 bits).
+<DT><B>--current-song-frequency</B>
+
+<DD>
+Print the sampling rate in hertz.
+<DT><B>--current-song-frequency-khz</B>
+
+<DD>
+Print the sampling rate in kilohertz.
+<DT><B>--current-song-channels</B>
+
+<DD>
+Print the number of audio channels.
+<DT><B>--current-song-tuple-data </B><I>field</I>
+
+<DD>
+Print the value of a named field (<B>artistFR, year</B>, <B>genre</B>, etc.)
+for the current song.  If the field name is omitted, a list of allowed fields
+will be printed.
+<DT><B>--current-song-info</B>
+
+<DD>
+Print the streaming bitrate, sampling rate, and number of audio channels.
+<P>
+</DL>
+<A NAME="lbAG">&nbsp;</A>
+<H3>Playback commands:</H3>
+
+<P>
+<DL COMPACT>
+<DT><B>--playback-play</B>
+
+<DD>
+Start playback.  If paused, playback will resume from the same point.  If
+already active and not paused, it will restart from the beginning of the song.
+<DT><B>--playback-pause</B>
+
+<DD>
+Pause playback, or resume if already paused.
+<DT><B>--playback-playpause</B>
+
+<DD>
+Equivalent to <B>--playback-pause</B> if playback is active, otherwise
+<B>--playback-play</B>.
+<DT><B>--playback-stop</B>
+
+<DD>
+Stop playback.
+<DT><B>--playback-playing</B>
+
+<DD>
+Return an exit code of 0 (true) if playback is active.
+<DT><B>--playback-paused</B>
+
+<DD>
+Return an exit code of 0 (true) if playback is paused.
+<DT><B>--playback-stopped</B>
+
+<DD>
+Return an exit code of 0 (true) if playback is not active.
+<DT><B>--playback-status</B>
+
+<DD>
+Print the playback status (``playing'', ``paused'', or ``stopped'').
+<DT><B>--playback-seek </B><I>time</I>
+
+<DD>
+Seek to the given time in seconds, relative to the beginning of the song.
+<DT><B>--playback-seek-relative </B><I>time</I>
+
+<DD>
+Seek to the given time in seconds, relative to the current time counter.
+<DT><B>--playback-record</B>
+
+<DD>
+Toggle stream recording (dubbing).
+<DT><B>--playback-recording</B>
+
+<DD>
+Return an exit code of 0 (true) if currently recording (dubbing).
+<DT><B>--playback-pausemute [0|false|no | 1|true|yes]</B>
+
+<DD>
+Set pause to just mute (True or False, default TRUE).
+<DT><B>--playback-doespausemute</B>
+
+<DD>
+Return an exit code of 1 (true) if pause is set to just mute.
+<P>
+</DL>
+<A NAME="lbAH">&nbsp;</A>
+<H3>Playlist commands:</H3>
+
+<P>
+<DL COMPACT>
+<DT><B>--playlist-advance</B>
+
+<DD>
+Skip to the next song in the playlist.
+<DT><B>--playlist-reverse</B>
+
+<DD>
+Skip to the previous song in the playlist.
+<DT><B>--playlist-addurl </B><I>path</I>
+
+<DD>
+Add a song to end of the playlist.  Either a URI or a local file path (absolute
+or relative) may be given.
+<DT><B>--playlist-insurl </B><I>path</I> <I>position</I>
+
+<DD>
+Insert a song at the given position (one-based) in the playlist.
+<DT><B>--playlist-addurl-to-new-playlist </B><I>path</I>
+
+<DD>
+Add a song to the ``Now Playing'' playlist, creating the playlist if necessary,
+and begin to play the song.  Depending on Fauxdacious settings, the playlist may
+first be cleared.
+<DT><B>--playlist-delete </B><I>position</I>
+
+<DD>
+Remove the song at the given position from the playlist.
+<DT><B>--playlist-length</B>
+
+<DD>
+Print the number of songs in the playlist.
+<DT><B>--playlist-song </B><I>position</I>
+
+<DD>
+Print the formatted title of a song in the playlist.
+<DT><B>--playlist-song-filename </B><I>position</I>
+
+<DD>
+Print the file name (full path or URI) of a song in the playlist.
+<DT><B>--playlist-song-length </B><I>position</I>
+
+<DD>
+Print the length of a song in the playlist in M:SS format.
+<DT><B>--playlist-song-length-seconds </B><I>position</I>
+
+<DD>
+Print the length of a song in the playlist in seconds.
+<DT><B>--playlist-song-length-frames </B><I>position</I>
+
+<DD>
+Print the length of a song in the playlist in milliseconds.
+<DT><B>--playlist-tuple-data </B><I>field</I> <I>position</I>
+
+<DD>
+Print the value of a named field for a song in the playlist.
+<DT><B>--playlist-display</B>
+
+<DD>
+Print the titles of all the songs in the playlist.
+<DT><B>--playlist-position</B>
+
+<DD>
+Print the position of the current song in the playlist.
+<DT><B>--playlist-jump </B><I>position</I>
+
+<DD>
+Skip to the song at the given position in the playlist.
+<DT><B>--playlist-clear</B>
+
+<DD>
+Clear the playlist.
+<DT><B>--playlist-auto-advance-status</B>
+
+<DD>
+Print the status of playlist auto-advance (``on'' or ``off'').
+<DT><B>--playlist-auto-advance-toggle</B>
+
+<DD>
+Toggle playlist auto-advance.
+<DT><B>--playlist-repeat-status</B>
+
+<DD>
+Print the status of playlist repeat (``on'' or ``off'').
+<DT><B>--playlist-repeat-toggle</B>
+
+<DD>
+Toggle playlist repeat.
+<DT><B>--playlist-shuffle-status</B>
+
+<DD>
+Print the status of playlist shuffle (``on'' or ``off'').
+<DT><B>--playlist-shuffle-toggle</B>
+
+<DD>
+Toggle playlist shuffle.
+<DT><B>--playlist-stop-after-status</B>
+
+<DD>
+Print the ``stop after current song'' option (``on'' or ``off'').
+<DT><B>--playlist-stop-after-toggle</B>
+
+<DD>
+Toggle the ``stop after current song'' option.
+<P>
+</DL>
+<A NAME="lbAI">&nbsp;</A>
+<H3>More playlist commands:</H3>
+
+<P>
+<DL COMPACT>
+<DT><B>--number-of-playlists</B>
+
+<DD>
+Print the number of open playlists.
+<DT><B>--current-playlist</B>
+
+<DD>
+Print the number of the current playlist.  When a song is playing, the current
+playlist is defined as the playlist containing that song.  Otherwise, it is the
+playlist currently displayed in Fauxdacious.
+<DT><B>--play-current-playlist</B>
+
+<DD>
+Start playback.  If paused or previously stopped in the middle of a song,
+playback will resume from the last point played.  There is no effect if playback
+is already active and not paused.
+<DT><B>--set-current-playlist </B><I>playlist</I>
+
+<DD>
+Switch to the given playlist.  If another playlist is playing, playback will
+switch to this one, resuming from the last point played.  If playback is
+currently paused, it will remain so after the switch.
+<DT><B>--current-playlist-name</B>
+
+<DD>
+Print the title of the current playlist.
+<DT><B>--set-current-playlist-name </B><I>title</I>
+
+<DD>
+Set the title of the current playlist.
+<DT><B>--new-playlist</B>
+
+<DD>
+Insert a new playlist after the current one and switch to it as if
+<B>--set-current-playlist</B> were used.
+<DT><B>--delete-current-playlist</B>
+
+<DD>
+Remove the current playlist.  Playback, if active, will be stopped.
+<P>
+</DL>
+<A NAME="lbAJ">&nbsp;</A>
+<H3>Playlist queue commands:</H3>
+
+<P>
+<DL COMPACT>
+<DT><B>--playqueue-add </B><I>position</I>
+
+<DD>
+Add the song at the given playlist position to the queue.
+<DT><B>--playqueue-remove </B><I>position</I>
+
+<DD>
+Remove the song at the given playlist position from the queue.
+<DT><B>--playqueue-is-queued </B><I>position</I>
+
+<DD>
+Return an exit code of 0 (true) if the song at the given playlist position is
+in the queue.
+<DT><B>--playqueue-get-queue-position </B><I>position</I>
+
+<DD>
+Print the queue position of the song at the given playlist position.
+<DT><B>--playqueue-get-list-position </B><I>position</I>
+
+<DD>
+Print the playlist position of the song at the given queue position.
+<DT><B>--playqueue-length</B>
+
+<DD>
+Print the number of songs in the queue.
+<DT><B>--playqueue-display</B>
+
+<DD>
+Print the titles of all the songs in the queue.
+<DT><B>--playqueue-clear</B>
+
+<DD>
+Clear the queue.
+<P>
+</DL>
+<A NAME="lbAK">&nbsp;</A>
+<H3>Volume control and equalizer:</H3>
+
+<P>
+<DL COMPACT>
+<DT><B>--get-volume</B>
+
+<DD>
+Print the current volume level in percent.
+<DT><B>--set-volume </B><I>level</I>
+
+<DD>
+Set the current volume level in percent.
+<DT><B>--set-volume-relative </B><I>level</I>
+
+<DD>
+Change current volume level by percent.
+<DT><B>--equalizer-activate [on|off]</B>
+
+<DD>
+Activate or deactivate the equalizer.
+<DT><B>--equalizer-get</B>
+
+<DD>
+Print the equalizer settings (preamp and gain for all bands) in decibels.
+<DT><B>--equalizer-set </B><I>preamp</I> <I>band0</I> <I>band1</I> <I>band2</I> <I>band3</I> <I>band4</I> <I>band5</I> <I>band6</I> <I>band7</I> <I>band8</I> <I>band9</I>
+
+<DD>
+Set the equalizer settings (preamp and gain for all bands) in decibels.
+<DT><B>--equalizer-get-preamp</B>
+
+<DD>
+Print the equalizer pre-amplification in decibels.
+<DT><B>--equalizer-set-preamp </B><I>preamp</I>
+
+<DD>
+Set the equalizer pre-amplification in decibels.
+<DT><B>--equalizer-get-band </B><I>band</I>
+
+<DD>
+Print the gain of the given equalizer band (0-9) in decibels.
+<DT><B>--equalizer-set-band </B><I>band</I> <I>gain</I>
+
+<DD>
+Set the gain of the given equalizer band (0-9) in decibels.
+<P>
+</DL>
+<A NAME="lbAL">&nbsp;</A>
+<H3>Miscellaneous:</H3>
+
+<P>
+<DL COMPACT>
+<DT><B>--mainwin-show [on|off]</B>
+
+<DD>
+Show or hide the Fauxdacious window.
+<DT><B>--filebrowser-show [on|off]</B>
+
+<DD>
+Show or hide the Add Files window.
+<DT><B>--jumptofile-show [on|off]</B>
+
+<DD>
+Show or hide the Jump to Song window.
+<DT><B>--preferences-show [on|off]</B>
+
+<DD>
+Show or hide the Settings window.
+<DT><B>--about-show [on|off]</B>
+
+<DD>
+Show or hide the About window.
+<DT><B>--version</B>
+
+<DD>
+Print version information.
+<DT><B>--plugin-is-enabled </B><I>plugin</I>
+
+<DD>
+Return an exit code of 0 (true) if the given plugin is enabled.  The plugin is
+specified using its installed filename minus the folder path and suffix: for
+example, <B>crossfade</B> for <I>${exec_prefix}/lib/fauxdacious/lib/fauxdacious/Effect/crossfade.so</I>.
+<DT><B>--plugin-enable </B><I>plugin</I> [on|off]
+
+<DD>
+Enable or disable the given plugin.  Note that interface and output plugins
+cannot be disabled directly since one of each must always be active.  Enabling
+an interface or output plugin will automatically disable the previous plugin.
+<DT><B>--shutdown</B>
+
+<DD>
+Shut down Fauxdacious.
+<DT><B>--help</B>
+
+<DD>
+Print a brief summary of fauxdtool commands.
+</DL>
+<P>
+
+Commands may be prefixed with `--' (GNU-style long options) or not, your choice.
+<P>
+<A NAME="lbAM">&nbsp;</A>
+<H2>BUGS</H2>
+
+<P>
+There are no known bugs in fauxdtool at this time; if you find any please report
+them to <I><A HREF="mailto:turnerjw784@yahoo.com">turnerjw784@yahoo.com</A></I>.  Do NOT report Fauxdacious issues to the 
+parent Audacious project.
+<P>
+<A NAME="lbAN">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+<P>
+<B>fauxdtool</B>
+
+was written by George Averill &lt;<A HREF="mailto:nhjm@nhjm.net">nhjm@nhjm.net</A>&gt; and William
+Pitcock &lt;<A HREF="mailto:nenolod@atheme.org">nenolod@atheme.org</A>&gt;.
+<P>
+
+This manual page was written by Adam Cecile &lt;<A HREF="mailto:gandalf@le-vert.net">gandalf@le-vert.net</A>&gt; and Kiyoshi
+Aman &lt;<A HREF="mailto:kiyoshi@atheme.org">kiyoshi@atheme.org</A>&gt;.  Some additional tweaks were done by William Pitcock
+&lt;<A HREF="mailto:nenolod@atheme.org">nenolod@atheme.org</A>&gt; and Tony Vroon &lt;<A HREF="mailto:chainsaw@gentoo.org">chainsaw@gentoo.org</A>&gt;.  The manual page was
+updated for Audacious 3.7 by John Lindgren &lt;<A HREF="mailto:john.lindgren@aol.com">john.lindgren@aol.com</A>&gt;, and 
+Fauxdacious v3.73+ by Jim Turner &lt;<A HREF="mailto:turnerjw784@yahoo.com">turnerjw784@yahoo.com</A>&gt;.
+<P>
+
+This work is licensed under a Creative Commons Attribution 3.0 Unported License
+&lt;<A HREF="https://creativecommons.org/licenses/by/3.0/">https://creativecommons.org/licenses/by/3.0/</A>&gt;.
+<P>
+<A NAME="lbAO">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="/cgi-bin/man/man2html?1+fauxdacious">fauxdacious</A></B>(1)
+
+<P>
+<A NAME="lbAP">&nbsp;</A>
+<H2>WEBSITE</H2>
+
+<I><A HREF="https://wildstar84.wordpress.com/fauxdacious">https://wildstar84.wordpress.com/fauxdacious</A></I>
+
+<I><A HREF="https://audacious-media-player.org">https://audacious-media-player.org</A></I>
+
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">COMMANDS</A><DD>
+<DL>
+<DT><A HREF="#lbAF">Current song information:</A><DD>
+<DT><A HREF="#lbAG">Playback commands:</A><DD>
+<DT><A HREF="#lbAH">Playlist commands:</A><DD>
+<DT><A HREF="#lbAI">More playlist commands:</A><DD>
+<DT><A HREF="#lbAJ">Playlist queue commands:</A><DD>
+<DT><A HREF="#lbAK">Volume control and equalizer:</A><DD>
+<DT><A HREF="#lbAL">Miscellaneous:</A><DD>
+</DL>
+<DT><A HREF="#lbAM">BUGS</A><DD>
+<DT><A HREF="#lbAN">AUTHORS</A><DD>
+<DT><A HREF="#lbAO">SEE ALSO</A><DD>
+<DT><A HREF="#lbAP">WEBSITE</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 03:27:22 GMT, May 25, 2018
+</BODY>
+</HTML>
