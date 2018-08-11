@@ -1152,13 +1152,13 @@ EXPORT void aud_playlist_entry_delete (int playlist_num, int at, int number)
     {
         Entry * entry = playlist->entries [at + count].get ();
 
-        if (entry->queued)
+        if (entry && entry->queued)
         {
             playlist->queued.remove (playlist->queued.find (entry), 1);
             update_flags |= QueueChanged;
         }
 
-        if (entry->selected)
+        if (entry && entry->selected)
         {
             playlist->selected_count --;
             playlist->selected_length -= entry->length;
@@ -1851,7 +1851,7 @@ EXPORT void aud_playlist_queue_insert (int playlist_num, int at, int entry_num)
 {
     ENTER_GET_ENTRY ();
 
-    if (entry->queued || at > playlist->queued.len ())
+    if (! entry || entry->queued || at > playlist->queued.len ())
         RETURN ();
 
     if (at < 0)
@@ -1912,7 +1912,7 @@ EXPORT int aud_playlist_queue_get_entry (int playlist_num, int at)
 EXPORT int aud_playlist_queue_find_entry (int playlist_num, int entry_num)
 {
     ENTER_GET_ENTRY (-1);
-    int pos = entry->queued ? playlist->queued.find (entry) : -1;
+    int pos = (entry && entry->queued) ? playlist->queued.find (entry) : -1;
     RETURN (pos);
 }
 
