@@ -1,5 +1,5 @@
 # Please don't update this file manually - use ./update-potfiles.sh instead!
-src/audacious/main.cc
+src/fauxdacious/main.cc
 src/libfauxdcore/adder.cc
 src/libfauxdcore/audstrings.cc
 src/libfauxdcore/output.cc
@@ -15,6 +15,7 @@ src/libfauxdgui/confirm.cc
 src/libfauxdgui/eq-preset.cc
 src/libfauxdgui/equalizer.cc
 src/libfauxdgui/file-opener.cc
+src/libfauxdgui/images.c
 src/libfauxdgui/infopopup.cc
 src/libfauxdgui/infowin.cc
 src/libfauxdgui/jump-to-time.cc
@@ -30,16 +31,19 @@ src/libfauxdgui/queue-manager.cc
 src/libfauxdgui/status.cc
 src/libfauxdgui/url-opener.cc
 src/libfauxdgui/util.cc
-src/libfauxdqt/about.cc
-src/libfauxdqt/equalizer.cc
+src/libfauxdqt/about-qt.cc
+src/libfauxdqt/audqt.cc
+src/libfauxdqt/equalizer-qt.cc
 src/libfauxdqt/fileopener.cc
+src/libfauxdqt/infopopup-qt.cc
 src/libfauxdqt/info-widget.cc
-src/libfauxdqt/infowin.cc
+src/libfauxdqt/infowin-qt.cc
 src/libfauxdqt/log-inspector.cc
 src/libfauxdqt/playlist-management.cc
-src/libfauxdqt/plugin-menu.cc
+src/libfauxdqt/plugin-menu-qt.cc
 src/libfauxdqt/prefs-plugin.cc
-src/libfauxdqt/prefs-window.cc
-src/libfauxdqt/queue-manager.cc
-src/libfauxdqt/url-opener.cc
-src/libfauxdqt/util.cc
+src/libfauxdqt/prefs-pluginlist-model.cc
+src/libfauxdqt/prefs-window-qt.cc
+src/libfauxdqt/queue-manager-qt.cc
+src/libfauxdqt/url-opener-qt.cc
+src/libfauxdqt/util-qt.cc
