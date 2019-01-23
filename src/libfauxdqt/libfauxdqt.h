@@ -20,19 +20,21 @@
 #ifndef LIBAUDQT_H
 #define LIBAUDQT_H
 
+#include <QFileDialog>
 #include <QMargins>
 #include <QMessageBox>
 #include <QString>
 #include <libfauxdcore/objects.h>
 
-class QIcon;
-class QLayout;
 class QBoxLayout;
 class QHBoxLayout;
-class QVBoxLayout;
 
+class QIcon;
+class QLayout;
+class QLineEdit;
 class QPixmap;
 class QToolButton;
+class QVBoxLayout;
 class QWidget;
 
 enum class PluginType;
@@ -78,6 +80,10 @@ void playlist_confirm_delete (int playlist);
 void equalizer_show ();
 void equalizer_hide ();
 
+/* eq-preset-qt.cc */
+void eq_presets_show ();
+void eq_presets_hide ();
+
 /* fileopener.cc */
 void fileopener_show (FileMode mode);
 
@@ -117,6 +123,12 @@ static inline QString translate_str (const char * str)
 #endif
 
 /* prefs-builder.cc */
+/* file-entry.cc */
+QLineEdit * file_entry_new (QWidget * parent, const char * title,
+ QFileDialog::FileMode file_mode, QFileDialog::AcceptMode accept_mode);
+String file_entry_get_uri (QLineEdit * entry);
+void file_entry_set_uri (QLineEdit * entry, const char * uri);
+
 void prefs_populate (QBoxLayout * layout, ArrayRef<PreferencesWidget> widgets, const char * domain);
 
 /* prefs-plugin.cc */
