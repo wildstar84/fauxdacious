@@ -23,6 +23,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPainter>
+#include <QPushButton>
+#include <QToolButton>
 #include <QSlider>
 #include <QStyle>
 #include <QVBoxLayout>
@@ -97,17 +99,20 @@ public:
 
 private:
     QCheckBox m_onoff_checkbox;
+    QToolButton * preset_button;
     EqualizerSlider * m_preamp_slider;
     EqualizerSlider * m_sliders[AUD_EQ_NBANDS];
 
     void updateActive ();
     void updatePreamp ();
     void updateBands ();
+    void updateSongAuto ();
 
     const HookReceiver<EqualizerWindow>
      hook1 {"set equalizer_active", this, & EqualizerWindow::updateActive},
      hook2 {"set equalizer_preamp", this, & EqualizerWindow::updatePreamp},
-     hook3 {"set equalizer_bands", this, & EqualizerWindow::updateBands};
+     hook3 {"set equalizer_bands", this, & EqualizerWindow::updateBands},
+     hook4 {"set equalizer_songauto", this, & EqualizerWindow::updateSongAuto};
 };
 
 EqualizerWindow::EqualizerWindow () :
@@ -134,9 +139,26 @@ EqualizerWindow::EqualizerWindow () :
         slider_layout->addWidget (m_sliders[i]);
     }
 
+    auto hide_button = new QPushButton (_("Hide"), this);
+    auto zero_button = new QPushButton (_("Flat"), this);
+    preset_button = new QToolButton (this);
+    preset_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    preset_button->setIcon(aud_get_bool (nullptr, "equalizer_songauto") 
+            ? audqt::get_icon ("media-record") : audqt::get_icon ("folder"));
+    preset_button->setText(_("Presets"));
+    auto auto_checkbox = new QCheckBox (_("Auto"), this);
+    auto hbox = audqt::make_hbox (nullptr);
+
+    hbox->addWidget (& m_onoff_checkbox);
+    hbox->addStretch (1);
+    hbox->addWidget (hide_button);
+    hbox->addWidget (zero_button);
+    hbox->addWidget (preset_button);
+    hbox->addWidget (auto_checkbox);
+
     auto layout = audqt::make_vbox (this);
     layout->setSizeConstraint (QLayout::SetFixedSize);
-    layout->addWidget (& m_onoff_checkbox);
+    layout->addLayout (hbox);
     layout->addWidget (slider_container);
 
     setWindowTitle (_("Equalizer"));
@@ -148,8 +170,25 @@ EqualizerWindow::EqualizerWindow () :
     updatePreamp ();
     updateBands ();
 
+    auto_checkbox->setCheckState (aud_get_bool (nullptr, "equalizer_autoload") 
+            ? Qt::Checked : Qt::Unchecked);
+
     connect (& m_onoff_checkbox, & QCheckBox::stateChanged, [] (int state) {
         aud_set_bool (nullptr, "equalizer_active", (state == Qt::Checked));
+    });
+
+    connect (hide_button, & QPushButton::clicked, [] () {
+        audqt::equalizer_hide ();
+    });
+
+    connect (zero_button, & QPushButton::clicked, [] () {
+        aud_eq_apply_preset (EqualizerPreset ());
+    });
+
+    connect (preset_button, & QPushButton::clicked, audqt::eq_presets_show);
+
+    connect (auto_checkbox, & QCheckBox::stateChanged, [] (int state) {
+        aud_set_bool (nullptr, "equalizer_autoload", (state == Qt::Checked));
     });
 
     connect (& m_preamp_slider->slider, & QSlider::valueChanged, [] (int value) {
@@ -182,6 +221,12 @@ void EqualizerWindow::updateBands ()
 
     for (int i = 0; i < AUD_EQ_NBANDS; i ++)
         m_sliders[i]->slider.setValue (values[i]);
+}
+
+void EqualizerWindow::updateSongAuto ()
+{
+    preset_button->setIcon(aud_get_bool (nullptr, "equalizer_songauto") 
+            ? audqt::get_icon ("media-record") : audqt::get_icon ("folder"));
 }
 
 static EqualizerWindow * s_equalizer = nullptr;

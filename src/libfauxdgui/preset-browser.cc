@@ -33,14 +33,17 @@
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/runtime.h>
 
-typedef void (* FilebrowserCallback) (const char * filename);
+typedef void (* PresetAction) (const char * filename, const EqualizerPreset * preset);
 
 static void browser_response (GtkWidget * dialog, int response, void * data)
 {
     if (response == GTK_RESPONSE_ACCEPT)
     {
         CharPtr filename (gtk_file_chooser_get_uri ((GtkFileChooser *) dialog));
-        ((FilebrowserCallback) data) (filename);
+        auto preset = (const EqualizerPreset *)
+                g_object_get_data ((GObject *) dialog, "eq-preset");
+
+        ((PresetAction) data) (filename, preset);
     }
 
     gtk_widget_destroy (dialog);
@@ -71,7 +74,8 @@ static void set_default_preset_dir ()
 }
 
 static void show_preset_browser (const char * title, gboolean save,
- const char * default_filename, FilebrowserCallback callback)
+        const char * default_filename, PresetAction callback,
+        const EqualizerPreset * preset)
 {
     GtkFileFilter * filter;
 
@@ -95,55 +99,62 @@ static void show_preset_browser (const char * title, gboolean save,
     if (default_filename)
         gtk_file_chooser_set_current_name ((GtkFileChooser *) browser, default_filename);
 
+    if (preset)
+        g_object_set_data_full ((GObject *) browser, "eq-preset",
+         new EqualizerPreset (* preset), aud::delete_obj<EqualizerPreset>);
+
     g_signal_connect (browser, "response", (GCallback) browser_response, (void *) callback);
 
     audgui_show_unique_window (AUDGUI_PRESET_BROWSER_WINDOW, browser);
 }
 
-static void do_load_file (const char * filename)
+static void do_load_file (const char * filename, const EqualizerPreset *)
 {
-    EqualizerPreset preset;
+    Index<EqualizerPreset> presets;
+    presets.append ();
 
     VFSFile file (filename, "r");
-    if (! file || ! aud_load_preset_file (preset, file))
+    if (! file || ! aud_load_preset_file (presets[0], file))
         return;
 
-    aud_eq_apply_preset (preset);
+    audgui_import_eq_presets (presets);
 }
 
 void eq_preset_load_file ()
 {
     set_default_preset_dir ();
-    show_preset_browser (_("Load Preset File"), false, nullptr, do_load_file);
+    show_preset_browser (_("Load Preset File"), false, nullptr, do_load_file, nullptr);
 }
 
-static void do_load_eqf (const char * filename)
+static void do_load_eqf (const char * filename, const EqualizerPreset *)
 {
     VFSFile file (filename, "r");
     if (! file)
         return;
 
-    Index<EqualizerPreset> presets = aud_import_winamp_presets (file);
-
-    if (presets.len ())
-        aud_eq_apply_preset (presets[0]);
+    audgui_import_eq_presets (aud_import_winamp_presets (file));
 }
 
 void eq_preset_load_eqf ()
 {
     set_default_preset_dir ();
-    show_preset_browser (_("Load EQF File"), false, nullptr, do_load_eqf);
+    show_preset_browser (_("Load EQF File"), false, nullptr, do_load_eqf, nullptr);
 }
 
-static void do_save_file (const char * filename)
+static void do_save_file (const char * filename, const EqualizerPreset * preset)
 {
-    EqualizerPreset preset;
-    aud_eq_update_preset (preset);
+    // JWT:USE CURRENT INSTEAD OF FAIL:  g_return_if_fail (preset);
+    EqualizerPreset current_preset;
+    if (! preset)
+    {
+        aud_eq_update_preset (current_preset);
+        preset = & current_preset;
+    }
 
     VFSFile file (filename, "w");
     if (file)
     {
-        aud_save_preset_file (preset, file);
+        aud_save_preset_file (* preset, file);
 
         // JWT:IF [Auto] IS ON && FILENAME SAVED == SONG AUTO (DEFAULT) PATH/SONGNAME.preset, LIGHT UP THE 
         // [PRESET] BUTTON INDICATING SONG-SPECIFIC EQUALIZATION IS IN EFFECT!
@@ -158,13 +169,22 @@ static void do_save_file (const char * filename)
     }
 }
 
-void eq_preset_save_file ()
+void eq_preset_save_file (const EqualizerPreset * preset)
 {
     String filename;
     aud_set_str(nullptr, "_eq_last_preset_filename", "");
     aud_set_str (nullptr, "_preset_dir", aud_get_path (AudPath::UserDir));
     int current_playlist = aud_playlist_get_playing ();
-    if (current_playlist >= 0)
+    if (preset)  // AUDACIOUS 3.10+ SAYS SAVE USING SELECTED PRESET NAME, IF ONE SELECTED!:
+    {
+        set_default_preset_dir ();
+
+        StringBuf name = str_concat ({preset->name, ".preset"});
+        show_preset_browser (_("Save Preset File"), true, name, do_save_file, preset);
+
+        return;
+    }
+    else if (current_playlist >= 0)  // JWT:NONE SELECTED, CALCULATE THE EXPORT NAME:
     {
         int current_song = aud_playlist_get_position (current_playlist);
         if (current_song >= 0)
@@ -184,7 +204,8 @@ void eq_preset_save_file ()
                         aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                                 (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
                                 (const char *) preset_file_namepart}))));
-                        show_preset_browser (_("Save Preset File"), true, preset_file_namepart, do_save_file);
+                        show_preset_browser (_("Save Preset File"), true,
+                                preset_file_namepart, do_save_file, preset);
 
                         return;
                     }
@@ -222,7 +243,8 @@ void eq_preset_save_file ()
                     aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                             (str_concat ({aud_get_path (AudPath::UserDir), "/", 
                             (const char *) preset_file_namepart}))));
-                    show_preset_browser (_("Save Preset File"), true, preset_file_namepart, do_save_file);
+                    show_preset_browser (_("Save Preset File"), true, preset_file_namepart,
+                            do_save_file, preset);
 
                     return;
                 }
@@ -252,7 +274,8 @@ void eq_preset_save_file ()
                         aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                                 (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
                                 (const char *) preset_file_namepart}))));
-                        show_preset_browser (_("Save Preset File"), true, preset_file_namepart, do_save_file);
+                        show_preset_browser (_("Save Preset File"), true,
+                                preset_file_namepart, do_save_file, preset);
 
                         return;
                     }
@@ -267,45 +290,35 @@ void eq_preset_save_file ()
                 aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                         (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
                         (const char *) preset_file_namepart}))));
-                show_preset_browser (_("Save Preset File"), true, preset_file_namepart, do_save_file);
+                show_preset_browser (_("Save Preset File"), true, preset_file_namepart,
+                        do_save_file, preset);
 
                 return;
             }
         }
     }
-    show_preset_browser (_("Save Preset File"), true, _("<name>.preset"), do_save_file);
+
+    StringBuf name = preset ? str_concat ({preset->name, ".preset"})
+            : str_copy("<NAMEME!>.preset");
+    show_preset_browser (_("Save Preset File"), true, name, do_save_file, preset);
 }
 
-static void do_save_eqf (const char * filename)
+static void do_save_eqf (const char * filename, const EqualizerPreset * preset)
 {
+    g_return_if_fail (preset);
+
     VFSFile file (filename, "w");
     if (! file)
         return;
 
-    EqualizerPreset preset = EqualizerPreset ();
-    preset.name = String ("Preset1");
-
-    aud_eq_update_preset (preset);
-    aud_export_winamp_preset (preset, file);
+    aud_export_winamp_preset (* preset, file);
 }
 
-void eq_preset_save_eqf ()
+void eq_preset_save_eqf (const EqualizerPreset * preset)
 {
     set_default_preset_dir ();
-    show_preset_browser (_("Save EQF File"), true, _("<name>.eqf"), do_save_eqf);
-}
 
-static void do_import_winamp (const char * filename)
-{
-    VFSFile file (filename, "r");
-    if (! file)
-        return;
-
-    audgui_import_eq_presets (aud_import_winamp_presets (file));
-}
-
-void eq_preset_import_winamp ()
-{
-    set_default_preset_dir ();
-    show_preset_browser (_("Import Winamp Presets"), false, nullptr, do_import_winamp);
+    StringBuf name = preset ? str_concat ({preset->name, ".eqf"})
+            : str_copy("<NAMEME!>.eqf");
+    show_preset_browser (_("Save EQF File"), true, name, do_save_eqf, preset);
 }

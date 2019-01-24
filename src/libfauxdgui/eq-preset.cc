@@ -22,6 +22,7 @@
 #include <libfauxdcore/equalizer.h>
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/index.h>
+#include <libfauxdcore/interface.h>
 #include <libfauxdcore/runtime.h>
 
 #include "internal.h"
@@ -65,11 +66,16 @@ static void select_all (void *, bool selected)
         item.selected = selected;
 }
 
+static void activate_preset (const EqualizerPreset & preset)
+{
+    aud_eq_apply_preset (preset);
+    aud_set_bool (nullptr, "equalizer_active", true);
+}
+
 static void activate_row (void *, int row)
 {
     g_return_if_fail (row >= 0 && row < preset_list.len ());
-    aud_eq_apply_preset (preset_list[row].preset);
-    aud_set_bool (nullptr, "equalizer_active", true);
+    activate_preset (preset_list[row].preset);
 }
 
 static void focus_change (void *, int row)
@@ -124,6 +130,28 @@ static int find_by_name (const char * name)
     return -1;
 }
 
+static const EqualizerPreset * find_one_selected ()
+{
+    const EqualizerPreset * preset = nullptr;
+
+    for (PresetItem & item : preset_list)
+    {
+        if (item.selected)
+        {
+            if (preset)
+            {
+                preset = nullptr;
+                break;
+            }
+            preset = & item.preset;
+        }
+    }
+
+    // JWT:THEY DON'T HAVE TO SELECT ONE IN FAUXDACIOUS!:  if (! preset)
+    //    aud_ui_show_error (_("Please select one preset to export."));
+
+    return preset;
+}
 static void text_changed ()
 {
     const char * name = gtk_entry_get_text ((GtkEntry *) entry);
@@ -206,8 +234,25 @@ static void revert_changes ()
     gtk_widget_set_sensitive (revert, false);
 }
 
+static void do_save_file (void)
+{
+    auto preset = find_one_selected ();
+    // JWT:THEY DON'T HAVE TO SELECT ONE IN FAUXDACIOUS!  if (preset)
+        eq_preset_save_file (preset);
+}
+
+static void do_save_eqf (void)
+{
+    auto preset = find_one_selected ();
+    // JWT:THEY DON'T HAVE TO SELECT ONE IN FAUXDACIOUS!  if (preset)
+        eq_preset_save_eqf (preset);
+}
+
 static void cleanup_eq_preset_window ()
 {
+    // also hide the preset browser window
+    audgui_hide_unique_window (AUDGUI_PRESET_BROWSER_WINDOW);
+
     if (changes_made)
     {
         save_list ();
@@ -226,14 +271,12 @@ static GtkWidget * create_menu_bar ()
 {
     static const AudguiMenuItem import_items[] = {
         MenuCommand (N_("Preset File ..."), nullptr, 0, (GdkModifierType) 0, eq_preset_load_file),
-        MenuCommand (N_("EQF File ..."), nullptr, 0, (GdkModifierType) 0, eq_preset_load_eqf),
-        MenuSep (),
-        MenuCommand (N_("Winamp Presets ..."), nullptr, 0, (GdkModifierType) 0, eq_preset_import_winamp)
+        MenuCommand (N_("EQF File ..."), nullptr, 0, (GdkModifierType) 0, eq_preset_load_eqf)
     };
 
     static const AudguiMenuItem export_items[] = {
-        MenuCommand (N_("Preset File ..."), nullptr, 0, (GdkModifierType) 0, eq_preset_save_file),
-        MenuCommand (N_("EQF File ..."), nullptr, 0, (GdkModifierType) 0, eq_preset_save_eqf)
+        MenuCommand (N_("Preset File ..."), nullptr, 0, (GdkModifierType) 0, do_save_file),
+        MenuCommand (N_("EQF File ..."), nullptr, 0, (GdkModifierType) 0, do_save_eqf)
     };
 
     static const AudguiMenuItem menus[] = {
@@ -387,28 +430,30 @@ static void merge_presets (const Index<EqualizerPreset> & presets)
         preset_list.remove_if (is_duplicate);
     }
 
+    /* deselect existing presets */
+    for (auto & item : preset_list)
+        item.selected = false;
+
+    /* append and select new presets */
     for (const EqualizerPreset & preset : presets)
-        preset_list.append (preset, false);
+        preset_list.append (preset, true);
+
+    /* if a single preset was imported, activate it */
+    if (presets.len () == 1)
+        activate_preset (presets[0]);
 }
 
 EXPORT void audgui_import_eq_presets (const Index<EqualizerPreset> & presets)
 {
-    if (list)
-    {
-        /* import via presets window if it exists */
-        audgui_list_delete_rows (list, 0, preset_list.len ());
-        merge_presets (presets);
-        audgui_list_insert_rows (list, 0, preset_list.len ());
+    // make sure the presets window is displayed
+    if (! list)
+        return;
 
-        changes_made = true;
-        gtk_widget_set_sensitive (revert, true);
-    }
-    else
-    {
-        /* otherwise import directly to ~/.config/audacious/eq.preset */
-        populate_list ();
-        merge_presets (presets);
-        save_list ();
-        preset_list.clear ();
-    }
+    audgui_list_delete_rows (list, 0, preset_list.len ());
+    merge_presets (presets);
+    audgui_list_insert_rows (list, 0, preset_list.len ());
+    audgui_list_set_focus (list, preset_list.len () - 1);
+
+    changes_made = true;
+    gtk_widget_set_sensitive (revert, true);
 }

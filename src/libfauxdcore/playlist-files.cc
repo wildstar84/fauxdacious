@@ -198,9 +198,17 @@ EXPORT bool aud_playlist_save (int list, const char * filename, Playlist::GetMod
 
             VFSFile file (filename, "w");
             if (! file)
+            {
+                aud_ui_show_error (str_printf (_("Error opening %s:\n%s"),
+                        filename, file.error ()));
                 return false;
+            }
 
-            return pp->save (filename, file, title, items) && file.fflush () == 0;
+            if (pp->save (filename, file, title, items) && file.fflush () == 0)
+                return true;
+
+            aud_ui_show_error (str_printf (_("Error saving %s."), filename));
+            return false;
         }
     }
 

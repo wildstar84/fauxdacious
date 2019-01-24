@@ -185,7 +185,7 @@ static GtkWidget * create_window ()
     gtk_box_pack_end ((GtkBox *) top_row, zero, false, false, 0);
 
     /* JWT:NEXT 3 ADDED A CLOSE BUTTON */
-    GtkWidget * close = audgui_button_new (_("_Close"), "window-close",
+    GtkWidget * close = audgui_button_new (_("_Hide"), "window-close",
      (AudguiCallback) gtk_widget_destroy, window);
     gtk_box_pack_end ((GtkBox *) top_row, close, false, false, 0);
 
