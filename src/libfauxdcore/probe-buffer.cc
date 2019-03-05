@@ -28,7 +28,7 @@ ProbeBuffer::ProbeBuffer (const char * filename, VFSImpl * file) :
     m_filename (filename),
     m_file (file)
 {
-    AUDINFO ("<%p> buffering enabled for %s\n", this, (const char *) m_filename);
+    AUDDBG ("<%p> buffering enabled for %s\n", this, (const char *) m_filename);
 }
 
 ProbeBuffer::~ProbeBuffer ()
@@ -51,7 +51,7 @@ void ProbeBuffer::increase_buffer (int64_t size)
 
 void ProbeBuffer::release_buffer ()
 {
-    AUDINFO ("<%p> buffering disabled for %s\n", this, (const char *) m_filename);
+    AUDDBG ("<%p> buffering disabled for %s\n", this, (const char *) m_filename);
     delete[] m_buffer;
     m_buffer = nullptr;
     m_filled = 0;
@@ -135,7 +135,7 @@ int ProbeBuffer::fseek (int64_t offset, VFSSeekType whence)
     /* activate buffering again when seeking to beginning of file */
     if (whence == VFS_SEEK_SET && offset == 0)
     {
-        AUDINFO ("<%p> buffering enabled for %s\n", this, (const char *) m_filename);
+        AUDDBG ("<%p> buffering enabled for %s\n", this, (const char *) m_filename);
         m_at = 0;
     }
 
