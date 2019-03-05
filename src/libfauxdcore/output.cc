@@ -167,7 +167,7 @@ static void cleanup_secondary ()
 /* assumes LOCK_MINOR, s_output */
 static void apply_pause ()
 {
-    /* JWT:  IF PauseMute SET, PAUSE SHOULD JUST SUSPEND OUTPUT
+    /* JWT:  IF PauseMute SET, PAUSE SHOULD JUST ZERO-OUT OUTPUT (BUT CONTINUE PLAYING)
              THIS IS SO WE CAN "MUTE" COMMERCIALS FROM RADIO WHILST PLAYING 
              SOMETHING ELSE!  THIS WAY, WE CAN RESUME AT THE CURRENT POINT vs
              WHERE WE PAUSED!
@@ -242,7 +242,7 @@ static void setup_output (bool new_input)
 
     apply_pause ();
 
-    if (! s_output || (s_paused && ! pausemuted) || s_resetting)
+    if (! (s_paused && ! pausemuted) && ! s_flushed && ! s_resetting)
         SIGNAL_MINOR;
 }
 
