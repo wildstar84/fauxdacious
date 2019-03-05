@@ -228,6 +228,7 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
     if (format & AUD_ART_DATA)
     {
         /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
+        bool needArt = true;
         if (! item->data.len () && ! item->art_file)
         {
             if (aud_get_bool (nullptr, "user_tag_data"))
@@ -237,18 +238,24 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
                 {
                     String tfld = img_tuple.get_str (Tuple::Comment);
                     if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
+                    {
                         item->art_file = tfld;
+                        needArt = false;
+                    }
                 }
-                else if (aud_read_tag_from_tagfile (file, "user_tag_data", img_tuple))
+                if (needArt && aud_read_tag_from_tagfile (file, "user_tag_data", img_tuple))
                 {
                     String tfld = img_tuple.get_str (Tuple::Comment);
                     if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
+                    {
                         item->art_file = tfld;
+                        needArt = false;
+                    }
                 }
             }
         }
         /* JWT:DO WE HAVE A "DEFAULT" COVER ART FILE? */
-        if (! item->data.len () && ! item->art_file)
+        if (needArt && ! item->data.len () && ! item->art_file)
         {
             String artdefault = aud_get_str(nullptr, "default_cover_file");
             if (artdefault && artdefault[0])
