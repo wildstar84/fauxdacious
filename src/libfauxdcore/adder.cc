@@ -383,6 +383,7 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
     else
     {
         int tests = 0;
+        bool intemppls = aud_get_bool (nullptr, "_in_tempurl"); // JWT:TRUE MEANS WE'RE PROCESSING tempurl.pls!
         if (! from_playlist)
             tests |= VFS_NO_ACCESS;
         tests |= VFS_IS_DIR;
@@ -398,10 +399,14 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
                 add_folder (item.filename, filter, user, result, save_title);
             result->saw_folder = true;
         }
-        else if ((! from_playlist) && aud_filename_is_playlist (item.filename))
+        else if (! intemppls && aud_filename_is_playlist (item.filename, from_playlist))
             add_playlist (item.filename, filter, user, result, save_title);
         else
+        {
             add_file (std::move (item), filter, user, result, false);
+            if (intemppls)
+                aud_set_bool (nullptr, "_in_tempurl", false);
+        }
     }
 }
 

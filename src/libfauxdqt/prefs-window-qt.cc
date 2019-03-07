@@ -197,6 +197,12 @@ static const ComboItem record_elements[] = {
     ComboItem (N_("After applying equalization"), (int) OutputStream::AfterEqualizer)
 };
 
+static const ComboItem url_helper_allow[] = {
+    ComboItem (N_("Never"), 0),
+    ComboItem (N_("URLs NOT in playlists"), 1),
+    ComboItem (N_("Always"), 2)
+};
+
 static const ComboItem replaygainmode_elements[] = {
     ComboItem (N_("Track"), (int) ReplayGainMode::Track),
     ComboItem (N_("Album"), (int) ReplayGainMode::Album),
@@ -413,7 +419,12 @@ static const PreferencesWidget advanced_page_widgets[] = {
         {1, 60, 1, N_("seconds")}),
     WidgetSpin (N_("Adjust volume by:"),
         WidgetInt (0, "volume_delta"),
-        {1, 25, 1, N_("percent")})
+        {1, 25, 1, N_("percent")}),
+    WidgetCombo (N_("Allow URL-helper:"),
+        WidgetInt (0, "url_helper_allow"),
+        {{url_helper_allow}}),
+    WidgetLabel (N_("URL-helper program?:")),
+    WidgetEntry (0, WidgetString (0, "url_helper"))
 };
 
 #define TITLESTRING_NPRESETS 8

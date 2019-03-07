@@ -29,19 +29,19 @@
 #include "plugins-internal.h"
 #include "runtime.h"
 
-EXPORT bool aud_filename_is_playlist (const char * filename)
+EXPORT bool aud_filename_is_playlist (const char * filename, bool from_playlist)
 {
     bool userurl2playlist = false;
 
-    if (strstr (filename, "://") && strncmp (filename, "file://", 7)
-            && strncmp (filename, "cdda://", 7) && strncmp (filename, "dvd://", 6)
-            && strncmp (filename, "stdin://", 8))  // JWT:WE'RE SOME KIND OF URL:
+    int url_helper_allow = aud_get_int ("audacious", "url_helper_allow");
+    bool url_skiphelper = ! url_helper_allow || (from_playlist && url_helper_allow < 2);
+    if (! url_skiphelper && (! strncmp (filename, "https://", 7) || ! strncmp (filename, "http://", 7)))  // A HELPABLE? URL:
     {
         String url_helper = aud_get_str ("audacious", "url_helper");
-    	   StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
-    	   remove ((const char *) temp_playlist_filename);
         if (url_helper[0])  // JWT:WE HAVE A PERL HELPER, LESSEE IF IT RECOGNIZES & CONVERTS IT (ie. tunein.com, youtube, etc):
         {
+            StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
+            remove ((const char *) temp_playlist_filename);
             StringBuf filenameBuf = strstr (filename, "&")
                 ? index_to_str_list (str_list_to_index (filename, "&"), "\\&") 
                 : str_copy (filename);  // JWT:MUST ESCAPE AMPRESANDS ELSE system TRUNCATES URL AT FIRST AMPRESAND!
@@ -53,8 +53,16 @@ EXPORT bool aud_filename_is_playlist (const char * filename)
     }
 
     /* JWT:THE HELPER CONVERTS RECOGNIZED URL PATTERNS TO A TEMP. SINGLE-ITEM PLAYLIST AS THIS IS 
-       THE ONLY WAY IN AUDACIOUS TO *CHANGE* THE URL (filename) TO SOMETHING ELSE! */
-    StringBuf ext = userurl2playlist ? str_printf (_("pls")) : uri_get_extension (filename);
+       THE ONLY WAY IN AUDACIOUS TO *CHANGE* THE URL (filename) TO SOMETHING ELSE!
+       NOTE:  WITHIN PLAYLISTS, WE ONLY ACCEPT THESE SPECIAL PLAYLISTS, *NOT* ORDINARY NESTED PLAYLISTS!:
+
+       ALSO NOTE:  "_in_tempurl" SET TELLS adder:add_generic() WE'RE PROCESSING THE URL IN tempurl.pls
+       AND TO NOT CALL THIS FUNCTION AGAIN SO AS TO NOT (RE)APPLY THE "URL HELPER" TO IT (AS IT HAS
+       ALREADY BEEN APPLIED TO THE ORIGINAL URL (AVOID RECURSION AND REDUNDANCE)!
+    */
+    aud_set_bool (nullptr, "_in_tempurl", userurl2playlist);
+    StringBuf ext = userurl2playlist ? str_printf (_("pls"))
+            : (from_playlist ? StringBuf () : uri_get_extension (filename));
     if (ext)
     {
         for (PluginHandle * plugin : aud_plugin_list (PluginType::Playlist))
@@ -74,7 +82,7 @@ bool playlist_load (const char * filename, String & title, Index<PlaylistAddItem
 
     AUDINFO ("Loading playlist %s.\n", filename);
 
-    if (strstr (filename, "://") && ! strstr (filename, "file:/"))
+    if (! strncmp (filename, "https://", 7) || ! strncmp (filename, "http://", 7))  // A HELPABLE? URL:
     {
         StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
         if (access((const char *) temp_playlist_filename, F_OK ) != -1 )

@@ -388,7 +388,7 @@ void aud_playlist_select_by_patterns (int playlist, const Tuple & patterns);
 void aud_playlist_cache_selected (int playlist);
 
 /* Returns true if <filename> refers to a playlist file. */
-bool aud_filename_is_playlist (const char * filename);
+bool aud_filename_is_playlist (const char * filename, bool from_playlist);
 
 /* Saves the entries in a playlist to a playlist file.  The format of the file
  * is determined from the file extension.  Returns true on success. */
