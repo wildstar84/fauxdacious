@@ -228,6 +228,13 @@ void PlaylistData::set_entry_tuple (Entry * entry, Tuple && tuple)
     if (entry->selected)
         selected_length -= entry->length;
 
+    /* JWT: KEEP (DON'T OVERWRITE) ENTRY'S TITLE IF TUPLE'S TITLE IS NOT SET!
+       (NEEDED FOR EXTENDED M3U PLAYLIST ITEMS TO KEEP THE TITLE!)
+    */
+    String Title = entry->tuple.get_str (Tuple::Title);
+    if (! tuple.is_set (Tuple::Title))
+        tuple.set_str (Tuple::Title, Title);
+
     entry->set_tuple (std::move (tuple));
 
     total_length += entry->length;
@@ -585,9 +592,31 @@ static void scan_finish (ScanRequest * request)
     if (! entry->decoder)
         entry->decoder = request->decoder;
 
+    const char * base;
+    const char * ext;
+    int isub_p;
+    uri_parse (request->filename, & base, & ext, nullptr, & isub_p);
+    int baselen = ext - base;
     if (! entry->tuple.valid () && request->tuple.valid ())
     {
+        int cuesetlength = entry->tuple.get_int (Tuple::Length);  // JWT:DON'T LET SCAN REPLACE CUESHEET-SET LENGTH, IF SET!
+        /* JWT: NEEDED FOR EXTENDED M3U PLAYLISTS - TO KEEP THE PLAYLIST TITLE FROM BEING OVERWRITTEN
+           BY THAT FROM THE CUESHEET!
+           * ONLY REPLACE ENTRY'S TITLE W/REQUEST'S TITLE IF CUESHEET AND THE ENTRY'S TITLE
+           IS STILL JUST THE FILENAME! (ACCOMPLISHED BY STUFFING THE CURRENT ENTRY'S TITLE
+           INTO THE REQUEST TUPLE BEFORE REPLACING ENTRY'S TUPLE W/REQUEST'S TUPLE)
+           THIS NEEDED TO ENSURE THAT A CUESHEET ENTRY'S TITLE IN A NON-EXTENDED M3U PLAYLIST
+           GETS (STAYS) OVERRIDDEN BY THE TITLE IN THE CUESHEET (PREVIOUSLY WE DIDN'T SUPPORT
+           CUESHEETS IN M3U PLAYLISTS).
+        */
+        String oldTitle = entry->tuple.get_str (Tuple::Title);
+        if (oldTitle && oldTitle[0] && isub_p > 0 && strncmp ((const char *) oldTitle, base, baselen))
+            request->tuple.set_str (Tuple::Title, oldTitle);
+
         playlist->set_entry_tuple (entry, std::move (request->tuple));
+        if (cuesetlength > 0)  // JWT:MAKE SURE RECALCULATED LENGTH FROM CUESHEETS DOESN'T GET CLOBBERED!
+            entry->tuple.set_int (Tuple::Length, cuesetlength);
+
         queue_update (Metadata, playlist, entry->number, 1, DelayedUpdate);
     }
 
@@ -2136,9 +2165,12 @@ void shuffle_replay (PlaylistData * playlist, const Index<int> & history)
     // replay the given history, entry by entry
     for (int entry_num : history)
     {
-        auto entry = playlist->entries[entry_num].get ();
-        if (entry)
-            entry->shuffle_num = ++ playlist->last_shuffle_num;
+        if (playlist && playlist->entries.len () > 0)  // PREVENT SEGFAULT IF ~/.config/fauxdacious*/playlists/* DELETED!
+        {
+            auto entry = playlist->entries[entry_num].get ();
+            if (entry)
+                entry->shuffle_num = ++ playlist->last_shuffle_num;
+        }
     }
 }
 
@@ -2282,7 +2314,8 @@ void playback_entry_set_tuple (int serial, Tuple && tuple)
     Entry * entry = get_playback_entry (serial);
 
     /* don't update cuesheet entries with stream metadata */
-    if (entry && ! entry->tuple.is_set (Tuple::StartTime))
+    /* JWT:FIXED!(STRICTER CUESHEET TEST):    if (entry && ! entry->tuple.is_set (Tuple::StartTime)) */
+    if (entry && (strncmp (entry->filename, "file://", 7) || ! strstr ((const char *) entry->filename, ".cue?")))
     {
         playing_playlist->set_entry_tuple (entry, std::move (tuple));
         queue_update (Metadata, playing_playlist, entry->number, 1);
