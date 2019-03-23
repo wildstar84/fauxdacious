@@ -253,8 +253,8 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
             ? uri_to_filename (tagdata_filename)
             : filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
-    //JWT:TAG FILENAME NEVER HAS "file://" IN FRONT OF IT IF SO, IT'S STRIPPED OFF!:
-    if (! g_key_file_load_from_file (rcfile, (const char *)filename, G_KEY_FILE_NONE, nullptr))
+    //JWT: filename NOW DOES NOT HAVE file:// PREFIX AND IS THE TAG DATA FILE (LOCAL OR GLOBAL):
+    if (! g_key_file_load_from_file (rcfile, (const char *) filename, G_KEY_FILE_NONE, nullptr))
     {
         g_key_file_free (rcfile);
 
@@ -337,8 +337,9 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     if (! open_input_file (filename, "r", ip, file, error))
         return false;
 
-    Tuple file_tuple, loclfile_tuple, new_tuple;
+    Tuple file_tuple, loclfile_tuple, tmpfile_tuple, new_tuple;
     Tuple * which_tuple;
+    Tuple * bkup_tuple;
     int fromtempfile = 0;
     int fromfile = 0;
     int fromlocalfile = 0;
@@ -350,50 +351,70 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     if (usrtag && ! strncmp (filename, "file://", 7))
     {
         StringBuf tag_fid = uri_to_filename (filename);
-        StringBuf path = filename_get_parent ((const char *)tag_fid);
-        filename_only = String (filename_get_base ((const char *)tag_fid));
-        local_tag_file = String (filename_to_uri (str_concat ({(const char *)path, "/user_tag_data.tag"})));
+        StringBuf path = filename_get_parent ((const char *) tag_fid);
+        filename_only = String (filename_get_base ((const char *) tag_fid));
+        local_tag_file = String (filename_to_uri (str_concat ({(const char *) path, "/user_tag_data.tag"})));
     }
     /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, new_tuple, image)) */
-    /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS TRUE!: 
+    /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS <0 ("ONLY")!: 
        WHEN SUCCESSFUL FETCHING FROM TAG FILE, IT RETURNS TRUE ONLY IF THE "PRECEDENCE" == "ONLY" (-1),
        OTHERWISE, WE KEEP PROCESSING THE CONDITIONS UNTIL AT LAST WE FETCH (ANY UNSET) TAGS FROM THE FILE ITSELF. */
     bool fileorNOTstdin = file || strncmp (filename, "stdin://", 8);  // JWT:IF stdin, MUST HAVE OPEN FILEHANDLE!
-    if ((local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *)filename_only, local_tag_file, loclfile_tuple)) < 0) 
-            || (usrtag && (fromtempfile = aud_read_tag_from_tagfile (filename, "tmp_tag_data", file_tuple)) < 0)
+
+    if ((usrtag && (fromtempfile = aud_read_tag_from_tagfile (filename, "tmp_tag_data", tmpfile_tuple)) < 0)
+            || (local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *) filename_only, local_tag_file, loclfile_tuple)) < 0)
             || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0)
             || (fileorNOTstdin && ip->read_tag (filename, file, new_tuple, image)))
     {
         which_tuple = &file_tuple;
+        bkup_tuple = nullptr;
         if (local_tag_file[0] && fromlocalfile)  //JWT:WE GOT TAGS FROM A LOCAL (DIRECTORY-BASED) user_tag_data.tag FILE.
         {
             /* USE THE "LOCAL" TAGFILE'S TAGS IFF "ONLY" OR "OVERRIDE" AND GLOBAL TAG FILE FAILED OR IS "DEFAULT". */
-            if (fromlocalfile < 2 || (! fromfile || fromfile == 2))
-            {
-                fromfile = fromlocalfile;
-                which_tuple = &loclfile_tuple;
-            }
+            if (fromfile)
+                bkup_tuple = &file_tuple;
+            fromfile = fromlocalfile;
+            which_tuple = &loclfile_tuple;
         }
 
         // cleanly replace existing tuple
         new_tuple.set_state (Tuple::Valid);
-        if (fromtempfile && ! fromfile)  // WE FOUND TAGS IN tmp_tag_data, BUT NOT IN usr_tag_data.
-            fromfile = fromtempfile;
-        if (fromfile < 0)  // ONLY - GOT DATA FROM FILE, ONLY USE THAT (MAY NOT WORK, IE. LENGTH MISSING)!
+        // NOTE:  tmp_tag_data IS FAUXDACIOUS-GENERATED AND SHOULD NORMALLY RETURN 2 (DEFAULT)!
+        if (fromtempfile)  // WE FOUND TAGS IN tmp_tag_data, IGNORE LOCAL TAG FILE (TMP. IS FOR CDs/DVDs/YOUTUBE URLS, ETC)!
         {
+            if (fromfile)
+                bkup_tuple = &file_tuple;
+            fromfile = fromtempfile;
+            which_tuple = &tmpfile_tuple;
+        }
+
+        if (fromfile < 0)  // -1 (ONLY) - GOT DATA FROM FILE, ONLY USE THAT (RETAIN START TIME & LENGTH, IF SET BY read_tag())!
+        {
+            int startTime = tuple.is_set (Tuple::StartTime) ? tuple.get_int (Tuple::StartTime) : -1;
+            int tupleLength = tuple.is_set (Tuple::Length) ? tuple.get_int (Tuple::Length) : -1;
+            which_tuple->set_filename (filename);
             which_tuple->set_state (Tuple::Valid);
             tuple = std::move (*which_tuple);
+            if (startTime > 0)  // JWT:DON'T CLOBBER START-TIME OR LENGTH IF ALREADY SET!:
+            {
+                tuple.set_int (Tuple::StartTime, startTime);
+                if (tupleLength > 0)
+                    tuple.set_int (Tuple::Length, tupleLength);
+            }
         }
-        else if (fromfile > 0)  // DEFAULT OR OVERRIDE
+        else if (fromfile > 0)  // PRIMARY FILE IS DEFAULT OR OVERRIDE:
         {
             int i_tfld;
             const char * tfld;
-            tuple = std::move (new_tuple);
-            if (fromfile == 1)  // OVERRIDE - USE FILE DATA, ONLY FILLING IN FIELDS NOT IN FILE W/TAGS DATA:
+            tuple = std::move (new_tuple);  // START OUT WITH ALL THE read_tag() DATA.
+            which_tuple->set_state (Tuple::Valid);
+            if (bkup_tuple)
+                bkup_tuple->set_state (Tuple::Valid);
+            if (fromfile == 1)  // 1 (OVERRIDE) - REPLACE ONLY TAG FIELDS THAT ARE ALSO FOUND IN THE PRIMARY TAG FILE:
             {
                 tfld = (const char *) which_tuple->get_str (Tuple::Title);
                 if (tfld)
-                    tuple.set_str (Tuple::Title, tfld);
+                    tuple.set_str (Tuple::Title, tfld);  // OVERRIDE TITLE WITH TITLE FROM THE PRIMARY TAG FILE...
                 tfld = (const char *) which_tuple->get_str (Tuple::Artist);
                 if (tfld)
                     tuple.set_str (Tuple::Artist, tfld);
@@ -410,74 +431,130 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 if (tfld)
                     tuple.set_str (Tuple::Genre, tfld);
                 i_tfld = which_tuple->get_int (Tuple::Year);
-                if (i_tfld && i_tfld > 0)
+                if (i_tfld && i_tfld >= 0)
                     tuple.set_int (Tuple::Year, i_tfld);
                 i_tfld = which_tuple->get_int (Tuple::Track);
-                if (i_tfld && i_tfld > 0)
+                if (i_tfld && i_tfld >= 0)
                     tuple.set_int (Tuple::Track, i_tfld);
+                i_tfld = which_tuple->is_set (Tuple::Length) ? which_tuple->get_int (Tuple::Length) : -1;
+                if (i_tfld && i_tfld >= 0)
+                    tuple.set_int (Tuple::Length, i_tfld);
             }
-            else   //DEFAULT - USE NON-EMPTY TAG DATA
+            else   // 2 (DEFAULT) - REPLACE ONLY EMPTY(MISSING) TAG FIELDS THAT ARE FOUND IN THE PRIMARY, OR ELSE IN THE BACKUP TAG FILE:
             {
                 tfld = (const char *) new_tuple.get_str (Tuple::Title);
                 if (! tfld)
                 {
                     tfld = (const char *) which_tuple->get_str (Tuple::Title);
-                    if (tfld)
-                        tuple.set_str (Tuple::Title, tfld);
+                    if (tfld)  tuple.set_str (Tuple::Title, tfld);  // SET EMPTY TITLE TO TITLE FROM THE PRIMARY TAG FILE...
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::Title);
+                        if (tfld)  tuple.set_str (Tuple::Title, tfld);  // SET EMPTY TITLE TO TITLE FROM THE BACKUP TAG FILE...
+                    }
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Artist);
                 if (! tfld)
                 {
                     tfld = (const char *) which_tuple->get_str (Tuple::Artist);
-                    if (tfld)
-                        tuple.set_str (Tuple::Artist, tfld);
+                    if (tfld) tuple.set_str (Tuple::Artist, tfld);
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::Artist);
+                        if (tfld)  tuple.set_str (Tuple::Artist, tfld);
+                    }
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Album);
                 if (! tfld)
                 {
                     tfld = (const char *) which_tuple->get_str (Tuple::Album);
-                    if (tfld)
-                        tuple.set_str (Tuple::Album, tfld);
+                    if (tfld)  tuple.set_str (Tuple::Album, tfld);
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::Album);
+                        if (tfld)  tuple.set_str (Tuple::Album, tfld);
+                    }
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::AlbumArtist);
                 if (! tfld)
                 {
                     tfld = (const char *) which_tuple->get_str (Tuple::AlbumArtist);
-                    if (tfld)
-                        tuple.set_str (Tuple::AlbumArtist, tfld);
+                    if (tfld)  tuple.set_str (Tuple::AlbumArtist, tfld);
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::AlbumArtist);
+                        if (tfld)  tuple.set_str (Tuple::AlbumArtist, tfld);
+                    }
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Comment);
                 if (! tfld)
                 {
                     tfld = (const char *) which_tuple->get_str (Tuple::Comment);
-                    if (tfld)
-                        tuple.set_str (Tuple::Comment, tfld);
+                    if (tfld)  tuple.set_str (Tuple::Comment, tfld);
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::Comment);
+                        if (tfld)  tuple.set_str (Tuple::Comment, tfld);
+                    }
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Genre);
                 if (! tfld)
                 {
                     tfld = (const char *) which_tuple->get_str (Tuple::Genre);
-                    if (tfld)
-                        tuple.set_str (Tuple::Genre, tfld);
+                    if (tfld)  tuple.set_str (Tuple::Genre, tfld);
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::Genre);
+                        if (tfld)  tuple.set_str (Tuple::Genre, tfld);
+                    }
                 }
                 i_tfld = new_tuple.get_int (Tuple::Year);
-                if (i_tfld <= 0)
+                if (i_tfld < 0)
                 {
                     i_tfld = which_tuple->get_int (Tuple::Year);
-                    if (i_tfld)
-                        tuple.set_int (Tuple::Year, i_tfld);
+                    if (i_tfld >= 0)  tuple.set_int (Tuple::Year, i_tfld);
+                    else if (bkup_tuple)
+                    {
+                        i_tfld = bkup_tuple->get_int (Tuple::Year);
+                        if (i_tfld >= 0)  tuple.set_int (Tuple::Year, i_tfld);
+                    }
                 }
                 i_tfld = new_tuple.get_int (Tuple::Track);
-                if (i_tfld <= 0)
+                if (i_tfld < 0)
                 {
                     i_tfld = which_tuple->get_int (Tuple::Track);
-                    if (i_tfld)
-                        tuple.set_int (Tuple::Track, i_tfld);
+                    if (i_tfld >= 0)  tuple.set_int (Tuple::Track, i_tfld);
+                    else if (bkup_tuple)
+                    {
+                        i_tfld = bkup_tuple->get_int (Tuple::Track);
+                        if (i_tfld >= 0)  tuple.set_int (Tuple::Track, i_tfld);
+                    }
+                }
+                i_tfld = new_tuple.is_set (Tuple::Length) ? new_tuple.get_int (Tuple::Length) : -1;
+                if (i_tfld < 0)
+                {
+                    i_tfld = which_tuple->is_set (Tuple::Length) ? which_tuple->get_int (Tuple::Length) : -1;
+                    if (i_tfld >= 0)  tuple.set_int (Tuple::Length, i_tfld);
+                    else if (bkup_tuple)
+                    {
+                        i_tfld = bkup_tuple->is_set (Tuple::Length) ? bkup_tuple->get_int (Tuple::Length) : -1;
+                        if (i_tfld >= 0)  tuple.set_int (Tuple::Length, i_tfld);
+                    }
                 }
             }
         }
         else  // NO TAG FILE DATA FOUND, ALL WE HAVE IS WHAT'S IN THE PLAYING FILE ITSELF.
+        {
+            int startTime = tuple.is_set (Tuple::StartTime) ? tuple.get_int (Tuple::StartTime) : -1;
+            int tupleLength = tuple.is_set (Tuple::Length) ? tuple.get_int (Tuple::Length) : -1;
             tuple = std::move (new_tuple);
+            if (startTime > 0)  // JWT:DON'T CLOBBER START-TIME OR LENGTH IF ALREADY SET!:
+            {
+                tuple.set_int (Tuple::StartTime, startTime);
+                if (tupleLength > 0)
+                    tuple.set_int (Tuple::Length, tupleLength);
+            }
+        }
 
         return true;
     }
@@ -493,36 +570,38 @@ EXPORT bool aud_file_can_write_tuple (const char * filename, PluginHandle * deco
     return input_plugin_can_write_tuple (decoder);
 }
 
-/* JWT: NEW FUNCTION TO WRITE TAG METADATA TO USER-CREATED TEXT FILE: */
+/* JWT: NEW FUNCTION TO WRITE TAG METADATA TO USER-CREATED TAG FILE: */
 EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & tuple, const char * tagdata_filename)
 {
     GKeyFile * rcfile = g_key_file_new ();
     String local_tag_fid = String ("");
     String song_key = String (song_filename);
     bool localtagfileexists = false;
-    if (! strncmp (song_filename, "file://", 7))  //JWT:ONLY LOOK FOR A LOCAL TAG FILE IF WE'RE PLAYING A "FILE"!:
+
+    //JWT:ONLY LOOK FOR A LOCAL TAG FILE IF WE'RE NOT THE TEMP. TAGFILE && WE'RE PLAYING A "FILE"!:
+    if (strncmp (tagdata_filename, "tmp_", 4) && ! strncmp (song_filename, "file://", 7))
     {
         struct stat statbuf;
         StringBuf song_fid = uri_to_filename (song_filename);
-        StringBuf path = filename_get_parent ((const char *)song_fid);
-        local_tag_fid = String (filename_normalize (str_concat ({(const char *)path, "/user_tag_data.tag"}))); 
-        if (! stat ((const char *)local_tag_fid, &statbuf))  // LOCAL TAG FILE DOESN'T EXIST:
+        StringBuf path = filename_get_parent ((const char *) song_fid);
+        local_tag_fid = String (filename_normalize (str_concat ({(const char *) path, "/user_tag_data.tag"}))); 
+        if (! stat ((const char *) local_tag_fid, &statbuf))  // LOCAL TAG FILE EXISTS, SO USE IT:
         {
             localtagfileexists = true;
-            song_key = String (filename_get_base ((const char *)song_fid));
+            song_key = String (filename_get_base ((const char *) song_fid));
         }
     }
 
-    StringBuf filename = localtagfileexists ? str_copy ((const char *)local_tag_fid)
+    StringBuf filename = localtagfileexists ? str_copy ((const char *) local_tag_fid)
             : filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
-    //JWT: filename DOES NOT HAVE file:// PREFIX AND IS THE TAG DATA FILE (LOCAL OR GLOBAL):
+    //JWT: filename NOW DOES NOT HAVE file:// PREFIX AND IS THE TAG DATA FILE (LOCAL OR GLOBAL):
     if (! g_key_file_load_from_file (rcfile, filename, 
             (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))
-        AUDDBG ("w:aud_write_tag_to_tagfile: error opening key file (%s), assuming we're creating a new one.",
+        AUDDBG ("w:aud_write_tag_to_tagfile: error opening key file (%s), assuming we're creating a new one.\n",
             (const char *) filename);
 
-    const char * song_key_const = (const char *)song_key;
+    const char * song_key_const = (const char *) song_key;
     char * precedence = g_key_file_get_string (rcfile, song_key_const, "Precedence", nullptr);
     if (! precedence)
         g_key_file_set_string (rcfile, song_key_const, "Precedence", "DEFAULT");
@@ -573,7 +652,7 @@ EXPORT bool aud_file_write_tuple (const char * filename,
 {
     bool success = true;
 
-    if (!strcmp(filename, "-") || strstr(filename, "://-."))  /* JWT:NO SONG-INFO SAVING ON STDIN!!! */
+    if (!strcmp (filename, "-") || strstr (filename, "://-."))  /* JWT:NO SONG-INFO SAVING ON STDIN!!! */
         return false;
 
     auto ip = (InputPlugin *) aud_plugin_get_header (decoder);
@@ -608,7 +687,7 @@ EXPORT bool aud_file_write_tuple (const char * filename,
     return success;
 }
 
-/* JWT: NEW FUNCTION TO REMOVE A TITLE FROM THE TAG FILE: */
+/* JWT: NEW FUNCTION TO REMOVE A TITLE FROM THE GLOBAL (NOT LOCAL) TAG FILES: */
 EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename, const char * tagdata_filename)
 {
     GKeyFile * rcfile = g_key_file_new ();
