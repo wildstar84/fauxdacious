@@ -102,9 +102,11 @@ private:
 
     void record_setup ();
     void record_update ();
+    void prefswindow_update ();
 
     const HookReceiver<PrefsWindow>
-     record_hook {"enable record", this, & PrefsWindow::record_update};
+     record_hook {"enable record", this, & PrefsWindow::record_update},
+     effects_hook {"set _autoeffects_loaded", this, & PrefsWindow::prefswindow_update};
 };
 
 /* static data */
@@ -300,15 +302,6 @@ static const PreferencesWidget proxy_auth_elements[] = {
         {true})
 };
 
-static const PreferencesWidget proxy_socks_elements[] = {
-    WidgetRadio (N_("SOCKS v4a"),
-        WidgetInt (0, "socks_type"),
-        {0}),
-    WidgetRadio (N_("SOCKS v5"),
-        WidgetInt (0, "socks_type"),
-        {1})
-};
-
 static const PreferencesWidget connectivity_page_widgets[] = {
     WidgetLabel (N_("<b>Network Settings</b>")),
     WidgetSpin (N_("Buffer size:"),
@@ -323,9 +316,15 @@ static const PreferencesWidget connectivity_page_widgets[] = {
         WidgetBool (0, "use_proxy_auth")),
     WidgetTable ({{proxy_auth_elements}},
         WIDGET_CHILD),
-    WidgetCheck (N_("SOCKS proxy?"),
+    WidgetCheck (N_("Use SOCKS proxy"),
         WidgetBool (0, "socks_proxy")),
-    WidgetTable ({{proxy_socks_elements}},
+    WidgetRadio (N_("SOCKS v4a"),
+        WidgetInt (0, "socks_type"),
+        {0},
+        WIDGET_CHILD),
+    WidgetRadio (N_("SOCKS v5"),
+        WidgetInt (0, "socks_type"),
+        {1},
         WIDGET_CHILD)
 };
 
@@ -680,11 +679,6 @@ PrefsWindow::PrefsWindow () :
 
     QObject::connect (bbox, & QDialogButtonBox::rejected, this, & QObject::deleteLater);
 
-    QSignalMapper * mapper = new QSignalMapper (this);
-
-    QObject::connect (mapper, static_cast <void (QSignalMapper::*)(int)>(&QSignalMapper::mapped),
-                      s_category_notebook, static_cast <void (QStackedWidget::*)(int)>(&QStackedWidget::setCurrentIndex));
-
     if (aud_get_bool(nullptr, "use_classic_icons"))
     {
         const char * data_dir = aud_get_path (AudPath::DataDir);
@@ -694,10 +688,9 @@ PrefsWindow::PrefsWindow () :
             QAction * a = new QAction (ico, translate_str (classic_categories[i].name), toolbar);
 
             toolbar->addAction (a);
-            mapper->setMapping (a, i);
-
-            void (QSignalMapper::* slot) () = & QSignalMapper::map;
-            QObject::connect (a, & QAction::triggered, mapper, slot);
+            connect (a, & QAction::triggered, [i] () {
+                s_category_notebook->setCurrentIndex (i);
+            });
         }
     }
     else
@@ -708,10 +701,9 @@ PrefsWindow::PrefsWindow () :
              translate_str (categories[i].name), toolbar);
 
             toolbar->addAction (a);
-            mapper->setMapping (a, i);
-
-            void (QSignalMapper::* slot) () = & QSignalMapper::map;
-            QObject::connect (a, & QAction::triggered, mapper, slot);
+            connect (a, & QAction::triggered, [i] () {
+                s_category_notebook->setCurrentIndex (i);
+            });
         }
     }
 
@@ -796,6 +788,12 @@ void PrefsWindow::record_update ()
         record_config_button->setEnabled (false);
         record_about_button->setEnabled (false);
     }
+}
+
+void PrefsWindow::prefswindow_update ()
+{
+	//JWT: AUDERR("XXXXXX UPDATE PREFS WINDOW XXXXXX\n");
+	s_plugin_view->repaint ();
 }
 
 EXPORT void prefswin_show ()
