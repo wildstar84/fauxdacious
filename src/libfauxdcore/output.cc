@@ -840,7 +840,7 @@ void output_drain ()
 
     if (! s_input)
     {
-        if (s_output)
+        if (s_output && ! (s_paused || s_flushed || s_resetting))
             finish_effects (true); /* second time for end of playlist */
 
         cleanup_output ();
