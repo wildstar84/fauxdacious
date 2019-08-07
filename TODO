@@ -1,4 +1,4 @@
-Rebuild v3.9 on Windows (after installing the new dependencies and patches 
+Rebuild v3.10 on Windows (after installing the new dependencies and patches 
 required by Audacious v3.9*, then clean up the Windows build-notes accordingly.
 
 Package all this into four separate Debian packages (source and binary for 
@@ -7,10 +7,11 @@ both Fauxdacious and Fauxdacious Plugins.
 Fix stupid but harmless DBus errors when exiting the QT version.  I've tried 
 everything I can think of for now though.
 
-Add an Equalizer Preset window for the QT version (when Audacious finally 
-gets around to doing this, since I know NOTHING about QT programming and 
-they've told everyone NOT to bug 'em about it until they get to it) so I 
-can add our custom Equalizer Preset features to our QT users!
+Make Effects plugin screen (checkboxes) update when song change (with custom 
+equalizer and effects settings) changes the active effects plugins.  The 
+effect plugins get properly turned off and on, but the QT screen does NOT 
+update the checkboxes unless you click on the screen.  So far I have not 
+found a way to fix this annoyance.
 
 Remove Adplug Classic plugin when Debian FINALLY gets around to patching 
 or upgrading Adplug.
