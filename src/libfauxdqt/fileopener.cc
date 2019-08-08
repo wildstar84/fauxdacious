@@ -54,12 +54,12 @@ EXPORT void fileopener_show (FileMode mode)
     if (! dialog)
     {
         static constexpr aud::array<FileMode, const char *> titles {
-            N_("Open Files"),
-            N_("Open Folder"),
-            N_("Add Files"),
-            N_("Add Folder"),
-            N_("Import Playlist"),
-            N_("Export Playlist")
+            N_("Open Files - Fauxdacious"),
+            N_("Open Folder - Fauxdacious"),
+            N_("Add Files - Fauxdacious"),
+            N_("Add Folder - Fauxdacious"),
+            N_("Import Playlist - Fauxdacious"),
+            N_("Export Playlist - Fauxdacious")
         };
 
         static constexpr aud::array<FileMode, const char *> labels {

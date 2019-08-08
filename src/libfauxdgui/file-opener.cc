@@ -75,7 +75,7 @@ static GtkWidget * create_filebrowser (gboolean open)
 
     if (open)
     {
-        window_title = _("Open Files");
+        window_title = _("Open Files - Fauxdacious");
         verb = _("_Open");
         icon = "document-open";
         toggle_text = _("Close _dialog on open");
@@ -83,7 +83,7 @@ static GtkWidget * create_filebrowser (gboolean open)
     }
     else
     {
-        window_title = _("Add Files");
+        window_title = _("Add Files - Fauxdacious");
         verb = _("_Add");
         icon = "list-add";
         toggle_text = _("Close _dialog on add");

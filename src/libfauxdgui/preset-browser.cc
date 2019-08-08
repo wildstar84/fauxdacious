@@ -123,7 +123,7 @@ static void do_load_file (const char * filename, const EqualizerPreset *)
 void eq_preset_load_file ()
 {
     set_default_preset_dir ();
-    show_preset_browser (_("Load Preset File"), false, nullptr, do_load_file, nullptr);
+    show_preset_browser (_("Load Preset File - Fauxdacious"), false, nullptr, do_load_file, nullptr);
 }
 
 static void do_load_eqf (const char * filename, const EqualizerPreset *)
@@ -138,7 +138,7 @@ static void do_load_eqf (const char * filename, const EqualizerPreset *)
 void eq_preset_load_eqf ()
 {
     set_default_preset_dir ();
-    show_preset_browser (_("Load EQF File"), false, nullptr, do_load_eqf, nullptr);
+    show_preset_browser (_("Load EQF File - Fauxdacious"), false, nullptr, do_load_eqf, nullptr);
 }
 
 static void do_save_file (const char * filename, const EqualizerPreset * preset)
@@ -180,7 +180,7 @@ void eq_preset_save_file (const EqualizerPreset * preset)
         set_default_preset_dir ();
 
         StringBuf name = str_concat ({preset->name, ".preset"});
-        show_preset_browser (_("Save Preset File"), true, name, do_save_file, preset);
+        show_preset_browser (_("Save Preset File - Fauxdacious"), true, name, do_save_file, preset);
 
         return;
     }
@@ -204,7 +204,7 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                         aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                                 (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
                                 (const char *) preset_file_namepart}))));
-                        show_preset_browser (_("Save Preset File"), true,
+                        show_preset_browser (_("Save Preset File - Fauxdacious"), true,
                                 preset_file_namepart, do_save_file, preset);
 
                         return;
@@ -243,7 +243,7 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                     aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                             (str_concat ({aud_get_path (AudPath::UserDir), "/", 
                             (const char *) preset_file_namepart}))));
-                    show_preset_browser (_("Save Preset File"), true, preset_file_namepart,
+                    show_preset_browser (_("Save Preset File - Fauxdacious"), true, preset_file_namepart,
                             do_save_file, preset);
 
                     return;
@@ -274,7 +274,7 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                         aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                                 (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
                                 (const char *) preset_file_namepart}))));
-                        show_preset_browser (_("Save Preset File"), true,
+                        show_preset_browser (_("Save Preset File - Fauxdacious"), true,
                                 preset_file_namepart, do_save_file, preset);
 
                         return;
@@ -290,7 +290,7 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                 aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
                         (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
                         (const char *) preset_file_namepart}))));
-                show_preset_browser (_("Save Preset File"), true, preset_file_namepart,
+                show_preset_browser (_("Save Preset File - Fauxdacious"), true, preset_file_namepart,
                         do_save_file, preset);
 
                 return;
@@ -300,7 +300,7 @@ void eq_preset_save_file (const EqualizerPreset * preset)
 
     StringBuf name = preset ? str_concat ({preset->name, ".preset"})
             : str_copy("<NAMEME!>.preset");
-    show_preset_browser (_("Save Preset File"), true, name, do_save_file, preset);
+    show_preset_browser (_("Save Preset File - Fauxdacious"), true, name, do_save_file, preset);
 }
 
 static void do_save_eqf (const char * filename, const EqualizerPreset * preset)
@@ -320,5 +320,5 @@ void eq_preset_save_eqf (const EqualizerPreset * preset)
 
     StringBuf name = preset ? str_concat ({preset->name, ".eqf"})
             : str_copy("<NAMEME!>.eqf");
-    show_preset_browser (_("Save EQF File"), true, name, do_save_eqf, preset);
+    show_preset_browser (_("Save EQF File - Fauxdacious"), true, name, do_save_eqf, preset);
 }

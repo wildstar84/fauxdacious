@@ -44,13 +44,13 @@ static QDialog * buildUrlDialog (bool open)
 
     if (open)
     {
-        title = _("Open URL");
+        title = _("Open URL - Fauxdacious");
         verb = _("_Open");
         icon = "document-open";
     }
     else
     {
-        title = _("Add URL");
+        title = _("Add URL - Fauxdacious");
         verb = _("_Add");
         icon = "list-add";
     }

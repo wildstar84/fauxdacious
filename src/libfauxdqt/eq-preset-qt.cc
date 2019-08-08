@@ -297,7 +297,7 @@ static void set_default_preset_dir ()
 
 static void show_import_dialog (QDialog * parent, PresetView * view)
 {
-    auto dialog = new QFileDialog (parent, _("Load Preset File"));
+    auto dialog = new QFileDialog (parent, _("Load Preset File - Fauxdacious"));
 
     dialog->setAttribute (Qt::WA_DeleteOnClose);
     dialog->setFileMode (QFileDialog::ExistingFile);
@@ -496,7 +496,7 @@ static QDialog * create_preset_win ()
 {
     auto win = new QDialog;
     win->setAttribute (Qt::WA_DeleteOnClose);
-    win->setWindowTitle (_("Equalizer Presets"));
+    win->setWindowTitle (_("Equalizer Presets - Fauxdacious"));
     win->setContentsMargins (margins.TwoPt);
 
     auto edit = new QLineEdit;
