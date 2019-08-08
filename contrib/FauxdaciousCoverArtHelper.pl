@@ -4,29 +4,13 @@
 
 #FAUXDACIOUS "HELPER" SCRIPT TO FETCH COVER ART FOR CDs/DVSs FROM coverartarchive and dvdcover.com:
 
-#USAGE:  ~/.config/audacious[_instancename]/config:  [audacious].cover_helper=FauxdaciousCoverArtHelper.pl
+#USAGE:  $0 {CD[T] diskID | DVD title} [configpath] | DELETE COVERART configpath
 
-#THIS SCRIPT WORKS BY TAKING THE URL THAT FAUXDACIOUS IS ATTEMPTING TO ADD TO IT'S
-#PLAYLIST AND TRIES TO MATCH IT AGAINST USER-WRITTEN REGEX PATTERNS.  IF IT MATCHES
-#ONE THEN CODE IS EXECUTED TO CONVERT IT TO A PLAYABLE URL AND WRITTEN OUT AS A 
-#TEMPORARY ONE (OR MORE) LINE ".pls" "PLAYLIST" THAT FAUXDACIOUS WILL THEN ACTUALLY
-#ADD TO IT'S PLAYLIST.  THIS IS NECESSARY BECAUSE THERE'S NO OTHER KNOWN WAY TO 
-#CHANGE THE URL WITHIN FAUXDACIOUS.  IF THE URL "FALLS THROUGH" - NOT MATCHING ANY
-#OF THE USER-SUPPLIED PATTERNS HERE, THIS PROGRAM EXITS SILENTLY AND FAUXACIOUS 
-#HANDLES THE URL NORMALLY (UNCHANGED).
-#THE CURRENTLY-PROVIDED PATTERNS ARE FOR "tunein.com" RADIO STATIONS AND "youtube" 
-#VIDEOS, FOR WHICH THE ACTUALLY VALID STREAM URL MUST BE LOCATED AND RETURNED.
-#TEMPLATE FOR ADDING USER-DEFINED PATTERNS:
-#if ($ARGV[0] =~ <pattern>) {
-#    <logic to locate proper stream URL, and perhaps the tag metadata / cover art url>
-#    $newPlaylistURL = <proper stream URL to actually play>;
-#    $title = <default descriptive title tag text to describe the stream>; #OPTIONAL
-#    $comment = <additional tag metadata for tag file>; #OPTIONAL
-#         #$comment SHOULD EITHER BE EMPTY OR IN THE FORM:  "Comment=string\nArtist=string...\n" etc.
-#         #ONE USE FOR comment IS TO FETCH A COVER-ART THUMBNAIL IMAGE FILE AND PASS 
-#         #IT'S URI/URL HERE AS "Comment=<art_uri>" SEE THE PREDEFINED PATTERNS FOR EXAMPLES:
-#    &writeTagData($comment);
-#}
+#CONFIGURE:  ~/.config/audacious[_instancename]/config:  [audacious].cover_helper=FauxdaciousCoverArtHelper.pl
+
+#THIS SCRIPT ATTEMPTS TO FETCH THE COVER ART FOR CDs AND DVDs AND, IF NEEDED, THE TRACK TITLES AND ARTISTS 
+#FOR CDs.  IT ALSO HANDLES DELETING TEMPORARY COVER-ART IMAGES FOR FAUXDACIOUS.
+#IT CURRENTLY SCRAPES SITES:  dvdcover.com, archive.org AND/OR musicbrainz.org FOR THE NEEDED INFORMATION.
 #YOU CAN CHANGE "DEFAULT" TO "OVERRIDE" IN writeTagData() TO KEEP STATION TITLE FROM BEING 
 #OVERWRITTEN BY CURRENT SONG TITLE:
 
@@ -71,6 +55,7 @@ if ($ARGV[1]) {
 
 my $html = '';
 my $title = '';
+my $artist = '';
 my $comment = '';
 my $DEBUG=1;
 my $ua = LWP::UserAgent->new;		
@@ -107,7 +92,6 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 	}
 	die "f:failed to find title ($ARGV[1]) on musicbrainz.com!\n"  unless ($html);
 	my $url2 = '';
-	my $artist = '';
 	my ($tmpurl2, $tmptitle, $tmpartist);
 	while ($html)  #MAY BE MULTIPLE MATCHES, TRY TO FIND ONE THAT'S A "CD" (VS. A "DVD", ETC.):
 	{
@@ -118,7 +102,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 			if ($html =~ s#^.*?\<bdi\>([^\<]+)\<\/bdi\>##is)
 			{
 				$tmpartist = $1;
-				print "-1a: artist=$tmpartist= url=$tmpurl2= title=$tmptitle=\n"  if ($DEBUG);
+				print STDERR "-1a: artist=$tmpartist= url=$tmpurl2= title=$tmptitle=\n"  if ($DEBUG);
 				$html =~ s#^.*?\<td\>##is;
 				if ($html =~ s#^CD\<\/td\>##is) {   #FOUND A DEFINITE "CD" (GRAB & QUIT!):
 					$url2 = $tmpurl2;   #URL OF PAGE CONTAINING DETAILS FOR THE PARTICULAR CD:
@@ -143,6 +127,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 	}
 	if ($url2) {   #NOW FETCH THE DETAILS (COVER ART & TRACK TITLES) FOR THE MATCHED CD:
 		my @tracktitle = ();
+		my @trackartist = ();
 		my $art_url = '';
 		$url2 = 'https://musicbrainz.org' . $url2  unless ($url2 =~ /^http/);
 		print STDERR "-2: URL2=$url2=\n"  if ($DEBUG);
@@ -174,14 +159,24 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 				print STDERR "--track$trk($1)=$t=\n"  if ($DEBUG);   #WE MAKE ASCII BY REMOVING ALL ACCENTS!:
 				$t =~ tr/ŠšžŸÀÁÂÃÅÄÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðñòóôõöùúüûýø×°/SszYAAAAAACEEEEIIIIDNOOOOOUUUUYaaaaaaceeeeiiiionooooouuuuy0x /;
 				$t =~ s/[\x80-\xff]//g;
-			    $tracktitle[$trk++] = $t;
+				$tracktitle[$trk] = $t;
+				if ($html =~ s#\<td\>\s*\<a\s+href\=\"\/artist\/[^\"]*\" title\=\"[^\"]*\"\>\<bdi\>([^\<]*)\<\/bdi\>##s) {
+					my $t = HTML::Entities::decode_entities($1);
+					$t =~ tr/ŠšžŸÀÁÂÃÅÄÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðñòóôõöùúüûýø×°/SszYAAAAAACEEEEIIIIDNOOOOOUUUUYaaaaaaceeeeiiiionooooouuuuy0x /;
+					$t =~ s/[\x80-\xff]//g;
+					$trackartist[$trk] = $t;
+				}
+				$trackartist[$trk] ||= $artist;
+				print STDERR "-4.1: artist($trk)=$trackartist[$trk]=\n";
+				++$trk;
 			}
 		} else {
 			die "f:No cover art url found!\n"  unless ($art_url);
 		}
 		
 		$comment = "Album=$title\n";
-		$comment .= "Artist=$artist\n"  if ($artist);
+		$comment .= "AlbumArtist=$artist\n"  if ($artist);
+		#x$comment .= "Artist=$artist\n"  if ($artist);
 		if ($art_url) {   #WE FOUND AN IMAGE LINK TO WHAT SHOULD BE "COVER-ART":
 			my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
 			my $art_image;
@@ -217,7 +212,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 				}
 			}
 		}
-		&writeTagData($comment, \@tracktitle);  #WRITE OUT ALL THE TRACK TAGS TO user_tag_data AND CUSTOM (<disk-id>.tag):
+		&writeTagData($comment, \@tracktitle, \@trackartist);  #WRITE OUT ALL THE TRACK TAGS TO user_tag_data AND CUSTOM (<disk-id>.tag):
 	}
 } elsif ($ARGV[0] =~ /^DVD/i) {   #WE'RE A DVD:  JUST LOOK UP AND DOWNLOAD THE COVER-ART:
 	eval "use LWP::Curl; \$haveCurl = 1; 1";   #MUST USE CURL ON Dvdcover.com - THEY CHECK FOR AD-BLOCKERZ:
@@ -319,9 +314,13 @@ exit(0);
 sub writeTagData {   #FOR CDs:  WRITE ALL TAG-DATA FOUND FOR EACH TRACK TO user_tag_data AND, IF NEEDED, CUSTOM TAG-FILE (<disk-ID>.tag)
 	my $comment = shift || '';
 	my $tracktitles = shift || '';
+	my $trackartists = shift || '';
 	my @tagdata = ();
 	(my $nocomment = $comment) =~ s/Comment\=\S*//gs;  #CON'T INCLUDE COVER-ART FILE IN CUSTOM-FILE COMMENTS (REDUNDANT!)
+	chomp $nocomment;
 	my $trktitle = ($#{$tracktitles} >= 0) ? shift (@{$tracktitles}) : $title;
+	my $trkartist = ($#{$trackartists} >= 0) ? shift (@{$trackartists}) : $artist;
+	$trkartist = "Artist=$trkartist\n"  if ($trkartist =~ /\w/o);
 	print STDERR "-7: comment=$comment= tagfid=${configPath}/tmp_tag_data=\n"  if ($DEBUG);
 	if (open TAGDATA, "<${configPath}/tmp_tag_data") {  #MUST FIRST FETCH EXISTING user_tag_data SINCE WE'LL OVERWRITE IT:
 		my $omit = 0;
@@ -347,7 +346,7 @@ sub writeTagData {   #FOR CDs:  WRITE ALL TAG-DATA FOUND FOR EACH TRACK TO user_
 [cdda://?$trk]
 Precedence=OVERRIDE
 Title=$trktitle
-Track=$trk
+${trkartist}Track=${trk}
 $comment
 EOF
 
@@ -357,13 +356,15 @@ EOF
 [cdda://?$trk]
 Precedence=OVERRIDE
 Title=$trktitle
-Track=$trk
+${trkartist}Track=${trk}
 $nocomment
 EOF
 
 			}
 			last  unless (@{$tracktitles});
 			$trktitle = shift (@{$tracktitles});
+			$trkartist = shift (@{$trackartists});
+			$trkartist = "Artist=$trkartist\n"  if ($trkartist =~ /\w/o);
 			++$trk;
 		}
 		close CUSTOM  if ($customAlso);
