@@ -360,6 +360,10 @@ static const PreferencesWidget song_info_page_widgets[] = {
         WIDGET_CHILD),
     WidgetCheck (N_("Show time scale for current song"),
         WidgetBool (0, "filepopup_showprogressbar"),
+        WIDGET_CHILD),
+    WidgetLabel (N_("<b>Fauxdacious Extras</b>")),
+    WidgetCheck (N_("Save unsavable metadata to file"),
+        WidgetBool (0, "user_tag_data"),
         WIDGET_CHILD)
 };
 
