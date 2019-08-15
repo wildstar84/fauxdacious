@@ -427,7 +427,9 @@ static const PreferencesWidget advanced_page_widgets[] = {
         WidgetInt (0, "url_helper_allow"),
         {{url_helper_allow}}),
     WidgetLabel (N_("URL-helper program?:")),
-    WidgetEntry (0, WidgetString (0, "url_helper"))
+    WidgetEntry (0, WidgetString (0, "url_helper")),
+    WidgetLabel (N_("CD/DVD Cover Art-helper program?:")),
+    WidgetEntry (0, WidgetString (0, "cover_helper"))
 };
 
 #define TITLESTRING_NPRESETS 8

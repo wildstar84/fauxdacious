@@ -59,7 +59,7 @@ In summary, before playing Youtube / Vimeo videos, do the following (one time):
 1) Install youtube-dl.
 2) Install Perl modules:  "StreamFinder", "LWP::Simple", "LWP::UserAgent", "URI::Escape", and "WWW::YouTube::Download".
 3) Copy [source-dir]/fauxdacious/contrib/*.pl /usr/local/bin
-4) Edit (ie. vi) ~/.config/fauxdacious/config and add the line "url_helper=/usr/local/bin/FauxdaciousUrlHelper.pl" under the [Audacious] section in that file.
+4) Go to [Settings].[Advanced] and in the "URL-helper program?:" field, and set it to:  "/usr/local/bin/FauxdaciousUrlHelper.pl"
 
 Then, to play a video:</span></td>
 </tr>
@@ -86,17 +86,21 @@ After moving the saved video file to wherever you want it to permanently reside,
 <td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">fauxdacious dvd://</code></td>
 </tr>
 <tr>
-<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">or open Fauxacous the usual way and go to [Services] menu and select either "Add DVD" or "Play DVD".  If you have trouble playing a specific DVD, you can adjust the settings in [Settings].[Plugins].[Input tab].[DVD Plugin].  If your dvd device is unusual, ie. something other than "/dev/dvd", change this box.  Make sure the "Play video stream in popup window..." box is checked (unless you just want audio).  You'll probably want the "Highlight menu buttons" box checked.  To avoid clutter in your playlist, most users will want "Only Title Track in Playlist" checked.  If the DVD menu doesn't seem to work (some DVDs just don't), you may want to also check the box "Only 1st track in Playlist" box, which is usually just the main feature movie).  If neither are checked, each "track" file on the DVD will appear in the playlist.  
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">or open Fauxacous the usual way and go to [Services] menu and select either "Add DVD" or "Play DVD".  If you have trouble playing a specific DVD, you can adjust the settings in [Settings].[Plugins].[Input tab].[DVD Plugin].  If your dvd device is unusual, ie. something other than "/dev/dvd", change this box.  Make sure the "Play video stream in popup window..." box is checked (unless you just want audio).  You'll probably want the "Highlight menu buttons" box checked.  To avoid clutter in your playlist, most users will want "Only Title Track in Playlist" checked.  If the DVD menu doesn't seem to work (some DVDs just don't), you may want to also either check the "Only 1st track in Playlist" and/or the "Only Lonest Track in Playlist" box, which is usually just the main feature movie).  If none of the "Only..." boxes are checked, each "track" file on the DVD will appear in the playlist.  
 
 "Continue at end of menus" and "Skip Menus" should only be checked if a DVD's menus don't work otherwise, as this can cause some DVDs to crash Fauxdacious.  It's also helpful to have one or the other checked (experiment) if just playing audio (in which case there's no way for the user to interact with the DVD menus).
 
-To have Fauxdacious attempt to fetch the DVD's "cover" image from the internet, edit your ~/.config/fauxdacious/config file with your favorite text editor and add the line:</span></td>
+Check the box for "Allow Custom Tag-files" to allow usage of custom tag files which you can either create manually and/or use the save Song Info box to create and save metadata for the DVD tracks.  The custom tag file for a DVD will be "~/.config/fauxdacious[_instancename]/DVD_TITLE.tag".
+
+NOTE:  This is also true for audio-CDs ("~/.config/fauxdacious[_instancename]/DISK-ID.tag"), except audio-CDs can also fetch metadata for individual tracks from freedb.com, or musicbrainz.com using the cover-art "helper" script (mentioned next paragraph below) and create the custom tag file (along with downloading any cover-art image) for you the first time you play the CD.
+
+To have Fauxdacious attempt to fetch the DVD's "cover" image from the internet, go to [Settings].[Advanced] and add the following to the "CD/DVD Cover Art-helper program?:" field:</span></td>
 </tr>
 <tr>
-<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">cover_helper=/usr/local/bin/FauxdaciousCoverArtHelper.pl</code></td>
+<td align="left" valign="top" width="100%"><code style="font-family:Lucida Console, Andale Mono, FreeMono, Courier;font-size:16px;font-weight:normal;">/usr/local/bin/FauxdaciousCoverArtHelper.pl</code></td>
 </tr>
 <tr>
-<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">to the [Audacious] section (and make sure the script file "FauxdaciousCoverArtHelper.pl" is in /usr/local/bin, otherwise specify it's location and make sure it's executable).  NOTE:  The cover-art helper script may not be able to fetch a proper art image for all DVDs, in which case, it will not have one.</span></td>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">(and make sure the script file "FauxdaciousCoverArtHelper.pl" is in /usr/local/bin, otherwise specify it's location and make sure it's executable).  NOTE:  The cover-art helper script may not be able to fetch a proper art image for all DVDs, in which case, it will not have one.</span></td>
 </tr>
 <tr>
 <td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">10) How do I use custom equalizer and / or effects plugin presets for specific songs, directories, disks, etc.?</span></td>
@@ -215,26 +219,32 @@ NOTE, it's not PLAYING the songs themselves here through stdin, but the playlist
 </tr>
 <tr>
 <tr>
-<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">15) When I start up Audacious from the command line with a list of stuff to play, Audacious creates a new "playlist", which is very annoying since I use the WinAmp Skins interface and don't see the previous ones it created, which gets annoying since I end up with a bunch of old, one-off playlists before I realise it!  How do I start up Fauxdacious with just a single playlist, or even just with the files I specified on the command line?</span></td>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">15) How do I save tag metadata (ie. song title, artist, cover-art, etc.) using the "Song Info." dialog or manually for online streams, CDs, DVDs, and files in audio-formats that do not support the metadata tag format used by Audacious?</span></td>
+</tr>
+<tr>
+<td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Unlike Audacious, Fauxdacious can still save your custom tag data associated with song entries whether they support it or not.  Fauxdacious first tries to save the tag data in the song file itself, and failing that, can save it to a file, and read the metadata from that file whenever that song entry is played, as if the tag data were saved in the song entry file itself (NOTE:  These tags will not be present if playing in Audacious or another media player though)!  For most entries, the "Song Info." dialog will save the tag data in the common tag file:  "~/.config/fauxdacious[_instancename]/user_tag_data".  For disks (CDs and DVDs), it will be saved in a separate custom tag file "~/.config/fauxdacious[_instancename]/DISK-ID.tag.  For streams downloaded via youtube-dl through the helper-script (which expire and thus are considered "one-off" plays), a separate "tmp_tag_data" file is used.  CDs and DVDs also store tag data there while they are playing.  When playing an entry, Fauxdacious will look for tag data to fill in the metadata fields first in "~/.config/fauxdacious[_instancename]/tmp_tag_data", then (if song is a local file) in user_tag_data.tag in the directory the song file is in, then in "~/.config/fauxdacious[_instancename]/user_tag_data", then (if song is a CD/DVD track, in "~/.config/fauxdacious[_instancename]/DISK-ID.tag", and last, any tag data stored in the audio file itself.  These are all editable text files.  One of the argument fields for each tag is "Precedence" which can be set to "DEFAULT", "OVERRIDE", or "ONLY", which while processing the above tag sources, will either use as default, override any value from a previous source found, or ONLY use THAT value.  Another special field is the "Comment" field, which can be any text comment, but if set to the full path of a valid image file name, will be used as the "cover art image" for the song entry!  To turn these features on, go to [Settings].[Song Info] and check the "Save unsavable metadata to file" box.  If unchecked, then Fauxdacious will be limited to handling most metadata the same way Audacious does.  NOTE:  See also the "Allow Custom Tag-files" options under [Settings].[Plugins].[Audio Cd/DVD plugins] configurations for allowing these custom tag files for individual disks.</span></td>
+</tr>
+<tr>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">16) When I start up Audacious from the command line with a list of stuff to play, Audacious creates a new "playlist", which is very annoying since I use the WinAmp Skins interface and don't see the previous ones it created, which gets annoying since I end up with a bunch of old, one-off playlists before I realise it!  How do I start up Fauxdacious with just a single playlist, or even just with the files I specified on the command line?</span></td>
 </tr>
 <tr>
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">To start up Fauxdacious with just a single playlist and discard any other existing ones, start with the "-D" (Delete playlists) option.  To clear the current playlist of any existing entries, start with the "-c" (Clear playlist) option.  To start Fauxdacious with a completely clean slate, start up with both "-D" and "-c" (or "-Dc").</span></td>
 </tr>
 <tr>
-<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">16) How do I start up Fauxdacious with the equalizer turned OFF?</span></td>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">17) How do I start up Fauxdacious with the equalizer turned OFF?</span></td>
 </tr>
 <tr>
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Start up Fauxdacious with the "-z" option.  Fauxdacious will remember whether it was on before you started up and restore that when exiting.</span></td>
 </tr>
 <tr>
-<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">17) How do I start up Fauxdacious with "Recording" (dubbing) turned ON?</span></td>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">18) How do I start up Fauxdacious with "Recording" (dubbing) turned ON?</span></td>
 </tr>
 <tr>
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Start up Fauxdacious with the "-R" option.
 NOTE:  This will be ignored if the "-o/--out=&lt;ext&gt;" option is also specified!</span></td>
 </tr>
 <tr>
-<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">18) How do I start up a second "instance" of Fauxdacious or one that uses a configuration different than my normal "default" configuration?</span></td>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">19) How do I start up a second "instance" of Fauxdacious or one that uses a configuration different than my normal "default" configuration?</span></td>
 </tr>
 <tr>
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">There are three different ways to start up multiple or different Fauxdacious instances:</span></td>
@@ -258,7 +268,7 @@ NOTE:  This will be ignored if the "-o/--out=&lt;ext&gt;" option is also specifi
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">This creates a new, separate running (but unnamed) Fauxdacious instance using the default config directory ("~/.config/fauxdacious/").  I've never found this to be of much use, but for each multicharacter argument that takes a value, the code requires a corresponding single-character version with no arguments.</span></td>
 </tr>
 <tr>
-<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">19) How do I control different running Fauxdacious instances using the Fauxdtool?</span></td>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">20) How do I control different running Fauxdacious instances using the Fauxdtool?</span></td>
 </tr>
 <tr>
 <td align="left" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">To control the default instance:</span></td>
@@ -282,13 +292,13 @@ NOTE:  This will be ignored if the "-o/--out=&lt;ext&gt;" option is also specifi
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">One can not access or control an unnamed instance created with "-n" though.</span></td>
 </tr>
 <tr>
-<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">20) How do I get Fauxdacious to randomly change "skins" when the playlist entry changes (like the old XMMS "Random Skin on Play" option)?</span></td>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">21) How do I get Fauxdacious to randomly change "skins" when the playlist entry changes (like the old XMMS "Random Skin on Play" option)?</span></td>
 </tr>
 <tr>
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">Go to [Settings].[Appearance], switch Fauxdacious's "Interface" to the "Winamp Classic Interface", then check the box at the bottom of the window labeled "Random skin on play".  Fauxdacious will randomly change it's "skin" each time the playlist advances.  NOTE:  Streaming radio stations that change song titles between songs does NOT cause the skin to change, however.  I may look into adding that in the future if there is any demand for it.</span></td>
 </tr>
 <tr>
-<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">21) Why do I get a bunch of "dbus errors" when exiting Fauxdacious when using the Qt interface (Audacious doesn't do this), is it serious?</span></td>
+<td align="left" valign="top" width="100%"><span style="font-family:Arial, Helvetica, sans-serif;font-size:19px;font-weight:normal;">22) Why do I get a bunch of "dbus errors" when exiting Fauxdacious when using the Qt interface (Audacious doesn't do this), is it serious?</span></td>
 </tr>
 <tr>
 <td align="justify" valign="top" width="100%"><span style="font-family:Times New Roman, Times, FreeSerif, serif;font-size:19px;font-weight:normal;">This is due to a conflict between the SDL2 system library, which must be started up early in the "main()" program, Qt, and the DBus library.  I've tried everything I know to suppress / fix this but have been unsuccessful so far.  It seems to be harmless "spam" warnings that do not cause any known issues or produce a core dump and Fauxdacious still seems to exit normally and properly, so just ignore.  Also note (and the Audacious team will tell you this too) that the Qt interfaces are new and still under construction thus lacking some of the functionality of the traditional GTK interfaces.  Equalizer preset files are a glaring example omission!  Writing this is beyond my knowledge level, I don't use the Qt interface anyway, and, as soon as I could do one, I'm sure the Audacious team will release one making my efforts here wasted.  Just use WinAmp Skins (GTK version) or the GTK interface for best user-experience!  The only reason I see for using the Qt interface at the moment is the "Ampache" plugin, if you really need that.</span></td>
