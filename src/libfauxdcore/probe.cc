@@ -662,20 +662,36 @@ EXPORT bool aud_file_write_tuple (const char * filename,
 
     if (success)
     {
-        VFSFile file;
-
-        if (! open_input_file (filename, "r+", ip, file))
-            success = false;
-
-        if (success)
+        if (! strncmp (filename, "cdda://", 7) || ! strncmp (filename, "dvd://", 6))  // FILE IS A DISK:
         {
-            if (! file)  /* JWT:ADDED TO PREVENT SEGFAULT - <input_plugins>.write_tuple () EXPECTS AN OPEN FILE!!! */
-                file = VFSFile (filename, "r+");
-            success = file ? ip->write_tuple (filename, file, tuple) : false;
-        }
+            String diskID = aud_get_str (nullptr, "playingdiskid");
+            String tag_file = String (str_concat ({(const char *) diskID, ".tag"}));
+            success = aud_write_tag_to_tagfile (filename, tuple, (const char *) tag_file);
+            if (success)
+            {
+                aud_set_bool (nullptr, "_disktagrefresh", TRUE);
+                aud_playlist_rescan_file (filename);
+            }
 
-        if (success && file && file.fflush () != 0)
-            success = false;
+            return success;
+        }
+        else
+        {
+            VFSFile file;
+
+            if (! open_input_file (filename, "r+", ip, file))
+                success = false;
+
+            if (success)
+            {
+                if (! file)  /* JWT:ADDED TO PREVENT SEGFAULT - <input_plugins>.write_tuple () EXPECTS AN OPEN FILE!!! */
+                    file = VFSFile (filename, "r+");
+                success = file ? ip->write_tuple (filename, file, tuple) : false;
+            }
+
+            if (success && file && file.fflush () != 0)
+                success = false;
+        }
     }
     /* JWT:IF CAN'T SAVE TAGS TO FILE (IE. STREAM), TRY SAVING TO USER'S CONFIG: */
     if (! success && aud_get_bool (nullptr, "user_tag_data"))
