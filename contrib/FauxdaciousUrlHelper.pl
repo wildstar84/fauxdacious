@@ -61,9 +61,6 @@ BEGIN
 use strict;
 use LWP::Simple qw();
 use StreamFinder;
-my $haveTuneinStreams = 1;
-my $haveIheartRadioStreams = 1;
-my $haveYoutubeDownload = 1;
 
 die "..usage: $0 url\n"  unless ($ARGV[0]);
 my $configPath = '';
@@ -76,34 +73,46 @@ my $comment = '';
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-#NAAAH - TURN OFF m3u PLUGIN TO LOAD FIRST TIME. - if ($ARGV[0] =~ /^http/ && $ARGV[0] =~ /\.m3u8?\b/i) {
-#	$newPlaylistURL = $ARGV[0];  #FORCE FAUXDACIOUS TO HANDLE http://url.m3u[8] AS A STREAM, *NOT* A PLAYLIST!:
-#} else {
-	my $client = new StreamFinder($ARGV[0]);
-	die "f:Could not open streamfinder or no streams found!"  unless ($client);
+exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
+exit (0)  if ($ARGV[0] =~ /\.\w{2,4}$/);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE EXTENSION!
 
-	$newPlaylistURL = $client->getURL();
-	die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
-	$title = $client->getTitle();
-	my $art_url = $client->getIconURL();
-	my $stationID = $client->getID();
-	$comment = "Album=$ARGV[0]\n";
-	$comment .= "Artist=".$client->{artist}."\n"  if (defined $client->{artist});
-	if ($art_url) {
-		my ($image_ext, $art_image) = $client->getIconData;
-		if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
-			binmode IMGOUT;
-			print IMGOUT $art_image;
-			close IMGOUT;
-			my $path = $configPath;
-			if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
-				$path =~ s#^(\w)\:#\/$1\%3A#;
-				$path =~ s#\\#\/#g;
-			}
-			$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
+my $client = new StreamFinder($ARGV[0]);
+die "f:Could not open streamfinder or no streams found!"  unless ($client);
+
+$newPlaylistURL = $client->getURL('-noplaylists');
+die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
+$title = $client->getTitle();
+my $art_url = $client->getIconURL();
+
+#NOTE:  MOST PODCAST EPISODE mp3's SEEM TO COME WITH THEIR OWN EMBEDDED ICONS OR RELY ON THE ALBUM'S ICON:
+#(SO OPTIONS #1 & #2 ARE PBLY POINTLESS (CREATE USELESS REDUNDANT ICON FILES):
+(my $stationID = $client->getID()) =~ s#\/.*$##;  #0: THIS NAMES IMAGE AFTER STATION-ID.
+#1	(my $stationID = $client->getID()) =~ s#\/#\_#;   #1: THIS NAMES IMAGE AFTER STATION-ID[_PODCAST-ID].
+#2	my $stationID = $client->getID();                 #2: THIS KEEPS SEPARATE PODCAST-ID icon in SEPARATE SUBDIRECTORY, CREATING IF NEEDED:
+#2	if ($stationID =~ m#^([^\/]+)\/#) {
+#2		my $substationDIR = $1;
+#2		`mkdir ${configPath}/${substationDIR}`  unless (-d "${configPath}/${substationDIR}");
+#2	}                                                 #END #2.
+
+$comment = 'Album=' . ((defined($client->{album}) && $client->{album} =~ /\S/) ? $client->{album} : $ARGV[0]) . "\n";
+$comment .= "Artist=".$client->{artist}."\n"  if (defined($client->{artist}) && $client->{artist} =~ /\w/);
+$comment .= "Year=".$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
+$comment .= "Genre=".$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
+if ($art_url) {
+	my ($image_ext, $art_image) = $client->getIconData;
+	if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
+		binmode IMGOUT;
+		print IMGOUT $art_image;
+		close IMGOUT;
+		my $path = $configPath;
+		if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+			$path =~ s#^(\w)\:#\/$1\%3A#;
+			$path =~ s#\\#\/#g;
 		}
+		$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
 	}
-#}
+}
+
 &writeTagData($client, $comment);
 #END USER-DEFINED PATTERN-MATCHING CODE.
 exit (0)  unless ($newPlaylistURL);
@@ -128,9 +137,9 @@ sub writeTagData {
 	my $client = shift;
 	my $comment = shift || '';
 	my @tagdata = ();
-	# WE WRITE Facebook/Youtube VIDEOS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
+	# WE WRITE Youtube VIDEOS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!:
-	my $tagfid = ($client && $client->getType() =~ /(?:Facebook|Youtube)/i) ? 'tmp_tag_data' : 'user_tag_data';
+	my $tagfid = ($client && $client->getType() =~ /^(?:Youtube|Vimeo)$/) ? 'tmp_tag_data' : 'user_tag_data';
 	if (open TAGDATA, "<${configPath}/$tagfid") {
 		my $omit = 0;
 		while (<TAGDATA>) {
