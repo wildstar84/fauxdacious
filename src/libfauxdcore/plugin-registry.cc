@@ -691,6 +691,11 @@ EXPORT void aud_plugin_remove_watch (PluginHandle * plugin, PluginWatchFunc func
     plugin->watches.remove_if (is_match);
 }
 
+const Index<String> & transport_plugin_get_schemes (PluginHandle * plugin)
+{
+    return plugin->schemes;
+}
+
 bool transport_plugin_has_scheme (PluginHandle * plugin, const char * scheme)
 {
     for (String & s : plugin->schemes)
@@ -742,4 +747,34 @@ bool input_plugin_has_subtunes (PluginHandle * plugin)
 bool input_plugin_can_write_tuple (PluginHandle * plugin)
 {
     return plugin->writes_tag;
+}
+
+EXPORT Index<const char *> aud_plugin_get_supported_mime_types ()
+{
+    Index<const char *> mimes;
+
+    for (PluginHandle * p : aud_plugin_list (PluginType::Input))
+    {
+        if (! aud_plugin_get_enabled (p))
+            continue;
+
+        for (auto k : p->keys[InputKey::MIME])
+            mimes.append ((const char *) k);
+    }
+
+    /* sort and remove duplicates */
+    /* lambda needed to avoid -Wnoexcept-type with GCC */
+    mimes.sort ([] (const char * a, const char * b) { return strcmp (a, b); });
+
+    int len = mimes.len ();
+    for (int i = 0; i + 1 < len; i ++)
+    {
+        if (! strcmp (mimes[i], mimes[i + 1]))
+            mimes[i] = nullptr;
+    }
+
+    mimes.remove_if ([] (const char * m) { return m == nullptr; });
+    mimes.append (nullptr);
+
+    return mimes;
 }

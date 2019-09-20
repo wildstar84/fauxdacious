@@ -1,7 +1,7 @@
 /*
  * vfs.c
- * Copyright 2006-2013 William Pitcock, Daniel Barkalow, Ralf Ertzinger,
- *                     Yoshiki Yazawa, Matti H√§m√§l√§inen, and John Lindgren
+ * Copyright 2006-2013 Ariadne Conill, Daniel Barkalow, Ralf Ertzinger,
+ *                     Yoshiki Yazawa, Matti H‰m‰l‰inen, and John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -416,4 +416,25 @@ EXPORT bool VFSFile::write_file (const char * filename, const void * data, int64
         AUDERR ("Cannot open %s for writing: %s\n", filename, file.error ());
 
     return written;
+}
+
+EXPORT Index<const char *> VFSFile::supported_uri_schemes ()
+{
+    Index<const char *> schemes;
+
+    schemes.append ("file");
+    schemes.append ("stdin");
+
+    for (PluginHandle * plugin : aud_plugin_list (PluginType::Transport))
+    {
+        if (! aud_plugin_get_enabled (plugin))
+            continue;
+
+        for (auto s : transport_plugin_get_schemes (plugin))
+            schemes.append ((const char *) s);
+    }
+
+    schemes.append (nullptr);
+
+    return schemes;
 }
