@@ -228,12 +228,23 @@ void PlaylistData::set_entry_tuple (Entry * entry, Tuple && tuple)
     if (entry->selected)
         selected_length -= entry->length;
 
-    /* JWT: KEEP (DON'T OVERWRITE) ENTRY'S TITLE IF TUPLE'S TITLE IS NOT SET!
-       (NEEDED FOR EXTENDED M3U PLAYLIST ITEMS TO KEEP THE TITLE!)
+    /* JWT: KEEP (DON'T OVERWRITE/BLANK OUT) ENTRY'S EXTENDED M3U DATA IF TUPLE'S CORRESPONDING DATA IS NOT SET!
+       (NEEDED FOR EXTENDED M3U PLAYLIST ITEMS THAT SET METADATA WITH #EXT*** TAGS!)
+       (POSSIBILITIES ARE:  TITLE, ALBUM, ARTIST, & GENRE) - SEE:  https://en.wikipedia.org/wiki/Extended_M3U#M3U8)
+       (NOTE:  MAY STILL BE OVERWRITTEN BY METADATA TAGS IN FILE OR USER TAG FILES!)
     */
     String Title = entry->tuple.get_str (Tuple::Title);
     if (! tuple.is_set (Tuple::Title))
         tuple.set_str (Tuple::Title, Title);
+    String Album = entry->tuple.get_str (Tuple::Album);
+    if (! tuple.is_set (Tuple::Album))
+        tuple.set_str (Tuple::Album, Album);
+    String Artist = entry->tuple.get_str (Tuple::Artist);
+    if (! tuple.is_set (Tuple::Artist))
+        tuple.set_str (Tuple::Artist, Artist);
+    String Genre = entry->tuple.get_str (Tuple::Genre);
+    if (! tuple.is_set (Tuple::Genre))
+        tuple.set_str (Tuple::Genre, Genre);
 
     entry->set_tuple (std::move (tuple));
 
