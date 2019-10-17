@@ -23,7 +23,7 @@ libfluidsynth-dev libgl1-mesa-dev-lts-utopic libgtk2.0-dev libguess-dev \
 libjack-jackd2-dev liblircclient-dev libmms-dev libmodplug-dev libmp3lame-dev \
 libmpg123-dev libneon27-gnutls-dev libnotify-dev libpulse-dev \
 libsamplerate0-dev libsdl2-dev libsidplayfp-dev libsndfile1-dev libsoxr-dev \
-libvorbis-dev libwavpack-dev libxml2-dev
+libvorbis-dev libwavpack-dev libxml2-dev libswscale-dev
 
 After installing any missing from the above list of dependencies, if you 
 untarred the tarballs, THEN:
