@@ -176,8 +176,8 @@ static void add_file (PlaylistAddItem && item, PlaylistFilterFunc filter,
                  * file extension.  Note that it's possible for multiple plugins
                  * to recognize the same extension (.ogg, for example). */
                 int flags = probe_by_filename (item.filename); // CHECK SCHEME OR EXTENTION.
-                if ((skip_invalid || ! strncmp (item.filename, N_("file://"), 7))
-                        && ! (flags & PROBE_FLAG_HAS_DECODER) && strncmp (item.filename, N_("stdin://"), 8))
+                if (skip_invalid && ! (flags & PROBE_FLAG_HAS_DECODER) 
+                        && strncmp (item.filename, N_("stdin://"), 8))
                     return;  // if (skipjunk || local-file) && no decoder && NOT stdin://!
 
                 if ((flags & PROBE_FLAG_MIGHT_HAVE_SUBTUNES))
