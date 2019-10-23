@@ -303,9 +303,7 @@ static void do_remote ()
     ObjFauxdacious * obj = nullptr;
     GError * error = nullptr;
 
-#if ! GLIB_CHECK_VERSION (2, 36, 0)
     g_type_init ();
-#endif
 
     aud_set_instancename (instancename);   /* TRY SETTING EARLY SINCE instancename GETS BLANKED?! */
     instancename = String ();  // JWT:PREVENT "LEAK" MESSAGES (FREE)!
