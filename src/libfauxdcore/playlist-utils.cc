@@ -99,6 +99,8 @@ static int tuple_compare_length (const Tuple & a, const Tuple & b)
     { return tuple_compare_int (a, b, Tuple::Length); }
 static int tuple_compare_comment (const Tuple & a, const Tuple & b)
     { return tuple_compare_string (a, b, Tuple::Comment); }
+static int tuple_compare_bitrate (const Tuple & a, const Tuple & b)
+    { return tuple_compare_int (a, b, Tuple::Bitrate); }
 
 static const PlaylistStringCompareFunc filename_comparisons[] = {
     filename_compare_path,      // path
@@ -112,7 +114,8 @@ static const PlaylistStringCompareFunc filename_comparisons[] = {
     nullptr,  // track
     nullptr,  // formatted title
     nullptr,  // length
-    nullptr   // comment
+    nullptr,  // comment
+    nullptr   // bitrate
 };
 
 static const PlaylistTupleCompareFunc tuple_comparisons[] = {
@@ -127,7 +130,8 @@ static const PlaylistTupleCompareFunc tuple_comparisons[] = {
     tuple_compare_track,
     tuple_compare_formatted_title,
     tuple_compare_length,
-    tuple_compare_comment
+    tuple_compare_comment,
+    tuple_compare_bitrate
 };
 
 static_assert (aud::n_elems (filename_comparisons) == Playlist::n_sort_types &&

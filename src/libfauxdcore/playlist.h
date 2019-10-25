@@ -66,6 +66,7 @@ enum SortType {
     FormattedTitle,
     Length,
     Comment,
+    Bitrate,
     n_sort_types
 };
 
