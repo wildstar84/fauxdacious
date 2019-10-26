@@ -189,8 +189,8 @@ void eq_preset_save_file (const EqualizerPreset * preset)
         int current_song = aud_playlist_get_position (current_playlist);
         if (current_song >= 0)
         {
-        	   if (aud_get_bool (nullptr, "try_local_preset_files") && aud_get_bool (nullptr, "_save_as_dirdefault"))
-        	   {
+            if (aud_get_bool (nullptr, "try_local_preset_files") && aud_get_bool (nullptr, "_save_as_dirdefault"))
+            {
                 String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
                 if (eqpreset_dir_default_file && eqpreset_dir_default_file[0])
                 {
@@ -201,8 +201,8 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                         StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
                         aud_set_str (nullptr, "_preset_dir", (const char *) path);
                         String preset_file_namepart = eqpreset_dir_default_file;
-                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
+                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
                                 (const char *) preset_file_namepart}))));
                         show_preset_browser (_("Save Preset File - Fauxdacious"), true,
                                 preset_file_namepart, do_save_file, preset);
@@ -216,6 +216,35 @@ void eq_preset_save_file (const EqualizerPreset * preset)
             filename = aud_playlist_entry_get_filename (current_playlist, current_song);
             const char * dross = aud_get_bool (nullptr, "eqpreset_nameonly") ? strstr (filename, "?") : nullptr;
             int ln = -1;
+            StringBuf scheme = uri_get_scheme ((const char *) filename);
+            if (aud_get_bool (nullptr, "eqpreset_use_url_sitename")
+                    && strcmp (scheme, "file") && strcmp (scheme, "stdin")
+                    && strcmp (scheme, "cdda") && strcmp (scheme, "dvd"))
+            {
+                /* WE'RE A URL AND USER WANTS TO SAVE PRESETFILE FOR THE BASE SITE NAME, IE. "www.site.com": */
+                slash = strstr (filename, "//");
+                if (slash)
+                {
+                    slash+=2;
+                    const char * endbase = strstr (slash, "/");
+                    ln = endbase ? endbase - slash : -1;
+                    String urlbase = String (str_copy (slash, ln));
+                    auto split = str_list_to_index (slash, "?&#:/");
+                    for (auto & str : split)
+                    {
+                        urlbase = String (str_copy (str));
+                        break;
+                    }
+                    String preset_file_namepart = String (str_concat ({urlbase, ".preset"}));
+                    aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                            (str_concat ({aud_get_path (AudPath::UserDir), "/",
+                            (const char *) preset_file_namepart}))));
+                    show_preset_browser (_("Save Preset File - Fauxdacious"), true, preset_file_namepart,
+                            do_save_file, preset);
+
+                    return;
+                }
+            }
             /* JWT: EXTRACT JUST THE "NAME" PART (URLs MAY END W/"/") TO USE TO NAME THE EQ. FILE: */
             slash = filename ? strrchr (filename, '/') : nullptr;
             if (slash && dross && slash > dross)
@@ -227,7 +256,7 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                 }
                 if (slash[0] != '/')
                     slash = nullptr;
-            }        	   	   
+            }
             base = slash ? slash + 1 : nullptr;
             if (slash && (!base || base[0] == '\0'))  // FILENAME (URL) ENDS IN A "/"!
             {
@@ -240,8 +269,8 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                 if (ln > 0)
                 {
                     String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, ln), ".preset"}));
-                    aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                            (str_concat ({aud_get_path (AudPath::UserDir), "/", 
+                    aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                            (str_concat ({aud_get_path (AudPath::UserDir), "/",
                             (const char *) preset_file_namepart}))));
                     show_preset_browser (_("Save Preset File - Fauxdacious"), true, preset_file_namepart,
                             do_save_file, preset);
@@ -260,19 +289,19 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                 }
                 if (iscue && base[0] != '?')  // WE'RE A CUE-SHEET FILE:
                 {
-                    /* JWT:SONGS FROM CUE FILES HAVE A TRAILING "?<cue#>" THAT'S NOT ON THE FILENAME IN output.cc 
-                        SO WE HAVE TO STRIP IT OFF THE "filename" HERE, BUT ONLY IF WE'RE A "file://..." SCHEME, 
+                    /* JWT:SONGS FROM CUE FILES HAVE A TRAILING "?<cue#>" THAT'S NOT ON THE FILENAME IN output.cc
+                        SO WE HAVE TO STRIP IT OFF THE "filename" HERE, BUT ONLY IF WE'RE A "file://..." SCHEME,
                         LEST WE WHACK OFF A URL LIKE "https://www.youtube.com/watch?t=4&v=BaW_jenozKc"!
-                        THE DRAWBACK W/THIS IS THAT ALL CUES OF THE SAME BASE FILE NAME WILL HAVE THE SAME 
-                        EQ. PRESET, BUT THE ALTERNATIVE IS THAT EQ. PRESETS WON'T WORK AT ALL FOR CUE-BASED 
+                        THE DRAWBACK W/THIS IS THAT ALL CUES OF THE SAME BASE FILE NAME WILL HAVE THE SAME
+                        EQ. PRESET, BUT THE ALTERNATIVE IS THAT EQ. PRESETS WON'T WORK AT ALL FOR CUE-BASED
                         FILES, SINCE WE DON'T SEEM TO HAVE THE <cue#> IN output.cc for output_open_audio()!
                     */
                     if (dross || ! strcmp (scheme, "file"))
                     {
                         int ln = iscue - base;
                         String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, ln), ".preset"}));
-                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
+                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
                                 (const char *) preset_file_namepart}))));
                         show_preset_browser (_("Save Preset File - Fauxdacious"), true,
                                 preset_file_namepart, do_save_file, preset);
@@ -287,8 +316,8 @@ void eq_preset_save_file (const EqualizerPreset * preset)
                     if (playingdiskid[0])
                         preset_file_namepart = String (str_concat ({(const char *) playingdiskid, ".preset"}));
                 }
-                aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                        (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
+                aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                        (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
                         (const char *) preset_file_namepart}))));
                 show_preset_browser (_("Save Preset File - Fauxdacious"), true, preset_file_namepart,
                         do_save_file, preset);

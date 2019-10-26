@@ -583,7 +583,7 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
             }
             if (slash[0] != '/')
                 slash = nullptr;
-        }        	   	   
+        }
         base = slash ? slash + 1 : nullptr;
         if (slash && (!base || base[0] == '\0'))  // FILENAME (PBLY. A URL) ENDS IN A "/", SO BACK UP A BIT!
         {
@@ -636,6 +636,26 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
                 if (playingdiskid[0])
                     found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/", 
                             (const char *) playingdiskid, ".preset"})), true, false);
+            }
+            else if (strncmp (filename, "stdin://", 8))  // WE'RE NOT A FILE, DISK, OR STDIN (ASSUME URL):
+            {
+                /* LOOK FOR A PRESET FILE MATCHING THE BASE URL, IE. "www.youtube.com": */
+                slash = strstr (filename, "//");
+                if (slash)
+                {
+                    slash+=2;
+                    const char * endbase = strstr (slash, "/");
+                    ln = endbase ? endbase - slash : -1;
+                    String urlbase = String (str_copy (slash, ln));
+                    auto split = str_list_to_index (slash, "?&#:/");
+                    for (auto & str : split)
+                    {
+                        urlbase = String (str_copy (str));
+                        break;
+                    }
+                    found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/",
+                            (const char *) urlbase, ".preset"})), true, false);
+                }
             }
         }
         s_songautoeq = found_songpreset;

@@ -173,8 +173,8 @@ public:
 
     void removeSelRows ()
     {
-    	   while (1)
-    	   {
+        while (1)
+        {
             auto idxs = selectionModel ()->selectedIndexes ();
             if (idxs.size () <= 0)
                 break;
@@ -358,8 +358,8 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
         int current_song = aud_playlist_get_position (current_playlist);
         if (current_song >= 0)
         {
-        	   if (aud_get_bool (nullptr, "try_local_preset_files") && aud_get_bool (nullptr, "_save_as_dirdefault"))
-        	   {
+            if (aud_get_bool (nullptr, "try_local_preset_files") && aud_get_bool (nullptr, "_save_as_dirdefault"))
+            {
                 String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
                 if (eqpreset_dir_default_file && eqpreset_dir_default_file[0])
                 {
@@ -371,8 +371,8 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                         aud_set_str (nullptr, "_preset_dir", (const char *) path);
                         dialog->setDirectory (QString ((const char *) path));
                         String preset_file_namepart = eqpreset_dir_default_file;
-                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
+                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
                                 (const char *) preset_file_namepart}))));
                         auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                         dialog->selectFile (safe);
@@ -387,84 +387,115 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                 filename = aud_playlist_entry_get_filename (current_playlist, current_song);
                 const char * dross = aud_get_bool (nullptr, "eqpreset_nameonly") ? strstr (filename, "?") : nullptr;
                 int ln = -1;
-                /* JWT: EXTRACT JUST THE "NAME" PART (URLs MAY END W/"/") TO USE TO NAME THE EQ. FILE: */
-                slash = filename ? strrchr (filename, '/') : nullptr;
-                if (slash && dross && slash > dross)
+                StringBuf scheme = uri_get_scheme ((const char *) filename);
+                if (aud_get_bool (nullptr, "eqpreset_use_url_sitename")
+                        && strcmp (scheme, "file") && strcmp (scheme, "stdin")
+                        && strcmp (scheme, "cdda") && strcmp (scheme, "dvd"))
                 {
-                    slash = dross;
-                    while (slash > filename && slash[0] != '/')
+                    /* WE'RE A URL AND USER WANTS TO SAVE PRESETFILE FOR THE BASE SITE NAME, IE. "www.site.com": */
+                    slash = strstr (filename, "//");
+                    if (slash)
                     {
-                        --slash;
-                    }
-                    if (slash[0] != '/')
-                        slash = nullptr;
-                }        	   	   
-                base = slash ? slash + 1 : nullptr;
-                if (slash && (!base || base[0] == '\0'))  // FILENAME (URL) ENDS IN A "/"!
-                {
-                    do
-                    {
-                        --slash;
-                        ++ln;
-                    } while (slash && slash > filename && slash[0] != '/');
-                    base = slash ? slash + 1 : (const char *)filename;
-                    if (ln > 0)
-                    {
-                        String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, ln), ".preset"}));
-                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                                (str_concat ({aud_get_path (AudPath::UserDir), "/", 
+                        slash+=2;
+                        const char * endbase = strstr (slash, "/");
+                        ln = endbase ? endbase - slash : -1;
+                        String urlbase = String (str_copy (slash, ln));
+                        auto split = str_list_to_index (slash, "?&#:/");
+                        for (auto & str : split)
+                        {
+                            urlbase = String (str_copy (str));
+                            break;
+                        }
+                        String preset_file_namepart = String (str_concat ({urlbase, ".preset"}));
+                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                                (str_concat ({aud_get_path (AudPath::UserDir), "/",
                                 (const char *) preset_file_namepart}))));
                         auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                         dialog->selectFile (safe);
                         dialog_set = true;
                     }
                 }
-                else if (base && base[0] != '\0' && strncmp (base, "-.", 2))
+                if (! dialog_set)
                 {
-                    const char * iscue = dross ? dross : strstr (filename, "?");
-                    StringBuf scheme = uri_get_scheme ((const char *) filename);
-                    if (aud_get_bool (nullptr, "try_local_preset_files") && ! strcmp (scheme, "file"))
+                    /* JWT: EXTRACT JUST THE "NAME" PART (URLs MAY END W/"/") TO USE TO NAME THE EQ. FILE: */
+                    slash = filename ? strrchr (filename, '/') : nullptr;
+                    if (slash && dross && slash > dross)
                     {
-                        StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
-                        aud_set_str (nullptr, "_preset_dir", (const char *) path);
-                        dialog->setDirectory (QString ((const char *) path));
-                    }
-                    if (iscue && base[0] != '?')  // WE'RE A CUE-SHEET FILE:
-                    {
-                        /* JWT:SONGS FROM CUE FILES HAVE A TRAILING "?<cue#>" THAT'S NOT ON THE FILENAME IN output.cc 
-                            SO WE HAVE TO STRIP IT OFF THE "filename" HERE, BUT ONLY IF WE'RE A "file://..." SCHEME, 
-                            LEST WE WHACK OFF A URL LIKE "https://www.youtube.com/watch?t=4&v=BaW_jenozKc"!
-                            THE DRAWBACK W/THIS IS THAT ALL CUES OF THE SAME BASE FILE NAME WILL HAVE THE SAME 
-                            EQ. PRESET, BUT THE ALTERNATIVE IS THAT EQ. PRESETS WON'T WORK AT ALL FOR CUE-BASED 
-                            FILES, SINCE WE DON'T SEEM TO HAVE THE <cue#> IN output.cc for output_open_audio()!
-                        */
-                        if (dross || ! strcmp (scheme, "file"))
+                        slash = dross;
+                        while (slash > filename && slash[0] != '/')
                         {
-                            int ln = iscue - base;
+                            --slash;
+                        }
+                        if (slash[0] != '/')
+                            slash = nullptr;
+                    }
+                    base = slash ? slash + 1 : nullptr;
+                    if (slash && (!base || base[0] == '\0'))  // FILENAME (URL) ENDS IN A "/"!
+                    {
+                        do
+                        {
+                            --slash;
+                            ++ln;
+                        } while (slash && slash > filename && slash[0] != '/');
+                        base = slash ? slash + 1 : (const char *)filename;
+                        if (ln > 0)
+                        {
                             String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, ln), ".preset"}));
-                            aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                                    (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
+                            aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                                    (str_concat ({aud_get_path (AudPath::UserDir), "/",
                                     (const char *) preset_file_namepart}))));
                             auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                             dialog->selectFile (safe);
                             dialog_set = true;
                         }
                     }
-                    if (! dialog_set)
+                    else if (base && base[0] != '\0' && strncmp (base, "-.", 2))
                     {
-                        String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, -1), ".preset"}));
-                        if (! strcmp (scheme, "cdda") || ! strcmp (scheme, "dvd"))
+                        const char * iscue = dross ? dross : strstr (filename, "?");
+                        StringBuf scheme = uri_get_scheme ((const char *) filename);
+                        if (aud_get_bool (nullptr, "try_local_preset_files") && ! strcmp (scheme, "file"))
                         {
-                            String playingdiskid = aud_get_str (nullptr, "playingdiskid");
-                            if (playingdiskid[0])
-                                preset_file_namepart = String (str_concat ({(const char *) playingdiskid, ".preset"}));
+                            StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
+                            aud_set_str (nullptr, "_preset_dir", (const char *) path);
+                            dialog->setDirectory (QString ((const char *) path));
                         }
-                        aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri 
-                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/", 
-                                (const char *) preset_file_namepart}))));
-                        auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
-                        dialog->selectFile (safe);
-                        dialog_set = true;
+                        if (iscue && base[0] != '?')  // WE'RE A CUE-SHEET FILE:
+                        {
+                            /* JWT:SONGS FROM CUE FILES HAVE A TRAILING "?<cue#>" THAT'S NOT ON THE FILENAME IN output.cc
+                                SO WE HAVE TO STRIP IT OFF THE "filename" HERE, BUT ONLY IF WE'RE A "file://..." SCHEME,
+                                LEST WE WHACK OFF A URL LIKE "https://www.youtube.com/watch?t=4&v=BaW_jenozKc"!
+                                THE DRAWBACK W/THIS IS THAT ALL CUES OF THE SAME BASE FILE NAME WILL HAVE THE SAME
+                                EQ. PRESET, BUT THE ALTERNATIVE IS THAT EQ. PRESETS WON'T WORK AT ALL FOR CUE-BASED
+                                FILES, SINCE WE DON'T SEEM TO HAVE THE <cue#> IN output.cc for output_open_audio()!
+                            */
+                            if (dross || ! strcmp (scheme, "file"))
+                            {
+                                int ln = iscue - base;
+                                String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, ln), ".preset"}));
+                                aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                                        (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
+                                        (const char *) preset_file_namepart}))));
+                                auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
+                                dialog->selectFile (safe);
+                                dialog_set = true;
+                            }
+                        }
+                        if (! dialog_set)
+                        {
+                            String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, -1), ".preset"}));
+                            if (! strcmp (scheme, "cdda") || ! strcmp (scheme, "dvd"))
+                            {
+                                String playingdiskid = aud_get_str (nullptr, "playingdiskid");
+                                if (playingdiskid[0])
+                                    preset_file_namepart = String (str_concat ({(const char *) playingdiskid, ".preset"}));
+                            }
+                            aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
+                                    (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
+                                    (const char *) preset_file_namepart}))));
+                            auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
+                            dialog->selectFile (safe);
+                            dialog_set = true;
+                        }
                     }
                 }
             }
@@ -510,9 +541,10 @@ static QDialog * create_preset_win ()
 
     /* JWT:ADD OUR CHECKBOXES: */
     auto localsave_checkbox = new QCheckBox (_("Use entry's local directory for preset files, if file."));
-    auto save_as_dirdefault_checkbox = new QCheckBox (_("Save as Directory-wide Preset, if file & above box checked."));
-    auto nameonly_checkbox = new QCheckBox (_("Exclude arg. lists from urls to create preset filename."));
-    auto save_effects2_checkbox = new QCheckBox (_("Exclude arg. lists from urls to create preset filename."));
+    auto save_as_dirdefault_checkbox = new QCheckBox (_("Save as Directory-wide Preset, IF file & above box checked."));
+    auto urlbase_checkbox = new QCheckBox (_("Use only base site name for URLs."));
+    auto nameonly_checkbox = new QCheckBox (_("Exclude arg. lists from URLs to create preset filename."));
+    auto save_effects2_checkbox = new QCheckBox (_("Save Effects (plugins) with presets."));
     /* JWT:END ADD OUR CHECKBOXES: */
 
     auto import_btn = new QPushButton (_("Import"));
@@ -547,27 +579,28 @@ static QDialog * create_preset_win ()
 
     auto vbox = make_vbox (win);
     vbox->addLayout (hbox);
-    /* JWT:OUR CHECKBOXES: */	
+    /* JWT:OUR CHECKBOXES: */
     vbox->addWidget (localsave_checkbox);
     String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
     if (eqpreset_dir_default_file && eqpreset_dir_default_file[0])
         vbox->addWidget (save_as_dirdefault_checkbox);
     else
         aud_set_bool (nullptr, "_save_as_dirdefault", false);
+    vbox->addWidget (urlbase_checkbox);
     vbox->addWidget (nameonly_checkbox);
     bool eqpreset_use_effects = aud_get_bool (nullptr, "eqpreset_use_effects");
     if (eqpreset_use_effects)
         vbox->addWidget (save_effects2_checkbox);
     else
         aud_set_bool (nullptr, "eqpreset_save_effects", false);
-    /* JWT:END OUR CHECKBOXES */	
+    /* JWT:END OUR CHECKBOXES */
     vbox->addWidget (view);
     vbox->addLayout (hbox2);
     vbox->addLayout (hbox3);
 
     auto pmodel = view->pmodel ();
 
-    /* JWT:OUR CHECKBOXES: */	
+    /* JWT:OUR CHECKBOXES: */
     localsave_checkbox->setCheckState (aud_get_bool (nullptr, "try_local_preset_files") 
             ? Qt::Checked : Qt::Unchecked);
     QObject::connect (localsave_checkbox, & QCheckBox::stateChanged, [] (int state) {
@@ -582,6 +615,12 @@ static QDialog * create_preset_win ()
             aud_set_bool (nullptr, "_save_as_dirdefault", (state == Qt::Checked));
         });
     }
+
+    urlbase_checkbox->setCheckState (aud_get_bool (nullptr, "eqpreset_use_url_sitename")
+            ? Qt::Checked : Qt::Unchecked);
+    QObject::connect (urlbase_checkbox, & QCheckBox::stateChanged, [] (int state) {
+        aud_set_bool (nullptr, "eqpreset_use_url_sitename", (state == Qt::Checked));
+    });
 
     nameonly_checkbox->setCheckState (aud_get_bool (nullptr, "eqpreset_nameonly") 
             ? Qt::Checked : Qt::Unchecked);

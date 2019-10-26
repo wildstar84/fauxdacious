@@ -168,6 +168,11 @@ static void save_as_dirdefault_toggled (GtkToggleButton * button)
     aud_set_bool (nullptr, "_save_as_dirdefault", gtk_toggle_button_get_active (button));
 }
 
+static void urlbase_toggled (GtkToggleButton * button)
+{
+    aud_set_bool (nullptr, "eqpreset_use_url_sitename", gtk_toggle_button_get_active (button));
+}
+
 static void nameonly_toggled (GtkToggleButton * button)
 {
     aud_set_bool (nullptr, "eqpreset_nameonly", gtk_toggle_button_get_active (button));
@@ -348,12 +353,23 @@ static GtkWidget * create_eq_preset_window ()
         g_signal_connect (save_as_dirdefault_checkbox, "toggled", (GCallback) save_as_dirdefault_toggled, nullptr);
         gtk_widget_set_sensitive (save_as_dirdefault_checkbox, true);
         gtk_button_set_label ((GtkButton *) save_as_dirdefault_checkbox,
-                _("Save as Directory-wide Preset, if file & above box checked."));
+                _("Save as Directory-wide Preset, IF file & above box checked."));
         if (aud_get_bool (nullptr, "_save_as_dirdefault"))
             gtk_toggle_button_set_active ((GtkToggleButton *) save_as_dirdefault_checkbox, true);
     }
     else
         aud_set_bool (nullptr, "_save_as_dirdefault", false);
+
+    GtkWidget * hbox1a2 = gtk_hbox_new (false, 6);
+    gtk_box_pack_start ((GtkBox *) vbox, hbox1a2, false, false, 0);
+    GtkWidget * urlbase_checkbox = gtk_check_button_new ();
+    gtk_box_pack_start ((GtkBox *) hbox1a2, urlbase_checkbox, true, true, 0);
+    g_signal_connect (urlbase_checkbox, "toggled", (GCallback) urlbase_toggled, nullptr);
+    gtk_widget_set_sensitive (urlbase_checkbox, true);
+    gtk_button_set_label ((GtkButton *) urlbase_checkbox,
+            _("Use only base site name for URLs."));
+    if (aud_get_bool (nullptr, "eqpreset_use_url_sitename"))
+        gtk_toggle_button_set_active ((GtkToggleButton *) urlbase_checkbox, true);
 
     GtkWidget * hbox1b = gtk_hbox_new (false, 6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox1b, false, false, 0);
@@ -362,7 +378,7 @@ static GtkWidget * create_eq_preset_window ()
     g_signal_connect (nameonly_checkbox, "toggled", (GCallback) nameonly_toggled, nullptr);
     gtk_widget_set_sensitive (nameonly_checkbox, true);
     gtk_button_set_label ((GtkButton *) nameonly_checkbox,
-            _("Exclude arg. lists from urls to create preset filename."));
+            _("Exclude arg. lists from URLs to create preset filename."));
     if (aud_get_bool (nullptr, "eqpreset_nameonly"))
         gtk_toggle_button_set_active ((GtkToggleButton *) nameonly_checkbox, true);
 
