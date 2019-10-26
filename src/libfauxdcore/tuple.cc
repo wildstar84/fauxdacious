@@ -31,6 +31,7 @@
 #include "i18n.h"
 #include "tuple.h"
 #include "vfs.h"
+#include "runtime.h"
 
 enum {
     FallbackTitle = Tuple::n_fields,
@@ -656,85 +657,89 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
 
     if (val && val[0] && strncmp ((const char *) val, "  - ", 4))
     {
-        const char * ttloffset = strstr ((const char *) val, " - text=\"");
-        if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
+        if (! fauxd_is_prevtitle (val))
         {
-            const char * endquote = strstr (ttloffset+10, "\"");
-            if (endquote)
+            fauxd_set_prevtitle (val);
+            const char * ttloffset = strstr ((const char *) val, " - text=\"");
+            if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
             {
-                const char * ttloffset9 = ttloffset + 9;
-                const char * tupletitle = (const char *) get_str (Title);
-                int artlen = ttloffset - (const char *) val;
-                if (artlen > 0 && (! tupletitle || strncmp ((const char *) val, tupletitle, artlen)))
+                const char * endquote = strstr (ttloffset+10, "\"");
+                if (endquote)
                 {
-                    set_str (Title, str_printf ("%.*s - %.*s", artlen,
-                            (const char *) val, (int)(endquote-ttloffset9), ttloffset9));
-                    set_str (Artist, str_printf ("%.*s", artlen, (const char *) val));
-                    updated = true;
-                }
-            }
-        }
-        else
-        {
-            ttloffset = strstr ((const char *) val, "Title: ");
-            if (ttloffset)  //JWT:FIXUP STREAM TILES IN FORMAT: "[[Artist: ]artist - ]Title: title [Album: album]:
-            {
-                /* WARNING: THIS THING SPLITS ON "-", SO IF "-" IN TITLE, ARTIST, ALBUM, ETC. THE 
-                   "-" & CHARACTERS AFTER IT WILL BE OMITTED!
-                */
-                const char * tupletitle = (const char *) get_str (Title);
-                const char * artoffset = strstr ((const char *) val, "Artist: ");
-                if (artoffset)
-                {
-                    if (! tupletitle || strncmp (artoffset+8, tupletitle, (ttloffset-(artoffset+8))))
+                    const char * ttloffset9 = ttloffset + 9;
+                    const char * tupletitle = (const char *) get_str (Title);
+                    int artlen = ttloffset - (const char *) val;
+                    if (artlen > 0 && (! tupletitle || strncmp ((const char *) val, tupletitle, artlen)))
                     {
-                        Index<::String> metaparts = str_list_to_index ((const char *) val, "-");
-                        const char * ptr;
-                        const char * yroffset = nullptr;
-                        const char * alboffset = nullptr;
-                        artoffset = nullptr;
-                        ttloffset = nullptr;
-                        for (const ::String & metapart : metaparts)
-                        {
-                            if (! artoffset)
-                                artoffset = (const char *) metapart;
-                            ptr = strstr ((const char *) metapart, "Title: ");
-                            if (ptr)
-                                ttloffset = ptr + 6;
-                            else
-                            {
-                                ptr = strstr ((const char *) metapart, "Artist: ");
-                                if (ptr)
-                                    artoffset = ptr + 8;
-                                else
-                                {
-                                    ptr = strstr ((const char *) metapart, "Album: ");
-                                    if (ptr)
-                                        alboffset = ptr + 7;
-                                    else
-                                    {
-                                        ptr = strstr ((const char *) metapart, "Year: ");
-                                        if (ptr)
-                                            yroffset = ptr + 6;
-                                    }
-                                }
-                            }                    
-                        }
-                        set_str (Title, str_printf ("%s%s%s", artoffset, "-", ttloffset));
-                        if (alboffset)
-                            set_str (Album, alboffset);
-                        if (yroffset)
-                            set_int (Year, atoi (yroffset));
+                        set_str (Title, str_printf ("%.*s - %.*s", artlen,
+                                (const char *) val, (int)(endquote-ttloffset9), ttloffset9));
+                        set_str (Artist, str_printf ("%.*s", artlen, (const char *) val));
                         updated = true;
                     }
                 }
-                else if (! tupletitle || strcmp (ttloffset+7, tupletitle))
-                    set_str (Title, ttloffset+7);  // WE HAVE "Title: " BUT NO ARTIST, SO ASSUME NOTHING ELSE!
             }
-            else if (val != get_str (Title))
+            else
             {
-                set_str (Title, val);
-                updated = true;
+                ttloffset = strstr ((const char *) val, "Title: ");
+                if (ttloffset)  //JWT:FIXUP STREAM TILES IN FORMAT: "[[Artist: ]artist - ]Title: title [Album: album]:
+                {
+                    /* WARNING: THIS THING SPLITS ON "-", SO IF "-" IN TITLE, ARTIST, ALBUM, ETC. THE 
+                       "-" & CHARACTERS AFTER IT WILL BE OMITTED!
+                    */
+                    const char * tupletitle = (const char *) get_str (Title);
+                    const char * artoffset = strstr ((const char *) val, "Artist: ");
+                    if (artoffset)
+                    {
+                        if (! tupletitle || strncmp (artoffset+8, tupletitle, (ttloffset-(artoffset+8))))
+                        {
+                            Index<::String> metaparts = str_list_to_index ((const char *) val, "-");
+                            const char * ptr;
+                            const char * yroffset = nullptr;
+                            const char * alboffset = nullptr;
+                            artoffset = nullptr;
+                            ttloffset = nullptr;
+                            for (const ::String & metapart : metaparts)
+                            {
+                                if (! artoffset)
+                                    artoffset = (const char *) metapart;
+                                ptr = strstr ((const char *) metapart, "Title: ");
+                                if (ptr)
+                                    ttloffset = ptr + 6;
+                                else
+                                {
+                                    ptr = strstr ((const char *) metapart, "Artist: ");
+                                    if (ptr)
+                                        artoffset = ptr + 8;
+                                    else
+                                    {
+                                        ptr = strstr ((const char *) metapart, "Album: ");
+                                        if (ptr)
+                                            alboffset = ptr + 7;
+                                        else
+                                        {
+                                            ptr = strstr ((const char *) metapart, "Year: ");
+                                            if (ptr)
+                                                yroffset = ptr + 6;
+                                        }
+                                    }
+                                }                    
+                            }
+                            set_str (Title, str_printf ("%s%s%s", artoffset, "-", ttloffset));
+                            if (alboffset)
+                                set_str (Album, alboffset);
+                            if (yroffset)
+                                set_int (Year, atoi (yroffset));
+                            updated = true;
+                        }
+                    }
+                    else if (! tupletitle || strcmp (ttloffset+7, tupletitle))
+                        set_str (Title, ttloffset+7);  // WE HAVE "Title: " BUT NO ARTIST, SO ASSUME NOTHING ELSE!
+                }
+                else if (val != get_str (Title))
+                {
+                    set_str (Title, val);
+                    updated = true;
+                }
             }
         }
     }

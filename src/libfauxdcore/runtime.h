@@ -105,6 +105,8 @@ EXPORT bool aud_get_pausemute_mode ();
 // referenced, or after aud_init(), is an error.
 EXPORT void aud_set_instancename (String);  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE NAME */
 EXPORT String aud_get_instancename ();
+EXPORT void fauxd_set_prevtitle (String);  /* JWT:NEXT 2 TO SAVE PREV. TITLE STATICALLY IN tuple.cc */
+EXPORT bool fauxd_is_prevtitle (String);
 
 EXPORT void aud_set_fudge_gain (int);  /* JWT:NEXT 2 TO ALLOW SPECIFYING FUDGE-GAIN */
 EXPORT int aud_get_fudge_gain ();

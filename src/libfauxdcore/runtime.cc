@@ -67,6 +67,7 @@ size_t misc_bytes_allocated;
 static bool headless_mode;
 static bool MuteInLieuOfPause;   /* JWT */
 static String instancename;      /* JWT */
+static String prevtitle;         /* JWT */
 static int fudge_gain;           /* JWT */
 static int stdout_fmt;           /* JWT */
 
@@ -99,6 +100,16 @@ EXPORT String aud_get_instancename ()
 
     instancename = String ("fauxdacious");
     return instancename;
+}
+
+EXPORT void fauxd_set_prevtitle (String strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
+{
+    prevtitle = (strarg && strarg[0]) ? strarg : String ("");
+}
+
+EXPORT bool fauxd_is_prevtitle (String newtitle)
+{
+    return (prevtitle == newtitle);
 }
 
 EXPORT void aud_set_mainloop_type (MainloopType type)
@@ -401,6 +412,7 @@ EXPORT void aud_leak_check ()
     for (String & path : aud_paths)
         path = String ();
 
+    prevtitle = String ();     // JWT:PREVENT "LEAK" MESSAGES (FREE)!
     instancename = String ();  // JWT:PREVENT "LEAK" MESSAGES (FREE)!
 
     string_leak_check ();
