@@ -254,6 +254,48 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
                 }
             }
         }
+        if (needArt && ! item->data.len () && ! item->art_file)
+        {
+            StringBuf scheme = uri_get_scheme (file);
+            if (strcmp (scheme, "file") && strcmp (scheme, "stdin")
+                    && strcmp (scheme, "cdda") && strcmp (scheme, "dvd"))
+            {
+                /* JWT:LOOK FOR IMAGE MATCHING STREAMING URL (IE: www.streamingradio.com.jpg): */
+                const char * slash = strstr (file, "//");
+                if (slash)
+                {
+                    slash+=2;
+                    const char * endbase = strstr (slash, "/");
+                    int ln = endbase ? endbase - slash : -1;
+                    String urlbase = String (str_copy (slash, ln));
+                    auto split = str_list_to_index (slash, "?&#:/");
+                    for (auto & str : split)
+                    {
+                        urlbase = String (str_copy (str));
+                        break;
+                    }
+                    Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
+                    struct stat statbuf;
+                    for (auto & ext : extlist)
+                    {
+                        String coverart_file = String (str_concat ({aud_get_path (AudPath::UserDir), "/",
+                                urlbase, ".", (const char *) ext}));
+                        if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE DOESN'T EXIST:
+                        {
+                            coverart_file = String (filename_to_uri (coverart_file));
+                            item->art_file = coverart_file;
+                            VFSFile file (item->art_file, "r");
+                            if (file)
+                            {
+                                item->data = file.read_all ();
+                                needArt = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         /* JWT:DO WE HAVE A "DEFAULT" COVER ART FILE? */
         if (needArt && ! item->data.len () && ! item->art_file)
         {
