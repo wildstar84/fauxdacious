@@ -1,6 +1,6 @@
 /*
  * libfauxdqt.h
- * Copyright 2014 William Pitcock
+ * Copyright 2014 Ariadne Conill
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,6 @@
 
 class QBoxLayout;
 class QHBoxLayout;
-
 class QIcon;
 class QLayout;
 class QLineEdit;
@@ -90,7 +89,7 @@ void fileopener_show (FileMode mode);
 /* url-opener.cc */
 void urlopener_show (bool open);
 
-/* util.cc */
+/* audqt.cc */
 
 extern const PixelSizes & sizes;
 extern const PixelMargins & margins;
@@ -107,6 +106,9 @@ void cleanup ();
 
 QIcon get_icon (const char * name);
 
+QGradientStops dark_bg_gradient (const QColor & base);
+QColor vis_bar_color (const QColor & hue, int bar, int n_bars);
+
 QHBoxLayout * make_hbox (QWidget * parent, int spacing = sizes.FourPt);
 QVBoxLayout * make_vbox (QWidget * parent, int spacing = sizes.FourPt);
 
@@ -122,13 +124,13 @@ static inline QString translate_str (const char * str)
     { return translate_str (str, PACKAGE); }
 #endif
 
-/* prefs-builder.cc */
 /* file-entry.cc */
 QLineEdit * file_entry_new (QWidget * parent, const char * title,
  QFileDialog::FileMode file_mode, QFileDialog::AcceptMode accept_mode);
 String file_entry_get_uri (QLineEdit * entry);
 void file_entry_set_uri (QLineEdit * entry, const char * uri);
 
+/* prefs-builder.cc */
 void prefs_populate (QBoxLayout * layout, ArrayRef<PreferencesWidget> widgets, const char * domain);
 
 /* prefs-plugin.cc */

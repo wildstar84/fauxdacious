@@ -49,14 +49,17 @@ private:
     HookReceiver<InfoPopup, const char *> art_ready_hook
         {"art ready", this, & InfoPopup::art_ready};
 
+    const String m_filename;
+    const QGradientStops m_stops;
+
     QHBoxLayout m_hbox;
     QGridLayout m_grid;
-    String m_filename;
     bool m_queued = false;
 };
 
 InfoPopup::InfoPopup (const String & filename, const Tuple & tuple) :
-    m_filename (filename)
+    m_filename (filename),
+    m_stops (dark_bg_gradient (palette ().color (QPalette::Window)))
 {
     setWindowFlags (Qt::ToolTip);
 
@@ -138,14 +141,8 @@ void InfoPopup::finish_loading ()
 
 void InfoPopup::paintEvent (QPaintEvent *)
 {
-    static const QGradientStops stops = {
-        {0, QColor (64, 64, 64)},
-        {0.499, QColor (38, 38, 38)},
-        {0.5, QColor (26, 26, 26)},
-        {1, QColor (0, 0, 0)}
-    };
     QLinearGradient grad (0, 0, 0, height ());
-    grad.setStops (stops);
+    grad.setStops (m_stops);
 
     QPainter p (this);
     p.fillRect (rect (), grad);
