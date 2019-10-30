@@ -284,7 +284,7 @@ static void set_default_preset_dir ()
             {
                 String filename = aud_playlist_entry_get_filename (current_playlist, current_song);
 
-                StringBuf scheme = uri_get_scheme ((const char *) filename);
+                StringBuf scheme = uri_get_scheme (filename);
                 if (aud_get_bool (nullptr, "try_local_preset_files") && ! strcmp (scheme, "file"))
                 {
                     StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
@@ -364,16 +364,16 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                 if (eqpreset_dir_default_file && eqpreset_dir_default_file[0])
                 {
                     filename = aud_playlist_entry_get_filename (current_playlist, current_song);
-                    StringBuf scheme = uri_get_scheme ((const char *) filename);
+                    StringBuf scheme = uri_get_scheme (filename);
                     if (! strcmp (scheme, "file"))  // JWT:WE'RE A "FILE" AND SAVE TO LOCAL DIR, AND SAVE AS DIR-PRESET:
                     {
-                        StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
+                        StringBuf path = filename_get_parent (uri_to_filename (filename));
                         aud_set_str (nullptr, "_preset_dir", (const char *) path);
                         dialog->setDirectory (QString ((const char *) path));
                         String preset_file_namepart = eqpreset_dir_default_file;
                         aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
-                                (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
-                                (const char *) preset_file_namepart}))));
+                                (str_concat ({aud_get_str (nullptr, "_preset_dir"), "/",
+                                preset_file_namepart}))));
                         auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                         dialog->selectFile (safe);
                         dialog_set = true;
@@ -387,7 +387,7 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                 filename = aud_playlist_entry_get_filename (current_playlist, current_song);
                 const char * dross = aud_get_bool (nullptr, "eqpreset_nameonly") ? strstr (filename, "?") : nullptr;
                 int ln = -1;
-                StringBuf scheme = uri_get_scheme ((const char *) filename);
+                StringBuf scheme = uri_get_scheme (filename);
                 if (aud_get_bool (nullptr, "eqpreset_use_url_sitename")
                         && strcmp (scheme, "file") && strcmp (scheme, "stdin")
                         && strcmp (scheme, "cdda") && strcmp (scheme, "dvd"))
@@ -409,7 +409,7 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                         String preset_file_namepart = String (str_concat ({urlbase, ".preset"}));
                         aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
                                 (str_concat ({aud_get_path (AudPath::UserDir), "/",
-                                (const char *) preset_file_namepart}))));
+                                preset_file_namepart}))));
                         auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                         dialog->selectFile (safe);
                         dialog_set = true;
@@ -437,13 +437,13 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                             --slash;
                             ++ln;
                         } while (slash && slash > filename && slash[0] != '/');
-                        base = slash ? slash + 1 : (const char *)filename;
+                        base = slash ? slash + 1 : (const char *) filename;
                         if (ln > 0)
                         {
-                            String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, ln), ".preset"}));
+                            String preset_file_namepart = String (str_concat ({str_encode_percent (base, ln), ".preset"}));
                             aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
                                     (str_concat ({aud_get_path (AudPath::UserDir), "/",
-                                    (const char *) preset_file_namepart}))));
+                                    preset_file_namepart}))));
                             auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                             dialog->selectFile (safe);
                             dialog_set = true;
@@ -452,10 +452,10 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                     else if (base && base[0] != '\0' && strncmp (base, "-.", 2))
                     {
                         const char * iscue = dross ? dross : strstr (filename, "?");
-                        StringBuf scheme = uri_get_scheme ((const char *) filename);
+                        StringBuf scheme = uri_get_scheme (filename);
                         if (aud_get_bool (nullptr, "try_local_preset_files") && ! strcmp (scheme, "file"))
                         {
-                            StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
+                            StringBuf path = filename_get_parent (uri_to_filename (filename));
                             aud_set_str (nullptr, "_preset_dir", (const char *) path);
                             dialog->setDirectory (QString ((const char *) path));
                         }
@@ -471,10 +471,10 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                             if (dross || ! strcmp (scheme, "file"))
                             {
                                 int ln = iscue - base;
-                                String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, ln), ".preset"}));
+                                String preset_file_namepart = String (str_concat ({str_encode_percent (base, ln), ".preset"}));
                                 aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
-                                        (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
-                                        (const char *) preset_file_namepart}))));
+                                        (str_concat ({aud_get_str (nullptr, "_preset_dir"), "/",
+                                        preset_file_namepart}))));
                                 auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                                 dialog->selectFile (safe);
                                 dialog_set = true;
@@ -482,16 +482,16 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
                         }
                         if (! dialog_set)
                         {
-                            String preset_file_namepart = String (str_concat ({(const char *) str_encode_percent (base, -1), ".preset"}));
+                            String preset_file_namepart = String (str_concat ({str_encode_percent (base, -1), ".preset"}));
                             if (! strcmp (scheme, "cdda") || ! strcmp (scheme, "dvd"))
                             {
                                 String playingdiskid = aud_get_str (nullptr, "playingdiskid");
                                 if (playingdiskid[0])
-                                    preset_file_namepart = String (str_concat ({(const char *) playingdiskid, ".preset"}));
+                                    preset_file_namepart = String (str_concat ({playingdiskid, ".preset"}));
                             }
                             aud_set_str (nullptr, "_eq_last_preset_filename", String (filename_to_uri
-                                    (str_concat ({(const char *) aud_get_str (nullptr, "_preset_dir"), "/",
-                                    (const char *) preset_file_namepart}))));
+                                    (str_concat ({aud_get_str (nullptr, "_preset_dir"), "/",
+                                    preset_file_namepart}))));
                             auto safe = QString (preset_file_namepart).replace (QLatin1Char ('/'), QLatin1Char ('_'));
                             dialog->selectFile (safe);
                             dialog_set = true;
