@@ -351,9 +351,9 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     if (usrtag && ! strncmp (filename, "file://", 7))
     {
         StringBuf tag_fid = uri_to_filename (filename);
-        StringBuf path = filename_get_parent ((const char *) tag_fid);
-        filename_only = String (filename_get_base ((const char *) tag_fid));
-        local_tag_file = String (filename_to_uri (str_concat ({(const char *) path, "/user_tag_data.tag"})));
+        StringBuf path = filename_get_parent (tag_fid);
+        filename_only = String (filename_get_base (tag_fid));
+        local_tag_file = String (filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
     }
     /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, new_tuple, image)) */
     /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS <0 ("ONLY")!: 
@@ -362,7 +362,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     bool fileorNOTstdin = file || strncmp (filename, "stdin://", 8);  // JWT:IF stdin, MUST HAVE OPEN FILEHANDLE!
 
     if ((usrtag && (fromtempfile = aud_read_tag_from_tagfile (filename, "tmp_tag_data", tmpfile_tuple)) < 0)
-            || (local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile ((const char *) filename_only, local_tag_file, loclfile_tuple)) < 0)
+            || (local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile (filename_only, local_tag_file, loclfile_tuple)) < 0)
             || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0)
             || (fileorNOTstdin && ip->read_tag (filename, file, new_tuple, image)))
     {
@@ -583,16 +583,16 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
     {
         struct stat statbuf;
         StringBuf song_fid = uri_to_filename (song_filename);
-        StringBuf path = filename_get_parent ((const char *) song_fid);
-        local_tag_fid = String (filename_normalize (str_concat ({(const char *) path, "/user_tag_data.tag"}))); 
+        StringBuf path = filename_get_parent (song_fid);
+        local_tag_fid = String (filename_normalize (str_concat ({path, "/user_tag_data.tag"})));
         if (! stat ((const char *) local_tag_fid, &statbuf))  // LOCAL TAG FILE EXISTS, SO USE IT:
         {
             localtagfileexists = true;
-            song_key = String (filename_get_base ((const char *) song_fid));
+            song_key = String (filename_get_base (song_fid));
         }
     }
 
-    StringBuf filename = localtagfileexists ? str_copy ((const char *) local_tag_fid)
+    StringBuf filename = localtagfileexists ? str_copy (local_tag_fid)
             : filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
     //JWT: filename NOW DOES NOT HAVE file:// PREFIX AND IS THE TAG DATA FILE (LOCAL OR GLOBAL):
@@ -665,8 +665,8 @@ EXPORT bool aud_file_write_tuple (const char * filename,
         if (! strncmp (filename, "cdda://", 7) || ! strncmp (filename, "dvd://", 6))  // FILE IS A DISK:
         {
             String diskID = aud_get_str (nullptr, "playingdiskid");
-            String tag_file = String (str_concat ({(const char *) diskID, ".tag"}));
-            success = aud_write_tag_to_tagfile (filename, tuple, (const char *) tag_file);
+            String tag_file = String (str_concat ({diskID, ".tag"}));
+            success = aud_write_tag_to_tagfile (filename, tuple, tag_file);
             if (success)
             {
                 aud_set_bool (nullptr, "_disktagrefresh", TRUE);

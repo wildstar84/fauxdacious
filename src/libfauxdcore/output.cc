@@ -483,9 +483,9 @@ static bool do_load_eq_file (StringBuf filename, bool save_prev_preset_as_defaul
         String cue_suffix = in_tuple.get_str (Tuple::Suffix);
         if (cue_suffix && cue_suffix[0] && strstr ((const char *) cue_suffix, "cue"))
         {
-            StringBuf path = filename_get_parent ((const char *) filename_local);
-            filename = filename_normalize (str_concat ({(const char *) path, "/", in_tuple.get_str (Tuple::Basename),
-                    ".", (const char *) cue_suffix, ".preset"}));
+            StringBuf path = filename_get_parent (filename_local);
+            filename = filename_normalize (str_concat ({path, "/", in_tuple.get_str (Tuple::Basename),
+                    ".", cue_suffix, ".preset"}));
             const char * filenamechar = (const char *) filename;
             havesongeqfile = ! (stat (filenamechar, &statbuf));
             if (havesongeqfile)
@@ -607,14 +607,14 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
             /* JWT:IF WE'RE A "FILE", FIRST CHECK LOCAL DIRECTORY FOR A SONG PRESET FILE: */
             if (! strncmp ((const char *) filename, "file://", 7))
             {
-                StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
-                found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({(const char *) path, "/", 
-                        (const char *) str_encode_percent (base, ln), ".preset"})), true, true);
+                StringBuf path = filename_get_parent (uri_to_filename (filename));
+                found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({path, "/",
+                        str_encode_percent (base, ln), ".preset"})), true, true);
             }
             /* JWT:NOT A FILE, OR NOT FOUND, SO NOW CHECK THE GLOBAL CONFIG PATH FOR A SONG PRESET FILE: */
             if (! found_songpreset)
                 found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/", 
-                        (const char *) str_encode_percent (base, ln), ".preset"})), true, true);
+                        str_encode_percent (base, ln), ".preset"})), true, true);
         }
         if (! found_songpreset)
         {
@@ -625,9 +625,9 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
                 String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
                 if (eqpreset_dir_default_file[0])
                 {
-                    StringBuf path = filename_get_parent ((const char *) uri_to_filename (filename));
-                    found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({(const char *) path, "/", 
-                            (const char *) eqpreset_dir_default_file})), true, false);
+                    StringBuf path = filename_get_parent (uri_to_filename (filename));
+                    found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({path, "/",
+                            eqpreset_dir_default_file})), true, false);
                 }
             }
             else if (! strncmp (filename, "cdda://", 7) || ! strncmp (filename, "dvd://", 6))
@@ -635,7 +635,7 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
                 String playingdiskid = aud_get_str (nullptr, "playingdiskid");
                 if (playingdiskid[0])
                     found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/", 
-                            (const char *) playingdiskid, ".preset"})), true, false);
+                            playingdiskid, ".preset"})), true, false);
             }
             else if (strncmp (filename, "stdin://", 8))  // WE'RE NOT A FILE, DISK, OR STDIN (ASSUME URL):
             {
@@ -654,7 +654,7 @@ bool output_open_audio (const String & filename, const Tuple & tuple,
                         break;
                     }
                     found_songpreset = do_load_eq_file (filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir), "/",
-                            (const char *) urlbase, ".preset"})), true, false);
+                            urlbase, ".preset"})), true, false);
                 }
             }
         }
