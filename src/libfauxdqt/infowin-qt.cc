@@ -1,6 +1,6 @@
 /*
  * infowin.cc
- * Copyright 2006-2014 William Pitcock, Tomasz Moń, Eugene Zagidullin,
+ * Copyright 2006-2019 Ariadne Conill, Tomasz Moń, Eugene Zagidullin,
  *                     John Lindgren, and Thomas Lange
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@
 #include <libfauxdcore/interface.h>
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/probe.h>
+#include <libfauxdcore/runtime.h>
 
 #include "info-widget.h"
 #include "libfauxdqt.h"
@@ -111,6 +112,8 @@ private:
     QLabel m_image;
     TextWidget m_uri_label;
     InfoWidget m_infowidget;
+    QLabel m_hint_icon, m_hint_text;
+    QDialogButtonBox * bbox;
 
     void displayImage (const char * filename);
 
@@ -137,14 +140,29 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
     left_vbox->setStretch (0, 1);
     left_vbox->setStretch (1, 0);
 
+    int size = style ()->pixelMetric (QStyle::PM_SmallIconSize);
+    m_hint_icon.setPixmap (get_icon ("dialog-information").pixmap (size));
+    m_hint_text.setText (_("Click on a value and press Ctrl+C to copy.\n"
+                           "Click on a value twice to edit."));
+
+    auto hint_hbox = make_hbox (nullptr);
+    hint_hbox->addStretch (1);
+    hint_hbox->addWidget (& m_hint_icon);
+    hint_hbox->addWidget (& m_hint_text);
+    hint_hbox->addStretch (1);
+
+    auto right_vbox = make_vbox (nullptr);
+    right_vbox->addWidget (& m_infowidget);
+    right_vbox->addLayout (hint_hbox);
+
     auto hbox = make_hbox (nullptr);
     hbox->addLayout (left_vbox);
-    hbox->addWidget (& m_infowidget);
+    hbox->addLayout (right_vbox);
 
     auto vbox = make_vbox (this);
     vbox->addLayout (hbox);
 
-    auto bbox = new QDialogButtonBox (QDialogButtonBox::Save | QDialogButtonBox::Close, this);
+    bbox = new QDialogButtonBox (QDialogButtonBox::Save | QDialogButtonBox::Close, this);
     bbox->button (QDialogButtonBox::Save)->setText (translate_str (N_("_Save")));
     bbox->button (QDialogButtonBox::Close)->setText (translate_str (N_("_Close")));
     vbox->addWidget (bbox);
@@ -163,6 +181,8 @@ void InfoWindow::fillInfo (int playlist, int entry, const char * filename, const
     m_filename = String (filename);
     m_uri_label.setText ((QString) uri_to_display (filename));
     displayImage (filename);
+    if (! updating_enabled)
+        bbox->button (QDialogButtonBox::Save)->setDisabled (true);
     m_infowidget.fillInfo (playlist, entry, filename, tuple, decoder, updating_enabled);
 }
 
@@ -209,6 +229,9 @@ EXPORT void infowin_show (int playlist, int entry)
         /* cuesheet entries cannot be updated */
         bool can_write = aud_file_can_write_tuple (filename, decoder) &&
          ! tuple.is_set (Tuple::StartTime);
+        /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
+        if (aud_get_bool (nullptr, "user_tag_data") && ! tuple.is_set (Tuple::StartTime))
+            can_write = true;
 
         tuple.delete_fallbacks ();
         show_infowin (playlist, entry, filename, tuple, decoder, can_write);
