@@ -553,7 +553,7 @@ int main (int argc, char * * argv)
         aud_set_stdout_fmt (1);
 
 #ifdef USE_DBUS
-    do_remote (); /* may exit */
+    do_remote (); /* may exit (calls dbus_server) */
 #endif
 
     AUDINFO ("No remote session; starting up.\n");
@@ -567,10 +567,17 @@ int main (int argc, char * * argv)
     /* JWT:MUST INITIALIZE SDL2 BEFORE ANY GTK WINDOWS POPUP ELSE MAY GET SEGFAULT WHEN OPENING ONE! */
     bool sdl_initialized = false;  // TRUE IF SDL (VIDEO) IS SUCCESSFULLY INITIALIZED.
     SDL_SetMainReady ();
-    if (SDL_InitSubSystem (SDL_INIT_VIDEO) < 0)
-        AUDERR ("e:Failed to init SDL in main(): (no video playing): %s.\n", SDL_GetError ());
-    else
-        sdl_initialized = true;
+#if defined(USE_GTK)
+#if defined(USE_QT)
+    if (! options.qt)
+#endif
+    {
+        if (SDL_Init (SDL_INIT_VIDEO))  // GTK REQUIRES INIT HERE TO AVOID SEGFAULTS, QT PUKES ON EXIT IF SO!:
+            AUDERR ("e:Failed to init SDL in main(): (no video playing): %s.\n", SDL_GetError ());
+        else
+            sdl_initialized = true;
+    }
+#endif
 
     aud_init ();
 
@@ -593,7 +600,7 @@ int main (int argc, char * * argv)
     }
 
     if (sdl_initialized)
-        SDL_QuitSubSystem (SDL_INIT_VIDEO);
+        SDL_QuitSubSystem (SDL_INIT_VIDEO);  // SDL DOCS SAY SDL_Quit () SAFE, BUT SEGFAULTS HERE?!
 
     aud_drct_enable_record (0);  // JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
 #ifdef USE_DBUS
