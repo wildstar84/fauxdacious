@@ -1,6 +1,6 @@
 LICENSE
 
-Copyright © 2001-2018 Jim Turner, Audacious developers and others
+Copyright © 2001-2019 Jim Turner, Audacious developers and others
 
 (A list of the copyright holders is provided in the AUTHORS file.)
 
@@ -20,16 +20,17 @@ Copyright © 2001-2018 Jim Turner, Audacious developers and others
 
 EXCEPTIONS
 
-The Fauxdacious logo was designed by (c 2015) Jim Turner.  All Fauxdacious changes 
-and patches, including plugin changes are copyright (c 2015) by Jim Turner,  with 
-all rights reserved.  You are free to use Fauxdacious subject to the same license 
-and terms as Audacious itself.  
+The Fauxdacious logo was designed by (c 2015) Jim Turner.  All Fauxdacious 
+changes and patches, including plugin changes are copyright (c 2015) by 
+Jim Turner, with all rights reserved.  You are free to use Fauxdacious 
+subject to the same license and terms as Audacious itself.  
 
-Other than the Fauxdacious and Audacious logos themselves, the images included with 
-Fauxdacious are based on the Tango Icon Library and are in the public domain.
+Other than the Fauxdacious and Audacious logos themselves, the images included 
+with Fauxdacious are based on the Tango Icon Library and are in the public 
+domain.
 
-Please note that many of the plugins distributed with Fauxdacious / Audacious are under
-different licenses.
+Please note that many of the plugins distributed with Fauxdacious / Audacious 
+are under different licenses.
 
 THIRD-PARTY LICENSES
 
