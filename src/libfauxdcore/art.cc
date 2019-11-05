@@ -114,52 +114,50 @@ static void request_callback (ScanRequest * request)
     pthread_mutex_unlock (& mutex);
 }
 
-/* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS, FOR ART FILE MATCHING BASE URL: */
+/* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS: CHECK FOR ART FILE MATCHING BASE URL: */
+
+static bool check_tag_file (const String & filename, AudArtItem * item, bool found, const char * tagfile)
+{
+    Tuple img_tuple = Tuple ();
+    int precedence = aud_read_tag_from_tagfile (filename, tagfile, img_tuple);
+    if (item->data.len () <= 0)
+    if (precedence && (precedence < 2 || ! found || item->data.len () <= 0))
+    {
+        /* SEARCH TAG FILE FOR ART *UNLESS* "DEFAULT" PRECEDENCE AND ART ITEM ALREADY EXISTS AND HAS DATA: */
+        String tfld = img_tuple.get_str (Tuple::Comment);
+        if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
+        {
+            item->art_file = tfld;
+            VFSFile file (item->art_file, "r");
+            if (file)
+            {
+                item->data = file.read_all ();
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 static bool check_for_user_art (const String & filename, AudArtItem * item, bool found)
 {
     /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
     bool foundArt = false;
-    if (aud_get_bool (nullptr, "user_tag_data"))
+    if (aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG FILES IF USER WANTS TO USE THEM:
     {
-        Tuple img_tuple = Tuple ();
-        int precedence = aud_read_tag_from_tagfile (filename, "tmp_tag_data", img_tuple);
-        if (item->data.len () <= 0)
-        if (precedence && (precedence < 2 || ! found || item->data.len () <= 0))
+        foundArt = check_tag_file (filename, item, found, "tmp_tag_data");  // 1ST, CHECK TEMP TAGFILE
+        if (! foundArt && ! strncmp (filename, "file://", 7))  // 2ND, CHECK DIRECTORY TAGFILE (IF FILE)
         {
-            /* SEARCH TAG FILE FOR ART *UNLESS* "DEFAULT" PRECEDENCE && ART ITEM ALREADY EXISTS && HAS DATA: */
-            String tfld = img_tuple.get_str (Tuple::Comment);
-            if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
-            {
-                item->art_file = tfld;
-                VFSFile file (item->art_file, "r");
-                if (file)
-                {
-                    item->data = file.read_all ();
-                    foundArt = true;
-                }
-            }
+            StringBuf tag_fid = uri_to_filename (filename);
+            StringBuf path = filename_get_parent (tag_fid);
+            String filename_only = String (filename_get_base (tag_fid));
+            foundArt = check_tag_file (filename_only, item, found,
+                    filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
         }
         if (! foundArt)
-        {
-            precedence = aud_read_tag_from_tagfile (filename, "user_tag_data", img_tuple);
-            if (precedence && (precedence < 2 || ! found || item->data.len () <= 0))
-            {
-                String tfld = img_tuple.get_str (Tuple::Comment);
-                if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
-                {
-                    item->art_file = tfld;
-                    VFSFile file (item->art_file, "r");
-                    if (file)
-                    {
-                        item->data = file.read_all ();
-                        foundArt = true;
-                    }
-                }
-            }
-        }
+            foundArt = check_tag_file (filename, item, found, "user_tag_data");  // 3RD, CHECK USER TAGFILE
     }
-    if (! foundArt && ! item->data.len () && ! item->art_file)
+    if (! foundArt && ! item->data.len () && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
     {
         StringBuf scheme = uri_get_scheme (filename);
         if (strcmp (scheme, "file") && strcmp (scheme, "stdin")
