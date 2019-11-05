@@ -114,6 +114,96 @@ static void request_callback (ScanRequest * request)
     pthread_mutex_unlock (& mutex);
 }
 
+/* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS, FOR ART FILE MATCHING BASE URL: */
+
+static bool check_for_user_art (const String & filename, AudArtItem * item, bool found)
+{
+    /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
+    bool foundArt = false;
+    if (aud_get_bool (nullptr, "user_tag_data"))
+    {
+        Tuple img_tuple = Tuple ();
+        int precedence = aud_read_tag_from_tagfile (filename, "tmp_tag_data", img_tuple);
+        if (item->data.len () <= 0)
+        if (precedence && (precedence < 2 || ! found || item->data.len () <= 0))
+        {
+            /* SEARCH TAG FILE FOR ART *UNLESS* "DEFAULT" PRECEDENCE && ART ITEM ALREADY EXISTS && HAS DATA: */
+            String tfld = img_tuple.get_str (Tuple::Comment);
+            if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
+            {
+                item->art_file = tfld;
+                VFSFile file (item->art_file, "r");
+                if (file)
+                {
+                    item->data = file.read_all ();
+                    foundArt = true;
+                }
+            }
+        }
+        if (! foundArt)
+        {
+            precedence = aud_read_tag_from_tagfile (filename, "user_tag_data", img_tuple);
+            if (precedence && (precedence < 2 || ! found || item->data.len () <= 0))
+            {
+                String tfld = img_tuple.get_str (Tuple::Comment);
+                if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
+                {
+                    item->art_file = tfld;
+                    VFSFile file (item->art_file, "r");
+                    if (file)
+                    {
+                        item->data = file.read_all ();
+                        foundArt = true;
+                    }
+                }
+            }
+        }
+    }
+    if (! foundArt && ! item->data.len () && ! item->art_file)
+    {
+        StringBuf scheme = uri_get_scheme (filename);
+        if (strcmp (scheme, "file") && strcmp (scheme, "stdin")
+                && strcmp (scheme, "cdda") && strcmp (scheme, "dvd"))
+        {
+            /* JWT:URL & NO OTHER ART FOUND, SO LOOK FOR IMAGE MATCHING STREAMING URL (IE: www.streamingradio.com.jpg): */
+            const char * slash = strstr (filename, "//");
+            if (slash)
+            {
+                slash+=2;
+                const char * endbase = strstr (slash, "/");
+                int ln = endbase ? endbase - slash : -1;
+                String urlbase = String (str_copy (slash, ln));
+                auto split = str_list_to_index (slash, "?&#:/");
+                for (auto & str : split)
+                {
+                    urlbase = String (str_copy (str));
+                    break;
+                }
+                Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
+                struct stat statbuf;
+                for (auto & ext : extlist)
+                {
+                    String coverart_file = String (str_concat ({aud_get_path (AudPath::UserDir), "/",
+                            urlbase, ".", (const char *) ext}));
+                    if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE DOESN'T EXIST:
+                    {
+                        coverart_file = String (filename_to_uri (coverart_file));
+                        item->art_file = coverart_file;
+                        VFSFile file (item->art_file, "r");
+                        if (file)
+                        {
+                            item->data = file.read_all ();
+                            foundArt = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return foundArt;
+}
+
 static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 {
     if (queued)
@@ -127,6 +217,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 
     if (item && item->flag)
     {
+        check_for_user_art (filename, item, true);  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
         item->refcount ++;
         return item;
     }
@@ -137,7 +228,13 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
         item->filename = filename;
         item->refcount = 1; /* temporary reference */
 
-        scanner_request (new ScanRequest (filename, SCAN_IMAGE, request_callback));
+        if (check_for_user_art (filename, item, false))
+        {
+            item->flag = FLAG_DONE;  // ART FOUND IN TAG FILE, WE'RE DONE, DON'T SCAN NON-PLAYING ENTRY (SLOW)!
+            return item;
+        }
+        else
+            scanner_request (new ScanRequest (filename, SCAN_IMAGE, request_callback));
     }
 
     if (queued)
@@ -227,86 +324,12 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
 
     if (format & AUD_ART_DATA)
     {
-        /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
-        bool needArt = true;
-        if (! item->data.len () && ! item->art_file)
-        {
-            if (aud_get_bool (nullptr, "user_tag_data"))
-            {
-                Tuple img_tuple = Tuple ();
-                if (aud_read_tag_from_tagfile (file, "tmp_tag_data", img_tuple))
-                {
-                    String tfld = img_tuple.get_str (Tuple::Comment);
-                    if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
-                    {
-                        item->art_file = tfld;
-                        needArt = false;
-                    }
-                }
-                if (needArt && aud_read_tag_from_tagfile (file, "user_tag_data", img_tuple))
-                {
-                    String tfld = img_tuple.get_str (Tuple::Comment);
-                    if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
-                    {
-                        item->art_file = tfld;
-                        needArt = false;
-                    }
-                }
-            }
-        }
-        if (needArt && ! item->data.len () && ! item->art_file)
-        {
-            StringBuf scheme = uri_get_scheme (file);
-            if (strcmp (scheme, "file") && strcmp (scheme, "stdin")
-                    && strcmp (scheme, "cdda") && strcmp (scheme, "dvd"))
-            {
-                /* JWT:LOOK FOR IMAGE MATCHING STREAMING URL (IE: www.streamingradio.com.jpg): */
-                const char * slash = strstr (file, "//");
-                if (slash)
-                {
-                    slash+=2;
-                    const char * endbase = strstr (slash, "/");
-                    int ln = endbase ? endbase - slash : -1;
-                    String urlbase = String (str_copy (slash, ln));
-                    auto split = str_list_to_index (slash, "?&#:/");
-                    for (auto & str : split)
-                    {
-                        urlbase = String (str_copy (str));
-                        break;
-                    }
-                    Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
-                    struct stat statbuf;
-                    for (auto & ext : extlist)
-                    {
-                        String coverart_file = String (str_concat ({aud_get_path (AudPath::UserDir), "/",
-                                urlbase, ".", (const char *) ext}));
-                        if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE DOESN'T EXIST:
-                        {
-                            coverart_file = String (filename_to_uri (coverart_file));
-                            item->art_file = coverart_file;
-                            VFSFile file (item->art_file, "r");
-                            if (file)
-                            {
-                                item->data = file.read_all ();
-                                needArt = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
         /* JWT:DO WE HAVE A "DEFAULT" COVER ART FILE? */
-        if (needArt && ! item->data.len () && ! item->art_file)
+        if (! item->data.len () && ! item->art_file)
         {
             String artdefault = aud_get_str(nullptr, "default_cover_file");
             if (artdefault && artdefault[0])
-            {
                 item->art_file = String (filename_to_uri ((const char *) artdefault));
-                VFSFile file (item->art_file, "r");
-                if (file)
-                    item->data = file.read_all ();
-            }
         }
         /* load data from external image file */
         if (! item->data.len () && item->art_file)
