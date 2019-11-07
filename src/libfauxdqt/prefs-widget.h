@@ -1,6 +1,6 @@
 /*
  * prefs-widget.cc
- * Copyright 2007-2014 Tomasz Moń, William Pitcock, and John Lindgren
+ * Copyright 2007-2019 Tomasz Moń, Ariadne Conill, and John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,18 +36,6 @@ class QLineEdit;
 class QSpinBox;
 
 namespace audqt {
-
-/*
- * basic idea is this.  create classes which wrap the PreferencesWidgets.
- * Each should have it's own get(), set() and widget() methods.  those are the
- * functions that we really care about.
- * get() and set() allow for introspection and manipulation of the underlying
- * objects.  they also handle pinging the plugin which owns the PreferencesWidget,
- * i.e. calling PreferencesWidget::callback().
- * widget() builds the actual Qt side of the widget, hooks up the relevant signals
- * to slots, etc.  the result of widget() is not const as it is linked into a
- * layout manager or shown or whatever.
- */
 
 /* base class which provides plumbing for hooks. */
 class HookableWidget {
@@ -126,6 +114,24 @@ private:
 class StringWidget : public QWidget, HookableWidget {
 public:
     StringWidget (const PreferencesWidget * parent, const char * domain);
+private:
+    void update ();
+    QLineEdit * m_lineedit;
+};
+
+/* file widget (audqt::FileEntry) */
+class FileWidget : public QWidget, HookableWidget {
+public:
+    FileWidget (const PreferencesWidget * parent, const char * domain);
+private:
+    void update ();
+    QLineEdit * m_lineedit;
+};
+
+/* font widget (audqt::FontEntry) */
+class FontWidget : public QWidget, HookableWidget {
+public:
+    FontWidget (const PreferencesWidget * parent, const char * domain);
 private:
     void update ();
     QLineEdit * m_lineedit;
