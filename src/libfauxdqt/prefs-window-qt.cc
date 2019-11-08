@@ -1,6 +1,6 @@
 /*
  * prefs-window.cc
- * Copyright 2006-2018 William Pitcock, Tomasz Moń, Michael Färber, and
+ * Copyright 2006-2019 William Pitcock, Tomasz Moń, Michael Färber, and
  *                     John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
@@ -361,6 +361,8 @@ static const PreferencesWidget playlist_page_widgets[] = {
         WidgetBool (0, "leading_zero", send_title_change)),
     WidgetCheck (N_("Show hours separately (1:30:00 vs. 90:00)"),
         WidgetBool (0, "show_hours", send_title_change)),
+    WidgetCheck (N_("Split Artist - Title in streams"),
+        WidgetBool (0, "split_titles")),
     WidgetCustomQt (create_titlestring_table),
     WidgetLabel (N_("<b>Export</b>")),
     WidgetCheck (N_("Use relative paths when possible"),

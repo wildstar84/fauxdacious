@@ -67,7 +67,7 @@ size_t misc_bytes_allocated;
 static bool headless_mode;
 static bool MuteInLieuOfPause;   /* JWT */
 static String instancename;      /* JWT */
-static String prevtitle;         /* JWT */
+static String prevmeta[2];       /* JWT */
 static int fudge_gain;           /* JWT */
 static int stdout_fmt;           /* JWT */
 
@@ -88,7 +88,9 @@ EXPORT void aud_set_stdout_fmt (int fmt)
 EXPORT int aud_get_stdout_fmt ()
     { return stdout_fmt; }
 
-EXPORT void aud_set_instancename (String strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
+/* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
+
+EXPORT void aud_set_instancename (String strarg)
 {
     instancename = (strarg && strarg[0]) ? strarg : String ("");
 }
@@ -102,14 +104,16 @@ EXPORT String aud_get_instancename ()
     return instancename;
 }
 
-EXPORT void fauxd_set_prevtitle (String strarg)  /* JWT:NEXT 2 TO ALLOW SPECIFYING ALTERNATE INSTANCE (CONFIG. DIRECTORY) NAME */
+/* JWT:NEXT 2 TO ALLOW SAVING TITLE(0) AND ALBUM(1) FROM STREAMS WHEN WE MODIFY IN tuple.cc: */
+
+EXPORT void fauxd_set_prevmeta (int which, String newmeta)
 {
-    prevtitle = (strarg && strarg[0]) ? strarg : String ("");
+    prevmeta[which] = (newmeta && newmeta[0]) ? newmeta : String ("");
 }
 
-EXPORT bool fauxd_is_prevtitle (String newtitle)
+EXPORT bool fauxd_is_prevmeta (int which, String newmeta)
 {
-    return (prevtitle == newtitle);
+    return (prevmeta[which] == newmeta);
 }
 
 EXPORT void aud_set_mainloop_type (MainloopType type)
@@ -412,7 +416,8 @@ EXPORT void aud_leak_check ()
     for (String & path : aud_paths)
         path = String ();
 
-    prevtitle = String ();     // JWT:PREVENT "LEAK" MESSAGES (FREE)!
+    prevmeta[0] = String ();   // JWT:PREVENT "LEAK" MESSAGES (FREE)!
+    prevmeta[1] = String ();   // JWT:PREVENT "LEAK" MESSAGES (FREE)!
     instancename = String ();  // JWT:PREVENT "LEAK" MESSAGES (FREE)!
 
     string_leak_check ();

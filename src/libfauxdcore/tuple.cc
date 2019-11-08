@@ -652,14 +652,15 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
 {
     bool updated = false;
     int value;
+    bool split_titles = aud_get_bool (nullptr, "split_titles");
 
     ::String val = stream.get_metadata ("track-name");
-
     if (val && val[0] && strncmp ((const char *) val, "  - ", 4))
     {
-        if (! fauxd_is_prevtitle (val))
+        if (! fauxd_is_prevmeta (0, val))
         {
-            fauxd_set_prevtitle (val);
+            bool albumisset = ! split_titles;
+            fauxd_set_prevmeta (0, val);
             const char * ttloffset = strstr ((const char *) val, " - text=\"");
             if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
             {
@@ -671,9 +672,14 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                     int artlen = ttloffset - (const char *) val;
                     if (artlen > 0 && (! tupletitle || strncmp ((const char *) val, tupletitle, artlen)))
                     {
-                        set_str (Title, str_printf ("%.*s - %.*s", artlen,
-                                (const char *) val, (int)(endquote-ttloffset9), ttloffset9));
-                        set_str (Artist, str_printf ("%.*s", artlen, (const char *) val));
+                        if (split_titles)
+                        {
+                            set_str (Title, str_printf ("%.*s", (int)(endquote-ttloffset9), ttloffset9));
+                            set_str (Artist, str_printf ("%.*s", artlen, (const char *) val));
+                        }
+                        else
+                            set_str (Title, str_printf ("%.*s - %.*s", artlen,
+                                    (const char *) val, (int) (endquote-ttloffset9), ttloffset9));
                         updated = true;
                     }
                 }
@@ -696,44 +702,106 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                             const char * ptr;
                             const char * yroffset = nullptr;
                             const char * alboffset = nullptr;
+                            const char * ttlextraptr = nullptr;
                             artoffset = nullptr;
                             ttloffset = nullptr;
+                            char what = ' ';
                             for (const ::String & metapart : metaparts)
                             {
                                 if (! artoffset)
                                     artoffset = (const char *) metapart;
                                 ptr = strstr ((const char *) metapart, "Title: ");
                                 if (ptr)
-                                    ttloffset = ptr + 6;
+                                {
+                                    what = 't';
+                                    ttloffset = ptr + 7;
+                                }
                                 else
                                 {
                                     ptr = strstr ((const char *) metapart, "Artist: ");
                                     if (ptr)
+                                    {
+                                        what = 'r';
                                         artoffset = ptr + 8;
+                                    }
                                     else
                                     {
                                         ptr = strstr ((const char *) metapart, "Album: ");
                                         if (ptr)
+                                        {
+                                            what = 'a';
                                             alboffset = ptr + 7;
+                                        }
                                         else
                                         {
                                             ptr = strstr ((const char *) metapart, "Year: ");
                                             if (ptr)
+                                            {
+                                                what = 'y';
                                                 yroffset = ptr + 6;
+                                            }
+                                            else
+                                            if (what == 't')
+                                                ttlextraptr = (const char *) metapart; // TITLE HAD A "-" IN IT.
                                         }
                                     }
                                 }                    
                             }
-                            set_str (Title, str_printf ("%s%s%s", artoffset, "-", ttloffset));
+                            if (split_titles)
+                            {
+                                if (ttlextraptr)
+                                    set_str (Title, str_printf ("%s%s%s", ttloffset,
+                                            "-", ttlextraptr));
+                                else
+                                    set_str (Title, ttloffset);
+                                set_str (Artist, artoffset);
+                            }
+                            else
+                                if (ttlextraptr)
+                                    set_str (Title, str_printf ("%s%s%s%s%s", artoffset,
+                                            "- ", ttloffset, "-", ttlextraptr));
+                                else
+                                    set_str (Title, str_printf ("%s%s%s", artoffset, "- ",
+                                            ttloffset));
+
                             if (alboffset)
-                                set_str (Album, alboffset);
+                            {
+                                if (split_titles)
+                                {
+                                    albumisset = true;
+                                    ::String stream_name = stream.get_metadata ("stream-name");
+                                    if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+                                        set_str (Album, str_printf ("%s%s%s", alboffset, " - ",
+                                                (const char *) stream_name));
+                                    else
+                                        set_str (Album, alboffset);
+                                }
+                                else
+                                    set_str (Album, alboffset);
+                            }
                             if (yroffset)
                                 set_int (Year, atoi (yroffset));
+
                             updated = true;
                         }
                     }
                     else if (! tupletitle || strcmp (ttloffset+7, tupletitle))
                         set_str (Title, ttloffset+7);  // WE HAVE "Title: " BUT NO ARTIST, SO ASSUME NOTHING ELSE!
+                }
+                else if (split_titles)
+                {
+                    const char * artoffset = (const char *) val;
+                    const char * ttloffset = strstr (artoffset, " - ");
+                    if (ttloffset)
+                    {
+                        set_str (Title, ttloffset+3);
+                        set_str (Artist, (const char *) str_printf ("%.*s", (int) (ttloffset-artoffset),
+                              artoffset));
+                    }
+                    else
+                        set_str (Title, val);
+
+                    updated = true;
                 }
                 else if (val != get_str (Title))
                 {
@@ -741,15 +809,36 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                     updated = true;
                 }
             }
+            if (! albumisset)
+            {
+                ::String stream_name = stream.get_metadata ("stream-name");
+                if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+                    set_str (Album, stream_name);
+            }
         }
     }
 
     val = stream.get_metadata ("stream-name");
-
-    if (val && val != get_str (Artist))
+    if (split_titles)
     {
-        set_str (Artist, val);
-        updated = true;
+        if (val && val[0] && ! fauxd_is_prevmeta (1, val))
+        {
+            fauxd_set_prevmeta (1, val);
+            ::String tuple_album = get_str (Album);
+            if (! tuple_album || tuple_album == ::String("(null)"))
+            {
+                set_str (Album, val);
+                updated = true;
+            }
+        }
+    }
+    else
+    {
+        if (val && val[0] && val != get_str (Artist))
+        {
+            set_str (Artist, val);
+            updated = true;
+        }
     }
 
     val = stream.get_metadata ("content-bitrate");
