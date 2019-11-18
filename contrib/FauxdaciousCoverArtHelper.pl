@@ -62,16 +62,30 @@ my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
 $ua->cookie_jar({});
 $ua->env_proxy;
+my $bummer = ($^O =~ /MSWin/);
+if ($bummer && $configPath) {  #STUPID WINDOWS DOESN'T SHOW DEBUG OUTPUT ON TERMINAL!
+	my $homedir = $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'};
+	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
+	$homedir =~ s#[\/\\]$##;
+	my $log_fh;
+    open $log_fh, ">${configPath}/FauxdaciousCoverArtHelper_log.txt";
+    *STDERR = $log_fh;
+}
+print STDERR "-FaudHelper(".join('|',@ARGV)."=\n"  if ($DEBUG);
 if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE REMOVING ALL OLD COVERART IMAGE FILES:
 	if (open TAGDATA, "<${configPath}/tmp_tag_data") {
 		my $fid;
+		my $skipdisks = 0;
 		while (<TAGDATA>) {
-			if (m#^Comment\=file\:\/\/\/(.+)#o) {  #THIS ELIMINATES ANY EXISTING CD TAGS (WILL ALL BE REPLACED!):
+			if (m#^\[([^\]]+)#o) {
+				my $one = $1;
+				$skipdisks = ($one =~ m#^(?:cdda|dvd)\:\/\/#o) ? 1 : 0;
+			} elsif (!$skipdisks && m#^Comment\=file\:\/\/\/(.+)#o) {  #THIS ELIMINATES ANY EXISTING CD TAGS (WILL ALL BE REPLACED!):
 				$fid = $1;
 				next  if ($fid =~ /[\*\?]/o);  #GUARD AGAINST WILDCARDS, ETC!!
 				next  unless ($fid =~ /(?:png|jpe?g|gif)$/io);  #MAKE SURE WE ONLY DELETE IMAGE FILES!
 				$fid =~ s/^(\w)\%3A/$1\:/;
-				if ($fid =~ /^\w\:/) {   #BUMMER, WE'RE ON WINDOWS:
+				if ($bummer && $fid =~ /^\w\:/) {   #BUMMER, WE'RE ON WINDOWS:
 					$fid =~ s#\/#\\#go;  #MAY NOT BE NECESSARY?
 				} else {
 					$fid = '/' . $fid  unless ($fid =~ m#^\/#o);
@@ -167,7 +181,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 					$trackartist[$trk] = $t;
 				}
 				$trackartist[$trk] ||= $artist;
-				print STDERR "-4.1: artist($trk)=$trackartist[$trk]=\n";
+				print STDERR "-4.1: artist($trk)=$trackartist[$trk]=\n"  if ($DEBUG);
 				++$trk;
 			}
 		} else {
@@ -184,7 +198,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 			if ($configPath && -e "${configPath}/$ARGV[1].$image_ext") {  #IF WE ALREADY HAVE THIS IMAGE, DON'T RE-DOWNLOAD IT!:
 				print STDERR "-5a: already have art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
 				my $path = $configPath;
-				if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+				if ($bummer && $path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 					$path =~ s#^(\w)\:#\/$1\%3A#;
 					$path =~ s#\\#\/#g;
 				}
@@ -204,7 +218,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 					print IMGOUT $art_image;
 					close IMGOUT;
 					my $path = $configPath;
-					if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+					if ($bummer && $path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 						$path =~ s#^(\w)\:#\/$1\%3A#;
 						$path =~ s#\\#\/#g;
 					}
