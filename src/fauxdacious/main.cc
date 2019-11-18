@@ -23,6 +23,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#define SDL_MAIN_HANDLED
 #endif
 
 #include "SDL.h"
@@ -379,7 +380,7 @@ static void do_commands ()
     if (options.deleteallplaylists)  /* JWT */
     {
         const char *playlist_dir = aud_get_path (AudPath::PlaylistDir);
-        if (strstr (playlist_dir, "config"))
+        if (strstr (playlist_dir, "playlists"))
         {   /* PREVENT POTENTIAL ACCIDENTAL DELETE AGONY IF playlist WAS SOMEHOW EMPTY!!! */
             AUDINFO ("-D2:DELETING ALL PLAYLISTS (DIR=%s)!", playlist_dir);
             int i;
