@@ -82,6 +82,7 @@ Source: "C:\libs\bin\libmodplug-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversi
 Source: "C:\libs\bin\libmpg123-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libmp3lame-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libneon-27.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\libogg-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libeay32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libssl32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\ssleay32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
