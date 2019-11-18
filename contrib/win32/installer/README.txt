@@ -1,15 +1,15 @@
-Audacious 3.7.2 for Windows
+Fauxdacious 4.0.0 for Windows
 
-    http://audacious-media-player.org
+    https://wildstar84.wordpress.com/fauxdacious
 
-Audacious is free and open source software.  By installing Audacious, you agree
+Fauxdacious is free and open source software.  By installing Fauxdacious, you agree
 to be bound by various licenses governing its use and redistribution.
 
-Build date: 28 March 2016
+Build date: 18 November, 2019
 
 LICENSE
 
-Copyright (C) 2001-2016 Audacious developers and others
+Copyright (C) 2001-2019 Jim Turner, Audacious developers and others
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -27,15 +27,15 @@ from the use of this software.
 
 EXCEPTIONS
 
-Other than the Audacious logo itself, the images included with Audacious are
+Other than the Fauxdacious logo itself, the images included with Fauxdacious are
 based on the Tango Icon Library and are in the public domain.
 
-Please note that many of the plugins distributed with Audacious are under
+Please note that many of the plugins distributed with Fauxdacious are under
 different licenses, whose full text may be found either in the "About" window
 of each plugin or in the source code.
 
-Audacious would not exist without the efforts of numerous other free and open
-source software projects, which are listed below.  By installing Audacious, you
+Fauxdacious would not exist without the efforts of numerous other free and open
+source software projects, which are listed below.  By installing Fauxdacious, you
 also agree to all relevant licenses governing these projects.  The source code
 and license of each project can be found on the Internet.
 
@@ -82,8 +82,10 @@ and license of each project can be found on the Internet.
     libmms           http://libmms.sourceforge.net
     sidplayfp        http://sidplay-residfp.sourceforge.net
     FluidSynth       http://fluidsynth.org
+    SDL              https://www.libsdl.org
+    libdvdread       https://www.videolan.org
 
 If you are an author of one of these projects and do not wish your software
-included with Audacious in binary form, please contact us via the support forum:
+included with Fauxdacious in binary form, please contact us via the support forum:
 
-    http://redmine.audacious-media-player.org/projects/audacious/boards
+    mailto:turnerjw784@yahoo.com

@@ -1,4 +1,7 @@
 ; fauxdacious.nsi
+
+; WARNING:  THIS IS UNTESTED!
+
 ; Copyright 2013-2016 Carlo Bramini, John Lindgren and Jim Turner
 ;
 ; Redistribution and use in source and binary forms, with or without
@@ -19,7 +22,7 @@
 !include "MUI2.nsh"
 
 ; Version
-!define VERSION "3.7.2"
+!define VERSION "4.0.0"
 
 ; Program name
 Name "Fauxdacious ${VERSION}"
