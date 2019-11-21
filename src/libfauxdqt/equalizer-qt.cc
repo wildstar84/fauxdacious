@@ -143,9 +143,16 @@ EqualizerWindow::EqualizerWindow () :
     auto zero_button = new QPushButton (_("Flat"), this);
     preset_button = new QToolButton (this);
     preset_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    preset_button->setIcon(aud_get_bool (nullptr, "equalizer_songauto") 
-            ? audqt::get_icon ("media-record") : audqt::get_icon ("folder"));
-    preset_button->setText(_("Presets"));
+    if (aud_get_bool (nullptr, "equalizer_songauto"))
+    {
+        preset_button->setIcon(audqt::get_icon ("list-add"));
+        preset_button->setText(_("PreSETs!"));
+    }
+    else
+    {
+        preset_button->setIcon(audqt::get_icon ("list-remove"));
+        preset_button->setText(_("Presets"));
+    }
     auto auto_checkbox = new QCheckBox (_("Auto"), this);
     auto hbox = audqt::make_hbox (nullptr);
 
@@ -225,8 +232,16 @@ void EqualizerWindow::updateBands ()
 
 void EqualizerWindow::updateSongAuto ()
 {
-    preset_button->setIcon(aud_get_bool (nullptr, "equalizer_songauto") 
-            ? audqt::get_icon ("media-record") : audqt::get_icon ("folder"));
+    if (aud_get_bool (nullptr, "equalizer_songauto"))
+    {
+        preset_button->setIcon(audqt::get_icon ("list-add"));
+        preset_button->setText(_("PreSETs!"));
+    }
+    else
+    {
+        preset_button->setIcon(audqt::get_icon ("list-remove"));
+        preset_button->setText(_("Presets"));
+    }
 }
 
 static EqualizerWindow * s_equalizer = nullptr;

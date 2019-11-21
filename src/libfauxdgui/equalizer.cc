@@ -41,10 +41,18 @@ static void eq_auto_cb (GtkToggleButton * btn)
 
 static void presetbtn_update (void *, GtkWidget * btn)
 {
-    GtkWidget * image = aud_get_bool (nullptr, "equalizer_songauto")
-        ? gtk_image_new_from_icon_name ("media-record", GTK_ICON_SIZE_MENU)
-        : gtk_image_new_from_icon_name ("folder", GTK_ICON_SIZE_MENU);
-    gtk_button_set_image ((GtkButton *) btn, image);
+    if (aud_get_bool (nullptr, "equalizer_songauto"))
+    {
+        GtkWidget * image = gtk_image_new_from_icon_name ("list-add", GTK_ICON_SIZE_MENU);
+        gtk_button_set_image ((GtkButton *) btn, image);
+        gtk_button_set_label ((GtkButton *) btn, _("_PreSETs!"));
+    }
+    else
+    {
+        GtkWidget * image = gtk_image_new_from_icon_name ("list-remove", GTK_ICON_SIZE_MENU);
+        gtk_button_set_image ((GtkButton *) btn, image);
+        gtk_button_set_label ((GtkButton *) btn, _("_Presets"));
+    }
 }
 
 static void on_off_update (void *, GtkWidget * on_off)
@@ -173,9 +181,9 @@ static GtkWidget * create_window ()
 
     gtk_box_pack_end ((GtkBox *) top_row, create_autobtn (), false, false, 0);
     GtkWidget * presets = aud_get_bool (nullptr, "equalizer_songauto")
-        ? audgui_button_new (_("_Presets"), "media-record",
+        ? audgui_button_new (_("_PreSETs!"), "list-add",
               (AudguiCallback) audgui_show_eq_preset_window, nullptr)
-        : audgui_button_new (_("_Presets"), "folder",
+        : audgui_button_new (_("_Presets"), "list-remove",
               (AudguiCallback) audgui_show_eq_preset_window, nullptr);
     hook_associate ("set equalizer_songauto", (HookFunction) presetbtn_update, presets);
     gtk_box_pack_end ((GtkBox *) top_row, presets, false, false, 0);
