@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Fauxdacious"
-#define MyAppVersion "4.0-beta2"
+#define MyAppVersion "4.0-beta3"
 #define MyAppPublisher "Jim Turner"
 #define MyAppURL "https://wildstar84.wordpress.com/fauxdacious"
 #define MyAppExeName "fauxdacious.exe"
@@ -39,12 +39,12 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\faud\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\libs\bin\avcodec-57.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\avdevice-57.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\avfilter-6.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\avformat-57.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\avutil-55.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\faud\*"; DestDir: "{app}"; Excludes: "*.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\libs\bin\avcodec-58.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\avdevice-58.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\avfilter-7.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\avformat-58.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\avutil-56.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\bin\libatk-1.0-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 ;Source: "C:\libs\bin\libfauxdcore.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 ;Source: "C:\libs\bin\libfauxdgui.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -88,7 +88,6 @@ Source: "C:\libs\bin\libssl32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\ssleay32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libssl-1_1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libcrypto-1_1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\ssleay32.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\lib\engines-1_1\capi.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\lib\engines-1_1\padlock.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\bin\libpango-1.0-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -107,25 +106,27 @@ Source: "C:\libs\bin\libvorbisenc-2.dll"; DestDir: "{app}\bin"; Flags: ignorever
 Source: "C:\libs\bin\libvorbisfile-3.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libwavpack-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libxml2-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\postproc-54.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\postproc-55.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\MinGW\bin\pthreadGC2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\MinGW\bin\pthreadGCE2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\SDL2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\swresample-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\libs\bin\swscale-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\swresample-3.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\swscale-5.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libcue.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\MinGW\bin\zlib1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libdvdread-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\libs\bin\libdvdnav-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\libs\bin\libdvdread-4_hascss"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\GTK\lib\gdk-pixbuf-2.0\*"; DestDir: "{app}\lib\gdk-pixbuf-2.0"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\GTK\lib\gtk-2.0\*"; DestDir: "{app}\lib\gtk-2.0"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\GTK\share\icons\*"; DestDir: "{app}\share\icons"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "C:\GTK\etc\gtk-2.0\*"; DestDir: "{app}\etc\gtk-2.0"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "C:\pango\modules\basic\.libs\pango-basic-win32.dll"; DestDir: "{app}\lib\pango\1.8.0\modules\pango-basic-win32.dll"; Flags: ignoreversion recursesubdirs createallsubdirs
+
 Source: "C:\aud\bin\fauxdacious.exe"; DestDir: "{app}\bin"; DestName: "fauxdacious.exe"; Flags: ignoreversion
 Source: "C:\aud\bin\fauxdtool.exe"; DestDir: "{app}\bin"; DestName: "fauxdtool.exe"; Flags: ignoreversion
-;Source: "C:\aud\bin\getTuneinStream.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\aud\bin\FauxdaciousUrlHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\aud\bin\FauxdaciousCoverArtHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\faud\bin\FauxdaciousUrlHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\faud\bin\FauxdaciousCoverArtHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\aud\*"; DestDir: "{app}"; Excludes: "*.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
