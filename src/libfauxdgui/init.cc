@@ -287,8 +287,9 @@ static void load_fallback_icons ()
         "applications-graphics",
         "applications-internet",
         "applications-system",
+        "fauxdacious", /* for window icons */
         "audio-volume-medium",
-        "audio-x-generic",
+        "audio-x-generic", /* also used for fallback album art */
         "dialog-information",
         "preferences-system"
     };
