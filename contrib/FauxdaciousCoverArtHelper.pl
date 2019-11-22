@@ -229,47 +229,126 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 		&writeTagData($comment, \@tracktitle, \@trackartist);  #WRITE OUT ALL THE TRACK TAGS TO user_tag_data AND CUSTOM (<disk-id>.tag):
 	}
 } elsif ($ARGV[0] =~ /^DVD/i) {   #WE'RE A DVD:  JUST LOOK UP AND DOWNLOAD THE COVER-ART:
+	foreach my $image_ext (qw(jpg png jpeg gif)) {
+		if ($configPath && -e "${configPath}/$ARGV[1].$image_ext") {
+			print STDERR "-DVD: done:Cover art file (${configPath}/$ARGV[1].$image_ext) found locally.\n"  if ($DEBUG);
+			exit (0);
+		}
+	}
 	eval "use LWP::Curl; \$haveCurl = 1; 1";   #MUST USE CURL ON Dvdcover.com - THEY CHECK FOR AD-BLOCKERZ:
 	(my $argv1clean = $ARGV[1]) =~ s/[\x00-\x1f]//g;
+	my $argv1unclean = $argv1clean;
 	my $art_url = '';
 
-	if ($haveCurl) {   #FIRST, TRY TO FETCH FROM Dvdcover.com:
+	if ($haveCurl || !$bummer) {   #FIRST, TRY TO FETCH FROM Dvdcover.com:
 		print STDERR "-1a: URL=https://dvdcover.com/?s=$argv1clean=\n"  if ($DEBUG);
-		my $lwpcurl = LWP::Curl->new(timeout => 10);
-		goto PLAN_B  unless ($lwpcurl);
-		for (my $try=0;$try<=1;$try++) {
+		my $lwpcurl = LWP::Curl->new(timeout => 10)  if ($haveCurl);
+		goto PLAN_B  if ($bummer && !$lwpcurl);
+OUTER:		for (my $try=0;$try<=1;$try++) {
+			$html = '';
 			print STDERR "-1a TRY($try) of 2: argv=$argv1clean=\n"  if ($DEBUG);
-			$html = $lwpcurl->get("https://dvdcover.com/?s=$argv1clean");
-			if ($html =~ s#\<img\s+src\=\"(https\:\/\/dvdcover\.com\/wp\-content\/uploads\/$argv1clean\S*?\-front\-www\.getdvdcovers\.com\_\-[0-9x]+\.jpg)##is) {
-				$art_url = $1;
-				print STDERR "-1b: art URL=$art_url=\n"  if ($DEBUG);
-				last  if ($art_url);
+			$html = $lwpcurl->get("https://dvdcover.com/?s=$argv1clean")  if ($lwpcurl);
+			print STDERR "--falling back to WGET (wget -t 2 -T 20 -O- -o /dev/null \"https://dvdcover.com/?s=$argv1clean\" 2>/dev/null)!...\n"  if ($DEBUG && !$html);
+			$html ||= `wget -t 2 -T 20 -O- -o /dev/null \"https://dvdcover.com/?s=$argv1clean\" 2>/dev/null `  unless ($bummer);
+##			if ($html =~ s#\<img\s+src\=\"(https\:\/\/dvdcover\.com\/wp\-content\/uploads\/$argv1clean\S*?\-front\-www\.getdvdcovers\.com\_\-[0-9x]+\.jpg)##is) {
+			if ($html =~ m#^.+\<ul\s+id\=\"infinite\-articles\"(.+)?\<\/ul\>#s) {
+				my $html0 = $1;
+				$html0 =~ s#\<\/ul\>.+##s;
+				my $imghtml = '';
+				$html = $html0;
+				my $entryhtml = '';
+				#MATCHES DO NOT EXACTLY MATCH BASED ON DVD_TITLE FROM libdvdread, SO WE HAVE TO SEARCH/GUESS BEST ONE!:
+				while ($html =~ s#(\<li\s+.+?\<\/li\>)##so) {  # 1ST CHECK IF DESCRIPTION MATCHES TITLE & IS DVD COVER:
+					$entryhtml = $1;
+					if ($entryhtml =~ /\bdescription\=\"?([^\"]+)/i) {
+						my $desc = $1;
+						(my $title = $argv1clean) =~ s/\_/ /g;
+						print STDERR "-TRY 1- DESC=$desc= TITLE=$title=\n";
+						if ($desc =~ /$title/i && $desc =~ /DVD Cover/i) {
+							if ($entryhtml =~ m#\<img\s+([^\>]+)\>#i) {
+								my $imghtml = $1;
+								$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
+								print STDERR "---GOT IT1! ($art_url)\n";
+								last   if ($art_url);
+							}
+						}
+					}
+				}
+				unless ($art_url) {
+					$html = $html0;
+					while ($html =~ s#(\<li\s+.+?\<\/li\>)##so) { # 2ND CHECK IF TAGGED AS DVD COVER:
+						$entryhtml = $1;
+						if ($entryhtml =~ /\<p\>\<p\>([^\<]+)/i) {
+							my $tagshtml = $1;
+							print STDERR "-TRY 2- TAGS=$tagshtml=\n";
+							if ($tagshtml =~ /DVD Cover/i) {
+								if ($entryhtml =~ m#\<img\s+([^\>]+)\>#i) {
+									my $imghtml = $1;
+									$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
+									print STDERR "---GOT IT2! ($art_url)\n";
+									last   if ($art_url);
+								}
+							}
+						}
+					}
+				}
+				unless ($art_url) {  # 3RD CHECK IF IMAGE URL ITSELF CONTAINS THE TITLE
+					$html = $html0;
+					while ($html =~ s#(\<li\s+.+?\<\/li\>)##so) {
+						$entryhtml = $1;
+						if ($entryhtml =~ m#\<img\s+([^\>]+)\>#i) {
+							my $imghtml = $1;
+							if ($imghtml =~ /$argv1clean/i) {
+								$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
+								print STDERR "---GOT IT3! ($art_url)\n";
+								last   if ($art_url);
+							}
+						}
+					}
+				}
+				unless ($art_url) { # LAST CHECK IF THE REFERENCE LINK CONTAINS THE TITLE:
+					(my $key = $argv1clean) =~ s/\_/\-/g;
+					$html = $html0;
+					while ($html =~ s#(\<li\s+.+?\<\/li\>)##so) {
+						$entryhtml = $1;
+						if ($entryhtml =~ m#\<a\s+href\=\"([^\"]+)\"\>\s+\<img\s+([^\>]+)\>#i) {
+							my $link = $1;
+							my $imghtml = $2;
+							print STDERR "-TRY 4- KEY=$key= link=$link=\n";
+							if ($link =~ m#\/$key#i) {
+								$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
+								print STDERR "---GOT IT4! ($art_url)\n";
+								last   if ($art_url);
+							}
+						}
+					}
+				}
 			}
-			$argv1clean =~ s/\_\d.*$//;  #TRY AGAIN W/O EXTRA SIZE INFO IN TITLE:
+			$argv1clean =~ s/\_\d+x.*$//i;  #TRY AGAIN W/O EXTRA DISK OR SIZE INFO IN TITLE:
+			$argv1clean =~ s/\_DISC.*$//;
+			last  if ($argv1clean eq $argv1unclean);
 		}
 		if ($art_url) {   #GOT AN IMAGE LINK TO (HOPEFULLY THE RIGHT) COVER-ART IMAGE:
 			my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
 			my $art_image = '';
 			print STDERR "-5: ext=$image_ext= art_url=$art_url= configpath=$configPath=\n"  if ($DEBUG);
-			if ($configPath && -e "${configPath}/$ARGV[1].$image_ext") {  #IF WE ALREADY HAVE THIS IMAGE, DON'T RE-DOWNLOAD IT!:
-				print STDERR "-5a: already have art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
-			} else {   #WE DON'T HAVE IT, SO DOWNLOAD IT:
-				print STDERR "-5b: attempt to download art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
-				my $response = $ua->get($art_url);
-				$art_image = $lwpcurl->get($art_url,'https://dvdcover.com');
-				#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
-				if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
-					print STDERR "-6: will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
-					binmode IMGOUT;
-					print IMGOUT $art_image;
-					close IMGOUT;
-				}
+			print STDERR "-5b: attempt to download art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
+			my $response = $ua->get($art_url);
+			$art_image = $lwpcurl->get($art_url,'https://dvdcover.com')  if ($lwpcurl);
+			$art_image ||= `wget -t 2 -T 20 -O- -o /dev/null --referer=\"https://dvdcover.com\" \"$art_url\" 2>/dev/null `  unless ($bummer);
+			#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
+			if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
+				print STDERR "-6: will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
+				binmode IMGOUT;
+				print IMGOUT $art_image;
+				close IMGOUT;
 			}
 			exit (0);
 		}
 	}
 PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover easier & has better DVD images, but I think Archive.org has more):
 	print STDERR "-1(PLAN B): URL=https://archive.org/details/coverartarchive?and[]=$argv1clean=\n"  if ($DEBUG);
+	$argv1clean = $argv1unclean;
 	for (my $try=0;$try<=1;$try++) {
 		print STDERR "-1a TRY($try) of 2: argv=$argv1clean=\n"  if ($DEBUG);
 		my $response = $ua->get("https://archive.org/details/coverartarchive?and[]=$argv1clean");
@@ -289,7 +368,9 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 			}
 			last;
 		}
-		$argv1clean =~ s/\_\d.*$//;  #TRY AGAIN W/O EXTRA SIZE INFO IN TITLE:
+		$argv1clean =~ s/\_\d+x.*$//;  #TRY AGAIN W/O EXTRA DISK OR SIZE INFO IN TITLE:
+		$argv1clean =~ s/\_DISC.*$//;
+		last  if ($argv1clean eq $argv1unclean);
 	}
 	print STDERR "-4: title=$title= cover url=$art_url=\n"  if ($DEBUG);
 	die "f:No cover art url found!\n"  unless ($art_url);
@@ -298,23 +379,19 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 		my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
 		my $art_image = '';
 		print STDERR "-5: ext=$image_ext= art_url=$art_url= configpath=$configPath=\n"  if ($DEBUG);
-		if ($configPath && -e "${configPath}/$ARGV[1].$image_ext") {  #IF WE ALREADY HAVE THIS IMAGE, DON'T RE-DOWNLOAD IT!:
-			print STDERR "-5a: already have art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
-		} else {   #WE DON'T HAVE IT, SO DOWNLOAD IT:
-			print STDERR "-5b: attempt to download art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
-			my $response = $ua->get($art_url);
-			if ($response->is_success) {
-				$art_image = $response->decoded_content;
-			} else {
-				print STDERR $response->status_line  if ($DEBUG);
-			}
-			#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
-			if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
-				print STDERR "-6: will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
-				binmode IMGOUT;
-				print IMGOUT $art_image;
-				close IMGOUT;
-			}
+		print STDERR "-5b: attempt to download art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
+		my $response = $ua->get($art_url);
+		if ($response->is_success) {
+			$art_image = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+		}
+		#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
+		if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
+			print STDERR "-6: will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
+			binmode IMGOUT;
+			print IMGOUT $art_image;
+			close IMGOUT;
 		}
 	}
 }
