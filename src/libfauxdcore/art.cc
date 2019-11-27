@@ -143,7 +143,22 @@ static bool check_for_user_art (const String & filename, AudArtItem * item, bool
 {
     /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
     bool foundArt = false;
-    if (aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG FILES IF USER WANTS TO USE THEM:
+    if (aud_get_bool ("albumart", "internet_coverartlookup") && strstr (filename, "_tmp_albumart"))
+    {
+        struct stat statbuf;
+        StringBuf coverart_file = uri_to_filename (filename);
+        if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
+        {
+            item->art_file = filename;
+            VFSFile file (item->art_file, "r");
+            if (file)
+            {
+                item->data = file.read_all ();
+                foundArt = true;
+            }
+        }
+    }
+    if (! foundArt && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG FILES IF USER WANTS TO USE THEM:
     {
         foundArt = check_tag_file (filename, item, found, "tmp_tag_data");  // 1ST, CHECK TEMP TAGFILE
         if (! foundArt && ! strncmp (filename, "file://", 7))  // 2ND, CHECK DIRECTORY TAGFILE (IF FILE)
