@@ -4,7 +4,7 @@
 
 #FAUXDACIOUS "HELPER" SCRIPT TO FETCH COVER ART FOR CDs/DVSs FROM coverartarchive and dvdcover.com:
 
-#USAGE:  $0 {CD[T] diskID | DVD title} [configpath] | DELETE COVERART configpath
+#USAGE:  $0 {CD[T] diskID | DVD title | ALBUM artist album} [configpath] | DELETE COVERART configpath
 
 #CONFIGURE:  ~/.config/audacious[_instancename]/config:  [audacious].cover_helper=FauxdaciousCoverArtHelper.pl
 
@@ -42,11 +42,13 @@ BEGIN
 	}
 }
 use strict;
+use File::Copy;
 use HTML::Entities ();
 #use LWP::Simple qw();
 use LWP::UserAgent ();
+use URI::Escape;
 
-die "..usage: $0 {CD[T] diskID | DVD title} [configpath] | DELETE COVERART configpath\n"  unless ($ARGV[0] && $ARGV[1]);
+die "..usage: $0 {CD[T] diskID | DVD title | ALBUM album} [configpath] [artist] | DELETE COVERART configpath\n"  unless ($ARGV[0] && $ARGV[1]);
 my $configPath = '';
 if ($ARGV[1]) {
 	($configPath = $ARGV[2]) =~ s#^file:\/\/##;
@@ -71,7 +73,7 @@ if ($bummer && $configPath) {  #STUPID WINDOWS DOESN'T SHOW DEBUG OUTPUT ON TERM
     open $log_fh, ">${configPath}/FauxdaciousCoverArtHelper_log.txt";
     *STDERR = $log_fh;
 }
-print STDERR "-FaudHelper(".join('|',@ARGV)."=\n"  if ($DEBUG);
+print STDERR "-CoverArtHelper(".join('|',@ARGV)."=\n"  if ($DEBUG);
 if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE REMOVING ALL OLD COVERART IMAGE FILES:
 	if (open TAGDATA, "<${configPath}/tmp_tag_data") {
 		my $fid;
@@ -103,6 +105,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 		$html = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
+		print STDERR "! (https://musicbrainz.org/otherlookup/freedbid?other-lookup.freedbid=$ARGV[1])\n";
 	}
 	die "f:failed to find title ($ARGV[1]) on musicbrainz.com!\n"  unless ($html);
 	my $url2 = '';
@@ -152,6 +155,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 			$html = $response->decoded_content;
 		} else {
 			print STDERR $response->status_line  if ($DEBUG);
+			print STDERR "! ($url2)\n";
 		}
 		print STDERR "-3: html=$html=\n"  if ($DEBUG > 1);
 		die "f:musicbrainz.org returned no html!\n"  unless ($html);
@@ -210,6 +214,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 					$art_image = $response->decoded_content;
 				} else {
 					print STDERR $response->status_line  if ($DEBUG);
+					print STDERR "! ($art_url)\n";
 				}
 				#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
 				if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
@@ -227,6 +232,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 			}
 		}
 		&writeTagData($comment, \@tracktitle, \@trackartist);  #WRITE OUT ALL THE TRACK TAGS TO user_tag_data AND CUSTOM (<disk-id>.tag):
+		exit (0);
 	}
 } elsif ($ARGV[0] =~ /^DVD/i) {   #WE'RE A DVD:  JUST LOOK UP AND DOWNLOAD THE COVER-ART:
 	foreach my $image_ext (qw(jpg png jpeg gif)) {
@@ -243,12 +249,12 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 OUTER:		for (my $try=0;$try<=1;$try++) {
 		$html = '';
 		print STDERR "-1a TRY($try) of 2: argv=$argv1clean=\n"  if ($DEBUG);
-		my $response = $ua->get("https://dvdcover.com/?s=$argv1clean")  if ($ua);
+		my $response = $ua->get("https://dvdcover.com/?s=$argv1clean");
 		if ($response->is_success) {
 			$html = $response->decoded_content;
 		} else {
 			print STDERR $response->status_line;
-			print STDERR "!\n";
+			print STDERR "! (https://dvdcover.com/?s=$argv1clean)\n";
 			$html = '';
 		}
 		print STDERR "--falling back to WGET (wget -t 2 -T 20 -O- -o /dev/null \"https://dvdcover.com/?s=$argv1clean\" 2>/dev/null)!...\n"
@@ -332,32 +338,8 @@ OUTER:		for (my $try=0;$try<=1;$try++) {
 		$argv1clean =~ s/\_DISC.*$//;
 		last  if ($argv1clean eq $argv1unclean);
 	}
-	if ($art_url) {   #GOT AN IMAGE LINK TO (HOPEFULLY THE RIGHT) COVER-ART IMAGE:
-		my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
-		my $art_image = '';
-		print STDERR "-5: ext=$image_ext= art_url=$art_url= configpath=$configPath=\n"  if ($DEBUG);
-		print STDERR "-5b: attempt to download art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
-		my $response = $ua->get($art_url);
-		if ($response->is_success) {
-			$art_image = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line;
-			print STDERR "!\n";
-			$art_image = '';
-		}
-		print STDERR "--falling back to WGET (wget -t 2 -T 20 -O- -o /dev/null \"https://dvdcover.com/?s=$argv1clean\" 2>/dev/null)!...\n"
-				if ($DEBUG && !$bummer && !$html);
-		$art_image ||= `wget -t 2 -T 20 -O- -o /dev/null --referer=\"https://dvdcover.com\" \"$art_url\" 2>/dev/null `
-				unless ($bummer);
-		#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
-		if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
-			print STDERR "-6: will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
-			binmode IMGOUT;
-			print IMGOUT $art_image;
-			close IMGOUT;
-		}
-		exit (0);
-	}
+	&writeArtImage($1, $ARGV[1])  if ($art_url);  #GOT AN IMAGE LINK TO (HOPEFULLY THE RIGHT) COVER-ART IMAGE:
+
 PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover easier & has better DVD images, but I think Archive.org has more):
 	print STDERR "-1(PLAN B): URL=https://archive.org/details/coverartarchive?and[]=$argv1clean=\n"  if ($DEBUG);
 	$argv1clean = $argv1unclean;
@@ -368,6 +350,7 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 			$html = $response->decoded_content;
 		} else {
 			print STDERR $response->status_line  if ($DEBUG);
+			print STDERR "! (https://archive.org/details/coverartarchive?and[]=$argv1clean)\n";
 		}
 		print STDERR "-1a TRY($try) of 2: HTML=$html=\n"  if ($DEBUG > 1);
 		if ($html && $html =~ s#\<a\s+href\=\"\/details\/mbid\-([^\"]+)\"\s+title\=\"([^\"]+)\"##is) {
@@ -387,32 +370,153 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 	print STDERR "-4: title=$title= cover url=$art_url=\n"  if ($DEBUG);
 	die "f:No cover art url found!\n"  unless ($art_url);
 
-	if ($art_url) {   #GOT AN IMAGE LINK TO (HOPEFULLY THE RIGHT) COVER-ART IMAGE:
-		my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
-		my $art_image = '';
-		print STDERR "-5: ext=$image_ext= art_url=$art_url= configpath=$configPath=\n"  if ($DEBUG);
-		print STDERR "-5b: attempt to download art image (${configPath}/$ARGV[1].$image_ext)!\n"  if ($DEBUG);
-		my $response = $ua->get($art_url);
-		if ($response->is_success) {
-			$art_image = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line  if ($DEBUG);
+	&writeArtImage($art_url, $ARGV[1])  if ($art_url);   #GOT AN IMAGE LINK TO (HOPEFULLY THE RIGHT) COVER-ART IMAGE:
+}
+elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICBRAINZ:
+{
+	$html = '';
+	(my $album = $ARGV[1]) =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
+	my $artist = defined($ARGV[3]) ? $ARGV[3] : '';
+	$artist =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
+	my $albart_FN = $album;    #FORMAT FILENAME AS:  <album>[__<artist>] (AS SOME ALBUMS FROM DIFFERENT ARTISTS SHARE SAME NAME)!
+	$albart_FN .= "__$ARGV[3]"  if ($artist =~ /\S/);
+	$albart_FN =~ s/\%20$//;   #WHACK OFF TRAILING SPACE.
+	$albart_FN =~ s/\%20/ /g;  #UNESCAPE OTHER SPACES.
+	print STDERR "-ALBUM FN=($albart_FN)=\n"  if ($DEBUG);
+	{
+		my $found = 0;
+		foreach my $ext (qw(jpg png jpeg gif)) {
+			if (-e "${configPath}/albumart/${albart_FN}.$ext") {
+				copy ("${configPath}/albumart/${albart_FN}.$ext", "${configPath}/_tmp_albumart.$ext");
+				print STDERR "--HELPER: FOUND (${configPath}/albumart/${albart_FN}.$ext) ALREADY ON DISK, EXITING.\n"  if ($DEBUG);
+				$found = 1;
+			} else {
+				unlink ("${configPath}/_tmp_albumart.$ext")  if (-e "${configPath}/_tmp_albumart.$ext");
+			}
 		}
-		#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
-		if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
-			print STDERR "-6: will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
+		exit (0)  if ($found);
+	}
+	my ($url, $response, $mbzid, $art_url, $arthtml);
+
+	$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$album";
+	$response = $ua->get($url);
+	if ($response->is_success) {
+		$html = $response->decoded_content;
+	} else {
+		print STDERR $response->status_line;
+		print STDERR "! ($url)\n";
+		$html = '';
+	}
+	die "--no html returned!\n"  unless ($html);
+
+	$album = uri_unescape($album);
+	$album = HTML::Entities::encode_entities($album, '<>&"()');
+	$artist = uri_unescape($artist);
+	$artist = HTML::Entities::encode_entities($artist, '<>&"()');
+	print STDERR "--album=$album= artist=$artist=\n"  if ($DEBUG);
+	$mbzid = '';
+	`mkdir ${configPath}/albumart`  unless (-d "${configPath}/albumart");
+	while ($html =~ s#\<a\s+href\=\"\/release\/([0-9a-f\-]+)\"\>\<bdi\>${album}##s) {
+		$mbzid = $1;
+		$art_url = "https://musicbrainz.org/release/$mbzid";
+		print STDERR "--MBZID1=$mbzid= ALBUMLINK=$art_url=\n";
+		if ($html =~ s#^.*?\<bdi\>([^\<]+)\<\/bdi\>##iso)
+		{
+			my $thisartist = $1;
+			next  unless ($thisartist =~ /(?:$artist|various)/is);
+
+			$html =~ s#^.*?\<td\>##iso;
+			if ($html =~ m#([^\<]+)\<\/td\>#iso) {
+				my $type = $1;
+				next  if ($type =~ m#(?:cassette|\(unknown\)|\>)#io);   #SKIP CASSETTES & UNKNOWNS!:
+			}
+		}
+		$response = $ua->get($art_url);
+		$arthtml = '';
+		if ($response->is_success) {
+			$arthtml = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line;
+			print STDERR "! ($art_url)\n";
+		}
+		if ($arthtml =~ s#\<div\s+class\=\"cover\-art\"\>\<img([^\>]+)\>##so) {
+			my $imghtml = $1;
+			print STDERR "--AMAZON IMAGE ($1)?\n"  if ($DEBUG);
+			&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart')  if ($imghtml =~ m#src\=\"([^\"]+)#so);
+		}
+		$art_url = "https://coverartarchive.org/release/$mbzid";
+		$response = $ua->get($art_url);
+		$arthtml = '';
+		if ($response->is_success) {
+			$arthtml = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line;
+			print STDERR "! ($art_url)\n";
+		}
+		if ($arthtml) {
+			print STDERR "--TRYING COVERART SITE (NO ART ON ALBUM PAGE):\n"  if ($DEBUG);
+			foreach my $sz (qw(small medium large)) {
+				if ($arthtml =~ s#\"$sz\"\:\"([^\"]+)\"##s) {
+					print STDERR "-----($sz) URL FOUND ($1)!\n"  if ($DEBUG);
+					&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart');  # EXITS IF SUCCESSFUL.
+				}
+			}
+		}
+		$art_url = "https://musicbrainz.org/release/$mbzid/cover-art";
+		$response = $ua->get($art_url);
+		$arthtml = '';
+		if ($response->is_success) {
+			$arthtml = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line;
+			print STDERR "! ($art_url)\n";
+		}
+		if ($arthtml =~ m#class\=\"artwork\"\>\s*\<a([^\>]+)#) {
+			my $imghtml = $1;
+			my $imgurl = $1  if ($imghtml =~ m#href\=\"([^\"]+)#s);
+			print STDERR "--ALT COVERART ARCHIVE IMAGE ($imgurl)?\n"  if ($DEBUG);
+			&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart')  if ($imgurl =~ m#\.(?:jpg|png|jpeg|gif)$#);
+		}
+	}
+	print STDERR "w:NO COVER-ART FOUND ON MUSICBRAINZ!\n"  if ($DEBUG);
+	exit (1);  # 1 INDICATES WE FAILED TO FIND ANY COVER ART (writeArtImage() EXITS W/zero, MEANING SUCCESS).
+}
+else
+{
+	die "f:usage: $0 {CD[T] diskID | DVD title | ALBUM album} [configpath] [artist] | DELETE COVERART configpath\n";
+}
+
+exit(0);
+
+sub writeArtImage {   # DOWNLOADS AND SAVES THE FOUND COVER-ART IMAGE AND EXITS:
+	my ($art_url, $filename, $tee2tmp) = @_;
+
+	my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
+	my $art_image = '';
+	print STDERR "-5: ext=$image_ext= art_url=$art_url= configpath=$configPath=\n"  if ($DEBUG);
+	print STDERR "-5b: attempt to download art image (${configPath}/${filename}.$image_ext)!\n"  if ($DEBUG);
+	my $response = $ua->get($art_url);
+	if ($response->is_success) {
+		$art_image = $response->decoded_content;
+	} else {
+		print STDERR $response->status_line;
+		print STDERR "! ($art_url)\n";
+		$art_image = '';
+	}
+	if ($configPath && $art_image && open IMGOUT, ">${configPath}/${filename}.$image_ext") {
+		print STDERR "-6: will write art image to (${configPath}/${filename}.$image_ext)\n"  if ($DEBUG);
+		binmode IMGOUT;
+		print IMGOUT $art_image;
+		close IMGOUT;
+		if (defined($tee2tmp) && $tee2tmp && open IMGOUT, ">${configPath}/${tee2tmp}.$image_ext") {
+			print STDERR "-6a: will also write art image to (${configPath}/${tee2tmp}.$image_ext)\n"  if ($DEBUG);
 			binmode IMGOUT;
 			print IMGOUT $art_image;
 			close IMGOUT;
 		}
+		exit (0);
 	}
 }
-else
-{
-	die "..usage: $0 {CD diskID | DVD title} [configpath]\n"
-}
-
-exit(0);
 
 sub writeTagData {   #FOR CDs:  WRITE ALL TAG-DATA FOUND FOR EACH TRACK TO user_tag_data AND, IF NEEDED, CUSTOM TAG-FILE (<disk-ID>.tag)
 	my $comment = shift || '';
