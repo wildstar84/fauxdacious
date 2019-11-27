@@ -316,6 +316,61 @@ static void add_entry (GtkWidget * grid, const char * title, GtkWidget * entry,
     g_signal_connect (entry, "changed", (GCallback) entry_changed, nullptr);
 }
 
+/* JWT:NEXT 3 FUNCTIONS ADDED TO ALLOW 'EM TO PICK A COVER-ART FILE TO FILL THE Comment: FIELD!: */
+static void coverart_entry_response_cb (GtkWidget * dialog, int response, GtkWidget * entry)
+{
+    if (response == GTK_RESPONSE_ACCEPT)
+    {
+        const char * text (gtk_file_chooser_get_uri ((GtkFileChooser *) dialog));
+        if (text)
+        {
+            if (strstr (text, "://"))
+                gtk_entry_set_text ((GtkEntry *) entry, text);
+            else
+                gtk_entry_set_text ((GtkEntry *) entry, filename_to_uri (filename_normalize (filename_expand (str_copy (text)))));
+        }
+    }
+
+    gtk_widget_destroy (dialog);
+}
+
+static void coverart_entry_browse_cb (GtkWidget * entry, GtkEntryIconPosition pos,
+ GdkEvent * event, void * data)
+{
+    GtkFileFilter * filter;
+    GtkWidget * dialog = gtk_file_chooser_dialog_new (_("Select Cover Art File - Fauxdacious"), nullptr,
+     GTK_FILE_CHOOSER_ACTION_OPEN, _("Cancel"), GTK_RESPONSE_CANCEL,
+     _("Open"), GTK_RESPONSE_ACCEPT, nullptr);
+
+    filter = gtk_file_filter_new ();
+    gtk_file_filter_set_name (filter, _("Coverart image files"));
+    gtk_file_filter_add_pattern (filter, _("*.jpg"));
+    gtk_file_filter_add_pattern (filter, _("*.png"));
+    gtk_file_filter_add_pattern (filter, _("*.jpeg"));
+    gtk_file_filter_add_pattern (filter, _("*.gif"));
+    gtk_file_chooser_add_filter ((GtkFileChooser *) dialog, filter);
+    gtk_file_chooser_set_current_folder_uri ((GtkFileChooser *) dialog,
+            filename_to_uri (aud_get_path (AudPath::UserDir)));
+    gtk_file_chooser_set_local_only ((GtkFileChooser *) dialog, false);
+
+    g_signal_connect (dialog, "response", (GCallback) coverart_entry_response_cb, entry);
+    g_signal_connect_object (entry, "destroy", (GCallback) gtk_widget_destroy,
+     dialog, G_CONNECT_SWAPPED);
+
+    gtk_widget_show (dialog);
+}
+
+static GtkWidget * coverart_file_entry_new (GtkFileChooserAction action, const char * title)
+{
+    GtkWidget * entry = gtk_entry_new ();
+
+    gtk_entry_set_icon_from_icon_name ((GtkEntry *) entry,
+     GTK_ENTRY_ICON_SECONDARY, "document-open");
+    g_signal_connect (entry, "icon-press", (GCallback) coverart_entry_browse_cb, _("File"));
+
+    return entry;
+}
+
 static void create_infowin ()
 {
     int dpi = audgui_get_dpi ();
@@ -378,7 +433,8 @@ static void create_infowin ()
     widgets.album_artist = gtk_entry_new ();
     add_entry (grid, _("Album Artist"), widgets.album_artist, 0, 6, 2);
 
-    widgets.comment = gtk_entry_new ();
+    /* JWT: ALLOW 'EM TO PICK A COVER-ART FILE TO FILL THE Comment: FIELD!: */
+    widgets.comment = coverart_file_entry_new (GTK_FILE_CHOOSER_ACTION_OPEN, _("Coverart File"));
     add_entry (grid, _("Comment"), widgets.comment, 0, 8, 2);
 
     widgets.genre = gtk_combo_box_text_new_with_entry ();
