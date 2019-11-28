@@ -1,20 +1,15 @@
 NOTE:  You NO LONGER NEED to uninstall Audacious and all audacious packages, 
-ie. libaudcore, libaudgui*, libaudtag*, etc.  before installing Fauxdacious!
+ie. libaudcore, libaudgui, libaudtag, etc.  before installing Fauxdacious!
 Both programs can now happily reside on the same system and root path.
 
-If running a current 64-bit Debian stable installation or equivalent, you can 
-try simply untarring the tarballs and running ((sudo) in parenthesis means 
-that it depends on where you're installing to)  You can change "/usr/local" 
-EVERYWHERE below if installing somewhere else:
+How to build:
 
-	(sudo) make install
+(For additional general info, see:  http://redmine.audacious-media-player.org/boards/1/topics/788?r=1762#message-1762 - 
+Building Audacious)
 
-since the objects (compiled for that system) are 
-already built and included.  If not, you'll need to build from scratch:
+(For building on M$-Windows systems, see:  http://phoenixcomm.net/~jturner/fauxdacious_buildnotes.htm
 
-from:  http://redmine.audacious-media-player.org/boards/1/topics/788?r=1762#message-1762
-
-Dependencies:
+Install the following Dependencies:
 
 sudo apt-get install git automake build-essential libasound2-dev \
 libavformat-dev libbinio-dev libbs2b-dev libcddb2-dev libcdio-cdda-dev \
@@ -25,15 +20,7 @@ libmpg123-dev libneon27-gnutls-dev libnotify-dev libpulse-dev \
 libsamplerate0-dev libsdl2-dev libsidplayfp-dev libsndfile1-dev libsoxr-dev \
 libvorbis-dev libwavpack-dev libxml2-dev libswscale-dev
 
-After installing any missing from the above list of dependencies, if you 
-untarred the tarballs, THEN:
-
-	cd fauxdacious-plugins
-	(sudo) make distclean
-	cd ../fauxdacious
-	(sudo) make distclean
-
-OTHERWISE (download and install from Github):
+Download and install from Github:
 
 	cd /tmp
 	mkdir fauxdacious
@@ -41,14 +28,17 @@ OTHERWISE (download and install from Github):
 	git clone --single-branch git://github.com/wildstar84/fauxdacious.git fauxdacious
 	git clone --single-branch git://github.com/wildstar84/fauxdacious-plugins.git fauxdacious-plugins
 
-NOW, regardless of whether installing from the tarballs OR from Github:
+Build Fauxdacious:
 
 	cd fauxdacious
 	./autogen.sh
 	./configure --prefix=/usr/local [--enable-qt] --with-buildstamp=Fauxdacious
 	make
 	(sudo) make install
+
 	sudo ldconfig
+
+Build Fauxdacious Plugins:
 
 	cd ../fauxdacious-plugins
 	./autogen.sh
@@ -59,8 +49,10 @@ NOW, regardless of whether installing from the tarballs OR from Github:
 	sudo update-desktop-database
 	sudo update-icon-caches /usr/share/icons/hicolor
 
-	OPTIONAL:  cd ~/.config; mkdir fauxdacious; cp -R audacious/. fauxdacious
-	# This copies your previous default instance profile to the new
+Optional (copy your existing Audacious profile to Fauxdacious):  
+
+	cd ~/.config; mkdir fauxdacious; cp -R audacious/. fauxdacious
+	# This copies your previous default Audacious instance profile to the new
 	# (Fauxdacious) location.
 
 Now run fauxdacious:
@@ -68,5 +60,7 @@ Now run fauxdacious:
 	fauxdacious &
 
 Fauxdacious should now start up.  Enjoy Fauxdacious!
-Read the "Changes" file for the latest Fauxdacious features, fixes, and changes,
-and how to configure to take best advantage of them!
+Be sure to read the "FAQ" file and the GIT commits for the latest Fauxdacious 
+features, fixes, changes, and how to configure to take best advantage of them!
+
+FAQ:  https://wildstar84.github.io/fauxdacious/FAQ.htm
