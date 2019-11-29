@@ -702,10 +702,11 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                             const char * ptr;
                             const char * yroffset = nullptr;
                             const char * alboffset = nullptr;
-                            const char * ttlextraptr = nullptr;
+                            const char * extraptr = nullptr;
                             artoffset = nullptr;
                             ttloffset = nullptr;
                             char what = ' ';
+                            char whatext = ' ';
                             for (const ::String & metapart : metaparts)
                             {
                                 if (! artoffset)
@@ -740,48 +741,84 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                                                 what = 'y';
                                                 yroffset = ptr + 6;
                                             }
-                                            else
-                                            if (what == 't')
-                                                ttlextraptr = (const char *) metapart; // TITLE HAD A "-" IN IT.
+                                            else if (metapart)
+                                            {
+                                                whatext = what;
+                                                extraptr = (const char *) metapart; // TITLE HAD A "-" IN IT.
+                                            }
                                         }
                                     }
                                 }                    
-                            }
-                            if (split_titles)
-                            {
-                                if (ttlextraptr)
-                                    set_str (Title, str_printf ("%s%s%s", ttloffset,
-                                            "-", ttlextraptr));
-                                else
-                                    set_str (Title, ttloffset);
-                                set_str (Artist, artoffset);
-                            }
-                            else
-                                if (ttlextraptr)
-                                    set_str (Title, str_printf ("%s%s%s%s%s", artoffset,
-                                            "- ", ttloffset, "-", ttlextraptr));
-                                else
-                                    set_str (Title, str_printf ("%s%s%s", artoffset, "- ",
-                                            ttloffset));
-
-                            if (alboffset)
-                            {
-                                if (split_titles)
+                                if (whatext != ' ')
                                 {
-                                    albumisset = true;
-                                    ::String stream_name = stream.get_metadata ("stream-name");
-                                    if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
-                                        set_str (Album, str_printf ("%s%s%s", alboffset, " - ",
-                                                (const char *) stream_name));
+                                    if (split_titles)
+                                    {
+                                        if (whatext == 't')
+                                            set_str (Title, str_printf ("%s%s%s", ttloffset,
+                                                    "-", extraptr));
+                                        else if (whatext == 'r')
+                                            set_str (Artist, str_printf ("%s%s%s", artoffset,
+                                                    "-", extraptr));
+                                        else if (whatext == 'a')
+                                        {
+                                            albumisset = true;
+                                            ::String stream_name = stream.get_metadata ("stream-name");
+                                            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+                                                set_str (Album, str_printf ("%s%s%s%s%s", alboffset, "-",
+                                                        extraptr, " - ", (const char *) stream_name));
+                                            else
+                                                set_str (Album, str_printf ("%s%s%s", alboffset,
+                                                        "-", extraptr));
+                                        }
+                                    }
                                     else
-                                        set_str (Album, alboffset);
+                                    {
+                                        if (whatext == 't' && artoffset)
+                                            set_str (Title, str_printf ("%s%s%s%s%s", artoffset,
+                                                    "- ", ttloffset, "-", extraptr));
+                                        else if (whatext == 'r' && ttloffset)
+                                            set_str (Title, str_printf ("%s%s%s%s%s", artoffset,
+                                                    "-", extraptr, "- ", ttloffset));
+                                        else if (whatext == 'a')
+                                            set_str (Album, str_printf ("%s%s%s", alboffset,
+                                                    "-", extraptr));
+                                    }
+                                    if (yroffset)
+                                        set_int (Year, atoi (yroffset));
+
+                                    whatext = ' ';
                                 }
                                 else
-                                    set_str (Album, alboffset);
+                                {
+                                    if (split_titles)
+                                    {
+                                        if (what == 't')
+                                            set_str (Title, ttloffset);
+                                        else if (what == 'r')
+                                            set_str (Artist, artoffset);
+                                        else if (what == 'a')
+                                        {
+                                            albumisset = true;
+                                            ::String stream_name = stream.get_metadata ("stream-name");
+                                            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+                                                set_str (Album, str_printf ("%s%s%s", alboffset, " - ",
+                                                        (const char *) stream_name));
+                                            else
+                                                set_str (Album, alboffset);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if ((what == 't' && artoffset) || (what == 'r' && ttloffset))
+                                            set_str (Title, str_printf ("%s%s%s", artoffset, "- ",
+                                                    ttloffset));
+                                        else if (what == 'a')
+                                            set_str (Album, alboffset);
+                                    }
+                                    if (what == 'y')
+                                        set_int (Year, atoi (yroffset));
+                                }
                             }
-                            if (yroffset)
-                                set_int (Year, atoi (yroffset));
-
                             updated = true;
                         }
                     }
