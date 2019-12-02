@@ -686,144 +686,88 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
             }
             else
             {
-                ttloffset = strstr ((const char *) val, "Title: ");
+                ttloffset = strstr_nocase ((const char *) val, "Title: ");
                 if (ttloffset)  //JWT:FIXUP STREAM TILES IN FORMAT: "[[Artist: ]artist - ]Title: title [Album: album]:
                 {
-                    /* WARNING: THIS THING SPLITS ON "-", SO IF "-" IN TITLE, ARTIST, ALBUM, ETC. THE 
-                       "-" & CHARACTERS AFTER IT WILL BE OMITTED!
-                    */
-                    const char * tupletitle = (const char *) get_str (Title);
-                    const char * artoffset = strstr ((const char *) val, "Artist: ");
-                    if (artoffset)
+                    const char * metaindxptr = (const char *) val;
+                    const char * metaptr[4];
+                    int metaindx = 0;
+                    int titleindx = -1;
+                    int artistindx = -1;
+                    int albumindx = -1;
+                    int yearindx = -1;
+                    /* JWT:PARSE OUT TITLE, ARTIST, ALBUM, & YEAR PARTS:
+                        (NOTE: MAY NOT HAVE 'EM ALL & ORDER MAY VARY) */
+                    while (metaindxptr && metaindx < 4)
                     {
-                        if (! tupletitle || strncmp (artoffset+8, tupletitle, (ttloffset-(artoffset+8))))
+                        if (str_has_prefix_nocase (metaindxptr, "Title: "))
                         {
-                            Index<::String> metaparts = str_list_to_index ((const char *) val, "-");
-                            const char * ptr;
-                            const char * yroffset = nullptr;
-                            const char * alboffset = nullptr;
-                            const char * extraptr = nullptr;
-                            artoffset = nullptr;
-                            ttloffset = nullptr;
-                            char what = ' ';
-                            char whatext = ' ';
-                            for (const ::String & metapart : metaparts)
-                            {
-                                if (! artoffset)
-                                    artoffset = (const char *) metapart;
-                                ptr = strstr ((const char *) metapart, "Title: ");
-                                if (ptr)
-                                {
-                                    what = 't';
-                                    ttloffset = ptr + 7;
-                                }
-                                else
-                                {
-                                    ptr = strstr ((const char *) metapart, "Artist: ");
-                                    if (ptr)
-                                    {
-                                        what = 'r';
-                                        artoffset = ptr + 8;
-                                    }
-                                    else
-                                    {
-                                        ptr = strstr ((const char *) metapart, "Album: ");
-                                        if (ptr)
-                                        {
-                                            what = 'a';
-                                            alboffset = ptr + 7;
-                                        }
-                                        else
-                                        {
-                                            ptr = strstr ((const char *) metapart, "Year: ");
-                                            if (ptr)
-                                            {
-                                                what = 'y';
-                                                yroffset = ptr + 6;
-                                            }
-                                            else if (metapart)
-                                            {
-                                                whatext = what;
-                                                extraptr = (const char *) metapart; // TITLE HAD A "-" IN IT.
-                                            }
-                                        }
-                                    }
-                                }                    
-                                if (whatext != ' ')
-                                {
-                                    if (split_titles)
-                                    {
-                                        if (whatext == 't')
-                                            set_str (Title, str_printf ("%s%s%s", ttloffset,
-                                                    "-", extraptr));
-                                        else if (whatext == 'r')
-                                            set_str (Artist, str_printf ("%s%s%s", artoffset,
-                                                    "-", extraptr));
-                                        else if (whatext == 'a')
-                                        {
-                                            albumisset = true;
-                                            ::String stream_name = stream.get_metadata ("stream-name");
-                                            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
-                                                set_str (Album, str_printf ("%s%s%s%s%s", alboffset, "-",
-                                                        extraptr, " - ", (const char *) stream_name));
-                                            else
-                                                set_str (Album, str_printf ("%s%s%s", alboffset,
-                                                        "-", extraptr));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (whatext == 't' && artoffset)
-                                            set_str (Title, str_printf ("%s%s%s%s%s", artoffset,
-                                                    "- ", ttloffset, "-", extraptr));
-                                        else if (whatext == 'r' && ttloffset)
-                                            set_str (Title, str_printf ("%s%s%s%s%s", artoffset,
-                                                    "-", extraptr, "- ", ttloffset));
-                                        else if (whatext == 'a')
-                                            set_str (Album, str_printf ("%s%s%s", alboffset,
-                                                    "-", extraptr));
-                                    }
-                                    if (yroffset)
-                                        set_int (Year, atoi (yroffset));
+                            metaptr[metaindx] = metaindxptr;
+                            titleindx = metaindx++;
+                        }
+                        else if (str_has_prefix_nocase (metaindxptr, "Artist: "))
+                        {
+                            metaptr[metaindx] = metaindxptr;
+                            artistindx = metaindx++;
+                        }
+                        else if (str_has_prefix_nocase (metaindxptr, "Album: "))
+                        {
+                            metaptr[metaindx] = metaindxptr;
+                            albumindx = metaindx++;
+                        }
+                        else if (str_has_prefix_nocase (metaindxptr, "Year: "))
+                        {
+                            metaptr[metaindx] = metaindxptr;
+                            yearindx = metaindx++;
+                        }
+                        ++metaindxptr;
+                    }
+                    --metaindx;
+                    int artistlen = (metaptr[artistindx] && artistindx < metaindx)
+                            ? metaptr[artistindx+1] - (metaptr[artistindx]+11) : -1;
+                    int titlelen = (metaptr[titleindx] && titleindx < metaindx)
+                            ? metaptr[titleindx+1] - (metaptr[titleindx]+10) : -1;
+                    if (split_titles)
+                    {
+                        set_str (Title, str_copy (metaptr[titleindx]+7, titlelen));
+                        if (metaptr[artistindx])
+                            set_str (Artist, str_copy (metaptr[artistindx]+8, artistlen));
 
-                                    whatext = ' ';
-                                }
-                                else
-                                {
-                                    if (split_titles)
-                                    {
-                                        if (what == 't')
-                                            set_str (Title, ttloffset);
-                                        else if (what == 'r')
-                                            set_str (Artist, artoffset);
-                                        else if (what == 'a')
-                                        {
-                                            albumisset = true;
-                                            ::String stream_name = stream.get_metadata ("stream-name");
-                                            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
-                                                set_str (Album, str_printf ("%s%s%s", alboffset, " - ",
-                                                        (const char *) stream_name));
-                                            else
-                                                set_str (Album, alboffset);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if ((what == 't' && artoffset) || (what == 'r' && ttloffset))
-                                            set_str (Title, str_printf ("%s%s%s", artoffset, "- ",
-                                                    ttloffset));
-                                        else if (what == 'a')
-                                            set_str (Album, alboffset);
-                                    }
-                                    if (what == 'y')
-                                        set_int (Year, atoi (yroffset));
-                                }
-                            }
-                            updated = true;
+                        if (metaptr[albumindx])
+                        {
+                            int albumlen = (metaptr[albumindx] && albumindx < metaindx)
+                                    ? metaptr[albumindx+1] - (metaptr[albumindx]+10) : -1;
+
+                            albumisset = true;
+                            ::String stream_name = stream.get_metadata ("stream-name");
+                            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+                                set_str (Album, str_printf ("%s%s%s",
+                                        (const char *) str_copy (metaptr[albumindx]+7, albumlen), " - ",
+                                        (const char *) stream_name));
+                            else
+                                set_str (Album, str_copy (metaptr[albumindx]+7, albumlen));
                         }
                     }
-                    else if (! tupletitle || strcmp (ttloffset+7, tupletitle))
-                        set_str (Title, ttloffset+7);  // WE HAVE "Title: " BUT NO ARTIST, SO ASSUME NOTHING ELSE!
+                    else
+                    {
+                        if (metaptr[artistindx])
+                            set_str (Title, str_printf ("%.*s%s%.*s", artistlen, metaptr[artistindx]+8,
+                                    " - ", titlelen, metaptr[titleindx]+7));
+                        else
+                            set_str (Title, (const char *) val);
+
+                        if (metaptr[albumindx])
+                        {
+                            int albumlen = (metaptr[albumindx] && albumindx < metaindx)
+                                    ? metaptr[albumindx+1] - (metaptr[albumindx]+10) : -1;
+
+                            albumisset = true;
+                            set_str (Album, str_copy (metaptr[albumindx]+7, albumlen));
+                        }
+                    }
+                    if (metaptr[yearindx])
+                        set_int (Year, atoi (str_copy (metaptr[yearindx]+6, ((yearindx < metaindx)
+                                ? (metaptr[yearindx+1] - (metaptr[yearindx]+6)) : -1))));
                 }
                 else if (split_titles)
                 {
@@ -832,19 +776,17 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                     if (ttloffset)
                     {
                         set_str (Title, ttloffset+3);
-                        set_str (Artist, (const char *) str_printf ("%.*s", (int) (ttloffset-artoffset),
-                              artoffset));
+                        set_str (Artist, (const char *) str_printf ("%.*s",
+                                (int) (ttloffset-artoffset), artoffset));
                     }
                     else
                         set_str (Title, val);
 
-                    updated = true;
                 }
                 else if (val != get_str (Title))
-                {
                     set_str (Title, val);
-                    updated = true;
-                }
+
+                updated = true;
             }
             if (! albumisset)
             {
