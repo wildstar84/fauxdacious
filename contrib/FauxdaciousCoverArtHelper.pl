@@ -4,7 +4,7 @@
 
 #FAUXDACIOUS "HELPER" SCRIPT TO FETCH COVER ART FOR CDs/DVSs FROM coverartarchive and dvdcover.com:
 
-#USAGE:  $0 {CD[T] diskID | DVD title | ALBUM artist album} [configpath] | DELETE COVERART configpath
+#USAGE:  $0 {CD[T] diskID | DVD title | ALBUM album} [configpath] | DELETE COVERART configpath
 
 #CONFIGURE:  ~/.config/audacious[_instancename]/config:  [audacious].cover_helper=FauxdaciousCoverArtHelper.pl
 
@@ -58,9 +58,9 @@ my $html = '';
 my $title = '';
 my $artist = '';
 my $comment = '';
-my $DEBUG=1;
 my @userAgentOps = ();
 my $bummer = ($^O =~ /MSWin/);
+my $DEBUG = $bummer ? 2 : 0;
 push (@userAgentOps, 'agent', ($bummer
 		? 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
 		: 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0'));
@@ -157,7 +157,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 			print STDERR $response->status_line  if ($DEBUG);
 			print STDERR "! ($url2)\n";
 		}
-		print STDERR "-3: html=$html=\n"  if ($DEBUG > 1);
+		print STDERR "-3: html=$html=\n"  if ($DEBUG > 2);
 		die "f:musicbrainz.org returned no html!\n"  unless ($html);
 		#TRY TO FIND THE COVER-ART THUMBNAIL URL:
 		if ($html =~ s/data\-small\-thumbnail\=\"([^\"]+)\"//) {
@@ -352,7 +352,7 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 			print STDERR $response->status_line  if ($DEBUG);
 			print STDERR "! (https://archive.org/details/coverartarchive?and[]=$argv1clean)\n";
 		}
-		print STDERR "-1a TRY($try) of 2: HTML=$html=\n"  if ($DEBUG > 1);
+		print STDERR "-1a TRY($try) of 2: HTML=$html=\n"  if ($DEBUG > 2);
 		if ($html && $html =~ s#\<a\s+href\=\"\/details\/mbid\-([^\"]+)\"\s+title\=\"([^\"]+)\"##is) {
 			my $mbid = $1;
 			$title = $2;
@@ -374,21 +374,24 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 }
 elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICBRAINZ:
 {
-	$html = '';
 	(my $album = $ARGV[1]) =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
-	my $artist = defined($ARGV[3]) ? $ARGV[3] : '';
+	my $artist = defined($ARGV[3]) ? $ARGV[3] : '_';
+	my $title = defined($ARGV[4]) ? $ARGV[4] : '_';
 	$artist =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $albart_FN = $album;    #FORMAT FILENAME AS:  <album>[__<artist>] (AS SOME ALBUMS FROM DIFFERENT ARTISTS SHARE SAME NAME)!
-	$albart_FN .= "__$ARGV[3]"  if ($artist =~ /\S/);
+	if ($artist =~ /\S/ && $artist ne '_') {
+		$albart_FN .= "__$ARGV[3]";
+	} elsif ($title =~ /\S/ && $title ne '_') {
+		$albart_FN .= "__$ARGV[4]";
+	}
 	$albart_FN =~ s/\%20$//;   #WHACK OFF TRAILING SPACE.
 	$albart_FN =~ s/\%20/ /g;  #UNESCAPE OTHER SPACES.
-	print STDERR "-ALBUM FN=($albart_FN)=\n"  if ($DEBUG);
 	{
 		my $found = 0;
 		foreach my $ext (qw(jpg png jpeg gif)) {
 			if (-e "${configPath}/albumart/${albart_FN}.$ext") {
 				copy ("${configPath}/albumart/${albart_FN}.$ext", "${configPath}/_tmp_albumart.$ext");
-				print STDERR "--HELPER: FOUND (${configPath}/albumart/${albart_FN}.$ext) ALREADY ON DISK, EXITING.\n"  if ($DEBUG);
+				print STDERR "i:HELPER: FOUND (${configPath}/albumart/${albart_FN}.$ext) ALREADY ON DISK, EXITING.\n"  if ($DEBUG);
 				$found = 1;
 			} else {
 				unlink ("${configPath}/_tmp_albumart.$ext")  if (-e "${configPath}/_tmp_albumart.$ext");
@@ -396,87 +399,116 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 		}
 		exit (0)  if ($found);
 	}
-	my ($url, $response, $mbzid, $art_url, $arthtml);
+	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 
-	$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$album";
-	$response = $ua->get($url);
-	if ($response->is_success) {
-		$html = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line;
-		print STDERR "! ($url)\n";
+	print STDERR "i:DOING:  ALBUM=$album= TITLE=$title=\n";
+	foreach my $release ($album, $title) {
+		next  if ($release eq '_');
+		chomp $release;
+		$release =~ s/(?:\%20)+$//o;  #CHOMPIT!
 		$html = '';
-	}
-	die "--no html returned!\n"  unless ($html);
+		$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$release";
+		print STDERR "i:SEARCHURL=$url=\n"  if ($DEBUG);
+		$response = $ua->get($url);
+		if ($response->is_success) {
+			$html = $response->decoded_content
+		} else {
+			print STDERR $response->status_line;
+			print STDERR "! ($url)\n";
+			$html = '';
+		}
+		die "f:no html returned!\n"  unless ($html);
+		unless (-d "${configPath}/albumart") {
+			mkdir ("${configPath}/albumart",0755) || die "f:Could not create directory (${configPath}/albumart) ($!)!\n";;
+		}
 
-	$album = uri_unescape($album);
-	$album = HTML::Entities::encode_entities($album, '<>&"()');
-	$artist = uri_unescape($artist);
-	$artist = HTML::Entities::encode_entities($artist, '<>&"()');
-	print STDERR "--album=$album= artist=$artist=\n"  if ($DEBUG);
-	$mbzid = '';
-	`mkdir ${configPath}/albumart`  unless (-d "${configPath}/albumart");
-	while ($html =~ s#\<a\s+href\=\"\/release\/([0-9a-f\-]+)\"\>\<bdi\>${album}##s) {
-		$mbzid = $1;
-		$art_url = "https://musicbrainz.org/release/$mbzid";
-		print STDERR "--MBZID1=$mbzid= ALBUMLINK=$art_url=\n";
-		if ($html =~ s#^.*?\<bdi\>([^\<]+)\<\/bdi\>##iso)
-		{
-			my $thisartist = $1;
-			next  unless ($thisartist =~ /(?:$artist|various)/is);
+		my $artistEscaped = uri_unescape($artist);
+		$artistEscaped = HTML::Entities::encode_entities($artistEscaped, '<>&"()');
+		$release = uri_unescape($release);
+		$release = HTML::Entities::encode_entities($release, '<>&"');
+		print STDERR "i:release=$release= artist=$artistEscaped=\n"  if ($DEBUG);
+		$mbzid = '';
+		%mbHash = ();
+		$html =~ s/\x{2019}/\'/gs;  #THEY HAVE SOME STUPID UNICODE SINGLE-QUOTES SOMETIMES!
+		$html =~ s/\&\#x27\;/\'/gs; #AND OTHER TIMES THEY ESCAPE THEM, SO CONVERT TO COMMON FORMAT FOR NEXT REGEX!:
+		while ($html =~ s#\<tr\s+class\=\"(?:odd|even)\"\s+data\-score\=\"\d*\"\>\<td\>\<a\s+href\=\"\/release\/([0-9a-f\-]+)\"\>\<bdi\>\Q${release}\E(.*?)\<\/tr\>##is) {
+			$mbzid = $1;
+			my $rowhtml = $2;
+			print STDERR "---found MBZID1=$mbzid=\n"  if ($DEBUG);
+			my $primaryArtistFactor = 20;
+			while ($rowhtml =~ s#^.*?\<bdi\>([^\<]+)\<\/bdi\>##iso)
+			{
+				(my $thisartist = $1) =~ s/\&\#x([0-9A-Fa-f]{2})\;/chr(hex($1))/eg;  #THEY HAVE SOME "&#X..;" STUFF TOO!
+				$primaryArtistFactor -= 3;
+				print STDERR "-----found ARTIST=$thisartist= ESCAPED=$artistEscaped=\n"  if ($DEBUG > 1);
+				next  unless ($thisartist =~ /(?:$artistEscaped|various)/is);
 
-			$html =~ s#^.*?\<td\>##iso;
-			if ($html =~ m#([^\<]+)\<\/td\>#iso) {
-				my $type = $1;
-				next  if ($type =~ m#(?:cassette|\(unknown\)|\>)#io);   #SKIP CASSETTES & UNKNOWNS!:
+				$priority = 0;
+				$priority += $primaryArtistFactor if ($thisartist =~ /$artistEscaped/is);
+				$rowhtml =~ s#^.*?\<td\>##iso;
+				if ($rowhtml =~ m#([^\<]+)\<\/td\>#iso) {
+					my $type = $1;
+					print STDERR "i:TYPE=$type=\n"  if ($DEBUG);
+					next  if ($type =~ m#(?:cassette|\>)#io);   #SKIP CASSETTES & UNKNOWNS!:
+
+					++$priority  unless ($type =~ /unknown/io);
+					++$priority  if ($type =~ /CD/o);
+					print STDERR "i:KEEPING TYPE=$type= PRIO:$priority!\n"  if ($DEBUG);
+				}
+				$mbHash{$mbzid} = $priority;
 			}
 		}
-		$response = $ua->get($art_url);
-		$arthtml = '';
-		if ($response->is_success) {
-			$arthtml = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line;
-			print STDERR "! ($art_url)\n";
-		}
-		if ($arthtml =~ s#\<div\s+class\=\"cover\-art\"\>\<img([^\>]+)\>##so) {
-			my $imghtml = $1;
-			print STDERR "--AMAZON IMAGE ($1)?\n"  if ($DEBUG);
-			&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart')  if ($imghtml =~ m#src\=\"([^\"]+)#so);
-		}
-		$art_url = "https://coverartarchive.org/release/$mbzid";
-		$response = $ua->get($art_url);
-		$arthtml = '';
-		if ($response->is_success) {
-			$arthtml = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line;
-			print STDERR "! ($art_url)\n";
-		}
-		if ($arthtml) {
-			print STDERR "--TRYING COVERART SITE (NO ART ON ALBUM PAGE):\n"  if ($DEBUG);
-			foreach my $sz (qw(small medium large)) {
-				if ($arthtml =~ s#\"$sz\"\:\"([^\"]+)\"##s) {
-					print STDERR "-----($sz) URL FOUND ($1)!\n"  if ($DEBUG);
-					&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart');  # EXITS IF SUCCESSFUL.
+		foreach $mbzid (sort { $mbHash{$b} <=> $mbHash{$a} } keys %mbHash) {
+			$art_url = "https://musicbrainz.org/release/$mbzid";
+			$response = $ua->get($art_url);
+			$arthtml = '';
+			if ($response->is_success) {
+				$arthtml = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line;
+				print STDERR "! ($art_url)\n";
+			}
+			if ($arthtml =~ s#\<div\s+class\=\"cover\-art\"\>\<img([^\>]+)\>##so) {
+				my $imghtml = $1;
+				print STDERR "i:found (AMAZON?) IMAGE ($1)?\n"  if ($DEBUG);
+				&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart')  if ($imghtml =~ m#src\=\"([^\"]+)#so);
+			}
+			$art_url = "https://coverartarchive.org/release/$mbzid";
+			$response = $ua->get($art_url);
+			$arthtml = '';
+			if ($response->is_success) {
+				$arthtml = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line;
+				print STDERR "! ($art_url)\n";
+			}
+			if ($arthtml) {
+				print STDERR "i:TRYING COVERART SITE (NO ART ON ALBUM PAGE):\n"  if ($DEBUG);
+				foreach my $sz (qw(small medium large)) {
+					if ($arthtml =~ s#\"$sz\"\:\"([^\"]+)\"##s) {
+						print STDERR "i:($sz) IMAGE FOUND ($1)!\n"  if ($DEBUG);
+						&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart');  # EXITS IF SUCCESSFUL.
+					}
 				}
 			}
+			$art_url = "https://musicbrainz.org/release/$mbzid/cover-art";
+			$response = $ua->get($art_url);
+			$arthtml = '';
+			if ($response->is_success) {
+				$arthtml = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line;
+				print STDERR "! ($art_url)\n";
+			}
+			if ($arthtml =~ m#class\=\"artwork\"\>\s*\<a([^\>]+)#) {
+				my $imghtml = $1;
+				my $imgurl = $1  if ($imghtml =~ m#href\=\"([^\"]+)#s);
+				$imgurl = 'https:' . $imgurl  if ($imgurl =~ m#^\/\/#o);
+				print STDERR "i:ALT COVERART ARCHIVE IMAGE ($imgurl)?\n";
+				&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart')  if ($imgurl =~ m#\.(?:jpg|png|jpeg|gif)$#);
+			}
 		}
-		$art_url = "https://musicbrainz.org/release/$mbzid/cover-art";
-		$response = $ua->get($art_url);
-		$arthtml = '';
-		if ($response->is_success) {
-			$arthtml = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line;
-			print STDERR "! ($art_url)\n";
-		}
-		if ($arthtml =~ m#class\=\"artwork\"\>\s*\<a([^\>]+)#) {
-			my $imghtml = $1;
-			my $imgurl = $1  if ($imghtml =~ m#href\=\"([^\"]+)#s);
-			print STDERR "--ALT COVERART ARCHIVE IMAGE ($imgurl)?\n"  if ($DEBUG);
-			&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart')  if ($imgurl =~ m#\.(?:jpg|png|jpeg|gif)$#);
-		}
+		print STDERR "-----AT END OF FOR-LOOP($release), CONTINUE OR PUNT...\n"  if ($DEBUG > 1);
 	}
 	print STDERR "w:NO COVER-ART FOUND ON MUSICBRAINZ!\n"  if ($DEBUG);
 	exit (1);  # 1 INDICATES WE FAILED TO FIND ANY COVER ART (writeArtImage() EXITS W/zero, MEANING SUCCESS).
