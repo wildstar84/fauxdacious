@@ -59,16 +59,30 @@ EXPORT QPixmap art_request (const char * filename, unsigned int w, unsigned int 
         return art_scale (img, w, h, want_hidpi);
 
     unsigned size = to_native_dpi (48);
-    return get_icon ("audio-x-generic").pixmap (aud::min (w, size), aud::min (h, size));
+    //x return get_icon ("audio-x-generic").pixmap (aud::min (w, size), aud::min (h, size));
+    return QPixmap (get_icon ("audio-x-generic").pixmap (aud::max (w, size), aud::max (h, size)));
 }
 
 EXPORT QPixmap art_request_current (unsigned int w, unsigned int h, bool want_hidpi)
 {
     String filename = aud_drct_get_filename ();
     if (! filename)
-        return QPixmap ();
+    {
+        //JWT:RETURN "FALLBACK" INSTEAD (LIKE GTK SIDE):  return QPixmap ();
+        unsigned size = to_native_dpi (48);
+        //x return get_icon ("audio-x-generic").pixmap (aud::min (w, size), aud::min (h, size));
+        return QPixmap (get_icon ("audio-x-generic").pixmap (aud::max (w, size), aud::max (h, size)));
+    }
 
-    return art_request (filename, w, h, want_hidpi);
+    //JWT:RETURN "FALLBACK" INSTEAD (LIKE GTK SIDE):  return art_request (filename, w, h, want_hidpi);
+    auto img = art_request (filename, w, h, want_hidpi);
+    if (img.isNull ())
+    {
+        unsigned size = to_native_dpi (48);
+        //x return get_icon ("audio-x-generic").pixmap (aud::min (w, size), aud::min (h, size));
+        return QPixmap (get_icon ("audio-x-generic").pixmap (aud::max (w, size), aud::max (h, size)));
+    }
+    return img;
 }
 
 } // namespace audqt
