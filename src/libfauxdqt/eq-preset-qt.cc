@@ -28,13 +28,13 @@
 #include <QCheckBox>
 #include <QStandardItemModel>
 
-#include "libaudcore/audstrings.h"
-#include "libaudcore/equalizer.h"
-#include "libaudcore/i18n.h"
-#include "libaudcore/interface.h"
+#include "libfauxdcore/audstrings.h"
+#include "libfauxdcore/equalizer.h"
+#include "libfauxdcore/i18n.h"
+#include "libfauxdcore/interface.h"
 #include "libfauxdcore/playlist.h"
-#include "libaudcore/runtime.h"
-#include "libaudcore/vfs.h"
+#include "libfauxdcore/runtime.h"
+#include "libfauxdcore/vfs.h"
 
 namespace audqt {
 
