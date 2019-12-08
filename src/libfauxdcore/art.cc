@@ -167,7 +167,10 @@ static bool check_for_user_art (const String & filename, AudArtItem * item, bool
             StringBuf path = filename_get_parent (tag_fid);
             String filename_only = String (filename_get_base (tag_fid));
             foundArt = check_tag_file (filename_only, item, found,
-                    filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
+                    filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})));
+            if (! foundArt)
+                foundArt = check_tag_file (filename_only, item, found,
+                        filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
         }
         if (! foundArt)
             foundArt = check_tag_file (filename, item, found, "user_tag_data");  // 3RD, CHECK USER TAGFILE

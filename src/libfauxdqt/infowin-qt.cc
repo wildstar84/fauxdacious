@@ -39,6 +39,8 @@
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/probe.h>
 #include <libfauxdcore/runtime.h>
+#include <libfauxdcore/drct.h>
+#include <libfauxdcore/vfs.h>
 
 #include "info-widget.h"
 #include "libfauxdqt.h"
@@ -223,6 +225,14 @@ EXPORT void infowin_show (int playlist, int entry)
      Playlist::Wait, & error);
     Tuple tuple = decoder ? aud_playlist_entry_get_tuple (playlist, entry,
      Playlist::Wait, & error) : Tuple ();
+
+    if (aud_drct_get_record_enabled ())  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
+    {
+        filename = aud_get_str ("filewriter", "_record_fid");
+        AUDDBG ("-infowin_show: RECORDING FID=%s=\n", (const char *) filename);
+        VFSFile file (filename, "r");
+        decoder = aud_file_find_decoder (filename, true, file, & error);
+    }
 
     if (decoder && tuple.valid () && ! aud_custom_infowin (filename, decoder))
     {

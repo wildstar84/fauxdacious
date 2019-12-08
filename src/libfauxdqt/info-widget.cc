@@ -26,7 +26,10 @@
 
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/probe.h>
+#include <libfauxdcore/runtime.h>
 #include <libfauxdcore/tuple.h>
+#include <libfauxdcore/drct.h>
+#include <libfauxdcore/vfs.h>
 
 namespace audqt {
 
@@ -130,10 +133,29 @@ EXPORT bool InfoWidget::updateFile ()
 
 bool InfoModel::updateFile () const
 {
+    bool success = false;
+
     if (! m_dirty)
         return true;
 
-    return aud_file_write_tuple (m_filename, m_plugin, m_tuple);
+    //x return aud_file_write_tuple (m_filename, m_plugin, m_tuple);
+    if (aud_drct_get_record_enabled ())
+    {
+        String recording_file = aud_get_str ("filewriter", "_record_fid");
+        if (recording_file && recording_file[0])
+        {
+            AUDDBG ("-infowin_update_tuple: RECORDING ON - SAVE TO (%s)!\n", (const char *) recording_file);
+            String error;
+            VFSFile file (recording_file, "r");
+            PluginHandle * out_plugin = aud_file_find_decoder (recording_file, true, file, & error);
+
+            success = aud_file_write_tuple (recording_file, out_plugin, m_tuple);
+        }
+    }
+    if (! success)
+        success = aud_file_write_tuple (m_filename, m_plugin, m_tuple);
+
+    return success;
 }
 
 bool InfoModel::setData (const QModelIndex & index, const QVariant & value, int role)

@@ -32,6 +32,8 @@
 #include <libfauxdcore/probe.h>
 #include <libfauxdcore/runtime.h>
 #include <libfauxdcore/tuple.h>
+#include <libfauxdcore/drct.h>
+#include <libfauxdcore/vfs.h>
 
 #include "internal.h"
 #include "libfauxdgui.h"
@@ -211,6 +213,8 @@ static void ministatus_display_message (const char * text)
 
 static void infowin_update_tuple ()
 {
+    bool success = false;
+
     set_field_str_from_entry (current_tuple, Tuple::Title, widgets.title);
     set_field_str_from_entry (current_tuple, Tuple::Artist, widgets.artist);
     set_field_str_from_entry (current_tuple, Tuple::Album, widgets.album);
@@ -221,7 +225,23 @@ static void infowin_update_tuple ()
     set_field_int_from_entry (current_tuple, Tuple::Year, widgets.year);
     set_field_int_from_entry (current_tuple, Tuple::Track, widgets.track);
 
-    if (aud_file_write_tuple (current_file, current_decoder, current_tuple))
+    /* JWT:IF RECORDING ON, SAVE THE TAG DATA EDITS TO THE FILE BEING RECORDED! */
+    if (aud_drct_get_record_enabled ())
+    {
+        String recording_file = aud_get_str ("filewriter", "_record_fid");
+        if (recording_file && recording_file[0])
+        {
+            String error;
+            VFSFile file (recording_file, "r");
+            PluginHandle * decoder = aud_file_find_decoder (recording_file, true, file, & error);
+
+            success = aud_file_write_tuple (recording_file, decoder, current_tuple);
+        }
+    }
+    if (! success)
+        success = aud_file_write_tuple (current_file, current_decoder, current_tuple);
+
+    if (success)
     {
         ministatus_display_message (_("Save successful"));
         gtk_widget_set_sensitive (widgets.apply, false);
@@ -552,11 +572,18 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
     Tuple tuple = decoder ? aud_playlist_entry_get_tuple (playlist, entry,
      Playlist::Wait, & error) : Tuple ();
 
+    if (aud_drct_get_record_enabled ())  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
+    {
+        filename = aud_get_str ("filewriter", "_record_fid");
+        VFSFile file (filename, "r");
+        decoder = aud_file_find_decoder (filename, true, file, & error);
+    }
+
     if (decoder && tuple.valid () && ! aud_custom_infowin (filename, decoder))
     {
         /* cuesheet entries cannot be updated */
         bool can_write = aud_file_can_write_tuple (filename, decoder) &&
-         ! tuple.is_set (Tuple::StartTime);
+                ! tuple.is_set (Tuple::StartTime);
         /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
         if (aud_get_bool (nullptr, "user_tag_data") && ! tuple.is_set (Tuple::StartTime))
             can_write = true;

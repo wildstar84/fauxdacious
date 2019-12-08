@@ -205,6 +205,12 @@ static const ComboItem url_helper_allow[] = {
     ComboItem (N_("Always"), 2)
 };
 
+static const ComboItem user_tag_data_options[] = {
+    ComboItem (N_("<song file-name>.tag (if local)"), 2),
+    ComboItem (N_("Directory tagfile (if local)"), 1),
+    ComboItem (N_("Global tagfile"), 0)
+};
+
 static const ComboItem replaygainmode_elements[] = {
     ComboItem (N_("Track"), (int) ReplayGainMode::Track),
     ComboItem (N_("Album"), (int) ReplayGainMode::Album),
@@ -398,7 +404,10 @@ static const PreferencesWidget song_info_page_widgets[] = {
     WidgetLabel (N_("<b>Fauxdacious Extras</b>")),
     WidgetCheck (N_("Save unsavable metadata to file"),
         WidgetBool (0, "user_tag_data"),
-        WIDGET_CHILD)
+        WIDGET_CHILD),
+    WidgetCombo (N_("Save tags to:"),
+        WidgetInt (0, "user_tag_data_options"),
+        {{user_tag_data_options}}),
 };
 
 static const PreferencesWidget advanced_page_widgets[] = {

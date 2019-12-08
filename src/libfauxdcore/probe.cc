@@ -344,6 +344,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     int fromfile = 0;
     int fromlocalfile = 0;
     bool usrtag = aud_get_bool (nullptr, "user_tag_data");
+    String individual_tag_file = String ("");
     String local_tag_file = String ("");
     String filename_only = String ("");
 
@@ -354,6 +355,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
         StringBuf path = filename_get_parent (tag_fid);
         filename_only = String (filename_get_base (tag_fid));
         local_tag_file = String (filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
+        individual_tag_file = String (filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})));
     }
     /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, new_tuple, image)) */
     /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS <0 ("ONLY")!: 
@@ -362,6 +364,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     bool fileorNOTstdin = file || strncmp (filename, "stdin://", 8);  // JWT:IF stdin, MUST HAVE OPEN FILEHANDLE!
 
     if ((usrtag && (fromtempfile = aud_read_tag_from_tagfile (filename, "tmp_tag_data", tmpfile_tuple)) < 0)
+            || (individual_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile (filename_only, individual_tag_file, loclfile_tuple)) < 0)
             || (local_tag_file[0] && (fromlocalfile = aud_read_tag_from_tagfile (filename_only, local_tag_file, loclfile_tuple)) < 0)
             || (usrtag && (fromfile = aud_read_tag_from_tagfile (filename, "user_tag_data", file_tuple)) < 0)
             || (fileorNOTstdin && ip->read_tag (filename, file, new_tuple, image)))
@@ -576,23 +579,19 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
     GKeyFile * rcfile = g_key_file_new ();
     String local_tag_fid = String ("");
     String song_key = String (song_filename);
-    bool localtagfileexists = false;
+    bool willuseLocalTagfile = false;
 
-    //JWT:ONLY LOOK FOR A LOCAL TAG FILE IF WE'RE NOT THE TEMP. TAGFILE && WE'RE PLAYING A "FILE"!:
-    if (strncmp (tagdata_filename, "tmp_", 4) && ! strncmp (song_filename, "file://", 7))
+    if (! strncmp (tagdata_filename, "file://", 7) && ! strncmp (song_filename, "file://", 7))
     {
-        struct stat statbuf;
+        /* TAGFILE IS A SPECIFIED LOCAL FILE (NOT "{user|tmp}_tag_data"): */
+        StringBuf tag_fid = uri_to_filename (tagdata_filename);
         StringBuf song_fid = uri_to_filename (song_filename);
-        StringBuf path = filename_get_parent (song_fid);
-        local_tag_fid = String (filename_normalize (str_concat ({path, "/user_tag_data.tag"})));
-        if (! stat ((const char *) local_tag_fid, &statbuf))  // LOCAL TAG FILE EXISTS, SO USE IT:
-        {
-            localtagfileexists = true;
-            song_key = String (filename_get_base (song_fid));
-        }
+        local_tag_fid = String (filename_normalize (uri_to_filename (tagdata_filename)));
+        song_key = String (filename_get_base (song_fid));
+        willuseLocalTagfile = true;
     }
 
-    StringBuf filename = localtagfileexists ? str_copy (local_tag_fid)
+    StringBuf filename = willuseLocalTagfile ? str_copy (local_tag_fid)
             : filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
 
     //JWT: filename NOW DOES NOT HAVE file:// PREFIX AND IS THE TAG DATA FILE (LOCAL OR GLOBAL):
@@ -691,11 +690,42 @@ EXPORT bool aud_file_write_tuple (const char * filename,
 
             if (success && file && file.fflush () != 0)
                 success = false;
+
+            if (success && aud_get_bool (nullptr, "user_tag_data"))
+            {
+                /* JWT:IF COMMENT IS AN ART IMAGE FILE, FORCE A WRITE TO TAG FILE ALSO (OTHERWISE, ART WON'T
+                    BE PICKED UP AS TUPLE.COMMENT CAN ONLY BE CHECKED IN TAG FILES, NOT THE MP3 ITSELF)! */
+                String TupleComment = tuple.get_str (Tuple::Comment);
+                if (TupleComment && TupleComment[0] && ! strncmp ((const char *) TupleComment, "file://", 7))
+                        success = false;
+            }
         }
     }
     /* JWT:IF CAN'T SAVE TAGS TO FILE (IE. STREAM), TRY SAVING TO USER'S CONFIG: */
     if (! success && aud_get_bool (nullptr, "user_tag_data"))
-        success = aud_write_tag_to_tagfile (filename, tuple, "user_tag_data");
+    {
+        if (! strncmp (filename, "file://", 7))
+        {
+            int user_tag_data_options = aud_get_int (nullptr, "user_tag_data_options");
+            if (user_tag_data_options == 2)  //Individual tag file (filename.tag):
+            {
+                StringBuf tag_fid = uri_to_filename (filename);
+                StringBuf path = filename_get_parent (tag_fid);
+                success = aud_write_tag_to_tagfile (filename, tuple,
+                        (const char *) filename_to_uri (str_concat ({path, "/", filename_get_base (tag_fid),
+                        ".tag"})));
+            }
+            else if (user_tag_data_options == 1)  //Individual tag file (filename.tag):
+            {
+                StringBuf tag_fid = uri_to_filename (filename);
+                StringBuf path = filename_get_parent (tag_fid);
+                success = aud_write_tag_to_tagfile (filename, tuple,
+                        (const char *) filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
+            }
+        }
+        if (! success)
+            success = aud_write_tag_to_tagfile (filename, tuple, "user_tag_data");
+    }
 
     if (success)
         aud_playlist_rescan_file (filename);
