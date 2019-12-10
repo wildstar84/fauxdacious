@@ -215,7 +215,7 @@ void PresetView::add_imported (const Index<EqualizerPreset> & presets)
     if (presets.len () == 1)
     {
         aud_eq_apply_preset (presets[0]);
-        aud_set_bool ("equalizer_active", true);
+        aud_set_bool (nullptr, "equalizer_active", true);
     }
 }
 

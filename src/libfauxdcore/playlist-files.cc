@@ -46,8 +46,8 @@ EXPORT bool aud_filename_is_playlist (const char * filename, bool from_playlist)
                 ? index_to_str_list (str_list_to_index (filename, "&"), "\\&") 
                 : str_copy (filename);  // JWT:MUST ESCAPE AMPRESANDS ELSE system TRUNCATES URL AT FIRST AMPRESAND!
 
-            system ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf, " ", aud_get_path (AudPath::UserDir)}));    
-            if (access((const char *) temp_playlist_filename, F_OK ) != -1 )
+            int res = system ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf, " ", aud_get_path (AudPath::UserDir)}));    
+            if (res >= 0 && access((const char *) temp_playlist_filename, F_OK ) != -1 )
                 userurl2playlist = true;
         }
     }
