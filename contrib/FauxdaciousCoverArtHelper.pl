@@ -61,6 +61,7 @@ my $comment = '';
 my @userAgentOps = ();
 my $bummer = ($^O =~ /MSWin/);
 my $DEBUG = $bummer ? 2 : 0;
+
 push (@userAgentOps, 'agent', ($bummer
 		? 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
 		: 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0'));
@@ -377,6 +378,8 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	(my $album = $ARGV[1]) =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $artist = defined($ARGV[3]) ? $ARGV[3] : '_';
 	my $title = defined($ARGV[4]) ? $ARGV[4] : '_';
+	$title =~ s/\%7c\%7c.*$//i;  #HANDLE SOME UGLY TITLES IN FORMAT:  "<title> || blah blah .."
+	$title =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	$artist =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $albart_FN = $album;    #FORMAT FILENAME AS:  <album>[__<artist>] (AS SOME ALBUMS FROM DIFFERENT ARTISTS SHARE SAME NAME)!
 	if ($artist =~ /\S/ && $artist ne '_') {
@@ -401,7 +404,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	}
 	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 
-	print STDERR "i:DOING:  ALBUM=$album= TITLE=$title=\n";
+	print STDERR "i:DOING:  ALBUM=$album= TITLE=$title=\n"  if ($DEBUG);
 	foreach my $release ($album, $title) {
 		next  if ($release eq '_');
 		chomp $release;
@@ -441,10 +444,12 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 				(my $thisartist = $1) =~ s/\&\#x([0-9A-Fa-f]{2})\;/chr(hex($1))/eg;  #THEY HAVE SOME "&#X..;" STUFF TOO!
 				$primaryArtistFactor -= 3;
 				print STDERR "-----found ARTIST=$thisartist= ESCAPED=$artistEscaped=\n"  if ($DEBUG > 1);
-				next  unless ($thisartist =~ /(?:$artistEscaped|various)/is);
+				next  unless ($artistEscaped =~ /$thisartist/is
+						|| $thisartist =~ /(?:$artistEscaped|various)/is);
 
 				$priority = 0;
-				$priority += $primaryArtistFactor if ($thisartist =~ /$artistEscaped/is);
+				$priority += $primaryArtistFactor if ($thisartist =~ /$artistEscaped/is
+						|| $artistEscaped =~ /$thisartist/is);
 				$rowhtml =~ s#^.*?\<td\>##iso;
 				if ($rowhtml =~ m#([^\<]+)\<\/td\>#iso) {
 					my $type = $1;
