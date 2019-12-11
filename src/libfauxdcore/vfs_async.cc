@@ -27,17 +27,14 @@
 struct QueuedData : public ListNode
 {
     const String filename;
-    const VFSConsumer cons_f;
-    void * const user;
+    const VFSConsumer2 cons_f;
 
     pthread_t thread;
-
     Index<char> buf;
 
-    QueuedData (const char * filename, VFSConsumer cons_f, void * user) :
+    QueuedData (const char * filename, VFSConsumer2 cons_f) :
         filename (filename),
-        cons_f (cons_f),
-        user (user) {}
+        cons_f (cons_f) {}
 };
 
 static QueuedFunc queued_func;
@@ -56,7 +53,7 @@ static void send_data (void *)
         pthread_mutex_unlock (& mutex);
 
         pthread_join (data->thread, nullptr);
-        data->cons_f (data->filename, data->buf, data->user);
+        data->cons_f (data->filename, data->buf);
         delete data;
 
         pthread_mutex_lock (& mutex);
@@ -84,8 +81,16 @@ static void * read_worker (void * data0)
     return nullptr;
 }
 
+EXPORT void vfs_async_file_get_contents (const char * filename, VFSConsumer2 cons_f)
+{
+    auto data = new QueuedData (filename, cons_f);
+    pthread_create (& data->thread, nullptr, read_worker, data);
+}
+
 EXPORT void vfs_async_file_get_contents (const char * filename, VFSConsumer cons_f, void * user)
 {
-    auto data = new QueuedData (filename, cons_f, user);
-    pthread_create (& data->thread, nullptr, read_worker, data);
+    auto functor = [cons_f, user] (const char * filename, const Index<char> & buf)
+        { cons_f (filename, buf, user); };
+
+    vfs_async_file_get_contents (filename, functor);
 }
