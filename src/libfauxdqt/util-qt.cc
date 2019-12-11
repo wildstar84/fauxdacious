@@ -113,12 +113,8 @@ namespace audqt {
             QApplication::clipboard ()->setMimeData (data);
         });
 
-        /* delete the menu as soon as it's closed */
-        QObject::connect (menu, & QMenu::aboutToHide, [menu] () {
-            menu->deleteLater ();
-        });
-
         menu->addAction (action);
+        menu->setAttribute (Qt::WA_DeleteOnClose);
         menu->popup (global_pos);
     }
 
