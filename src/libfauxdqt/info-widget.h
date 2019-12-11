@@ -39,7 +39,11 @@ public:
 
     void fillInfo (int playlist, int entry, const char * filename, const Tuple & tuple,
      PluginHandle * decoder, bool updating_enabled);
+    void linkEnabled (QWidget * widget);
     bool updateFile ();
+
+protected:
+    void keyPressEvent (QKeyEvent * event) override;
 
 private:
     InfoModel * m_model;
