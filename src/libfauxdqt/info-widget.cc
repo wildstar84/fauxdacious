@@ -23,6 +23,8 @@
 #include "libfauxdqt-internal.h"
 
 #include <QHeaderView>
+#include <QKeyEvent>
+#include <QPointer>
 
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/probe.h>
@@ -61,36 +63,83 @@ static const TupleFieldMap tuple_field_map[] = {
     {N_("Bitrate"), Tuple::Bitrate, false},
 };
 
+static const TupleFieldMap * to_field_map (const QModelIndex & index)
+{
+    int row = index.row ();
+    if (row < 0 || row >= aud::n_elems (tuple_field_map))
+        return nullptr;
+
+    return & tuple_field_map[row];
+}
+
+static QModelIndex sibling_field_index (const QModelIndex & current, int direction)
+{
+    QModelIndex index = current;
+
+    while (1)
+    {
+        index = index.sibling (index.row () + direction, index.column ());
+        auto map = to_field_map (index);
+
+        if (! map)
+            return QModelIndex ();
+        if (map->field != Tuple::Invalid)
+            return index;
+    }
+}
+
 class InfoModel : public QAbstractTableModel
 {
 public:
+    enum {
+        Col_Name = 0,
+        Col_Value = 1
+    };
+
     InfoModel (QObject * parent = nullptr) :
         QAbstractTableModel (parent) {}
 
-    int rowCount (const QModelIndex & parent = QModelIndex ()) const
+    int rowCount (const QModelIndex &) const override
         { return aud::n_elems (tuple_field_map); }
-    int columnCount (const QModelIndex & parent = QModelIndex ()) const
+    int columnCount (const QModelIndex &) const override
         { return 2; }
 
-    QVariant data (const QModelIndex & index, int role = Qt::DisplayRole) const;
-    bool setData (const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    Qt::ItemFlags flags (const QModelIndex & index) const;
+    QVariant data (const QModelIndex & index, int role) const override;
+    bool setData (const QModelIndex & index, const QVariant & value, int role) override;
+    Qt::ItemFlags flags (const QModelIndex & index) const override;
 
     void setTupleData (const Tuple & tuple, String filename, PluginHandle * plugin)
     {
         m_tuple = tuple.ref ();
         m_filename = filename;
         m_plugin = plugin;
-        m_dirty = false;
+        setDirty (false);
+    }
+
+    void linkEnabled (QWidget * widget)
+    {
+        widget->setEnabled (m_dirty);
+        m_linked_widgets.append (widget);
     }
 
     bool updateFile () const;
 
 private:
+    void setDirty (bool dirty)
+    {
+        m_dirty = dirty;
+        for (auto & widget : m_linked_widgets)
+        {
+            if (widget)
+                widget->setEnabled (dirty);
+        }
+    }
+
     Tuple m_tuple;
     String m_filename;
     PluginHandle * m_plugin = nullptr;
     bool m_dirty = false;
+    QList<QPointer<QWidget>> m_linked_widgets;
 };
 
 EXPORT InfoWidget::InfoWidget (QWidget * parent) :
@@ -106,7 +155,7 @@ EXPORT InfoWidget::InfoWidget (QWidget * parent) :
     connect (this, & QWidget::customContextMenuRequested, [this] (const QPoint & pos)
     {
         auto index = indexAt (pos);
-        if (index.column () != 1)
+        if (index.column () != InfoModel::Col_Value)
             return;
         auto text = m_model->data (index, Qt::DisplayRole).toString ();
         if (! text.isEmpty ())
@@ -123,12 +172,40 @@ EXPORT void InfoWidget::fillInfo (int playlist, int entry, const char * filename
 {
     m_model->setTupleData (tuple, String (filename), decoder);
     reset ();
-    setEditTriggers (updating_enabled ? QAbstractItemView::SelectedClicked : QAbstractItemView::NoEditTriggers);
+
+    setEditTriggers (updating_enabled ? QAbstractItemView::CurrentChanged :
+                                        QAbstractItemView::NoEditTriggers);
+
+    auto initial_index = m_model->index (1 /* title */, InfoModel::Col_Value);
+    setCurrentIndex (initial_index);
+    if (updating_enabled)
+        edit (initial_index);
+}
+
+EXPORT void InfoWidget::linkEnabled (QWidget * widget)
+{
+    m_model->linkEnabled (widget);
 }
 
 EXPORT bool InfoWidget::updateFile ()
 {
     return m_model->updateFile ();
+}
+
+void InfoWidget::keyPressEvent (QKeyEvent * event)
+{
+    if (event->type () == QEvent::KeyPress &&
+        (event->key () == Qt::Key_Up || event->key () == Qt::Key_Down))
+    {
+        auto index = sibling_field_index (currentIndex (), (event->key () == Qt::Key_Up) ? -1 : 1);
+        if (index.isValid ())
+            setCurrentIndex (index);
+
+        event->accept ();
+        return;
+    }
+
+    QTreeView::keyPressEvent (event);
 }
 
 bool InfoModel::updateFile () const
@@ -163,21 +240,35 @@ bool InfoModel::setData (const QModelIndex & index, const QVariant & value, int 
     if (role != Qt::EditRole)
         return false;
 
-    Tuple::Field field_id = tuple_field_map [index.row ()].field;
-    if (field_id == Tuple::Invalid)
+    auto map = to_field_map (index);
+    if (! map || map->field == Tuple::Invalid)
         return false;
 
-    m_dirty = true;
-
-    auto t = Tuple::field_get_type (field_id);
+    auto t = Tuple::field_get_type (map->field);
     auto str = value.toString ();
 
+    bool changed = false;
+
     if (str.isEmpty ())
-        m_tuple.unset (field_id);
+    {
+        changed = m_tuple.is_set (map->field);
+        m_tuple.unset (map->field);
+    }
     else if (t == Tuple::String)
-        m_tuple.set_str (field_id, str.toUtf8 ());
+    {
+        auto utf8 = str.toUtf8 ();
+        changed = (!m_tuple.is_set (map->field) || m_tuple.get_str (map->field) != utf8);
+        m_tuple.set_str (map->field, utf8);
+    }
     else /* t == Tuple::Int */
-        m_tuple.set_int (field_id, str.toInt ());
+    {
+        int val = str.toInt ();
+        changed = (!m_tuple.is_set (map->field) || m_tuple.get_int (map->field) != val);
+        m_tuple.set_int (map->field, val);
+    }
+
+    if (changed)
+        setDirty (true);
 
     emit dataChanged (index, index, {role});
     return true;
@@ -185,24 +276,26 @@ bool InfoModel::setData (const QModelIndex & index, const QVariant & value, int 
 
 QVariant InfoModel::data (const QModelIndex & index, int role) const
 {
-    Tuple::Field field_id = tuple_field_map [index.row ()].field;
+    auto map = to_field_map (index);
+    if (! map)
+        return QVariant ();
 
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
-        if (index.column () == 0)
-            return translate_str (tuple_field_map [index.row ()].name);
-        else if (index.column () == 1)
+        if (index.column () == InfoModel::Col_Name)
+            return translate_str (map->name);
+        else if (index.column () == InfoModel::Col_Value)
         {
-            if (field_id == Tuple::Invalid)
+            if (map->field == Tuple::Invalid)
                 return QVariant ();
 
-            switch (m_tuple.get_value_type (field_id))
+            switch (m_tuple.get_value_type (map->field))
             {
             case Tuple::String:
-                return QString (m_tuple.get_str (field_id));
+                return QString (m_tuple.get_str (map->field));
             case Tuple::Int:
                 /* convert to string so Qt allows clearing the field */
-                return QString::number (m_tuple.get_int (field_id));
+                return QString::number (m_tuple.get_int (map->field));
             default:
                 return QVariant ();
             }
@@ -210,7 +303,7 @@ QVariant InfoModel::data (const QModelIndex & index, int role) const
     }
     else if (role == Qt::FontRole)
     {
-        if (field_id == Tuple::Invalid)
+        if (map->field == Tuple::Invalid)
         {
             QFont f;
             f.setBold (true);
@@ -224,13 +317,13 @@ QVariant InfoModel::data (const QModelIndex & index, int role) const
 
 Qt::ItemFlags InfoModel::flags (const QModelIndex & index) const
 {
-    if (index.column () == 1)
+    if (index.column () == InfoModel::Col_Value)
     {
-        auto & t = tuple_field_map [index.row ()];
+        auto map = to_field_map (index);
 
-        if (t.field == Tuple::Invalid)
+        if (! map || map->field == Tuple::Invalid)
             return Qt::ItemNeverHasChildren;
-        else if (t.editable)
+        else if (map->editable)
             return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
 
         return Qt::ItemIsEnabled;
