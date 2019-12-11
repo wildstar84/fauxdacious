@@ -20,12 +20,8 @@
 #include "libfauxdqt.h"
 
 #include <QCheckBox>
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QLineEdit>
+#include <QInputDialog>
 #include <QPushButton>
-#include <QVBoxLayout>
 
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/i18n.h>
@@ -36,36 +32,21 @@ namespace audqt {
 
 static QDialog * buildRenameDialog (int playlist)
 {
-    auto dialog = new QDialog;
-    auto prompt = new QLabel (_("What would you like to call this playlist?"), dialog);
-    auto entry = new QLineEdit ((const char *) aud_playlist_get_title (playlist), dialog);
-    auto rename = new QPushButton (translate_str (N_("_Rename")), dialog);
-    auto cancel = new QPushButton (translate_str (N_("_Cancel")), dialog);
-
-    auto buttonbox = new QDialogButtonBox (dialog);
-    buttonbox->addButton (rename, QDialogButtonBox::AcceptRole);
-    buttonbox->addButton (cancel, QDialogButtonBox::RejectRole);
+    auto dialog = new QInputDialog;
+    dialog->setInputMode (QInputDialog::TextInput);
+    dialog->setWindowTitle (_("Rename Playlist"));
+    dialog->setLabelText (_("What would you like to call this playlist?"));
+    dialog->setOkButtonText (translate_str (N_("_Rename")));
+    dialog->setCancelButtonText (translate_str (N_("_Cancel")));
+    dialog->setTextValue ((const char *) aud_playlist_get_title (playlist));
 
     int id = aud_playlist_get_unique_id (playlist);
-    QObject::connect (buttonbox, & QDialogButtonBox::accepted, [dialog, entry, id] () {
+    QObject::connect (dialog, & QInputDialog::textValueSelected, [dialog, id] (const QString & text) {
         int list = aud_playlist_by_unique_id (id);
         if (list >= 0)
-            aud_playlist_set_title (list, entry->text ().toUtf8 ());
+            aud_playlist_set_title (list, text.toUtf8 ());
         dialog->close ();
     });
-
-    QObject::connect (buttonbox, & QDialogButtonBox::rejected, dialog, & QDialog::close);
-
-    auto layout = make_vbox (dialog);
-    layout->addWidget (prompt);
-    layout->addWidget (entry);
-    layout->addStretch (1);
-    layout->addWidget (buttonbox);
-
-    dialog->setWindowTitle (_("Rename Playlist"));
-    dialog->setContentsMargins (margins.EightPt);
-
-    entry->selectAll ();
 
     return dialog;
 }
