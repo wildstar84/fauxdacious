@@ -23,7 +23,6 @@
 #include "libfauxdqt/export.h"
 
 #include <QPushButton>
-#include <QColorDialog>
 #include <QColor>
 
 namespace audqt {
@@ -42,10 +41,8 @@ public:
 protected:
     virtual void onColorChanged () {};
 
-private slots:
-    void onClicked ();
-
 private:
+    void paintEvent (QPaintEvent *) override;
     QColor m_color;
 };
 
