@@ -22,6 +22,11 @@
 #include <unistd.h>
 #include "playlist-internal.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <winbase.h>
+#endif
+
 #include "audstrings.h"
 #include "i18n.h"
 #include "interface.h"
@@ -46,9 +51,16 @@ EXPORT bool aud_filename_is_playlist (const char * filename, bool from_playlist)
                 ? index_to_str_list (str_list_to_index (filename, "&"), "\\&") 
                 : str_copy (filename);  // JWT:MUST ESCAPE AMPRESANDS ELSE system TRUNCATES URL AT FIRST AMPRESAND!
 
+#ifdef _WIN32
+            int res = WinExec ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf,
+                    " ", aud_get_path (AudPath::UserDir)}), SW_HIDE);
+            if (res > 31 && access((const char *) temp_playlist_filename, F_OK ) != -1 )
+                userurl2playlist = true;
+#else
             int res = system ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf, " ", aud_get_path (AudPath::UserDir)}));    
             if (res >= 0 && access((const char *) temp_playlist_filename, F_OK ) != -1 )
                 userurl2playlist = true;
+#endif
         }
     }
 

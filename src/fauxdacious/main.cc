@@ -23,6 +23,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <winbase.h>
 #define SDL_MAIN_HANDLED
 #endif
 
@@ -398,8 +399,13 @@ static void do_commands ()
                 {
                     AUDINFO ("----HELPER FOUND: WILL DO (%s)\n", (const char *) str_concat ({cover_helper, " DELETE COVERART ", 
                           aud_get_path (AudPath::UserDir)}));
+#ifdef _WIN32
+                    WinExec ((const char *) str_concat ({cover_helper, " DELETE COVERART ", 
+                          aud_get_path (AudPath::UserDir)}), SW_HIDE);
+#else
                     system ((const char *) str_concat ({cover_helper, " DELETE COVERART ", 
                           aud_get_path (AudPath::UserDir)}));
+#endif
                 }
                 StringBuf tagdata_filename = filename_build ({aud_get_path (AudPath::UserDir), "tmp_tag_data"});
                 if (! remove ((const char *) tagdata_filename))
