@@ -114,14 +114,37 @@ static void request_callback (ScanRequest * request)
     pthread_mutex_unlock (& mutex);
 }
 
+static void art_item_unref_locked (AudArtItem * item)
+{
+    if (! -- item->refcount)
+    {
+        /* delete temporary file */
+        if (item->art_file && item->is_temp)
+        {
+            StringBuf local = uri_to_filename (item->art_file);
+            if (local)
+                g_unlink (local);
+        }
+        art_items.remove (item->filename);
+    }
+}
+
+static void clear_current_locked ()
+{
+    if (current_item)
+    {
+        art_item_unref_locked (current_item);
+        current_item = nullptr;
+    }
+}
+
 /* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS: CHECK FOR ART FILE MATCHING BASE URL: */
 
-static bool check_tag_file (const String & filename, AudArtItem * item, bool found, const char * tagfile)
+static bool check_tag_file (const String & filename, AudArtItem * item, bool isNewItem, const char * tagfile)
 {
     Tuple img_tuple = Tuple ();
     int precedence = aud_read_tag_from_tagfile (filename, tagfile, img_tuple);
-    if (item->data.len () <= 0)
-    if (precedence && (precedence < 2 || ! found || item->data.len () <= 0))
+    if (precedence && (precedence < 2 || ! isNewItem || item->data.len () <= 0))
     {
         /* SEARCH TAG FILE FOR ART *UNLESS* "DEFAULT" PRECEDENCE AND ART ITEM ALREADY EXISTS AND HAS DATA: */
         String tfld = img_tuple.get_str (Tuple::Comment);
@@ -132,48 +155,52 @@ static bool check_tag_file (const String & filename, AudArtItem * item, bool fou
             if (file)
             {
                 item->data = file.read_all ();
-                return true;
+                if (item->data.len () > 0)
+                    return true;
             }
         }
     }
     return false;
 }
 
-static bool check_for_user_art (const String & filename, AudArtItem * item, bool found)
+static bool check_for_user_art (const String & filename, AudArtItem * item, bool isNewItem)
 {
     /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
     bool foundArt = false;
-    if (aud_get_bool ("albumart", "internet_coverartlookup") && strstr (filename, "_tmp_albumart"))
+
+    if (! isNewItem && aud_get_bool ("albumart", "internet_coverartlookup") && strstr (filename, "_tmp_albumart"))
     {
         struct stat statbuf;
         StringBuf coverart_file = uri_to_filename (filename);
         if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
         {
             item->art_file = filename;
+            item->is_temp = true;
             VFSFile file (item->art_file, "r");
             if (file)
             {
                 item->data = file.read_all ();
-                foundArt = true;
+                if (item->data.len () > 0)
+                    foundArt = true;
             }
         }
     }
     if (! foundArt && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG FILES IF USER WANTS TO USE THEM:
     {
-        foundArt = check_tag_file (filename, item, found, "tmp_tag_data");  // 1ST, CHECK TEMP TAGFILE
+        foundArt = check_tag_file (filename, item, isNewItem, "tmp_tag_data");  // 1ST, CHECK TEMP TAGFILE
         if (! foundArt && ! strncmp (filename, "file://", 7))  // 2ND, CHECK DIRECTORY TAGFILE (IF FILE)
         {
             StringBuf tag_fid = uri_to_filename (filename);
             StringBuf path = filename_get_parent (tag_fid);
             String filename_only = String (filename_get_base (tag_fid));
-            foundArt = check_tag_file (filename_only, item, found,
+            foundArt = check_tag_file (filename_only, item, isNewItem,
                     filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})));
             if (! foundArt)
-                foundArt = check_tag_file (filename_only, item, found,
+                foundArt = check_tag_file (filename_only, item, isNewItem,
                         filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
         }
         if (! foundArt)
-            foundArt = check_tag_file (filename, item, found, "user_tag_data");  // 3RD, CHECK USER TAGFILE
+            foundArt = check_tag_file (filename, item, isNewItem, "user_tag_data");  // 3RD, CHECK USER TAGFILE
     }
     if (! foundArt && ! item->data.len () && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
     {
@@ -209,14 +236,18 @@ static bool check_for_user_art (const String & filename, AudArtItem * item, bool
                         if (file)
                         {
                             item->data = file.read_all ();
-                            foundArt = true;
-                            break;
+                            if (item->data.len () > 0)
+                            {
+                                foundArt = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
     }
+
     return foundArt;
 }
 
@@ -233,7 +264,9 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 
     if (item && item->flag)
     {
-        check_for_user_art (filename, item, true);  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
+        if (check_for_user_art (filename, item, true))  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
+            item->flag = FLAG_DONE;
+
         item->refcount ++;
         return item;
     }
@@ -257,31 +290,6 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
         * queued = true;
 
     return nullptr;
-}
-
-static void art_item_unref_locked (AudArtItem * item)
-{
-    if (! -- item->refcount)
-    {
-        /* delete temporary file */
-        if (item->art_file && item->is_temp)
-        {
-            StringBuf local = uri_to_filename (item->art_file);
-            if (local)
-                g_unlink (local);
-        }
-
-        art_items.remove (item->filename);
-    }
-}
-
-static void clear_current_locked ()
-{
-    if (current_item)
-    {
-        art_item_unref_locked (current_item);
-        current_item = nullptr;
-    }
 }
 
 void art_cache_current (const String & filename, Index<char> && data, String && art_file)
