@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #MUST INSTALL youtube-dl FOR Youtube to work!
-#pp -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
+#pp --gui -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
 #FAUXDACIOUS "HELPER" SCRIPT TO HANDLE URLS THAT FAUXDACIOUS CAN'T PLAY DIRECTLY:
 
@@ -77,15 +77,18 @@ exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOU
 exit (0)  if ($ARGV[0] =~ /\.\w{2,4}$/);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE EXTENSION!
 
 my $bummer = ($^O =~ /MSWin/);
+my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 if ($bummer && $configPath) {  #STUPID WINDOWS DOESN'T SHOW DEBUG OUTPUT ON TERMINAL!
 	my $homedir = $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'};
 	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
 	$homedir =~ s#[\/\\]$##;
-	my $log_fh;
-    open $log_fh, ">${configPath}/FauxdaciousUrlHelper_log.txt";
-    *STDERR = $log_fh;
+	if ($DEBUG) {
+        my $log_fh;
+        open $log_fh, ">${configPath}/FauxdaciousUrlHelper_log.txt";
+        *STDERR = $log_fh;
+    }
 }
-my $client = new StreamFinder($ARGV[0], -debug => 1);
+my $client = new StreamFinder($ARGV[0], -debug => $DEBUG);
 die "f:Could not open streamfinder or no streams found!"  unless ($client);
 
 $newPlaylistURL = $client->getURL('-noplaylists');

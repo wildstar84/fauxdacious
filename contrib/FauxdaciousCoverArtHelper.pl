@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-#pp -o FauxdaciousCoverArtHelper.exe -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousCoverArtHelper.pl
+#pp --gui -o FauxdaciousCoverArtHelper.exe -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousCoverArtHelper.pl
 
 #FAUXDACIOUS "HELPER" SCRIPT TO FETCH COVER ART FOR CDs/DVSs FROM coverartarchive and dvdcover.com:
 
@@ -50,6 +50,12 @@ use URI::Escape;
 
 die "..usage: $0 {CD[T] diskID | DVD title | ALBUM album} [configpath] [artist] | DELETE COVERART configpath\n"  unless ($ARGV[0] && $ARGV[1]);
 my $configPath = '';
+
+for (my $a=0;$a<=$#ARGV;$a++) {  #STRIP QUOTES AROUND ARGUMENTS OFF!:
+	$ARGV[$a] =~ s/^\'//;
+	$ARGV[$a] =~ s/\'$//;
+}
+
 if ($ARGV[1]) {
 	($configPath = $ARGV[2]) =~ s#^file:\/\/##;
 }
@@ -60,7 +66,7 @@ my $artist = '';
 my $comment = '';
 my @userAgentOps = ();
 my $bummer = ($^O =~ /MSWin/);
-my $DEBUG = $bummer ? 2 : 0;
+my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 push (@userAgentOps, 'agent', ($bummer
 		? 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
@@ -69,7 +75,7 @@ my $ua = LWP::UserAgent->new(@userAgentOps);
 $ua->timeout(10);
 $ua->cookie_jar({});
 $ua->env_proxy;
-if ($bummer && $configPath) {  #STUPID WINDOWS DOESN'T SHOW DEBUG OUTPUT ON TERMINAL!
+if ($bummer && $configPath && $DEBUG) {  #WARNING:MAY HANG WHEN MULTITHREADED, BUT STUPID WINDOWS DOESN'T SHOW DEBUG OUTPUT ON TERMINAL!
 	my $log_fh;
     open $log_fh, ">${configPath}/FauxdaciousCoverArtHelper_log.txt";
     *STDERR = $log_fh;
@@ -155,7 +161,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 		if ($response->is_success) {
 			$html = $response->decoded_content;
 		} else {
-			print STDERR $response->status_line  if ($DEBUG);
+			print STDERR $response->status_line;
 			print STDERR "! ($url2)\n";
 		}
 		print STDERR "-3: html=$html=\n"  if ($DEBUG > 2);
@@ -214,7 +220,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 				if ($response->is_success) {
 					$art_image = $response->decoded_content;
 				} else {
-					print STDERR $response->status_line  if ($DEBUG);
+					print STDERR $response->status_line;
 					print STDERR "! ($art_url)\n";
 				}
 				#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
@@ -274,12 +280,12 @@ OUTER:		for (my $try=0;$try<=1;$try++) {
 				if ($entryhtml =~ /\bdescription\=\"?([^\"]+)/i) {
 					my $desc = $1;
 					(my $title = $argv1clean) =~ s/\_/ /g;
-					print STDERR "-1:SEARCH DESCRIPTION- DESC=$desc= TITLE=$title=\n";
+					print STDERR "-1:SEARCH DESCRIPTION- DESC=$desc= TITLE=$title=\n"  if ($DEBUG);
 					if ($desc =~ /$title/i && $desc =~ /DVD Cover/i) {
 						if ($entryhtml =~ m#\<img\s+([^\>]+)\>#i) {
 							my $imghtml = $1;
 							$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
-							print STDERR "---GOT IT1! ($art_url)\n";
+							print STDERR "---GOT IT1! ($art_url)\n"  if ($DEBUG);
 							last   if ($art_url);
 						}
 					}
@@ -291,12 +297,12 @@ OUTER:		for (my $try=0;$try<=1;$try++) {
 					$entryhtml = $1;
 					if ($entryhtml =~ /\<p\>\<p\>([^\<]+)/i) {
 						my $tagshtml = $1;
-						print STDERR "-2:SEARCH TAGS- TAGS=$tagshtml=\n";
+						print STDERR "-2:SEARCH TAGS- TAGS=$tagshtml=\n"  if ($DEBUG);
 						if ($tagshtml =~ /DVD Cover/i) {
 							if ($entryhtml =~ m#\<img\s+([^\>]+)\>#i) {
 								my $imghtml = $1;
 								$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
-								print STDERR "---GOT IT2! ($art_url)\n";
+								print STDERR "---GOT IT2! ($art_url)\n"  if ($DEBUG);
 								last   if ($art_url);
 							}
 						}
@@ -311,7 +317,7 @@ OUTER:		for (my $try=0;$try<=1;$try++) {
 						my $imghtml = $1;
 						if ($imghtml =~ /$argv1clean/i) {
 							$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
-							print STDERR "---GOT IT3! ($art_url)\n";
+							print STDERR "---GOT IT3! ($art_url)\n"  if ($DEBUG);
 							last   if ($art_url);
 						}
 					}
@@ -325,10 +331,10 @@ OUTER:		for (my $try=0;$try<=1;$try++) {
 					if ($entryhtml =~ m#\<a\s+href\=\"([^\"]+)\"\>\s+\<img\s+([^\>]+)\>#i) {
 						my $link = $1;
 						my $imghtml = $2;
-						print STDERR "-4:SEARCH REF. LINK- KEY=$key= link=$link=\n";
+						print STDERR "-4:SEARCH REF. LINK- KEY=$key= link=$link=\n"  if ($DEBUG);
 						if ($link =~ m#\/$key#i) {
 							$art_url = $1  if ($imghtml =~ m#src\=\"([^\"]+)#);
-							print STDERR "---GOT IT4! ($art_url)\n";
+							print STDERR "---GOT IT4! ($art_url)\n"  if ($DEBUG);
 							last   if ($art_url);
 						}
 					}
@@ -351,7 +357,7 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 			$html = $response->decoded_content;
 		} else {
 			print STDERR $response->status_line  if ($DEBUG);
-			print STDERR "! (https://archive.org/details/coverartarchive?and[]=$argv1clean)\n";
+			print STDERR "! (https://archive.org/details/coverartarchive?and[]=$argv1clean)\n"  if ($DEBUG);
 		}
 		print STDERR "-1a TRY($try) of 2: HTML=$html=\n"  if ($DEBUG > 2);
 		if ($html && $html =~ s#\<a\s+href\=\"\/details\/mbid\-([^\"]+)\"\s+title\=\"([^\"]+)\"##is) {
@@ -509,14 +515,14 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 				my $imghtml = $1;
 				my $imgurl = $1  if ($imghtml =~ m#href\=\"([^\"]+)#s);
 				$imgurl = 'https:' . $imgurl  if ($imgurl =~ m#^\/\/#o);
-				print STDERR "i:ALT COVERART ARCHIVE IMAGE ($imgurl)?\n";
+				print STDERR "i:ALT COVERART ARCHIVE IMAGE ($imgurl)?\n"  if ($DEBUG);
 				&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart')  if ($imgurl =~ m#\.(?:jpg|png|jpeg|gif)$#);
 			}
 		}
 		print STDERR "-----AT END OF FOR-LOOP($release), CONTINUE OR PUNT...\n"  if ($DEBUG > 1);
 	}
 	print STDERR "w:NO COVER-ART FOUND ON MUSICBRAINZ!\n"  if ($DEBUG);
-	exit (1);  # 1 INDICATES WE FAILED TO FIND ANY COVER ART (writeArtImage() EXITS W/zero, MEANING SUCCESS).
+	exit (0);
 }
 else
 {
