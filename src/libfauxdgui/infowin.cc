@@ -73,6 +73,7 @@ static struct {
 
 static GtkWidget * infowin;
 static int current_playlist_id, current_entry;
+static bool force_image;
 static String current_file;
 static Tuple current_tuple;
 static PluginHandle * current_decoder = nullptr;
@@ -298,7 +299,7 @@ static void autofill_toggled (GtkToggleButton * toggle)
 
 static void infowin_display_image (const char * filename)
 {
-    if (! current_file || strcmp (filename, current_file))
+    if (! current_file || (! force_image && strcmp (filename, current_file)))
         return;
 
     AudguiPixbuf pb = audgui_pixbuf_request (filename);
@@ -318,6 +319,7 @@ static void infowin_destroyed ()
     memset (& widgets, 0, sizeof widgets);
 
     infowin = nullptr;
+    force_image = false;
     current_file = String ();
     current_tuple = Tuple ();
     current_decoder = nullptr;
@@ -344,10 +346,18 @@ static void coverart_entry_response_cb (GtkWidget * dialog, int response, GtkWid
         const char * text (gtk_file_chooser_get_uri ((GtkFileChooser *) dialog));
         if (text)
         {
+            force_image = true;
             if (strstr (text, "://"))
+            {
+                infowin_display_image (text);  // THEY PICKED AN IMAGE FILE, SHOW IT IN THE WINDOW!
                 gtk_entry_set_text ((GtkEntry *) entry, text);
+            }
             else
-                gtk_entry_set_text ((GtkEntry *) entry, filename_to_uri (filename_normalize (filename_expand (str_copy (text)))));
+            {
+                String uri = String (filename_to_uri (filename_normalize (filename_expand (str_copy (text)))));
+                infowin_display_image (uri);   // THEY PICKED AN IMAGE FILE, SHOW IT IN THE WINDOW!
+                gtk_entry_set_text ((GtkEntry *) entry, uri);
+            }
         }
     }
 
@@ -517,6 +527,7 @@ static void infowin_show (int list, int entry, const String & filename,
     current_playlist_id = aud_playlist_get_unique_id (list);
     current_entry = entry;
     current_file = filename;
+    force_image = false;
     current_tuple = tuple.ref ();
     current_decoder = decoder;
     can_write = writable;
