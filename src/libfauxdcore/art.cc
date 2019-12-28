@@ -140,11 +140,12 @@ static void clear_current_locked ()
 
 /* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS: CHECK FOR ART FILE MATCHING BASE URL: */
 
-static bool check_tag_file (const String & filename, AudArtItem * item, bool isNewItem, const char * tagfile)
+static bool check_tag_file (const String & filename, AudArtItem * item, bool itemExists, const char * tagfile)
 {
+    /* JWT:LOOK FOR IMAGE IN TAG DATA FILE(S) UNDER "Comment": */
     Tuple img_tuple = Tuple ();
     int precedence = aud_read_tag_from_tagfile (filename, tagfile, img_tuple);
-    if (precedence && (precedence < 2 || ! isNewItem || item->data.len () <= 0))
+    if (precedence && (precedence < 2 || ! itemExists || item->data.len () <= 0))
     {
         /* SEARCH TAG FILE FOR ART *UNLESS* "DEFAULT" PRECEDENCE AND ART ITEM ALREADY EXISTS AND HAS DATA: */
         String tfld = img_tuple.get_str (Tuple::Comment);
@@ -163,44 +164,60 @@ static bool check_tag_file (const String & filename, AudArtItem * item, bool isN
     return false;
 }
 
-static bool check_for_user_art (const String & filename, AudArtItem * item, bool isNewItem)
+/* JWT:THIS FUNCTION NOW SUPPORTS DIRECT REQUESTS FOR SPECIFIC IMAGE FILES (filename IS A JPG|PNG, ETC.):
+   THIS IS USED DIRECTLY BY infowin.cc AND INDIRECTLY BY THE ALBUMART PLUGIN:
+*/
+static int check_for_user_art (const String & filename, AudArtItem * item, bool itemExists)
 {
-    /* JWT:LOOK FOR IMAGE IN TAG DATA FILE UNDER "Comment": */
     bool foundArt = false;
 
-    if (! isNewItem && aud_get_bool ("albumart", "internet_coverartlookup") && strstr (filename, "_tmp_albumart"))
+    if (! itemExists)  // NEW ITEM, SEE IF FILE IS ALREADY AN IMAGE FILE:
     {
-        struct stat statbuf;
-        StringBuf coverart_file = uri_to_filename (filename);
-        if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
+        bool fileIsImage = false;
+        String ext = String (uri_get_extension (filename));
+        Index<String> extlist = str_list_to_index ("jpg,png,jpeg,gif", ",");
+        for (auto & tryext : extlist)
         {
-            item->art_file = filename;
-            item->is_temp = true;
-            VFSFile file (item->art_file, "r");
-            if (file)
+            if (strcmp_nocase (ext, tryext))
+                continue;
+
+            fileIsImage = true;
+            break;
+        }
+        if (fileIsImage)  // infowin.cc:audgui_pixbuf_request () CAN NOW REQUEST A SPECIFIC IMAGE FILE!:
+        {
+            struct stat statbuf;
+            StringBuf coverart_file = uri_to_filename (filename);
+            if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE EXISTS, FETCH IT AS-IS!:
             {
-                item->data = file.read_all ();
-                if (item->data.len () > 0)
-                    foundArt = true;
+                item->art_file = filename;
+                VFSFile file (item->art_file, "r");
+                if (file)
+                {
+                    item->data = file.read_all ();
+                    if (item->data.len () > 0)
+                        return 1;  // FILE IS AN IMAGE, BUT COULDN'T READ? SO WE'RE DONE!
+                }
             }
+            return -1;  // FILE IS AN IMAGE (NOT A SONG ENTRY), BUT COULDN'T READ? SO WE'RE DONE (DON'T SCAN)!
         }
     }
     if (! foundArt && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG FILES IF USER WANTS TO USE THEM:
     {
-        foundArt = check_tag_file (filename, item, isNewItem, "tmp_tag_data");  // 1ST, CHECK TEMP TAGFILE
+        foundArt = check_tag_file (filename, item, itemExists, "tmp_tag_data");  // 1ST, CHECK TEMP TAGFILE
         if (! foundArt && ! strncmp (filename, "file://", 7))  // 2ND, CHECK DIRECTORY TAGFILE (IF FILE)
         {
             StringBuf tag_fid = uri_to_filename (filename);
             StringBuf path = filename_get_parent (tag_fid);
             String filename_only = String (filename_get_base (tag_fid));
-            foundArt = check_tag_file (filename_only, item, isNewItem,
+            foundArt = check_tag_file (filename_only, item, itemExists,
                     filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})));
             if (! foundArt)
-                foundArt = check_tag_file (filename_only, item, isNewItem,
+                foundArt = check_tag_file (filename_only, item, itemExists,
                         filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
         }
         if (! foundArt)
-            foundArt = check_tag_file (filename, item, isNewItem, "user_tag_data");  // 3RD, CHECK USER TAGFILE
+            foundArt = check_tag_file (filename, item, itemExists, "user_tag_data");  // 3RD, CHECK USER TAGFILE
     }
     if (! foundArt && ! item->data.len () && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
     {
@@ -248,7 +265,7 @@ static bool check_for_user_art (const String & filename, AudArtItem * item, bool
         }
     }
 
-    return foundArt;
+    return foundArt ? 1 : 0;
 }
 
 static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
@@ -264,8 +281,8 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 
     if (item && item->flag)
     {
-        if (check_for_user_art (filename, item, true))  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
-            item->flag = FLAG_DONE;
+        if (check_for_user_art (filename, item, true) > 0)  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
+            item->flag = FLAG_SENT;
 
         item->refcount ++;
         return item;
@@ -277,13 +294,19 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
         item->filename = filename;
         item->refcount = 1; /* temporary reference */
 
-        if (check_for_user_art (filename, item, false))
+        int chkres = check_for_user_art (filename, item, false);
+        if (chkres > 0)
         {
-            item->flag = FLAG_DONE;  // ART FOUND IN TAG FILE, WE'RE DONE, DON'T SCAN NON-PLAYING ENTRY (SLOW)!
+            item->flag = FLAG_SENT;  // ART FOUND IN TAG FILE, WE'RE DONE, DON'T SCAN NON-PLAYING ENTRY (SLOW)!
             return item;
         }
-        else
+        else if (! chkres)
             scanner_request (new ScanRequest (filename, SCAN_IMAGE, request_callback));
+        else
+        {
+            art_item_unref_locked (item);
+            return nullptr;
+        }
     }
 
     if (queued)
