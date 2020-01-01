@@ -299,7 +299,7 @@ static void autofill_toggled (GtkToggleButton * toggle)
 
 static void infowin_display_image (const char * filename)
 {
-    if (! current_file || (! force_image && strcmp (filename, current_file)))
+    if (! force_image && (! current_file || strcmp (filename, current_file)))
         return;
 
     AudguiPixbuf pb = audgui_pixbuf_request (filename);
@@ -518,7 +518,7 @@ static void create_infowin ()
     hook_associate ("art ready", (HookFunction) infowin_display_image, nullptr);
 }
 
-static void infowin_show (int list, int entry, const String & filename,
+static void infowin_show (int list, int entry, const String & filename, const String & entryfn,
  const Tuple & tuple, PluginHandle * decoder, bool writable)
 {
     if (! infowin)
@@ -526,7 +526,7 @@ static void infowin_show (int list, int entry, const String & filename,
 
     current_playlist_id = aud_playlist_get_unique_id (list);
     current_entry = entry;
-    current_file = filename;
+    current_file = entryfn;
     force_image = false;
     current_tuple = tuple.ref ();
     current_decoder = decoder;
@@ -563,7 +563,7 @@ static void infowin_show (int list, int entry, const String & filename,
         gtk_label_set_text ((GtkLabel *) widgets.codec[row], text);
     }
 
-    infowin_display_image (filename);
+    infowin_display_image (entryfn);
 
     gtk_widget_set_sensitive (widgets.apply, changed);
     gtk_widget_grab_focus (widgets.title);
@@ -577,6 +577,7 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
     String filename = aud_playlist_entry_get_filename (playlist, entry);
     g_return_if_fail (filename != nullptr);
 
+    String entryfn = filename;
     String error;
     PluginHandle * decoder = aud_playlist_entry_get_decoder (playlist, entry,
      Playlist::Wait, & error);
@@ -600,7 +601,7 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
             can_write = true;
 
         tuple.delete_fallbacks ();
-        infowin_show (playlist, entry, filename, tuple, decoder, can_write);
+        infowin_show (playlist, entry, filename, entryfn, tuple, decoder, can_write);
     }
     else
         audgui_infowin_hide ();
