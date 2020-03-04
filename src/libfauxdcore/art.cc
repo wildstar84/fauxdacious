@@ -196,7 +196,7 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
                 {
                     item->data = file.read_all ();
                     if (item->data.len () > 0)
-                        return 1;  // FILE IS AN IMAGE, BUT COULDN'T READ? SO WE'RE DONE!
+                        return 1;  // FILE IS AN IMAGE, SO WE'RE DONE (FLAG_SENT - DON'T BOTHER SENDING "art ready")!
                 }
             }
             return -1;  // FILE IS AN IMAGE (NOT A SONG ENTRY), BUT COULDN'T READ? SO WE'RE DONE (DON'T SCAN)!
@@ -219,7 +219,7 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
         if (! foundArt)
             foundArt = check_tag_file (filename, item, itemExists, "user_tag_data");  // 3RD, CHECK USER TAGFILE
     }
-    if (! foundArt && ! item->data.len () && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
+    if (! foundArt && item->data.len () <= 0 && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
     {
         StringBuf scheme = uri_get_scheme (filename);
         if (strcmp (scheme, "file") && strcmp (scheme, "stdin")
@@ -372,21 +372,21 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
     if (format & AUD_ART_DATA)
     {
         /* JWT:DO WE HAVE A "DEFAULT" COVER ART FILE? */
-        if (! item->data.len () && ! item->art_file)
+        if (item->data.len () <= 0 && ! item->art_file)
         {
             String artdefault = aud_get_str(nullptr, "default_cover_file");
             if (artdefault && artdefault[0])
                 item->art_file = String (filename_to_uri ((const char *) artdefault));
         }
         /* load data from external image file */
-        if (! item->data.len () && item->art_file)
+        if (item->data.len () <= 0 && item->art_file)
         {
             VFSFile file (item->art_file, "r");
             if (file)
                 item->data = file.read_all ();
         }
 
-        if (! item->data.len ())
+        if (item->data.len () <= 0)
             good = false;
     }
 
