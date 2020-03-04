@@ -1,17 +1,17 @@
-Rebuild v3.10 on Windows (after installing the new dependencies and patches 
-required by Audacious v3.9*, then clean up the Windows build-notes accordingly.
+* Fix APPEARANCE of occasional gui "hang" when using dynamic album art:
+Problem is more common in Windows, but sometimes happens in Linux.
+Workaround is to pop up and pop back down the "About Fauxdacious" screen.
+I have tried numerous things and spent copious amounts of labor to fix this
+but have been unable to so far...
 
-Package all this into four separate Debian packages (source and binary for 
+* Package all this into four separate Debian packages (source and binary for
 both Fauxdacious and Fauxdacious Plugins.
 
-Fix stupid but harmless DBus errors when exiting the QT version.  I've tried 
-everything I can think of for now though.
-
-Make Effects plugin screen (checkboxes) update when song change (with custom 
-equalizer and effects settings) changes the active effects plugins.  The 
-effect plugins get properly turned off and on, but the QT screen does NOT 
-update the checkboxes unless you click on the screen.  So far I have not 
+* (Qt): Make Effects plugin screen (checkboxes) update when song change (with
+custom equalizer and effects settings) changes the active effects plugins.
+The effect plugins get properly turned off and on, but the QT screen does NOT
+update the checkboxes unless you click on the screen.  So far I have not
 found a way to fix this annoyance.
 
-Remove Adplug Classic plugin when Debian FINALLY gets around to patching 
-or upgrading Adplug.
+* Remove Adplug Classic plugin when Debian FINALLY gets around to patching
+or upgrading Adplug.  But may just leave in anyway! :)
