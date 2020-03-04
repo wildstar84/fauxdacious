@@ -27,7 +27,9 @@
 #define SDL_MAIN_HANDLED
 #endif
 
+#ifdef USE_SDL2
 #include "SDL.h"
+#endif
 
 #define AUD_GLIB_INTEGRATION
 #include <libfauxdcore/audstrings.h>
@@ -571,18 +573,23 @@ int main (int argc, char * * argv)
 
     initted = true;
 
+#ifdef USE_SDL2
     /* JWT:MUST INITIALIZE SDL2 BEFORE ANY GTK WINDOWS POPUP ELSE MAY GET SEGFAULT WHEN OPENING ONE! */
     bool sdl_initialized = false;  // TRUE IF SDL (VIDEO) IS SUCCESSFULLY INITIALIZED.
     SDL_SetMainReady ();
+#endif
+
 #if defined(USE_GTK)
 #if defined(USE_QT)
     if (! options.qt)
 #endif
     {
+#ifdef USE_SDL2
         if (SDL_Init (SDL_INIT_VIDEO))  // GTK REQUIRES INIT HERE TO AVOID SEGFAULTS, QT PUKES ON EXIT IF SO!:
             AUDERR ("e:Failed to init SDL in main(): (no video playing): %s.\n", SDL_GetError ());
         else
             sdl_initialized = true;
+#endif
     }
 #endif
 
@@ -606,8 +613,10 @@ int main (int argc, char * * argv)
         hook_dissociate ("quit", (HookFunction) aud_quit);
     }
 
+#ifdef USE_SDL2
     if (sdl_initialized)
         SDL_QuitSubSystem (SDL_INIT_VIDEO);  // SDL DOCS SAY SDL_Quit () SAFE, BUT SEGFAULTS HERE?!
+#endif
 
     aud_drct_enable_record (0);  // JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
 #ifdef USE_DBUS
