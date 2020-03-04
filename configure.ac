@@ -6,13 +6,13 @@ dnl Initialize
 dnl ==========
 
 AC_PREREQ([2.59])
-AC_INIT([fauxdacious], [4.0-beta4])
-AC_COPYRIGHT([Copyright (C) 2001-2019 Jim Turner, Audacious developers and others])
+AC_INIT([fauxdacious], [4.0-final])
+AC_COPYRIGHT([Copyright (C) 2001-2020 Jim Turner, Audacious developers and others])
 
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE_NAME", [Name of package])
 AC_DEFINE_UNQUOTED(VERSION, "$PACKAGE_VERSION", [Version number of package])
 
-COPYRIGHT="Copyright (C) 2001-2019 Jim Turner, Audacious developers and others"
+COPYRIGHT="Copyright (C) 2001-2020 Jim Turner, Audacious developers and others"
 AC_DEFINE_UNQUOTED(COPYRIGHT, "$COPYRIGHT", [Copyright])
 AC_SUBST(COPYRIGHT)
 
@@ -73,6 +73,23 @@ if test $USE_DBUS = yes ; then
 fi
 
 AC_SUBST(USE_DBUS)
+
+dnl SDL (needed for SDL audio and/or any Video play)!
+dnl =========================
+
+AC_ARG_ENABLE(sdl2,
+ AS_HELP_STRING(--disable-sdl2, [Disable SDL2 (Video) support (default=enabled)]),
+ USE_SDL2=$enableval, USE_SDL2=yes)
+
+have_sdl2=no
+if test $USE_SDL2 = yes ; then
+    PKG_CHECK_MODULES(SDL, sdl2 >= 2.0, [
+        have_sdl2=yes
+        AC_DEFINE(USE_SDL2, 1, [Defined if SDL2 support enabled])
+    ], [
+        AC_MSG_WARN([SDL2 support unavailable due to missing dependency: sdl2 >= 2.0])
+    ])
+fi
 
 dnl Valgrind analysis support
 dnl =========================
@@ -135,5 +152,6 @@ echo ""
 echo "  D-Bus support:                          $USE_DBUS"
 echo "  GTK+ support:                           $USE_GTK"
 echo "  Qt support:                             $USE_QT"
+echo "  SDL2 (Video) support:                   $have_sdl2"
 echo "  Valgrind analysis support:              $enable_valgrind"
 echo ""

@@ -24,7 +24,7 @@ endif
 
 LD = ${CXX}
 
-CPPFLAGS := -I/usr/include/SDL2 -I.. -I../.. \
+CPPFLAGS := ${SDL_CFLAGS} -I.. -I../.. \
             ${CPPFLAGS} \
             ${GLIB_CFLAGS}
 
