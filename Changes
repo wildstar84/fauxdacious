@@ -1,4 +1,71 @@
-Version 3.9-final
+Version 4.1-beta1
+
+Version 4.0-final has shown to be a very good release, stability-wise and 
+is now pretty much doing everything I want it to do, however due to very 
+little uptake (by others), I'm starting to lose interest in development.  
+That said, I continue to monitor Audacious and what they're doing.  Since 
+they've officially switched to Qt (and I only use GTK), very little of what 
+they're doing interests me, however, they are still finding small bugs and 
+optimizations, which I am continuing to merge here.  One issue is that they've 
+been doing a titanic amount of work under the hood that would require 
+immense labor on my part to merge into our now widely-different codesets that 
+don't seem to actually improve functionality.  Some support some new Qt plugins 
+/ features such as their searchtool plugin, and a new album-advance feature 
+that I won't use or need.
+
+* One new fauxdacious-specific feature I have added to the StreamTuner plugin 
+is grabbing image thumbnails for stations selected via StreamTuner and 
+implementing using our "user_tag_data" custom tag-file.  This is for the 
+IHeartRadio model only for now, as only that site has these image 
+links in their metadata.  I would love to have the StreamTuner plugin 
+available to me as a user, but Audacious does not plan to create a GTK 
+version at this point and I do not have the skillset necessary to create one 
+on my own.  I have also filed feature request# 969 to make streamtuner sorted 
+and sortable, as this is also above my skill level.
+
+* Fixed Qt time slider/display issues, closing Audacious bug# 957.
+
+* Fixed segfault when using sox resampler at higher bitrate than song when 
+adjusting the time slider (closes Audacious bug# 950).
+
+* Merging various Audacious tweaks (mostly minor bugfixes and Qt changes).
+
+
+Version 4.0-final
+
+Notable enhancements include:
+
+* Custom song/stream-specific equalizer & effects-plugin settings added to 
+the Qt version. including stream URLs.
+
+* New option for the Album Art plugin for fetching album-art from MusicBrainz 
+for the current song playing, including changing the album-art as the song 
+title changes when playing from streams!
+
+* Lyricwiki fixes and improvements, including the ability to save to and use 
+local lyric files for songs.
+
+* Enable tag-data saving while song is being recorded from a stream, including 
+album-art.
+
+* Add option for enabling separate custom tag-files for individual songs and 
+directories (for local song files).
+
+* New option to split the artist and title from icecast, et. al. streams 
+which do not format them correctly.
+
+* Improve Win32 building and build a new binary Win32 version of v4.0-final!
+
+* Eliminate spam warning messages when exiting the Qt version!
+
+* m3u8 tag improvements.
+
+* Merge on more of Audacious's Qt interface fixes / improvements.
+
+* numerous code optimizations and UI touchups!
+
+
+Version 3.10-final
 
 * Expose PauseMute option (-P option in Fauxdacious) to fauxdtool 
 ("--playback-pausemute 0|1" to set and "--playback-doespausemute" to 
