@@ -39,7 +39,8 @@ EXPORT bool aud_filename_is_playlist (const char * filename, bool from_playlist)
     bool userurl2playlist = false;
 
     int url_helper_allow = aud_get_int ("audacious", "url_helper_allow");
-    bool url_skiphelper = ! url_helper_allow || (from_playlist && url_helper_allow < 2);
+    bool url_skiphelper = (! url_helper_allow || (from_playlist && url_helper_allow < 2)
+            || aud_get_bool ("audacious", "_url_helper_denythistime"));
     if (! url_skiphelper && (! strncmp (filename, "https://", 7) || ! strncmp (filename, "http://", 7)))  // A HELPABLE? URL:
     {
         String url_helper = aud_get_str ("audacious", "url_helper");
@@ -73,6 +74,7 @@ EXPORT bool aud_filename_is_playlist (const char * filename, bool from_playlist)
        ALREADY BEEN APPLIED TO THE ORIGINAL URL (AVOID RECURSION AND REDUNDANCE)!
     */
     aud_set_bool (nullptr, "_in_tempurl", userurl2playlist);
+    aud_set_bool ("audacious", "_url_helper_denythistime", false);
     StringBuf ext = userurl2playlist ? str_printf (_("pls"))
             : (from_playlist ? StringBuf () : uri_get_extension (filename));
     if (ext)
