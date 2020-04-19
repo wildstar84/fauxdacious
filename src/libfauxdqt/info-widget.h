@@ -41,12 +41,13 @@ public:
      PluginHandle * decoder, bool updating_enabled);
     void linkEnabled (QWidget * widget);
     bool updateFile ();
+    void show_coverart_dialog (QDialog * parent);
+    bool setData (const QModelIndex & index, const QVariant & value, int role);
+    QModelIndex createModelIndex (int row, int column);
+    InfoModel * m_model;
 
 protected:
     void keyPressEvent (QKeyEvent * event) override;
-
-private:
-    InfoModel * m_model;
 };
 
 } // namespace audqt

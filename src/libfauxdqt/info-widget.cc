@@ -32,6 +32,11 @@
 #include <libfauxdcore/tuple.h>
 #include <libfauxdcore/drct.h>
 #include <libfauxdcore/vfs.h>
+#include <libfauxdcore/interface.h>
+#include <libfauxdcore/playlist.h>
+#include <libfauxdcore/audstrings.h>
+#include <libfauxdcore/runtime.h>
+#include <libfauxdcore/hook.h>
 
 namespace audqt {
 
@@ -106,6 +111,7 @@ public:
 
     QVariant data (const QModelIndex & index, int role) const override;
     bool setData (const QModelIndex & index, const QVariant & value, int role) override;
+    QModelIndex createModelIndex (int row, int column);
     Qt::ItemFlags flags (const QModelIndex & index) const override;
 
     void setTupleData (const Tuple & tuple, String filename, PluginHandle * plugin)
@@ -192,6 +198,68 @@ EXPORT bool InfoWidget::updateFile ()
     return m_model->updateFile ();
 }
 
+/* JWT:POP UP IMAGE FILE SELECTOR WHEN NEW [Art Lookup] BUTTON PRESSED: */
+EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
+{
+    const char * name_filter = N_("Image files (*.gif *.jpg *.jpeg *.png)");
+    auto dialog = new QFileDialog (parent, _("Select Cover Art File - Fauxdacious"));
+
+    dialog->setAttribute (Qt::WA_DeleteOnClose);
+    dialog->setFileMode (QFileDialog::ExistingFile);
+    dialog->setLabelText (QFileDialog::Accept, _("Load"));
+    dialog->setNameFilter (_(name_filter));
+    dialog->setDirectory (QString (aud_get_path (AudPath::UserDir)));
+
+    QObject::connect (dialog, & QFileDialog::accepted, [this, dialog, parent] () {
+        auto urls = dialog->selectedUrls ();
+        String error;
+
+        if (urls.size () != 1)
+            return;
+
+        auto coverart_fid = urls[0].toEncoded ();
+
+        if (coverart_fid.length ())
+        {
+            int playlist = aud_playlist_get_playing ();
+            int position;
+
+            if (playlist == -1)
+                playlist = aud_playlist_get_active ();
+
+            position = aud_playlist_get_position (playlist);
+
+            if (position == -1)
+                return;
+
+            /* JWT:PUT THE IMAGE FILE INTO THE Comment FIELD & UPDATE FIELD AND IMAGE DISPLAYED: */
+            Tuple tuple = aud_playlist_entry_get_tuple (playlist, position, Playlist::Wait, & error);
+            tuple.set_str (Tuple::Comment, coverart_fid.constData ());
+            m_model->setData (this->createModelIndex (6, 1), coverart_fid.constData (), Qt::EditRole);
+            hook_call ("image change", aud::to_ptr (coverart_fid.constData ()));
+            dialog->deleteLater ();
+            window_bring_to_front (dialog);
+            return;
+        }
+        else
+        {
+            aud_ui_show_error (str_printf (_("Error loading %s."), coverart_fid.constData ()));
+        }
+    });
+
+    window_bring_to_front (dialog);
+}
+
+EXPORT bool InfoWidget::setData (const QModelIndex & index, const QVariant & value, int role)
+{
+    return m_model->setData (index, value, role);
+}
+
+EXPORT QModelIndex InfoWidget::createModelIndex (int row, int column)
+{
+    return m_model->QAbstractTableModel::index (row, column);
+}
+
 void InfoWidget::keyPressEvent (QKeyEvent * event)
 {
     if (event->type () == QEvent::KeyPress &&
@@ -215,7 +283,6 @@ bool InfoModel::updateFile () const
     if (! m_dirty)
         return true;
 
-    //x return aud_file_write_tuple (m_filename, m_plugin, m_tuple);
     if (aud_drct_get_record_enabled ())
     {
         String recording_file = aud_get_str ("filewriter", "_record_fid");
@@ -231,6 +298,8 @@ bool InfoModel::updateFile () const
     }
     if (! success)
         success = aud_file_write_tuple (m_filename, m_plugin, m_tuple);
+    if (success)
+        aud_playlist_rescan_selected (aud_playlist_get_active ());
 
     return success;
 }
@@ -252,6 +321,10 @@ bool InfoModel::setData (const QModelIndex & index, const QVariant & value, int 
     if (str.isEmpty ())
     {
         changed = m_tuple.is_set (map->field);
+        if (t == Tuple::String)
+            m_tuple.set_str (map->field, "");
+        else
+            m_tuple.set_int (map->field, -1);
         m_tuple.unset (map->field);
     }
     else if (t == Tuple::String)

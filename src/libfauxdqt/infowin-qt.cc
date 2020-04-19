@@ -108,19 +108,23 @@ public:
 
     void fillInfo (int playlist, int entry, const char * filename, const Tuple & tuple,
      PluginHandle * decoder, bool updating_enabled);
+    void displayImage (const char * filename);
+
+protected:
+    InfoWidget m_infowidget;
 
 private:
     String m_filename;
     QLabel m_image;
     TextWidget m_uri_label;
-    InfoWidget m_infowidget;
     QDialogButtonBox * bbox;
-
-    void displayImage (const char * filename);
 
     const HookReceiver<InfoWindow, const char *>
      art_hook {"art ready", this, & InfoWindow::displayImage};
 };
+
+static bool force_image;
+static void displayTupleImage (void * image_fn, void * hookarg);
 
 InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
 {
@@ -148,9 +152,12 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
     auto vbox = make_vbox (this);
     vbox->addLayout (hbox);
 
+    auto ArtLookupButton = new QPushButton (_("Art Lookup"), this);
+    ArtLookupButton->setIcon (get_icon ("document-open"));
     bbox = new QDialogButtonBox (QDialogButtonBox::Save | QDialogButtonBox::Close, this);
     bbox->button (QDialogButtonBox::Save)->setText (translate_str (N_("_Save")));
     bbox->button (QDialogButtonBox::Close)->setText (translate_str (N_("_Close")));
+    bbox->addButton (ArtLookupButton, QDialogButtonBox::ActionRole);
     vbox->addWidget (bbox);
 
     m_infowidget.linkEnabled (bbox->button (QDialogButtonBox::Save));
@@ -158,6 +165,11 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
     connect (bbox, & QDialogButtonBox::accepted, [this] () {
         m_infowidget.updateFile ();
         deleteLater ();
+    });
+
+    /* JWT:ADD AN [Art Lookup] BUTTON TO ALLOW USER TO SELECT ALBUM ART IMAGE FOR Tuple::Comment FIELD: */
+    connect (ArtLookupButton, & QPushButton::clicked, [this] () {
+        m_infowidget.show_coverart_dialog (this);
     });
 
     connect (bbox, & QDialogButtonBox::rejected, this, & QObject::deleteLater);
@@ -168,6 +180,7 @@ void InfoWindow::fillInfo (int playlist, int entry, const char * filename, const
 {
     m_filename = String (filename);
     m_uri_label.setText ((QString) uri_to_display (filename));
+    force_image = false;
     displayImage (filename);
     if (! updating_enabled)
         bbox->button (QDialogButtonBox::Save)->setDisabled (true);
@@ -176,11 +189,25 @@ void InfoWindow::fillInfo (int playlist, int entry, const char * filename, const
 
 void InfoWindow::displayImage (const char * filename)
 {
-    if (! strcmp_safe (filename, m_filename))
+    if (force_image || ! strcmp_safe (filename, m_filename))
+    {
         m_image.setPixmap (art_request (filename, 2 * sizes.OneInch, 2 * sizes.OneInch));
+        force_image = false;
+    }
 }
 
 static InfoWindow * s_infowin = nullptr;
+
+/* JWT:IMMEDIATELY DISPLAY ART IMAGE USER SELECTS WITH THE [Art Lookup] BUTTON (SO USER CAN SEE IT): */
+static void displayTupleImage (void * image_fn, void * hookarg)
+{
+    if (s_infowin && image_fn && strstr ((const char *) image_fn, "://"))
+    {
+        force_image = true;
+        s_infowin->displayImage ((const char *) image_fn);
+        window_bring_to_front (s_infowin);
+    }
+}
 
 static void show_infowin (int playlist, int entry, const char * filename,
  const Tuple & tuple, PluginHandle * decoder, bool can_write)
@@ -189,8 +216,10 @@ static void show_infowin (int playlist, int entry, const char * filename,
     {
         s_infowin = new InfoWindow;
         s_infowin->setAttribute (Qt::WA_DeleteOnClose);
+        hook_associate ("image change", displayTupleImage, nullptr);
 
         QObject::connect (s_infowin, & QObject::destroyed, [] () {
+            hook_dissociate ("image change", displayTupleImage, nullptr);
             s_infowin = nullptr;
         });
     }
