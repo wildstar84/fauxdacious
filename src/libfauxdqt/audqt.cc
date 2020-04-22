@@ -79,6 +79,9 @@ EXPORT void init ()
     QApplication::setFont (QApplication::font ("QTipLabel"), "QStatusBar");
 #endif
 
+    if (aud_get_bool ("qtui", "equalizer_visible"))
+        equalizer_show ();
+
     log_init ();
 }
 
@@ -97,6 +100,8 @@ EXPORT void cleanup ()
     if (-- init_count)
         return;
 
+    bool equalizer_was_visible = aud_get_bool ("qtui", "equalizer_visible");
+
     aboutwindow_hide ();
     eq_presets_hide ();
     equalizer_hide ();
@@ -105,6 +110,8 @@ EXPORT void cleanup ()
     log_inspector_hide ();
     prefswin_hide ();
     queue_manager_hide ();
+    if (equalizer_was_visible)
+        aud_set_bool ("qtui", "equalizer_visible", true);
 
     log_cleanup ();
 

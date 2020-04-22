@@ -256,11 +256,24 @@ EXPORT void equalizer_show ()
         s_equalizer->setAttribute (Qt::WA_DeleteOnClose);
 
         QObject::connect (s_equalizer, & QObject::destroyed, [] () {
+            aud_set_int ("qtui", "equalizer_x", s_equalizer->geometry().x());
+            aud_set_int ("qtui", "equalizer_y", s_equalizer->geometry().y());
+            aud_set_bool ("qtui", "equalizer_visible", false);
             s_equalizer = nullptr;
         });
+
+        int x = aud_get_int ("qtui", "equalizer_x");
+        int y = aud_get_int ("qtui", "equalizer_y");
+        if (y <= 0)
+            y = 25; /* JWT:MAKE SURE THE WINDOW TITLEBAR (WHICH USUALLY ALLOWS abUSER TO MOVE) ISN'T OFF THE SCREEN!: */
+        s_equalizer->move (x, y);
     }
 
-    window_bring_to_front (s_equalizer);
+    if (s_equalizer)
+    {
+        aud_set_bool ("qtui", "equalizer_visible", true);
+        window_bring_to_front (s_equalizer);
+    }
 }
 
 EXPORT void equalizer_hide ()

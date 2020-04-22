@@ -156,6 +156,7 @@ static void destroy_cb ()
     hook_dissociate ("set equalizer_preamp", (HookFunction) update_sliders);
     hook_dissociate ("set equalizer_autoload", (HookFunction) autobtn_update);
     hook_dissociate ("set equalizer_songauto", (HookFunction) presetbtn_update);
+    aud_set_bool ("gtkui", "equalizer_visible", false);
 }
 
 static GtkWidget * create_window ()
@@ -226,9 +227,12 @@ EXPORT void audgui_show_equalizer_window ()
 {
     if (! audgui_reshow_unique_window (AUDGUI_EQUALIZER_WINDOW))
         audgui_show_unique_window (AUDGUI_EQUALIZER_WINDOW, create_window ());
+
+    aud_set_bool ("gtkui", "equalizer_visible", true);
 }
 
 EXPORT void audgui_hide_equalizer_window ()
 {
     audgui_hide_unique_window (AUDGUI_EQUALIZER_WINDOW);
+    aud_set_bool ("gtkui", "equalizer_visible", false);
 }
