@@ -227,7 +227,7 @@ static void infowin_update_tuple ()
     set_field_int_from_entry (current_tuple, Tuple::Track, widgets.track);
 
     /* JWT:IF RECORDING ON, SAVE THE TAG DATA EDITS TO THE FILE BEING RECORDED! */
-    if (aud_drct_get_record_enabled ())
+    if (aud_get_bool (nullptr, "record"))
     {
         String recording_file = aud_get_str ("filewriter", "_record_fid");
         if (recording_file && recording_file[0])
@@ -394,9 +394,12 @@ static GtkWidget * coverart_file_entry_new (GtkFileChooserAction action, const c
 {
     GtkWidget * entry = gtk_entry_new ();
 
-    gtk_entry_set_icon_from_icon_name ((GtkEntry *) entry,
-     GTK_ENTRY_ICON_SECONDARY, "document-open");
-    g_signal_connect (entry, "icon-press", (GCallback) coverart_entry_browse_cb, _("File"));
+    if (aud_get_bool (nullptr, "user_tag_data"))
+    {
+        gtk_entry_set_icon_from_icon_name ((GtkEntry *) entry,
+         GTK_ENTRY_ICON_SECONDARY, "document-open");
+        g_signal_connect (entry, "icon-press", (GCallback) coverart_entry_browse_cb, _("File"));
+    }
 
     return entry;
 }
@@ -584,7 +587,7 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
     Tuple tuple = decoder ? aud_playlist_entry_get_tuple (playlist, entry,
      Playlist::Wait, & error) : Tuple ();
 
-    if (aud_drct_get_record_enabled ())  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
+    if (aud_get_bool (nullptr, "record"))  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
     {
         filename = aud_get_str ("filewriter", "_record_fid");
         VFSFile file (filename, "r");
@@ -613,6 +616,7 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
 
 EXPORT void audgui_infowin_show_current ()
 {
+AUDERR("--audgui_infowin_show_current called...\n");
     int playlist = aud_playlist_get_playing ();
     int position;
 
@@ -621,6 +625,7 @@ EXPORT void audgui_infowin_show_current ()
 
     position = aud_playlist_get_position (playlist);
 
+AUDERR("--POSITION=%d=\n", position);
     if (position == -1)
         return;
 

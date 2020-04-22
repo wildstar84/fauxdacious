@@ -667,11 +667,6 @@ PrefsWindow::PrefsWindow () :
     setWindowTitle (_("Fauxdacious Settings"));
     setContentsMargins (0, 0, 0, 0);
 
-    output_config_button->setAutoDefault (false);
-    output_about_button->setAutoDefault (false);
-    record_config_button->setAutoDefault (false);
-    record_about_button->setAutoDefault (false);
-
     QToolBar * toolbar = new QToolBar;
     toolbar->setToolButtonStyle (Qt::ToolButtonTextUnderIcon);
 
@@ -775,13 +770,13 @@ void PrefsWindow::record_setup ()
     });
 
     QObject::connect (record_config_button, & QPushButton::clicked, [] (bool) {
-        /* JWT:REMOVED CONDITION TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: if (aud_drct_get_record_enabled ()) */
-        plugin_prefs (aud_drct_get_record_plugin ());
+        if (aud_drct_get_record_enabled ())
+            plugin_prefs (aud_drct_get_record_plugin ());
     });
 
     QObject::connect (record_about_button, & QPushButton::clicked, [] (bool) {
-        /* JWT:REMOVED CONDITION TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: if (aud_drct_get_record_enabled ()) */
-        plugin_about (aud_drct_get_record_plugin ());
+        if (aud_drct_get_record_enabled ())
+            plugin_about (aud_drct_get_record_plugin ());
     });
 }
 
@@ -792,15 +787,13 @@ void PrefsWindow::record_update ()
     if (p && ! aud_get_stdout_fmt ())  // JWT:MAKE SURE WE DON'T HAVE FILEWRITER AS PRIMARY!
     {
         bool enabled = aud_drct_get_record_enabled ();
-        auto text = str_printf (_("Record audio stream using %s"), aud_plugin_get_name (p));
+        auto text = str_printf (_("Enable audio stream recording with %s"), aud_plugin_get_name (p));
 
         record_checkbox->setEnabled (true);
         record_checkbox->setText ((const char *) text);
         record_checkbox->setChecked (enabled);
-        /* JWT:CHGD. TO NEXT TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: record_config_button->setEnabled (enabled && aud_plugin_has_configure (p));
-        record_about_button->setEnabled (enabled && aud_plugin_has_about (p)); */
-        record_config_button->setEnabled (aud_plugin_has_configure (p));
-        record_about_button->setEnabled (aud_plugin_has_about (p));
+        record_config_button->setEnabled (enabled && aud_plugin_has_configure (p));
+        record_about_button->setEnabled (enabled && aud_plugin_has_about (p));
     }
     else
     {
@@ -814,7 +807,6 @@ void PrefsWindow::record_update ()
 
 void PrefsWindow::prefswindow_update ()
 {
-	//JWT: AUDERR("XXXXXX UPDATE PREFS WINDOW XXXXXX\n");
 	s_plugin_view->repaint ();
 }
 

@@ -233,12 +233,10 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
                 return;
 
             /* JWT:PUT THE IMAGE FILE INTO THE Comment FIELD & UPDATE FIELD AND IMAGE DISPLAYED: */
-            Tuple tuple = aud_playlist_entry_get_tuple (playlist, position, Playlist::Wait, & error);
-            tuple.set_str (Tuple::Comment, coverart_fid.constData ());
             m_model->setData (this->createModelIndex (6, 1), coverart_fid.constData (), Qt::EditRole);
             hook_call ("image change", aud::to_ptr (coverart_fid.constData ()));
             dialog->deleteLater ();
-            window_bring_to_front (dialog);
+
             return;
         }
         else
@@ -283,7 +281,7 @@ bool InfoModel::updateFile () const
     if (! m_dirty)
         return true;
 
-    if (aud_drct_get_record_enabled ())
+    if (aud_get_bool (nullptr, "record"))
     {
         String recording_file = aud_get_str ("filewriter", "_record_fid");
         if (recording_file && recording_file[0])
@@ -298,8 +296,6 @@ bool InfoModel::updateFile () const
     }
     if (! success)
         success = aud_file_write_tuple (m_filename, m_plugin, m_tuple);
-    if (success)
-        aud_playlist_rescan_selected (aud_playlist_get_active ());
 
     return success;
 }

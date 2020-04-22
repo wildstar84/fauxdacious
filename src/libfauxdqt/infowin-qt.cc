@@ -154,6 +154,7 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
 
     auto ArtLookupButton = new QPushButton (_("Art Lookup"), this);
     ArtLookupButton->setIcon (get_icon ("document-open"));
+    ArtLookupButton->setEnabled (aud_get_bool (nullptr, "user_tag_data"));
     bbox = new QDialogButtonBox (QDialogButtonBox::Save | QDialogButtonBox::Close, this);
     bbox->button (QDialogButtonBox::Save)->setText (translate_str (N_("_Save")));
     bbox->button (QDialogButtonBox::Close)->setText (translate_str (N_("_Close")));
@@ -241,7 +242,7 @@ EXPORT void infowin_show (int playlist, int entry)
     Tuple tuple = decoder ? aud_playlist_entry_get_tuple (playlist, entry,
      Playlist::Wait, & error) : Tuple ();
 
-    if (aud_drct_get_record_enabled ())  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
+    if (aud_get_bool (nullptr, "record"))  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
     {
         filename = aud_get_str ("filewriter", "_record_fid");
         AUDDBG ("-infowin_show: RECORDING FID=%s=\n", (const char *) filename);

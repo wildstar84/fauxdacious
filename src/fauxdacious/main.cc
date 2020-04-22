@@ -54,6 +54,7 @@
 bool jwt_norepeat = false;  /* JWT:SAVE PRE-CONFIGURED STATES IF WE OR CMD-LINES ALTER (MAKE ONE-SHOT ONLY). */
 bool resetEqState;          /* JWT:SAVE EQUALIZER STATE FOR RESET IF USER FORCES IT TEMPORARILY ON. */
 bool resetRepeatToOn;       /* JWT:SAVE REPEAT STATUS FOR RESET IF STDIN-PIPING FORCES IT TEMPORARILY OFF. */
+bool resetRecordEnabled;    /* JWT:SAVE RECORDING-ENABLED STATUS (IF -R FORCES IT ON) */
 
 static struct {
     int help, version;
@@ -427,7 +428,7 @@ static void do_commands ()
     {
         if (options.headless)  // JWT:IF HEADLESS AND PIPING TO STDOUT, THEN QUIT WHEN DONE!
             options.quit_after_play = 1;
-        if (out_ext[0])
+        if (out_ext && out_ext[0])
         {
             int outstd = aud_get_int ("filewriter", (const char *) str_concat ({"have_", (const char *) out_ext}));
             if (outstd > 0)
@@ -443,7 +444,18 @@ static void do_commands ()
             aud_set_stdout_fmt (1);
     }
     else if (options.force_recording)
-        aud_drct_enable_record (1);  // JWT:USER WANTS TO START WITH RECORDING ON (GREAT FOR RECORDING FROM STDIN!)!
+    {
+        resetRecordEnabled = aud_drct_get_record_enabled ();
+        aud_drct_enable_record (true);
+        if (aud_drct_get_record_enabled ())
+            aud_set_bool (nullptr, "record", true);
+        else
+        {
+            aud_set_bool (nullptr, "record", false);
+            resetRecordEnabled = false;
+            AUDERR ("e:Stream recording must be configured in Audio, -R ignored!\n");
+        }
+    }
 
     if (filenames.len ())
     {
@@ -618,7 +630,8 @@ int main (int argc, char * * argv)
         SDL_QuitSubSystem (SDL_INIT_VIDEO);  // SDL DOCS SAY SDL_Quit () SAFE, BUT SEGFAULTS HERE?!
 #endif
 
-    aud_drct_enable_record (0);  // JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
+    aud_set_bool (nullptr, "record", false);  // JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
+
 #ifdef USE_DBUS
     dbus_server_cleanup ();
 #endif
@@ -629,6 +642,8 @@ int main (int argc, char * * argv)
         aud_set_bool (nullptr, "repeat", resetRepeatToOn);
     if (options.outstd)
         aud_set_int (nullptr, "stdout_fmt", 0);
+    if (options.force_recording)
+        aud_drct_enable_record (resetRecordEnabled);
 
     aud_cleanup ();
     initted = false;

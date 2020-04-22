@@ -806,8 +806,8 @@ static void * record_create_config_button ()
 {
     auto do_config = [] (void *)
     {
-        /* JWT:REMOVED CONDITION TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: if (aud_drct_get_record_enabled ()) */
-        audgui_show_plugin_prefs (aud_drct_get_record_plugin ());
+        if (aud_drct_get_record_enabled ())
+            audgui_show_plugin_prefs (aud_drct_get_record_plugin ());
     };
 
     return (record_config_button = audgui_button_new (_("_Settings"),
@@ -818,8 +818,8 @@ static void * record_create_about_button ()
 {
     auto do_about = [] (void *)
     {
-        /* JWT:REMOVED CONDITION TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: if (aud_drct_get_record_enabled ()) */
-        audgui_show_plugin_about (aud_drct_get_record_plugin ());
+        if (aud_drct_get_record_enabled ())
+            audgui_show_plugin_about (aud_drct_get_record_plugin ());
     };
 
     return (record_about_button = audgui_button_new (_("_About"), "help-about",
@@ -836,12 +836,10 @@ static void record_update (void * = nullptr, void * = nullptr)
 
         gtk_widget_set_sensitive (record_checkbox, true);
         gtk_button_set_label ((GtkButton *) record_checkbox,
-         str_printf (_("Record audio stream using %s"), aud_plugin_get_name (p)));
+         str_printf (_("Enable audio stream recording with %s"), aud_plugin_get_name (p)));
         gtk_toggle_button_set_active ((GtkToggleButton *) record_checkbox, enabled);
-        /* JWT:CHGD. TO NEXT TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: gtk_widget_set_sensitive (record_config_button, enabled && aud_plugin_has_configure (p)); */
-        gtk_widget_set_sensitive (record_config_button, aud_plugin_has_configure (p));
-        /* JWT:CHGD. TO NEXT TO ALLOW CONFIG CHG. W/O ACTUALLY RECORDING: gtk_widget_set_sensitive (record_about_button, enabled && aud_plugin_has_about (p)); */
-        gtk_widget_set_sensitive (record_about_button, aud_plugin_has_about (p));
+        gtk_widget_set_sensitive (record_config_button, enabled && aud_plugin_has_configure (p));
+        gtk_widget_set_sensitive (record_about_button, enabled && aud_plugin_has_about (p));
     }
     else
     {
