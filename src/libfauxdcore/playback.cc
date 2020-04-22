@@ -306,7 +306,9 @@ static void run_playback ()
     if (! pb_info.filename || ! pb_info.tuple.valid () || ! dec.ip ||
      (! dec.ip->input_info.keys[InputKey::Scheme] && ! dec.file))
     {
-        pb_info.error = true;
+        // JWT:ONLY *SHOW* ERROR MSG. IF (!stdin || NO INPUT PLUGIN) B/C WE'RE JUST PIPING IN A PLAYLIST!
+        if (strcmp_safe (pb_info.filename, "stdin://", 8) || dec.ip)
+            pb_info.error = true;
         pb_info.error_s = std::move (dec.error);
         unlock ();
         return;
@@ -373,7 +375,7 @@ static void finish_playback_locked ()
             aud_ui_show_error (str_printf (_("Error playing %s:\n%s"),
              (const char *) pb_info.filename, (const char *) pb_info.error_s));
         else
-            AUDERR ("Playback finished with error.\n");
+            AUDERR ("Playback of %s finished with error (no msg given).\n", (const char *) pb_info.filename);
     }
     else
         failed_entries = 0;
