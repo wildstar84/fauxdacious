@@ -97,6 +97,9 @@ public:
 
         /* Title formatted for display; input plugins do not need to set this field */
         FormattedTitle,
+        Description,           /* Track description */
+        MusicBrainzID,         /* MusicBrainz identifier */
+        Lyrics,       /* JWT:Lyrics from id3 tags. */
 
         n_fields
     };
