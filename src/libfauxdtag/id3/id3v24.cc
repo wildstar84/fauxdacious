@@ -55,6 +55,7 @@ enum
     ID3_TXXX,
     ID3_RVA2,
     ID3_APIC,
+    ID3_LYRICS,
     ID3_TAGS_NO
 };
 
@@ -75,7 +76,8 @@ static const char * id3_frames[ID3_TAGS_NO] = {
     "TDRC",
     "TXXX",
     "RVA2",
-    "APIC"
+    "APIC",
+    "USLT"
 };
 
 #pragma pack(push) /* must be byte-aligned */
@@ -611,6 +613,9 @@ bool ID3v24TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
           case ID3_APIC:
             if (image)
                 * image = id3_decode_picture (& frame[0], frame.len ());
+            break;
+          case ID3_LYRICS:
+            id3_decode_lyrics (tuple, & frame[0], frame.len ());
             break;
           default:
             AUDDBG ("Ignoring unsupported ID3 frame %s.\n", (const char *) frame.key);

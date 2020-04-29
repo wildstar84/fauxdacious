@@ -169,6 +169,24 @@ void id3_decode_comment (Tuple & tuple, const char * data, int size)
         tuple.set_str (Tuple::Comment, value);
 }
 
+void id3_decode_lyrics (Tuple & tuple, const char * data, int size)
+{
+    if (size < 4)
+        return;
+
+    int before_nul, after_nul;
+    id3_strnlen (data + 4, size - 4, data[0], & before_nul, & after_nul);
+
+    const char * lang = data + 1;
+    StringBuf type = id3_convert (data + 4, before_nul, data[0]);
+    StringBuf value = id3_convert (data + 4 + after_nul, size - 4 - after_nul, data[0]);
+
+    AUDDBG ("Lyrics: lang = %.3s, type = %s, value = %s.\n", lang, (const char *) type, (const char *) value);
+
+    if (type && ! type[0] && value) /* blank type = actual comment */
+        tuple.set_str (Tuple::Lyrics, (const char *) value);
+}
+
 static bool decode_rva_block (const char * * _data, int * _size,
  int * channel, int * adjustment, int * adjustment_unit, int * peak,
  int * peak_unit)
