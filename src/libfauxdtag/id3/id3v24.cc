@@ -519,6 +519,32 @@ static void add_comment_frame (const char * text, FrameDict & dict)
     g_free (utf16);
 }
 
+static void add_lyrics_frame (const char * text, FrameDict & dict)
+{
+    if (! text)
+    {
+        remove_frame (ID3_LYRICS, dict);
+        return;
+    }
+
+    AUDDBG ("Adding lyrics frame = %s.\n", text);
+
+    long words;
+    uint16_t * utf16 = g_utf8_to_utf16 (text, -1, nullptr, & words, nullptr);
+    g_return_if_fail (utf16);
+
+    GenericFrame & frame = add_generic_frame (ID3_LYRICS, 10 + 2 * words, dict);
+
+    frame[0] = 1;                              /* UTF-16 encoding */
+    memcpy (& frame[1], "eng", 3);             /* language */
+    * (uint16_t *) (& frame[4]) = 0xfeff;      /* byte order mark */
+    * (uint16_t *) (& frame[6]) = 0;           /* end of content description */
+    * (uint16_t *) (& frame[8]) = 0xfeff;      /* byte order mark */
+    memcpy (& frame[10], utf16, 2 * words);
+
+    g_free (utf16);
+}
+
 static void add_frameFromTupleStr (const Tuple & tuple, Tuple::Field field,
  int id3_field, FrameDict & dict)
 {
@@ -663,6 +689,9 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
 
     String comment = tuple.get_str (Tuple::Comment);
     add_comment_frame (comment, dict);
+    String lyrics = tuple.get_str (Tuple::Lyrics);
+    if (lyrics && lyrics[9])
+        add_lyrics_frame (lyrics, dict);
 
     /* location and size of non-tag data */
     int64_t mp3_offset = offset ? 0 : header_size + data_size + footer_size;
