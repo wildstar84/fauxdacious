@@ -148,7 +148,7 @@ QVariant PluginListModel::data (const QModelIndex & index, int role) const
     {
     case NameColumn:
         if (role == Qt::DisplayRole)
-            return QString (aud_plugin_get_name (p));
+            return QString (aud_plugin_get_title (p));
         if (role == Qt::CheckStateRole)
             return enabled ? Qt::Checked : Qt::Unchecked;
 

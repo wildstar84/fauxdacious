@@ -637,6 +637,11 @@ EXPORT const char * aud_plugin_get_name (PluginHandle * plugin)
     return dgettext (plugin->domain, plugin->name);
 }
 
+EXPORT const char * aud_plugin_get_title (PluginHandle * plugin)  /* JWT:ADDED FOR DISPLAYING FULL NAME TO USER */
+{
+    return str_concat ({dgettext (plugin->domain, plugin->name), " [", plugin->basename, "]"});
+}
+
 EXPORT bool aud_plugin_has_about (PluginHandle * plugin)
 {
     return plugin->has_about;

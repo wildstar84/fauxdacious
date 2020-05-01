@@ -94,8 +94,8 @@ static void add_to_list (GtkTreeModel * model, PluginHandle * p)
     GtkTreeIter iter;
     gtk_list_store_append ((GtkListStore *) model, & iter);
     gtk_list_store_set ((GtkListStore *) model, & iter, PVIEW_COL_NODE, n,
-     PVIEW_COL_ENABLED, aud_plugin_get_enabled (p), PVIEW_COL_NAME,
-     aud_plugin_get_name (p), -1);
+            PVIEW_COL_ENABLED, aud_plugin_get_enabled (p), PVIEW_COL_NAME,
+            aud_plugin_get_title (p), -1);
 
     n->p = p;
     n->model = model;
