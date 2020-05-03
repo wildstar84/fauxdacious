@@ -295,6 +295,16 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
         tuple.set_str (Tuple::Comment, instr);
     else
         tuple.unset (Tuple::Comment);
+    instr = g_key_file_get_string (rcfile, song_filename, "Composer", nullptr);
+    if (instr)
+        tuple.set_str (Tuple::Composer, instr);
+    else
+        tuple.unset (Tuple::Composer);
+    instr = g_key_file_get_string (rcfile, song_filename, "Performer", nullptr);
+    if (instr)
+        tuple.set_str (Tuple::Performer, instr);
+    else
+        tuple.unset (Tuple::Performer);
     instr = g_key_file_get_string (rcfile, song_filename, "Genre", nullptr);
     if (instr)
         tuple.set_str (Tuple::Genre, instr);
@@ -430,6 +440,12 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 tfld = (const char *) which_tuple->get_str (Tuple::Comment);
                 if (tfld)
                     tuple.set_str (Tuple::Comment, tfld);
+                tfld = (const char *) which_tuple->get_str (Tuple::Composer);
+                if (tfld)
+                    tuple.set_str (Tuple::Composer, tfld);
+                tfld = (const char *) which_tuple->get_str (Tuple::Performer);
+                if (tfld)
+                    tuple.set_str (Tuple::Performer, tfld);
                 tfld = (const char *) which_tuple->get_str (Tuple::Genre);
                 if (tfld)
                     tuple.set_str (Tuple::Genre, tfld);
@@ -498,6 +514,28 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                     {
                         tfld = (const char *) bkup_tuple->get_str (Tuple::Comment);
                         if (tfld)  tuple.set_str (Tuple::Comment, tfld);
+                    }
+                }
+                tfld = (const char *) new_tuple.get_str (Tuple::Composer);
+                if (! tfld)
+                {
+                    tfld = (const char *) which_tuple->get_str (Tuple::Composer);
+                    if (tfld)  tuple.set_str (Tuple::Composer, tfld);
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::Composer);
+                        if (tfld)  tuple.set_str (Tuple::Composer, tfld);
+                    }
+                }
+                tfld = (const char *) new_tuple.get_str (Tuple::Performer);
+                if (! tfld)
+                {
+                    tfld = (const char *) which_tuple->get_str (Tuple::Performer);
+                    if (tfld)  tuple.set_str (Tuple::Performer, tfld);
+                    else if (bkup_tuple)
+                    {
+                        tfld = (const char *) bkup_tuple->get_str (Tuple::Performer);
+                        if (tfld)  tuple.set_str (Tuple::Performer, tfld);
                     }
                 }
                 tfld = (const char *) new_tuple.get_str (Tuple::Genre);
@@ -625,6 +663,12 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
     tfld = (const char *) tuple.get_str (Tuple::Comment);
     if (tfld)
         g_key_file_set_string (rcfile, song_key_const, "Comment", tfld);
+    tfld = (const char *) tuple.get_str (Tuple::Composer);
+    if (tfld)
+        g_key_file_set_string (rcfile, song_key_const, "Composer", tfld);
+    tfld = (const char *) tuple.get_str (Tuple::Performer);
+    if (tfld)
+        g_key_file_set_string (rcfile, song_key_const, "Performer", tfld);
     tfld = (const char *) tuple.get_str (Tuple::Genre);
     if (tfld)
         g_key_file_set_string (rcfile, song_key_const, "Genre", tfld);
@@ -656,7 +700,6 @@ EXPORT bool aud_file_write_tuple (const char * filename,
 
     auto ip = (InputPlugin *) aud_plugin_get_header (decoder);
     if (! ip)
-        //return false;
         success = false;
 
     if (success)
@@ -674,7 +717,7 @@ EXPORT bool aud_file_write_tuple (const char * filename,
 
             return success;
         }
-        else
+        else if (! strncmp (filename, "file://", 7) && ! aud_get_bool (nullptr, "record"))  // FILE IS A FILE:
         {
             VFSFile file;
 
@@ -691,23 +734,28 @@ EXPORT bool aud_file_write_tuple (const char * filename,
             if (success && file && file.fflush () != 0)
                 success = false;
 
-            if (success && aud_get_bool (nullptr, "user_tag_data"))
+            if (success && aud_get_bool (nullptr, "user_tag_data") && ! aud_get_bool (nullptr, "_user_tag_skipthistime"))
             {
                 /* JWT:IF COMMENT IS AN ART IMAGE FILE, FORCE A WRITE TO TAG FILE ALSO (OTHERWISE, ART WON'T
-                    BE PICKED UP AS TUPLE.COMMENT CAN ONLY BE CHECKED IN TAG FILES, NOT THE MP3 ITSELF)! */
+                    BE PICKED UP AS TUPLE.COMMENT CAN ONLY BE CHECKED IN TAG FILES, NOT THE MP3 ITSELF)!
+                    NOTE:  WE NOW SKIP THIS IF WE WERE ABLE TO WRITE THE IMAGE INTO AN ID3V24 TAG!
+                */
                 String TupleComment = tuple.get_str (Tuple::Comment);
                 if (TupleComment && TupleComment[0] && ! strncmp ((const char *) TupleComment, "file://", 7))
-                        success = false;
+                    success = false;
             }
+            aud_set_bool (nullptr, "_user_tag_skipthistime", false);
         }
+        else
+            success = false;
     }
-    /* JWT:IF CAN'T SAVE TAGS TO FILE (IE. STREAM), TRY SAVING TO USER'S CONFIG: */
+    /* JWT:IF CAN'T SAVE TAGS TO FILE (IE. STREAM, RECORDING), TRY SAVING TO USER'S CONFIG: */
     if (! success && aud_get_bool (nullptr, "user_tag_data"))
     {
         if (! strncmp (filename, "file://", 7))
         {
             int user_tag_data_options = aud_get_int (nullptr, "user_tag_data_options");
-            if (user_tag_data_options == 2)  //Individual tag file (filename.tag):
+            if (user_tag_data_options == 2)  //use Individual tag file (filename.tag):
             {
                 StringBuf tag_fid = uri_to_filename (filename);
                 StringBuf path = filename_get_parent (tag_fid);
@@ -715,7 +763,7 @@ EXPORT bool aud_file_write_tuple (const char * filename,
                         (const char *) filename_to_uri (str_concat ({path, "/", filename_get_base (tag_fid),
                         ".tag"})));
             }
-            else if (user_tag_data_options == 1)  //Individual tag file (filename.tag):
+            else if (user_tag_data_options == 1)  //use Directory-specific tag file (./user_tag_data.tag):
             {
                 StringBuf tag_fid = uri_to_filename (filename);
                 StringBuf path = filename_get_parent (tag_fid);
@@ -723,7 +771,7 @@ EXPORT bool aud_file_write_tuple (const char * filename,
                         (const char *) filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
             }
         }
-        if (! success)
+        if (! success)  //use Global tag file (ie. for streams/URLs):
             success = aud_write_tag_to_tagfile (filename, tuple, "user_tag_data");
     }
 

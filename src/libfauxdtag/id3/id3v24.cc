@@ -545,6 +545,27 @@ static void add_lyrics_frame (const char * text, FrameDict & dict)
     g_free (utf16);
 }
 
+static void add_picture_frame (const char * data, int size, FrameDict & dict, const char * mime, int mimelen)
+{
+    if (! data || size <= 0)
+        return;
+
+    remove_frame (ID3_APIC, dict);
+
+    AUDDBG ("Adding image frame\n");
+
+    GenericFrame & frame = add_generic_frame (ID3_APIC, size + mimelen + 17, dict);
+
+    frame[0] = 3;                              /* UTF-16 encoding */
+    memcpy (& frame[1], mime, mimelen);     /* mime/type */
+    frame[mimelen+1] = 0;
+    frame[mimelen+2] = 0;
+    //memcpy (& frame[13], (const char *) str_to_utf8 ("\"Album cover\"", -1), 13);
+    memcpy (& frame[mimelen+3], "\"Album cover\"", 13);
+    frame[mimelen+16] = 0;
+    memcpy (& frame[mimelen+17], data, size);
+}
+
 static void add_frameFromTupleStr (const Tuple & tuple, Tuple::Field field,
  int id3_field, FrameDict & dict)
 {
@@ -688,7 +709,28 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
     add_frameFromTupleStr (tuple, Tuple::Genre, ID3_GENRE, dict);
 
     String comment = tuple.get_str (Tuple::Comment);
-    add_comment_frame (comment, dict);
+    if (comment && comment[0] && ! strncmp ((const char *) comment, "file://", 7))
+    {
+        VFSFile file (comment, "r");  /* JWT:ASSUME COMMENT IS AN IMAGE FILE FROM SONG-INFO EDITS!: */
+        if (file)
+        {
+            Index<char> data = file.read_all ();
+            if (data.len () > 499)  /* JWT:SANITY-CHECK: ANY VALID ART IMAGE SHOULD BE BIGGER THAN THIS! */
+            {
+                if (str_has_suffix_nocase ((const char *) comment, ".png"))
+                    add_picture_frame (data.begin (), data.len (), dict, "image/png", 9);
+                else if (str_has_suffix_nocase ((const char *) comment, ".gif"))
+                    add_picture_frame (data.begin (), data.len (), dict, "image/gif", 9);
+                else  // DEFAULT TO JPEG, AS THIS SEEMS TO WORK FOR MOST STUFF ANYWAY!:
+                    add_picture_frame (data.begin (), data.len (), dict, "image/jpeg", 10);
+
+                aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
+            }
+        }
+    }
+    else
+        add_comment_frame (comment, dict);
+
     String lyrics = tuple.get_str (Tuple::Lyrics);
     if (lyrics && lyrics[9])
         add_lyrics_frame (lyrics, dict);

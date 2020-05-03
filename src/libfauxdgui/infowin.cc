@@ -222,7 +222,7 @@ static void infowin_update_tuple ()
     set_field_str_from_entry (current_tuple, Tuple::AlbumArtist, widgets.album_artist);
     set_field_str_from_entry (current_tuple, Tuple::Comment, widgets.comment);
     set_field_str_from_entry (current_tuple, Tuple::Genre,
-     gtk_bin_get_child ((GtkBin *) widgets.genre));
+            gtk_bin_get_child ((GtkBin *) widgets.genre));
     set_field_int_from_entry (current_tuple, Tuple::Year, widgets.year);
     set_field_int_from_entry (current_tuple, Tuple::Track, widgets.track);
 
@@ -385,7 +385,7 @@ static void coverart_entry_browse_cb (GtkWidget * entry, GtkEntryIconPosition po
 
     g_signal_connect (dialog, "response", (GCallback) coverart_entry_response_cb, entry);
     g_signal_connect_object (entry, "destroy", (GCallback) gtk_widget_destroy,
-     dialog, G_CONNECT_SWAPPED);
+            dialog, G_CONNECT_SWAPPED);
 
     gtk_widget_show (dialog);
 }
@@ -394,12 +394,9 @@ static GtkWidget * coverart_file_entry_new (GtkFileChooserAction action, const c
 {
     GtkWidget * entry = gtk_entry_new ();
 
-    if (aud_get_bool (nullptr, "user_tag_data"))
-    {
-        gtk_entry_set_icon_from_icon_name ((GtkEntry *) entry,
-         GTK_ENTRY_ICON_SECONDARY, "document-open");
-        g_signal_connect (entry, "icon-press", (GCallback) coverart_entry_browse_cb, _("File"));
-    }
+    gtk_entry_set_icon_from_icon_name ((GtkEntry *) entry,
+            GTK_ENTRY_ICON_SECONDARY, "document-open");
+    g_signal_connect (entry, "icon-press", (GCallback) coverart_entry_browse_cb, _("File"));
 
     return entry;
 }

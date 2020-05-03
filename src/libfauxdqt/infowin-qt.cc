@@ -154,7 +154,6 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
 
     auto ArtLookupButton = new QPushButton (_("Art Lookup"), this);
     ArtLookupButton->setIcon (get_icon ("document-open"));
-    ArtLookupButton->setEnabled (aud_get_bool (nullptr, "user_tag_data"));
     bbox = new QDialogButtonBox (QDialogButtonBox::Save | QDialogButtonBox::Close, this);
     bbox->button (QDialogButtonBox::Save)->setText (translate_str (N_("_Save")));
     bbox->button (QDialogButtonBox::Close)->setText (translate_str (N_("_Close")));
