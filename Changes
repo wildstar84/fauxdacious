@@ -11,7 +11,9 @@ been doing a titanic amount of work under the hood that would require
 immense labor on my part to merge into our now widely-different codesets that 
 don't seem to actually improve functionality.  Some support some new Qt plugins 
 / features such as their searchtool plugin, and a new album-advance feature 
-that I won't use or need.
+that I won't use or need.  Oh, never mind - Audacious has recently been 
+rejecting some user-requests that I think are cool ideas, so it's gotten me 
+busy again! :D
 
 * One new fauxdacious-specific feature I have added to the StreamTuner plugin 
 is grabbing image thumbnails for stations selected via StreamTuner and 
@@ -30,6 +32,42 @@ adjusting the time slider (closes Audacious bug# 950).
 
 * Merging various Audacious tweaks (mostly minor bugfixes and Qt changes).
 
+* Added cover-art file-selector button to the "Song Info" window on the 
+Qt side.  Also disabled the button on both sides when the [Settings].
+[Song Info]."Save unsaveable metadata to (tag) file" option isn't checked, 
+as fetching album art from the Tuple::Comment field ONLY works when it's 
+in a tag file, NOT embedded in the song file's metadata!
+
+* Merged a massive Audacious change to the "recording/dubbing" API from back 
+in 2017, since some of our changes were causing seg-faults and needed these 
+changes to work correctly.
+
+* Added option to the Lyricwiki plugin to save fetched lyrics directly into 
+the id3v24 tags in mp3 files (Audacious-rejected feature #977 and 
+Audacious-ignored request #752).  
+
+* Whilst I was at it, I also figured out how to save cover-art images 
+directly into them as well, greatly reducing the need for large 
+"user_tag_data" tag files and the need to keep all the album-art images 
+stored forever on the albumart directory!  The requestor of #752 said he 
+knew of only one Linux player that supported this, well, now there are TWO!
+
+* Fixed issue of tag-saving during recording, which could cause an annoying 
+"hiccup" in mp3 files.  The issue is that you really can't properly save 
+id3 tags into a file whilst it's being recorded, so now we don't - instead, 
+we just save to the "user_tag_data" tag files (if "save unsavable metadata" 
+option is enabled), otherwise, we no longer attempt to save tag data while 
+file is being recorded into.
+
+* We now save the status and position of the Equalizer window in the non-
+skinned interfaces (as is already the case in the skinned ones, addressing 
+Audacious request #909.
+
+* Added the plugins' actuall (short) "names" to the [Settings].[Plugins] 
+window (enclosed in []) to make it easer to enable and disable plugins via 
+the Fauxdtool (since it needs THAT name), as there is no other good way to 
+get that name.  Someone requested this in Audacious a while back but I can't 
+find it (and they haven't done it).
 
 Version 4.0-final
 
