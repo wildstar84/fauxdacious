@@ -157,6 +157,7 @@ QImage art_request (const char * filename, bool * queued = nullptr);
 QPixmap art_scale (const QImage & image, unsigned int w, unsigned int h, bool want_hidpi = true);
 QPixmap art_request (const char * filename, unsigned int w, unsigned int h, bool want_hidpi = true);
 QPixmap art_request_current (unsigned int w, unsigned int h, bool want_hidpi = true);
+QPixmap art_request_fallback (unsigned int w, unsigned int h);
 
 /* infopopup-qt.cc */
 void infopopup_show (int playlist, int entry);

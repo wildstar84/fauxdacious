@@ -126,7 +126,7 @@ void id3_associate_length (Tuple & tuple, const char * data, int size)
     if (text && (tlen_length = atoi (text)))
     {
         if (decoder_length <= 0 ||
-            (tlen_length > (decoder_length / 2) && tlen_length < (decoder_length * 2)))
+                (tlen_length > (decoder_length / 2) && tlen_length < (decoder_length * 2)))
             tuple.set_int (Tuple::Length, tlen_length);
     }
 }
@@ -166,7 +166,7 @@ void id3_decode_comment (Tuple & tuple, const char * data, int size)
      (const char *) type, (const char *) value);
 
     if (type && ! type[0] && value) /* blank type = actual comment */
-        tuple.set_str (Tuple::Comment, value);
+        tuple.set_str (Tuple::Comment, (const char *) value);
 }
 
 void id3_decode_lyrics (Tuple & tuple, const char * data, int size)

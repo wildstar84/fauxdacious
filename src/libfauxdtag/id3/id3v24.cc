@@ -688,6 +688,7 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
     int header_size, data_size, footer_size;
     bool syncsafe;
     int64_t offset;
+    bool mustpreservelength = false;  // JWT:SAVING IMAGE OR LYRICS TAGS SCREAW UP LENGTH?!
 
     //read all frames into generic frames;
     FrameDict dict;
@@ -724,6 +725,7 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
                 else  // DEFAULT TO JPEG, AS THIS SEEMS TO WORK FOR MOST STUFF ANYWAY!:
                     add_picture_frame (data.begin (), data.len (), dict, "image/jpeg", 10);
 
+                mustpreservelength = true;
                 aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
             }
         }
@@ -733,7 +735,17 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
 
     String lyrics = tuple.get_str (Tuple::Lyrics);
     if (lyrics && lyrics[9])
+    {
         add_lyrics_frame (lyrics, dict);
+        mustpreservelength = true;
+    }
+
+    if (mustpreservelength)
+    {
+        int decoder_length = tuple.get_int (Tuple::Length);
+        if (decoder_length > 0)
+            add_frameFromTupleInt (tuple, Tuple::Length, ID3_LENGTH, dict);
+    }
 
     /* location and size of non-tag data */
     int64_t mp3_offset = offset ? 0 : header_size + data_size + footer_size;
