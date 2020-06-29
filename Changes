@@ -1,3 +1,33 @@
+Version 4.1-beta2
+
+* Fix potential bug (mostly affects M$-Windows users) where cue-sheet files 
+named with upper case extention (".CUE") probably weren't being correctly 
+recognized and handled as cue-sheets.
+
+* Fix bug where adding an album cover image to a cue-sheet entry would 
+clobber the cue-sheet file itself when being added via the Song-Info screen.  
+Problem was the metadata was being saved to (over) the cue-sheet file itself 
+instead of the selected entry.  Saving other metada to cue-sheet entries was 
+already prohibited (except the art image).  Fixed by both correcting this 
+bug AND now permitting user to edit the other metadata by making the song-info 
+screen data user-editable for cue-sheet entries as well.  NOTE:  Metadata 
+fields updated by the song-info screen are still OVERRIDDEN by any 
+corresponding values specified in the cue-sheet file (even though the updated 
+data is still saved and preserved in the referenced entry file)!
+
+* Added audio channels data to the Song Info. plugin screen (Audacious-added 
+feature), but for audio-CDs, we fetch the actual no. of channels instead of 
+hardcoding to 2!
+
+* Added option to hide the menu-row at the top of the Qt playlist window 
+(Audacious-added feature).
+
+* Added option to hide the cover-art icon and / or the visualization shown 
+on the info-bar below the playlist on the Qt playlist window.
+
+* Numerous other minor Audacious commits merged along with minor cleanups and 
+optimizations of our own.
+
 Version 4.1-beta1
 
 Version 4.0-final has shown to be a very good release, stability-wise and 
