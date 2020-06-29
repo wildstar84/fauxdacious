@@ -704,31 +704,42 @@ EXPORT bool aud_file_write_tuple (const char * filename,
 
     if (success)
     {
-        if (! strncmp (filename, "cdda://", 7) || ! strncmp (filename, "dvd://", 6))  // FILE IS A DISK:
+        String cue_suffix = tuple.get_str (Tuple::Suffix);
+        String actual_filename = String (filename);
+        if (cue_suffix && cue_suffix[0] && strstr_nocase ((const char *) cue_suffix, "cue"))
+        {
+            /* JWT:MUST USE ACTUAL AUDIO FILE FOR CUESHEETS! */
+            String audio_file = tuple.get_str (Tuple::AudioFile);
+            if (! audio_file || ! audio_file[0])
+                return false;  // PUNT!
+
+            actual_filename = audio_file;
+        }
+        if (! strncmp (actual_filename, "cdda://", 7) || ! strncmp (actual_filename, "dvd://", 6))  // FILE IS A DISK:
         {
             String diskID = aud_get_str (nullptr, "playingdiskid");
             String tag_file = String (str_concat ({diskID, ".tag"}));
-            success = aud_write_tag_to_tagfile (filename, tuple, tag_file);
+            success = aud_write_tag_to_tagfile (actual_filename, tuple, tag_file);
             if (success)
             {
                 aud_set_bool (nullptr, "_disktagrefresh", TRUE);
-                aud_playlist_rescan_file (filename);
+                aud_playlist_rescan_file (actual_filename);
             }
 
             return success;
         }
-        else if (! strncmp (filename, "file://", 7) && ! aud_get_bool (nullptr, "record"))  // FILE IS A FILE:
+        else if (! strncmp (actual_filename, "file://", 7) && ! aud_get_bool (nullptr, "record"))  // FILE IS A FILE:
         {
             VFSFile file;
 
-            if (! open_input_file (filename, "r+", ip, file))
+            if (! open_input_file (actual_filename, "r+", ip, file))
                 success = false;
 
             if (success)
             {
                 if (! file)  /* JWT:ADDED TO PREVENT SEGFAULT - <input_plugins>.write_tuple () EXPECTS AN OPEN FILE!!! */
-                    file = VFSFile (filename, "r+");
-                success = file ? ip->write_tuple (filename, file, tuple) : false;
+                    file = VFSFile (actual_filename, "r+");
+                success = file ? ip->write_tuple (actual_filename, file, tuple) : false;
             }
 
             if (success && file && file.fflush () != 0)
