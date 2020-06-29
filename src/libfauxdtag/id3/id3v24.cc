@@ -82,7 +82,7 @@ static const char * id3_frames[ID3_TAGS_NO] = {
 
 #pragma pack(push) /* must be byte-aligned */
 #pragma pack(1)
-struct ID3v2Header {
+struct ID3v24Header {
     char magic[3];
     unsigned char version;
     unsigned char revision;
@@ -90,7 +90,7 @@ struct ID3v2Header {
     uint32_t size;
 };
 
-struct ID3v2FrameHeader {
+struct ID3v24FrameHeader {
     char key[4];
     uint32_t size;
     uint16_t flags;
@@ -152,7 +152,7 @@ static bool skip_extended_header_4 (VFSFile & handle, int * _size)
     return true;
 }
 
-static bool validate_header (ID3v2Header * header, bool is_footer)
+static bool validate_header (ID3v24Header * header, bool is_footer)
 {
     if (memcmp (header->magic, is_footer ? "3DI" : "ID3", 3))
         return false;
@@ -164,7 +164,7 @@ static bool validate_header (ID3v2Header * header, bool is_footer)
     if (header->size > MAX_TAG_SIZE)
         return false;
 
-    AUDDBG ("Found ID3v2 %s:\n", is_footer ? "footer" : "header");
+    AUDDBG ("Found ID3v24 %s:\n", is_footer ? "footer" : "header");
     AUDDBG (" magic = %.3s\n", header->magic);
     AUDDBG (" version = %d\n", (int) header->version);
     AUDDBG (" revision = %d\n", (int) header->revision);
@@ -177,19 +177,19 @@ static bool read_header (VFSFile & handle, int * version, bool *
  syncsafe, int64_t * offset, int * header_size, int * data_size, int *
  footer_size)
 {
-    ID3v2Header header, footer;
+    ID3v24Header header, footer;
 
     if (handle.fseek (0, VFS_SEEK_SET))
         return false;
 
-    if (handle.fread (& header, 1, sizeof (ID3v2Header)) != sizeof (ID3v2Header))
+    if (handle.fread (& header, 1, sizeof (ID3v24Header)) != sizeof (ID3v24Header))
         return false;
 
     if (validate_header (& header, false))
     {
         * offset = 0;
         * version = header.version;
-        * header_size = sizeof (ID3v2Header);
+        * header_size = sizeof (ID3v24Header);
         * data_size = header.size;
 
         if (header.flags & ID3_HEADER_HAS_FOOTER)
@@ -197,16 +197,16 @@ static bool read_header (VFSFile & handle, int * version, bool *
             if (handle.fseek (header.size, VFS_SEEK_CUR))
                 return false;
 
-            if (handle.fread (& footer, 1, sizeof (ID3v2Header)) != sizeof (ID3v2Header))
+            if (handle.fread (& footer, 1, sizeof (ID3v24Header)) != sizeof (ID3v24Header))
                 return false;
 
             if (! validate_header (& footer, true))
                 return false;
 
-            if (handle.fseek (sizeof (ID3v2Header), VFS_SEEK_SET))
+            if (handle.fseek (sizeof (ID3v24Header), VFS_SEEK_SET))
                 return false;
 
-            * footer_size = sizeof (ID3v2Header);
+            * footer_size = sizeof (ID3v24Header);
         }
         else
             * footer_size = 0;
@@ -218,26 +218,26 @@ static bool read_header (VFSFile & handle, int * version, bool *
         if (end < 0)
             return false;
 
-        if (handle.fseek (end - sizeof (ID3v2Header), VFS_SEEK_SET))
+        if (handle.fseek (end - sizeof (ID3v24Header), VFS_SEEK_SET))
             return false;
 
-        if (handle.fread (& footer, 1, sizeof (ID3v2Header)) != sizeof (ID3v2Header))
+        if (handle.fread (& footer, 1, sizeof (ID3v24Header)) != sizeof (ID3v24Header))
             return false;
 
         if (! validate_header (& footer, true))
             return false;
 
-        * offset = end - 2 * sizeof (ID3v2Header) - footer.size;
+        * offset = end - 2 * sizeof (ID3v24Header) - footer.size;
         * version = footer.version;
-        * header_size = sizeof (ID3v2Header);
+        * header_size = sizeof (ID3v24Header);
         * data_size = footer.size;
-        * footer_size = sizeof (ID3v2Header);
+        * footer_size = sizeof (ID3v24Header);
 
         if (handle.fseek (* offset, VFS_SEEK_SET))
             return false;
 
-        if (handle.fread (& header, 1, sizeof (ID3v2Header)) != sizeof
-         (ID3v2Header))
+        if (handle.fread (& header, 1, sizeof (ID3v24Header)) != sizeof
+         (ID3v24Header))
             return false;
 
         if (! validate_header (& header, false))
@@ -314,14 +314,14 @@ static Index<char> read_tag_data (VFSFile & handle, int size, bool syncsafe)
 static bool read_frame (const char * data, int max_size, int version,
  int * frame_size, GenericFrame & frame)
 {
-    ID3v2FrameHeader header;
+    ID3v24FrameHeader header;
     unsigned skip = 0;
 
-    if ((max_size -= sizeof (ID3v2FrameHeader)) < 0)
+    if ((max_size -= sizeof (ID3v24FrameHeader)) < 0)
         return false;
 
-    memcpy (& header, data, sizeof (ID3v2FrameHeader));
-    data += sizeof (ID3v2FrameHeader);
+    memcpy (& header, data, sizeof (ID3v24FrameHeader));
+    data += sizeof (ID3v24FrameHeader);
 
     if (! header.key[0]) /* padding */
         return false;
@@ -351,7 +351,7 @@ static bool read_frame (const char * data, int max_size, int version,
     if (skip >= header.size)
         return false;
 
-    * frame_size = sizeof (ID3v2FrameHeader) + header.size;
+    * frame_size = sizeof (ID3v24FrameHeader) + header.size;
 
     frame.key = String (str_copy (header.key, 4));
     frame.clear ();
@@ -388,7 +388,7 @@ static bool write_frame (VFSFile & file, const GenericFrame & frame, int version
 {
     AUDDBG ("Writing frame %s, size %d\n", (const char *) frame.key, frame.len ());
 
-    ID3v2FrameHeader header;
+    ID3v24FrameHeader header;
 
     strncpy (header.key, frame.key, 4);
 
@@ -399,13 +399,13 @@ static bool write_frame (VFSFile & file, const GenericFrame & frame, int version
     header.size = TO_BE32 (size);
     header.flags = 0;
 
-    if (file.fwrite (& header, 1, sizeof (ID3v2FrameHeader)) != sizeof (ID3v2FrameHeader))
+    if (file.fwrite (& header, 1, sizeof (ID3v24FrameHeader)) != sizeof (ID3v24FrameHeader))
         return false;
 
     if (file.fwrite (& frame[0], 1, frame.len ()) != frame.len ())
         return false;
 
-    * frame_size = sizeof (ID3v2FrameHeader) + frame.len ();
+    * frame_size = sizeof (ID3v24FrameHeader) + frame.len ();
     return true;
 }
 
@@ -429,7 +429,7 @@ static int write_all_frames (VFSFile & file, FrameDict & dict, int version)
 
 static bool write_header (VFSFile & file, int version, int size)
 {
-    ID3v2Header header;
+    ID3v24Header header;
 
     memcpy (header.magic, "ID3", 3);
     header.version = version;
@@ -437,7 +437,7 @@ static bool write_header (VFSFile & file, int version, int size)
     header.flags = 0;
     header.size = TO_BE32 (syncsafe32 (size));
 
-    return file.fwrite (& header, 1, sizeof (ID3v2Header)) == sizeof (ID3v2Header);
+    return file.fwrite (& header, 1, sizeof (ID3v24Header)) == sizeof (ID3v24Header);
 }
 
 static int get_frame_id (const char * key)
