@@ -593,11 +593,10 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
 
     if (decoder && tuple.valid () && ! aud_custom_infowin (filename, decoder))
     {
-        /* cuesheet entries cannot be updated */
-        bool can_write = aud_file_can_write_tuple (filename, decoder) &&
-                ! tuple.is_set (Tuple::StartTime);
+        /* cuesheet entries cannot be updated - JWT:THEY CAN NOW IN FAUXDACIOUS (EXCEPT CUESHEET CAN OVERRIDE)! */
+        bool can_write = aud_file_can_write_tuple (filename, decoder);
         /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
-        if (aud_get_bool (nullptr, "user_tag_data") && ! tuple.is_set (Tuple::StartTime))
+        if (! can_write && aud_get_bool (nullptr, "user_tag_data"))
             can_write = true;
 
         tuple.delete_fallbacks ();
