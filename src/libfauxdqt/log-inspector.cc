@@ -62,7 +62,7 @@ public:
     void cleanup ();
 protected:
     int rowCount (const QModelIndex & parent = QModelIndex ()) const
-        { return m_entries.len (); }
+        { return parent.isValid () ? 0 : m_entries.len (); }
     int columnCount (const QModelIndex & parent = QModelIndex ()) const
         { return LogEntryColumn::Count; }
 
