@@ -10,8 +10,8 @@ lib_dir=@libdir@
 
 plugin_dir=@plugindir@
 
-Name: Audacious
-Description: Audacious is a versatile and handy multi platform media player
+Name: Fauxdacious
+Description: Fauxdacious is a fork of Audacious, a versatile and handy multi platform media player
 Version: @PACKAGE_VERSION@
 Libs: -L${lib_dir} -lfauxdcore
 Cflags: -I${fauxdacious_include_dir}
