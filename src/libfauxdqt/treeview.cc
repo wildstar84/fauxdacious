@@ -19,6 +19,7 @@
 
 #include "treeview.h"
 
+#include <QApplication>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QProxyStyle>
@@ -40,15 +41,29 @@ namespace audqt {
 class TreeViewStyleOverrides : public QProxyStyle
 {
 public:
-    int styleHint(StyleHint hint,
-                  const QStyleOption * option = nullptr,
+    TreeViewStyleOverrides ()
+    {
+        // detect and respond to application-wide style change
+        connect (qApp->style (), &QObject::destroyed, this,
+                &TreeViewStyleOverrides::resetBaseStyle);
+    }
+
+    int styleHint (StyleHint hint, const QStyleOption * option = nullptr,
                   const QWidget * widget = nullptr,
                   QStyleHintReturn * returnData = nullptr) const override
     {
         if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
             return 0;
 
-        return QProxyStyle::styleHint(hint, option, widget, returnData);
+        return QProxyStyle::styleHint (hint, option, widget, returnData);
+    }
+
+private:
+    void resetBaseStyle ()
+    {
+        setBaseStyle (nullptr);
+        connect (qApp->style (), &QObject::destroyed, this,
+                &TreeViewStyleOverrides::resetBaseStyle);
     }
 };
 
