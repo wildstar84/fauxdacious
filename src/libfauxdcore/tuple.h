@@ -99,7 +99,8 @@ public:
         FormattedTitle,
         Description,           /* Track description */
         MusicBrainzID,         /* MusicBrainz identifier */
-        Lyrics,       /* JWT:Lyrics from id3 tags. */
+        Lyrics,                /* JWT:Lyrics from id3 tags. */
+        Channels,              /* Track channels count */
 
         n_fields
     };

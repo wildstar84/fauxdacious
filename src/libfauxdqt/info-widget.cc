@@ -66,6 +66,8 @@ static const TupleFieldMap tuple_field_map[] = {
     {N_("Codec"), Tuple::Codec, false},
     {N_("Quality"), Tuple::Quality, false},
     {N_("Bitrate"), Tuple::Bitrate, false},
+    {N_("Channels"), Tuple::Channels, false},
+    {N_("MusicBrainz ID"), Tuple::MusicBrainzID, false}
 };
 
 static const TupleFieldMap * to_field_map (const QModelIndex & index)
@@ -104,8 +106,8 @@ public:
     InfoModel (QObject * parent = nullptr) :
         QAbstractTableModel (parent) {}
 
-    int rowCount (const QModelIndex &) const override
-        { return aud::n_elems (tuple_field_map); }
+    int rowCount (const QModelIndex & parent) const override
+        { return parent.isValid () ? 0 : aud::n_elems (tuple_field_map); }
     int columnCount (const QModelIndex &) const override
         { return 2; }
 

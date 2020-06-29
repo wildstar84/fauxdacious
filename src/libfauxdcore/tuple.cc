@@ -149,6 +149,7 @@ static const struct {
     {"description", Tuple::String, -1},
     {"musicbrainz-id", Tuple::String, -1},
     {"lyrics", Tuple::String, -1},
+    {"channels", Tuple::Int, -1},
 
     /* fallbacks */
     {nullptr, Tuple::String, -1},
@@ -170,6 +171,7 @@ static const FieldDictEntry field_dict[] = {
     {"artist", Tuple::Artist},
     {"audio-file", Tuple::AudioFile},
     {"bitrate", Tuple::Bitrate},
+    {"channels", Tuple::Channels},
     {"codec", Tuple::Codec},
     {"comment", Tuple::Comment},
     {"composer", Tuple::Composer},
@@ -572,6 +574,9 @@ EXPORT void Tuple::set_format (const char * format, int chans, int rate, int bra
 
     if (brate > 0)
         set_int (Bitrate, brate);
+
+    if (chans > 0)
+        set_int (Channels, chans);
 }
 
 EXPORT void Tuple::set_subtunes (short n_subtunes, const short * subtunes)
