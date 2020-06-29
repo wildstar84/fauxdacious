@@ -381,6 +381,12 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 }
 elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICBRAINZ:
 {
+    #ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
+    #NEXT SONG IN ORDER TO AVOID RE-SEARCHING MUSIC-BRAINZ FOR LIKELY NON-EXISTANT "TITLE" EVERY SONG!
+    #FORMAT:  'album%20name\|title%20name' [, ...]
+	my @SKIPTHESE = (
+	);
+
 	(my $album = $ARGV[1]) =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $artist = defined($ARGV[3]) ? $ARGV[3] : '_';
 	my $title = defined($ARGV[4]) ? $ARGV[4] : '_';
@@ -400,6 +406,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 		foreach my $ext (qw(jpg png jpeg gif)) {
 			if (-e "${configPath}/albumart/${albart_FN}.$ext") {
 				copy ("${configPath}/albumart/${albart_FN}.$ext", "${configPath}/_tmp_albumart.$ext");
+				utime(undef, undef, "${configPath}/albumart/${albart_FN}.$ext");
 				print STDERR "i:HELPER: FOUND (${configPath}/albumart/${albart_FN}.$ext) ALREADY ON DISK, EXITING.\n"  if ($DEBUG);
 				$found = 1;
 			} else {
@@ -411,8 +418,19 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 
 	print STDERR "i:DOING:  ALBUM=$album= TITLE=$title=\n"  if ($DEBUG);
+	foreach my $skipit (@SKIPTHESE) {
+		if ("$album|$title" =~ /^${skipit}$/) {
+			print STDERR "i:HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+			exit (0);
+		}
+	}
 	foreach my $release ($album, $title) {
 		next  if ($release eq '_');
+		if ($release eq $album) {
+			foreach my $skipit (@SKIPTHESE) {
+				next  if ($skipit =~ /^${release}\|/);
+			}
+		}
 		chomp $release;
 		$release =~ s/(?:\%20)+$//o;  #CHOMPIT!
 		$html = '';
@@ -494,8 +512,8 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 				print STDERR "! ($art_url)\n";
 			}
 			if ($arthtml) {
-				print STDERR "i:TRYING COVERART SITE (NO ART ON ALBUM PAGE):\n"  if ($DEBUG);
-				foreach my $sz (qw(small medium large)) {
+				print STDERR "i:TRYING COVERART SITE (NO ART ON ALBUM PAGE) FOR ID=$mbzid:\n"  if ($DEBUG);
+				foreach my $sz (qw(medium large small)) {
 					if ($arthtml =~ s#\"$sz\"\:\"([^\"]+)\"##s) {
 						print STDERR "i:($sz) IMAGE FOUND ($1)!\n"  if ($DEBUG);
 						&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart');  # EXITS IF SUCCESSFUL.
