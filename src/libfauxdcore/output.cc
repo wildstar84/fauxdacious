@@ -481,7 +481,7 @@ static bool do_load_eq_file (StringBuf filename, bool save_prev_preset_as_defaul
     {
         /* JWT:SEE IF WE ARE REALLY A CUESHEET, IF SO, LOOK FOR A PRESET FOR THAT CUESHEET: */
         String cue_suffix = in_tuple.get_str (Tuple::Suffix);
-        if (cue_suffix && cue_suffix[0] && strstr ((const char *) cue_suffix, "cue"))
+        if (cue_suffix && cue_suffix[0] && strstr_nocase ((const char *) cue_suffix, "cue"))
         {
             StringBuf path = filename_get_parent (filename_local);
             filename = filename_normalize (str_concat ({path, "/", in_tuple.get_str (Tuple::Basename),

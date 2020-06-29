@@ -2326,7 +2326,7 @@ void playback_entry_set_tuple (int serial, Tuple && tuple)
 
     /* don't update cuesheet entries with stream metadata */
     /* JWT:FIXED!(STRICTER CUESHEET TEST):    if (entry && ! entry->tuple.is_set (Tuple::StartTime)) */
-    if (entry && (strncmp (entry->filename, "file://", 7) || ! strstr ((const char *) entry->filename, ".cue?")))
+    if (entry && (strncmp (entry->filename, "file://", 7) || ! strstr_nocase ((const char *) entry->filename, ".cue?")))
     {
         playing_playlist->set_entry_tuple (entry, std::move (tuple));
         queue_update (Metadata, playing_playlist, entry->number, 1);
