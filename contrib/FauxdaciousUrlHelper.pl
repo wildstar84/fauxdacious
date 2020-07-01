@@ -62,7 +62,13 @@ use strict;
 use LWP::Simple qw();
 use StreamFinder;
 
+#THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
+#FORMAT:  '//www.problemserver.com' [, ...]
+my @downloadServerList = ();  #USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE.
+
 die "..usage: $0 url\n"  unless ($ARGV[0]);
+exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
+
 my $configPath = '';
 if ($ARGV[1]) {
 	($configPath = $ARGV[1]) =~ s#^file:\/\/##;
@@ -70,62 +76,80 @@ if ($ARGV[1]) {
 my $newPlaylistURL = '';
 my $title = $ARGV[0];
 my $comment = '';
+my $client = 0;
+my $downloadit = 0;
+my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
-exit (0)  if ($ARGV[0] =~ /\.\w{2,4}$/);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE EXTENSION!
+	exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
 
-my $bummer = ($^O =~ /MSWin/);
-my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
-if ($bummer && $configPath) {  #STUPID WINDOWS DOESN'T SHOW DEBUG OUTPUT ON TERMINAL!
-	my $homedir = $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'};
-	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
-	$homedir =~ s#[\/\\]$##;
-	if ($DEBUG) {
-        my $log_fh;
-        open $log_fh, ">${configPath}/FauxdaciousUrlHelper_log.txt";
-        *STDERR = $log_fh;
-    }
-}
-my $client = new StreamFinder($ARGV[0], -debug => $DEBUG);
-die "f:Could not open streamfinder or no streams found!"  unless ($client);
-
-$newPlaylistURL = $client->getURL('-noplaylists');
-die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
-$title = $client->getTitle();
-my $art_url = $client->getIconURL();
-
-#NOTE:  MOST PODCAST EPISODE mp3's SEEM TO COME WITH THEIR OWN EMBEDDED ICONS OR RELY ON THE ALBUM'S ICON:
-#(SO OPTIONS #1 & #2 ARE PBLY POINTLESS (CREATE USELESS REDUNDANT ICON FILES):
-(my $stationID = $client->getID()) =~ s#\/.*$##;  #0: THIS NAMES IMAGE AFTER STATION-ID.
-#1	(my $stationID = $client->getID()) =~ s#\/#\_#;   #1: THIS NAMES IMAGE AFTER STATION-ID[_PODCAST-ID].
-#2	my $stationID = $client->getID();                 #2: THIS KEEPS SEPARATE PODCAST-ID icon in SEPARATE SUBDIRECTORY, CREATING IF NEEDED:
-#2	if ($stationID =~ m#^([^\/]+)\/#) {
-#2		my $substationDIR = $1;
-#2		`mkdir ${configPath}/${substationDIR}`  unless (-d "${configPath}/${substationDIR}");
-#2	}                                                 #END #2.
-
-$comment = 'Album=' . ((defined($client->{album}) && $client->{album} =~ /\S/) ? $client->{album} : $ARGV[0]) . "\n";
-$comment .= "Artist=".$client->{artist}."\n"  if (defined($client->{artist}) && $client->{artist} =~ /\w/);
-$comment .= "Year=".$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
-$comment .= "Genre=".$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
-if ($art_url) {
-	my ($image_ext, $art_image) = $client->getIconData;
-	if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
-		binmode IMGOUT;
-		print IMGOUT $art_image;
-		close IMGOUT;
-		my $path = $configPath;
-		if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
-			$path =~ s#^(\w)\:#\/$1\%3A#;
-			$path =~ s#\\#\/#g;
+	foreach my $s (@downloadServerList) {
+		if ($ARGV[0] =~ /$s/) {
+			$downloadit = 1;
+			last;
 		}
-		$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
 	}
-}
+	if ($downloadit) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
+		my $fn = $1  if ($ARGV[0] =~ m#([^\/]+)$#);
+		exit (0)  unless ($fn);
+		unless (-f "/tmp/$fn") {
+			my $cmd = "curl -o /tmp/$fn \"$ARGV[0]\"";
+			`$cmd`;
+		}
+		if (-f "/tmp/$fn") {
+			$newPlaylistURL = "file:///tmp/$fn";
+			my $getTitle = `ffprobe -loglevel error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 /tmp/$fn`;
+			if ($getTitle =~ /\w/) {
+				chomp $getTitle;
+				$title = $getTitle;
+			}
+		} else {
+			exit (0);
+		}
+	} else {
+		exit (0)  if ($ARGV[0] =~ /\.\w{2,4}$/);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE EXTENSION!
 
-&writeTagData($client, $comment);
+		$client = new StreamFinder($ARGV[0], -debug => $DEBUG);
+		die "f:Could not open streamfinder or no streams found!"  unless ($client);
+
+		$newPlaylistURL = $client->getURL();
+		die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
+
+		$title = $client->getTitle();
+		my $art_url = $client->getIconURL();
+
+		#NOTE:  MOST PODCAST EPISODE mp3's SEEM TO COME WITH THEIR OWN EMBEDDED ICONS OR RELY ON THE ALBUM'S ICON:
+		#(SO OPTIONS #1 & #2 ARE PBLY POINTLESS (CREATE USELESS REDUNDANT ICON FILES):
+		(my $stationID = $client->getID()) =~ s#\/.*$##;  #0: THIS NAMES IMAGE AFTER STATION-ID.
+#1		(my $stationID = $client->getID()) =~ s#\/#\_#;   #1: THIS NAMES IMAGE AFTER STATION-ID[_PODCAST-ID].
+#2		my $stationID = $client->getID();                 #2: THIS KEEPS SEPARATE PODCAST-ID icon in SEPARATE SUBDIRECTORY, CREATING IF NEEDED:
+#2		if ($stationID =~ m#^([^\/]+)\/#) {
+#2			my $substationDIR = $1;
+#2			`mkdir ${configPath}/${substationDIR}`  unless (-d "${configPath}/${substationDIR}");
+#2		}                                                 #END #2.
+
+		$comment = 'Album=' . ((defined($client->{album}) && $client->{album} =~ /\S/) ? $client->{album} : $ARGV[0]) . "\n";
+		$comment .= "Artist=".$client->{artist}."\n"  if (defined($client->{artist}) && $client->{artist} =~ /\w/);
+		$comment .= "Year=".$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
+		$comment .= "Genre=".$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
+		if ($art_url) {
+			my ($image_ext, $art_image) = $client->getIconData;
+			if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
+				binmode IMGOUT;
+				print IMGOUT $art_image;
+				close IMGOUT;
+				my $path = $configPath;
+				if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+					$path =~ s#^(\w)\:#\/$1\%3A#;
+					$path =~ s#\\#\/#g;
+				}
+				$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
+			}
+		}
+	}
+
+&writeTagData($client, $comment, $downloadit);
 #END USER-DEFINED PATTERN-MATCHING CODE.
 exit (0)  unless ($newPlaylistURL);
 
@@ -148,10 +172,13 @@ exit(0);
 sub writeTagData {
 	my $client = shift;
 	my $comment = shift || '';
+	my $downloadit = shift || 0;
 	my @tagdata = ();
-	# WE WRITE Youtube VIDEOS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
+	# WE WRITE VIDEOS/PODCASTS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!:
-	my $tagfid = ($client && $client->getType() =~ /^(?:Youtube|Vimeo)$/) ? 'tmp_tag_data' : 'user_tag_data';
+	my $tagfid = ($downloadit || ($client && $client->getType()
+			=~ /^(?:Youtube|BannedVideo|Brighteon|Vimeo|Apple|Infowars|Spreaker)$/))
+			? 'tmp_tag_data' : 'user_tag_data';
 	if (open TAGDATA, "<${configPath}/$tagfid") {
 		my $omit = 0;
 		while (<TAGDATA>) {
@@ -178,6 +205,5 @@ EOF
 		close TAGDATA;
 	}
 }
-
 
 __END__
