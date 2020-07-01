@@ -390,7 +390,6 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	(my $album = $ARGV[1]) =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $artist = defined($ARGV[3]) ? $ARGV[3] : '_';
 	my $title = defined($ARGV[4]) ? $ARGV[4] : '_';
-	$title =~ s/\%7c\%7c.*$//i;  #HANDLE SOME UGLY TITLES IN FORMAT:  "<title> || blah blah .."
 	$title =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	$artist =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $albart_FN = $album;    #FORMAT FILENAME AS:  <album>[__<artist>] (AS SOME ALBUMS FROM DIFFERENT ARTISTS SHARE SAME NAME)!

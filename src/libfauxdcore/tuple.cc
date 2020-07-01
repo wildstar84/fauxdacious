@@ -784,14 +784,24 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                 {
                     const char * artoffset = (const char *) val;
                     const char * ttloffset = strstr (artoffset, " - ");
+                    const char * junkoffset = strstr (artoffset, " || "); // JWT:CLEAN UP TITLES W/" || #### S", ETC?!
                     if (ttloffset)
                     {
-                        set_str (Title, ttloffset+3);
+                        ttloffset += 3;
+                        if (junkoffset && junkoffset > ttloffset)
+                            set_str (Title, (const char *) str_printf ("%.*s",
+                                (int) (junkoffset-ttloffset), ttloffset));
+                        else
+                            set_str (Title, ttloffset);
+
                         set_str (Artist, (const char *) str_printf ("%.*s",
-                                (int) (ttloffset-artoffset), artoffset));
+                                (int) ((ttloffset-artoffset)-3), artoffset));
                     }
+                    else if (junkoffset)
+                        set_str (Title, (const char *) str_printf ("%.*s",
+                                (int) (junkoffset-artoffset), artoffset));
                     else
-                        set_str (Title, val);
+                        set_str (Title, artoffset);
 
                 }
                 else if (val != get_str (Title))
