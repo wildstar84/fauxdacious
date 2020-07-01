@@ -82,8 +82,6 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-	exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
-
 	foreach my $s (@downloadServerList) {
 		if ($ARGV[0] =~ /$s/) {
 			$downloadit = 1;
