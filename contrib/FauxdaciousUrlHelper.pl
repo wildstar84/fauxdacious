@@ -111,7 +111,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		$client = new StreamFinder($ARGV[0], -debug => $DEBUG);
 		die "f:Could not open streamfinder or no streams found!"  unless ($client);
 
-		$newPlaylistURL = $client->getURL();
+		$newPlaylistURL = $client->getURL('-nopls');
 		die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
 
 		$title = $client->getTitle();
@@ -127,10 +127,11 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 #2			`mkdir ${configPath}/${substationDIR}`  unless (-d "${configPath}/${substationDIR}");
 #2		}                                                 #END #2.
 
-		$comment = 'Album=' . ((defined($client->{album}) && $client->{album} =~ /\S/) ? $client->{album} : $ARGV[0]) . "\n";
-		$comment .= "Artist=".$client->{artist}."\n"  if (defined($client->{artist}) && $client->{artist} =~ /\w/);
-		$comment .= "Year=".$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
-		$comment .= "Genre=".$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
+		$comment = 'Album=' . ((defined($client->{album}) && $client->{album} =~ /\S/) ? ($client->{album}." - $ARGV[0]") : $ARGV[0]) . "\n";
+		$comment .= 'Artist='.$client->{artist}."\n"  if (defined($client->{artist}) && $client->{artist} =~ /\w/);
+		$comment .= 'AlbumArtist='.$client->{albumartist}."\n"  if (defined($client->{albumartist}) && $client->{albumartist} =~ /\w/);
+		$comment .= 'Year='.$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
+		$comment .= 'Genre='.$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
 		if ($art_url) {
 			my ($image_ext, $art_image) = $client->getIconData;
 			if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
