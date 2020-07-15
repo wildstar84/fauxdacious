@@ -293,7 +293,7 @@ static void set_config_paths ()
     const char * xdg_config_home = g_get_user_config_dir ();
     StringBuf namebuf = (! strcmp ((const char *) aud_get_instancename (), "fauxdacious") 
             ? str_copy ("fauxdacious")
-            : str_printf ("fauxdacious_%s", (const char *) aud_get_instancename ()));
+            : str_printf ("fauxdacious-%s", (const char *) aud_get_instancename ()));
 
     aud_paths[AudPath::UserDir] = String (filename_build ({xdg_config_home, namebuf}));
     aud_paths[AudPath::PlaylistDir] = String (filename_build

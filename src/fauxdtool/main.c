@@ -170,9 +170,9 @@ static void fauxdtool_connect (void)
 
     char instname [64];  /* ALLOW INSTANCE NAME UP TO 40 CHARS (TO AVOID CHANCE OF OVERFLOW!) */
     memset (instname, '\0', sizeof (instname));
-    /* JWT:40 = 64 - len("org.atheme.fauxdacious_")+1 # IF THIS CHANGES, MUST CHANGE 40! */
+    /* JWT:40 = 64 - len("org.atheme.fauxdacious-")+1 # IF THIS CHANGES, MUST CHANGE 40! */
     if (which_instance && which_instance[0] && sizeof (which_instance) <= 40)
-        sprintf (instname, "org.atheme.fauxdacious_%s", which_instance);
+        sprintf (instname, "org.atheme.fauxdacious-%s", which_instance);
     else
         strcpy (instname, "org.atheme.fauxdacious");
 

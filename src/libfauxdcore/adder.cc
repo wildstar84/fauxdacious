@@ -405,7 +405,11 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
         {
             add_file (std::move (item), filter, user, result, false);
             if (intemppls)
+            {
                 aud_set_bool (nullptr, "_in_tempurl", false);
+                StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
+                remove ((const char *) temp_playlist_filename);
+            }
         }
     }
 }
