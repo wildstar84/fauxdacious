@@ -17,8 +17,11 @@
  * the use of this software.
  */
 
+#include <memory>
+
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QPointer>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -29,6 +32,7 @@
 #include <libfauxdcore/preferences.h>
 #include <libfauxdcore/runtime.h>
 
+#include "libfauxdqt-internal.h"
 #include "libfauxdqt.h"
 
 namespace audqt {
@@ -58,17 +62,19 @@ EXPORT void plugin_about (PluginHandle * ph)
 
 struct ConfigWindow {
     PluginHandle * ph;
-    QDialog * root;
+    QPointer<QDialog> root;
+
+    ~ConfigWindow () { delete root; }
 };
 
-static Index<ConfigWindow *> config_windows;
+static Index<std::unique_ptr<ConfigWindow>> config_windows;
 
 static ConfigWindow * find_config_window (PluginHandle * ph)
 {
-    for (ConfigWindow * cw : config_windows)
+    for (auto & cw : config_windows)
     {
         if (cw && cw->ph == ph)
-            return cw;
+            return cw.get();
     }
 
     return nullptr;
@@ -105,11 +111,9 @@ EXPORT void plugin_prefs (PluginHandle * ph)
     if (p->init)
         p->init ();
 
-    QObject::connect (cw->root, & QObject::destroyed, [p, cw] () {
+    QObject::connect (cw->root, & QObject::destroyed, [p] () {
         if (p->cleanup)
             p->cleanup ();
-
-        cw->root = nullptr;
     });
 
     const char * name = header->info.name;
@@ -147,5 +151,7 @@ EXPORT void plugin_prefs (PluginHandle * ph)
 
     window_bring_to_front (cw->root);
 }
+
+void plugin_prefs_hide(void) { config_windows.clear(); }
 
 } // namespace audqt

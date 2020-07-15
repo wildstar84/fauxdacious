@@ -35,6 +35,9 @@ void infopopup_hide_now ();
 void log_init ();
 void log_cleanup ();
 
+/* prefs-plugin.cc */
+void plugin_prefs_hide();
+
 /* util-qt.cc */
 class PopupWidget : public QWidget
 {
