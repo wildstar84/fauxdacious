@@ -1,5 +1,9 @@
 Version 4.1-beta2
 
+* Enable fetching and storing cover-art images in APE-tagged files 
+(Wavpack/.wv files) and Vorbis-comment tagged files (.ogg), as was previously 
+added for ID3v24 (.mp3) files.
+
 * Fix potential bug (mostly affects M$-Windows users) where cue-sheet files 
 named with upper case extention (".CUE") probably weren't being correctly 
 recognized and handled as cue-sheets.
