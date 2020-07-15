@@ -272,6 +272,17 @@ bool APETagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * imag
             tuple.set_gain (Tuple::AlbumGain, Tuple::GainDivisor, pair.value.begin ());
         else if (! strcmp_nocase (pair.key, "REPLAYGAIN_ALBUM_PEAK"))
             tuple.set_gain (Tuple::AlbumPeak, Tuple::PeakDivisor, pair.value.begin ());
+        else if (image && ! strcmp_nocase (pair.key, "COVER ART", 9))
+        {
+            const char * valuebegin = pair.value.begin ();
+            uint32_t img_offset = strlen (valuebegin);
+            int imgsz = pair.value.len () - (img_offset + 2);
+            if (img_offset > 0 && imgsz > 0)
+            {
+                AUDDBG ("i:Found cover art image (length=%d)\n", pair.value.len () - (img_offset + 2));
+                image->insert (valuebegin + img_offset + 1, 0, imgsz);
+            }
+        }
     }
 
     return true;
@@ -333,6 +344,46 @@ static bool write_integer_item (const Tuple & tuple, Tuple::Field field,
     return true;
 }
 
+/* JWT: WRITE COVER-ART IMAGE INTO APE TAG.
+   EFFECTIVELY EMULATES:
+   $>wavpack [--allow-huge-tags] --write-binary-tag "Cover Art (Front)=@imagefile.jpg" songfile.wav
+*/
+static bool write_artimage_item (const Index<char> & data, const char * fileext,
+ VFSFile & handle, const char * key, int * written_length, int * written_items)
+{
+    int key_len = strlen (key) + 1;
+    Index<char> buf;
+    uint32_t header[2];
+
+    if (fileext)
+    {
+        buf.insert (key, 0, strlen (key));
+        buf.append ('.');
+        buf.insert (fileext, -1, strlen (fileext));
+        buf.append (0);
+    }
+    buf.insert (data.begin (), -1, data.len ());
+    int value_len = buf.len ();
+
+    AUDDBG ("Write: %s = %s.\n", key, buf.begin ());
+
+    header[0] = TO_LE32 (value_len);
+    header[1] = 2;  // JWT(T&E): WAVPACK ALWAYS SEEMS TO SET THIS TO 2 & VLC, ETC. SEEM TO REQUIRE IT TO BE?!
+
+    if (handle.fwrite (header, 1, 8) != 8)
+        return false;
+
+    if (handle.fwrite (key, 1, key_len) != key_len)
+        return false;
+
+    if (handle.fwrite (buf.begin (), 1, value_len) != value_len)
+        return false;
+
+    * written_length += 8 + key_len + value_len;
+
+    return true;
+}
+
 static bool write_header (int data_length, int items, bool is_header,
  VFSFile & handle)
 {
@@ -383,10 +434,29 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
     if (! write_string_item (tuple, Tuple::Artist, handle, "Artist", & length, & items) ||
      ! write_string_item (tuple, Tuple::Title, handle, "Title", & length, & items) ||
      ! write_string_item (tuple, Tuple::Album, handle, "Album", & length, & items) ||
-     ! write_string_item (tuple, Tuple::Comment, handle, "Comment", & length, & items) ||
      ! write_string_item (tuple, Tuple::Genre, handle, "Genre", & length, & items) ||
      ! write_integer_item (tuple, Tuple::Track, handle, "Track", & length, & items) ||
      ! write_integer_item (tuple, Tuple::Year, handle, "Year", & length, & items))
+        return false;
+
+    String comment = tuple.get_str (Tuple::Comment);
+    bool wrote_art = false;
+    if (comment && comment[0] && ! strncmp ((const char *) comment, "file://", 7))
+    {
+        VFSFile file (comment, "r");  /* JWT:ASSUME COMMENT IS AN IMAGE FILE FROM SONG-INFO EDITS!: */
+        if (file)
+        {
+            Index<char> data = file.read_all ();
+            if (data.len () > 499)  /* JWT:SANITY-CHECK: ANY VALID ART IMAGE SHOULD BE BIGGER THAN THIS! */
+            {
+                wrote_art = write_artimage_item (data, uri_get_extension (comment), handle, "Cover Art (Front)", & length, & items);
+                if (wrote_art)
+                    items ++;
+                aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
+            }
+        }
+    }
+    if (! wrote_art && ! write_string_item (tuple, Tuple::Comment, handle, "Comment", & length, & items))
         return false;
 
     for (const ValuePair & pair : list)
@@ -394,10 +464,15 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
         if (! strcmp_nocase (pair.key, "Artist") || ! strcmp_nocase (pair.key, "Title") ||
          ! strcmp_nocase (pair.key, "Album") || ! strcmp_nocase (pair.key, "Comment") ||
          ! strcmp_nocase (pair.key, "Genre") || ! strcmp_nocase (pair.key, "Track") ||
-         ! strcmp_nocase (pair.key, "Year"))
+         ! strcmp_nocase (pair.key, "Year") || (wrote_art && ! strcmp_nocase (pair.key, "Cover Art", 9)))
             continue;
 
-        if (! ape_write_item (handle, pair.key, pair.value.begin (), & length))
+        if (! strcmp_nocase (pair.key, "Cover Art", 9))
+        {
+            if (! write_artimage_item (pair.value, nullptr, handle, pair.key, & length, & items))
+                return false;
+        }
+        else if (! ape_write_item (handle, pair.key, pair.value.begin (), & length))
             return false;
 
         items ++;
