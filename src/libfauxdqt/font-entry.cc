@@ -146,7 +146,7 @@ void FontEntry::show_dialog ()
     {
         m_dialog = new QFontDialog (this);
 
-        QObject::connect (m_dialog, & QFontDialog::fontSelected, [this] (const QFont & font) {
+        QObject::connect (m_dialog.data (), & QFontDialog::fontSelected, [this] (const QFont & font) {
             setText ((const char *) qfont_to_string (font));
             end (false);
         });
