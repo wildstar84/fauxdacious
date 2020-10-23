@@ -70,7 +70,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 push (@userAgentOps, 'agent', ($bummer
 		? 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
-		: 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0'));
+		: 'Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0'));
 my $ua = LWP::UserAgent->new(@userAgentOps);
 $ua->timeout(10);
 $ua->cookie_jar({});
@@ -420,7 +420,35 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	foreach my $skipit (@SKIPTHESE) {
 		if ("$album|$title" =~ /^${skipit}$/) {
 			print STDERR "i:HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-			exit (0);
+			exit (0);  #QUIT - WE ALREADY HAVE THIS IMAGE STORED!
+		}
+	}
+	if ($artist && $title) {  #TRY genius.com FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
+		($url = $artist) =~ s#\/.*$##;
+		$url .= " ${title}-lyrics";
+		$url =~ s/\&/and/g;
+		$url =~ s/ +/\-/g;
+		$url =~ s/\%20/\-/g;
+		$url =~ s/\%\d+//g;
+		$url =~ s/\.//g;
+		$url =~ s/[^a-zA-Z0-9\.\-]+//g;
+		$url = 'https://genius.com/' . $url;
+		print STDERR "i:ART:TRYING GENIUS($url)!\n"  if ($DEBUG);
+		$response = $ua->get($url);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+			if ($html =~ m#\<div\s+class\=\"cover\_art\"\>(.+)\<\/div\>#is) {
+				my $cadiv = $1;
+				if ($cadiv =~ m#src\=\"([^\"]+)\"#) {
+					my $imgurl = $1;
+					print STDERR "i:found (GENIUS) IMAGE ($imgurl)?\n"  if ($DEBUG);
+					&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart');
+				}
+			}
+		} else {
+			print STDERR $response->status_line;
+			print STDERR "! ($url)\n";
+			$html = '';
 		}
 	}
 	foreach my $release ($album, $title) {
