@@ -437,7 +437,9 @@ static const PreferencesWidget advanced_page_widgets[] = {
     WidgetLabel (N_("URL-helper program?:")),
     WidgetEntry (0, WidgetString (0, "url_helper")),
     WidgetLabel (N_("CD/DVD Cover Art-helper program?:")),
-    WidgetEntry (0, WidgetString (0, "cover_helper"))
+    WidgetEntry (0, WidgetString (0, "cover_helper")),
+    WidgetLabel (N_("Lyricwiki plugins helper program?:")),
+    WidgetEntry (0, WidgetString (0, "lyric_helper"))
 };
 
 #define TITLESTRING_NPRESETS 8
