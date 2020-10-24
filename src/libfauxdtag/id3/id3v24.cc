@@ -659,7 +659,7 @@ bool ID3v24TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
             break;
           case ID3_APIC:
             if (image)
-                * image = id3_decode_picture (& frame[0], frame.len ());
+                * image = id3_decode_picture (& frame[0], frame.len (), 4);
             break;
           case ID3_LYRICS:
             id3_decode_lyrics (tuple, & frame[0], frame.len ());
@@ -688,7 +688,7 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
     int header_size, data_size, footer_size;
     bool syncsafe;
     int64_t offset;
-    bool mustpreservelength = false;  // JWT:SAVING IMAGE OR LYRICS TAGS SCREAW UP LENGTH?!
+    bool mustpreservelength = false;  // JWT:SAVING IMAGE OR LYRICS TAGS SCREW UP LENGTH?!
 
     //read all frames into generic frames;
     FrameDict dict;

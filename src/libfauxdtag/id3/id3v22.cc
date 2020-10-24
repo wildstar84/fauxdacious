@@ -233,7 +233,7 @@ bool ID3v22TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
 
         if (! read_frame (handle, data_size - pos, version, syncsafe, & frame_size, frame))
         {
-            AUDDBG("read_frame failed at pos %i\n", pos);
+            AUDDBG ("read_frame failed at pos %i\n", pos);
             break;
         }
 
@@ -280,7 +280,7 @@ bool ID3v22TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
             break;
           case ID3_PIC:
             if (image)
-                * image = id3_decode_picture (& frame[0], frame.len ());
+                * image = id3_decode_picture (& frame[0], frame.len (), 2);
             break;
           case ID3_LYRICS:
             id3_decode_lyrics (tuple, & frame[0], frame.len ());
