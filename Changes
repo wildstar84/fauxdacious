@@ -1,3 +1,31 @@
+Version 4.1-beta3
+
+* Add a true "visualization plugin" to toggle whether or not a video window 
+will pop up when a video stream or DVD is played (Previously, the user went 
+to the config options for those other two plugins to check the box if they 
+wanted the video popup window to display).
+
+* Add a Pure-Perl lyrics "helper" script (FauxdaciousLyricsHelper.pl) and 
+update the LyricsWiki plugins to use the Perl helper script to fetch lyrics 
+from sites supported by David Precious's Lyrics::Fetcher::* modules (on CPAN). 
+Sites currently known to work:  genius.com, azlyrics.com, and musixmatch.com.  
+This was all necessitated by the fact the lyricwiki (fandom.com) is now 
+defunct, and Audacious rejected the last bug reporting that fact, implying to 
+me that they may decide to depreciate the lyricwiki plugins.  NOTE:  if no 
+helper script is specified, the lyricwiki plugins will still "work" the old 
+way, so if Audacious does fix this, then it should work again without the 
+helper script.  This should provide a longer-term fix, since as sites change 
+and come and go, users should only need to update the Lyrics::Fetcher::* 
+modules rather than having to update / recompile Fauxdacious.  Also, multiple 
+lyrics sites can be searched as needed.
+
+* Fix fetching cover-art images in files tagged as id3v2.2 
+(Audacious bug# 1030).
+
+* Add genius.com to the Cover Art helper script, as it provides much quicker 
+and simpler searches, and contains a vast library of song-specific cover-art 
+images.
+
 Version 4.1-beta2
 
 * Enable fetching and storing cover-art images in APE-tagged files 
