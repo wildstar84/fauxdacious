@@ -1,5 +1,27 @@
 Version 4.1-beta3
 
+* Add [Song Info] option to search for cover-art file name matching the 
+Album tag (if specified).  This is only done if this new option is set AND 
+there's an album tag AND no other cover art file was found.  The matching 
+<Album-name>.{jpg|jpeg|png} file must be in the same directory as the song 
+file (no recursive search is done).  Address Audacious bug# 1013.
+
+* Add a "Hide info bar art icon unless separate album cover fetched" option 
+to the Qt version of the Album Art plugin (I don't know how to program this 
+in the GTK version yet).  This enhances the new Audacious [View]."Show info 
+bar Album Art" option, which allows hiding the album-art icon in the playlist 
+"info bar" (not the hover-over playlist info popup).  This new Fauxdacious 
+option will still hide the info bar icon only when no custom album-art image 
+is fetched from Musicbrainz (the web) for the currently-playing song.  The 
+reason for this is that unless a custom album-art image is fetched from 
+the web, the image shown in the Album Art plugin will be a *duplicate* of 
+the icon shown in the info bar, which some may find redundant / annoying.
+This is typically noticable when streaming radio stations with the Album Art 
+plugin enabled and fetching images for each song, but not finding images for 
+some, in which case the station icon will show in both places, but the user 
+WANTS the station icon shown in the info bar only if there's a different 
+(real album cover) found for the song.
+
 * Add a true "visualization plugin" to toggle whether or not a video window 
 will pop up when a video stream or DVD is played (Previously, the user went 
 to the config options for those other two plugins to check the box if they 
@@ -17,7 +39,9 @@ way, so if Audacious does fix this, then it should work again without the
 helper script.  This should provide a longer-term fix, since as sites change 
 and come and go, users should only need to update the Lyrics::Fetcher::* 
 modules rather than having to update / recompile Fauxdacious.  Also, multiple 
-lyrics sites can be searched as needed.
+lyrics sites can be searched as needed.  NOTE:  This is still "beta quality", 
+as I'm working with David Precious's Lyrics::Fetcher::* modules to work better 
+with Fauxdacious and better handle special case artist names and titles.
 
 * Fix fetching cover-art images in files tagged as id3v2.2 
 (Audacious bug# 1030).

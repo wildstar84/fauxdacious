@@ -62,6 +62,7 @@ static const char * const core_defaults[] = {
  "recurse_for_cover_depth", "0",
  "show_filepopup_for_tuple", "TRUE",
  "use_file_cover", "FALSE",
+ "use_album_tag_cover", "FALSE",
 
  /* network */
  "net_buffer_kb", "128",

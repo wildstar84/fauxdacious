@@ -385,6 +385,8 @@ static const PreferencesWidget song_info_page_widgets[] = {
     WidgetEntry (0, WidgetString (0, "default_cover_file")),
     WidgetCheck (N_("Search for images matching song file name"),
         WidgetBool (0, "use_file_cover")),
+    WidgetCheck (N_("Search for images matching Album tag (file name overrides)"),
+        WidgetBool (0, "use_album_tag_cover")),
     WidgetCheck (N_("Search recursively"),
         WidgetBool (0, "recurse_for_cover")),
     WidgetSpin (N_("Search depth:"),

@@ -29,6 +29,7 @@
 #include "probe.h"
 #include "tuple.h"
 #include "vfs.h"
+#include "runtime.h"
 
 static GThreadPool * pool;
 
@@ -94,8 +95,35 @@ void ScanRequest::run ()
         if (! aud_file_read_tag (audio_file, decoder, file, rtuple, pimage, & error))
             goto err;
 
-        if (need_image && ! image_data.len ())
-            image_file = art_search (audio_file);
+        if (! image_data.len ())
+        {
+            if (need_image)
+                image_file = art_search (audio_file);
+
+            /* JWT:IF SEARCH FOUND NO OTHER ART IMAGE BASED ON FILE NAME, SEARCH FOR FILE MATCHING Album TAG: */
+            if (! image_file && aud_get_bool (nullptr, "use_album_tag_cover"))
+            {
+                String album_tag = rtuple.get_str (Tuple::Album);
+                if (album_tag && album_tag[0])
+                {
+                    StringBuf local_fid = uri_to_filename (audio_file);
+                    if (local_fid)  // WE'RE A LOCAL FILE NAME (file://...)
+                    {
+                        StringBuf path = filename_get_parent (local_fid);
+                        Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
+                        for (auto & tryext : extlist)
+                        {
+                            StringBuf tryimg = str_concat ({path, "/", album_tag, ".", tryext});
+                            if (g_file_test (tryimg, G_FILE_TEST_EXISTS))
+                            {
+                                image_file = String (tryimg);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /* rewind/reopen the input file */
