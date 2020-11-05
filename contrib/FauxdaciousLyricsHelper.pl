@@ -47,7 +47,7 @@ use strict;
 use warnings;
 use Lyrics::Fetcher;
 
-#ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
+#USER: ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
 #NEXT SONG IN ORDER TO AVOID RE-SEARCHING THE LYRICS SITES FOR LIKELY NON-EXISTANT "TITLE" EVERY SONG!
 #FORMAT:  'artist name\|title name' [, ...]
 my @SKIPTHESE = (
@@ -63,7 +63,7 @@ my $random_fetcher;
 
 if ($#ARGV >= 1) {
 	unlink "$ARGV[2]/_tmp_lyrics.txt"  if ($ARGV[2] && -d $ARGV[2] && -f "$ARGV[2]/_tmp_lyrics.txt");
-	print STDERR "..Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
+	print STDERR "..LYRICS:Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 		if ("$ARGV[0]|$ARGV[1]" =~ /^${skipit}$/i) {
@@ -73,14 +73,14 @@ if ($#ARGV >= 1) {
 	}
 	my %tried = ();
 	my $triedcnt = 0;
-	srand(time);
 	while ($triedcnt <= $#fetchers) {
 		$random_fetcher = int(rand(scalar @fetchers));
 		unless ($tried{$fetchers[$random_fetcher]}) {
-			print STDERR "----TRYING $fetchers[$random_fetcher]...\n"  if ($DEBUG);
+			print STDERR "..LYRICS:TRYING $fetchers[$random_fetcher]...\n"  if ($DEBUG);
 			my $lyrics = Lyrics::Fetcher->fetch($ARGV[0], $ARGV[1], $fetchers[$random_fetcher]);
 			if ($lyrics) {
-				$lyrics .= "\n\n(Lyrics courtesy: $fetchers[$random_fetcher])\n";
+				my $doschar = ($^O =~ /Win/) ? "\r" : '';
+				$lyrics .= "${doschar}\n(Lyrics courtesy: $fetchers[$random_fetcher])";
 				if ($ARGV[2] && -d $ARGV[2] && open OUT, ">$ARGV[2]/_tmp_lyrics.txt") {
 					binmode OUT;
 					print OUT "${lyrics}\0";

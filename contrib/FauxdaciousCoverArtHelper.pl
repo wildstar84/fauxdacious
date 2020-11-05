@@ -381,7 +381,7 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 }
 elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICBRAINZ:
 {
-    #ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
+    #USER: ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
     #NEXT SONG IN ORDER TO AVOID RE-SEARCHING MUSIC-BRAINZ FOR LIKELY NON-EXISTANT "TITLE" EVERY SONG!
     #FORMAT:  'album%20name\|title%20name' [, ...]
 	my @SKIPTHESE = (
@@ -398,15 +398,16 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	} elsif ($title =~ /\S/ && $title ne '_') {
 		$albart_FN .= "__$ARGV[4]";
 	}
-	$albart_FN =~ s/\%20$//;   #WHACK OFF TRAILING SPACE.
-	$albart_FN =~ s/\%20/ /g;  #UNESCAPE OTHER SPACES.
+	$albart_FN =~ s/\%20$//;      #WHACK OFF TRAILING SPACE.
+	$albart_FN =~ s/\%20/ /g;     #UNESCAPE OTHER SPACES.
+	$albart_FN =~ s#\s*\/\s*#\_#; #ELIMINATE SLASHES (FILE NAME IS *NOT* A PATH!
 	{
 		my $found = 0;
 		foreach my $ext (qw(jpg png jpeg gif)) {
 			if (-e "${configPath}/albumart/${albart_FN}.$ext") {
 				copy ("${configPath}/albumart/${albart_FN}.$ext", "${configPath}/_tmp_albumart.$ext");
 				utime(undef, undef, "${configPath}/albumart/${albart_FN}.$ext");
-				print STDERR "i:HELPER: FOUND (${configPath}/albumart/${albart_FN}.$ext) ALREADY ON DISK, EXITING.\n"  if ($DEBUG);
+				print STDERR "i:ART HELPER: FOUND (${configPath}/albumart/${albart_FN}.$ext) ALREADY ON DISK, EXITING.\n"  if ($DEBUG);
 				$found = 1;
 			} else {
 				unlink ("${configPath}/_tmp_albumart.$ext")  if (-e "${configPath}/_tmp_albumart.$ext");
@@ -416,22 +417,21 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	}
 	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 
-	print STDERR "i:DOING:  ALBUM=$album= TITLE=$title=\n"  if ($DEBUG);
+	print STDERR "i:ART:DOING: ALBUM=$album= TITLE=$title= ARTIST=$artist=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
 		if ("$album|$title" =~ /^${skipit}$/) {
-			print STDERR "i:HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			exit (0);  #QUIT - WE ALREADY HAVE THIS IMAGE STORED!
 		}
 	}
-	if ($artist && $title) {  #TRY genius.com FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
-		($url = $artist) =~ s#\/.*$##;
-		$url .= " ${title}-lyrics";
+	if ($artist && $artist ne '_' && $title) {  #TRY genius.com FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
+		my $artist_uesc = uri_unescape($artist);
+		my $title_uesc = uri_unescape($title);
+		($url = $artist_uesc) =~ s#\s*\/.*$##;
+		$url .= " ${title_uesc}-lyrics";
 		$url =~ s/\&/and/g;
 		$url =~ s/ +/\-/g;
-		$url =~ s/\%20/\-/g;
-		$url =~ s/\%\d+//g;
-		$url =~ s/\.//g;
-		$url =~ s/[^a-zA-Z0-9\.\-]+//g;
+		$url =~ s/[^a-zA-Z0-9\-]+//g;
 		$url = 'https://genius.com/' . $url;
 		print STDERR "i:ART:TRYING GENIUS($url)!\n"  if ($DEBUG);
 		$response = $ua->get($url);
@@ -462,7 +462,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 		$release =~ s/(?:\%20)+$//o;  #CHOMPIT!
 		$html = '';
 		$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$release";
-		print STDERR "i:SEARCHURL=$url=\n"  if ($DEBUG);
+		print STDERR "i:ART: SEARCHURL=$url=\n"  if ($DEBUG);
 		$response = $ua->get($url);
 		if ($response->is_success) {
 			$html = $response->decoded_content
@@ -494,7 +494,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 			{
 				(my $thisartist = $1) =~ s/\&\#x([0-9A-Fa-f]{2})\;/chr(hex($1))/eg;  #THEY HAVE SOME "&#X..;" STUFF TOO!
 				$primaryArtistFactor -= 3;
-				print STDERR "-----found ARTIST=$thisartist= ESCAPED=$artistEscaped=\n"  if ($DEBUG > 1);
+				print STDERR "i:ART:found ARTIST=$thisartist= ESCAPED=$artistEscaped=\n"  if ($DEBUG > 1);
 				next  unless ($artistEscaped =~ /$thisartist/is
 						|| $thisartist =~ /(?:$artistEscaped|various)/is);
 
@@ -504,12 +504,12 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 				$rowhtml =~ s#^.*?\<td\>##iso;
 				if ($rowhtml =~ m#([^\<]+)\<\/td\>#iso) {
 					my $type = $1;
-					print STDERR "i:TYPE=$type=\n"  if ($DEBUG);
+					print STDERR "i:ART:TYPE=$type=\n"  if ($DEBUG);
 					next  if ($type =~ m#(?:cassette|\>)#io);   #SKIP CASSETTES & UNKNOWNS!:
 
 					++$priority  unless ($type =~ /unknown/io);
 					++$priority  if ($type =~ /CD/o);
-					print STDERR "i:KEEPING TYPE=$type= PRIO:$priority!\n"  if ($DEBUG);
+					print STDERR "i:ART:KEEPING TYPE=$type= PRIO:$priority!\n"  if ($DEBUG);
 				}
 				$mbHash{$mbzid} = $priority;
 			}
@@ -539,10 +539,10 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 				print STDERR "! ($art_url)\n";
 			}
 			if ($arthtml) {
-				print STDERR "i:TRYING COVERART SITE (NO ART ON ALBUM PAGE) FOR ID=$mbzid:\n"  if ($DEBUG);
+				print STDERR "i:ART:TRYING COVERART SITE (NO ART ON ALBUM PAGE) FOR ID=$mbzid:\n"  if ($DEBUG);
 				foreach my $sz (qw(medium large small)) {
 					if ($arthtml =~ s#\"$sz\"\:\"([^\"]+)\"##s) {
-						print STDERR "i:($sz) IMAGE FOUND ($1)!\n"  if ($DEBUG);
+						print STDERR "i:ART:($sz) IMAGE FOUND ($1)!\n"  if ($DEBUG);
 						&writeArtImage($1, "albumart/${albart_FN}", '_tmp_albumart');  # EXITS IF SUCCESSFUL.
 					}
 				}
@@ -560,11 +560,11 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 				my $imghtml = $1;
 				my $imgurl = $1  if ($imghtml =~ m#href\=\"([^\"]+)#s);
 				$imgurl = 'https:' . $imgurl  if ($imgurl =~ m#^\/\/#o);
-				print STDERR "i:ALT COVERART ARCHIVE IMAGE ($imgurl)?\n"  if ($DEBUG);
+				print STDERR "i:ART:ALT COVERART ARCHIVE IMAGE ($imgurl)?\n"  if ($DEBUG);
 				&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart')  if ($imgurl =~ m#\.(?:jpg|png|jpeg|gif)$#);
 			}
 		}
-		print STDERR "-----AT END OF FOR-LOOP($release), CONTINUE OR PUNT...\n"  if ($DEBUG > 1);
+		print STDERR "-----ART:AT END OF FOR-LOOP($release), CONTINUE OR PUNT...\n"  if ($DEBUG > 1);
 	}
 	print STDERR "w:NO COVER-ART FOUND ON MUSICBRAINZ!\n"  if ($DEBUG);
 	exit (0);
@@ -597,7 +597,7 @@ sub writeArtImage {   # DOWNLOADS AND SAVES THE FOUND COVER-ART IMAGE AND EXITS:
 		print IMGOUT $art_image;
 		close IMGOUT;
 		if (defined($tee2tmp) && $tee2tmp && open IMGOUT, ">${configPath}/${tee2tmp}.$image_ext") {
-			print STDERR "-6a: will also write art image to (${configPath}/${tee2tmp}.$image_ext)\n"  if ($DEBUG);
+			print STDERR "--6a: will also write art image to (${configPath}/${tee2tmp}.$image_ext)\n"  if ($DEBUG);
 			binmode IMGOUT;
 			print IMGOUT $art_image;
 			close IMGOUT;

@@ -119,8 +119,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 		#NOTE:  MOST PODCAST EPISODE mp3's SEEM TO COME WITH THEIR OWN EMBEDDED ICONS OR RELY ON THE ALBUM'S ICON:
 		#(SO OPTIONS #1 & #2 ARE PBLY POINTLESS (CREATE USELESS REDUNDANT ICON FILES):
-		(my $stationID = $client->getID()) =~ s#\/.*$##;  #0: THIS NAMES IMAGE AFTER STATION-ID.
-#1		(my $stationID = $client->getID()) =~ s#\/#\_#;   #1: THIS NAMES IMAGE AFTER STATION-ID[_PODCAST-ID].
+#1		(my $stationID = $client->getID()) =~ s#\/.*$##;  #0: THIS NAMES IMAGE AFTER STATION-ID.
+		(my $stationID = $client->getID()) =~ s#\/#\_#;   #1: THIS NAMES IMAGE AFTER STATION-ID[_PODCAST-ID].
 #2		my $stationID = $client->getID();                 #2: THIS KEEPS SEPARATE PODCAST-ID icon in SEPARATE SUBDIRECTORY, CREATING IF NEEDED:
 #2		if ($stationID =~ m#^([^\/]+)\/#) {
 #2			my $substationDIR = $1;
@@ -174,10 +174,11 @@ sub writeTagData {
 	my $downloadit = shift || 0;
 	my @tagdata = ();
 	# WE WRITE VIDEOS/PODCASTS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
-	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!:
-	my $tagfid = ($downloadit || ($client && $client->getType()
-			=~ /^(?:Youtube|BannedVideo|Brighteon|Vimeo|Apple|Infowars|Spreaker)$/))
-			? 'tmp_tag_data' : 'user_tag_data';
+	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!
+	# THE LIST IN THE REGEX BELOW ARE THE ONES TO *NOT* DELETE ART IMAGES FOR (ie. STREAMING STATIONS)!:
+	my $tagfid = (!$downloadit && $client && $client->getType()
+			=~ /^(?:IHeartRadio|RadioNet|Radionomy|Reciva|Tunein)$/)
+			? 'user_tag_data' : 'tmp_tag_data';
 	if (open TAGDATA, "<${configPath}/$tagfid") {
 		my $omit = 0;
 		while (<TAGDATA>) {
