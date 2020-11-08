@@ -29,7 +29,7 @@ CPPFLAGS := ${SDL_CFLAGS} -I.. -I../.. \
             ${GLIB_CFLAGS}
 
 LIBS := -L../libfauxdcore -lfauxdcore \
-        ${LIBS} -lm -lSDL2 \
+        ${LIBS} -lm ${SDL_LIBS} \
         ${LIBINTL} \
         ${GLIB_LIBS}
 

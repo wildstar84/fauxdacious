@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Fauxdacious"
-#define MyAppVersion "4.0-beta3"
+#define MyAppVersion "4.1-final"
 #define MyAppPublisher "Jim Turner"
 #define MyAppURL "https://wildstar84.wordpress.com/fauxdacious"
 #define MyAppExeName "fauxdacious.exe"
@@ -125,8 +125,7 @@ Source: "C:\GTK\share\icons\*"; DestDir: "{app}\share\icons"; Flags: ignoreversi
 
 Source: "C:\aud\bin\fauxdacious.exe"; DestDir: "{app}\bin"; DestName: "fauxdacious.exe"; Flags: ignoreversion
 Source: "C:\aud\bin\fauxdtool.exe"; DestDir: "{app}\bin"; DestName: "fauxdtool.exe"; Flags: ignoreversion
-Source: "C:\faud\bin\FauxdaciousUrlHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "C:\faud\bin\FauxdaciousCoverArtHelper.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "C:\faud\bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "C:\aud\*"; DestDir: "{app}"; Excludes: "*.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

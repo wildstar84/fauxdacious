@@ -1,6 +1,14 @@
 #!/usr/bin/perl
 
-#pp --gui -o FauxdaciousLyricsHelper.exe -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousLyricsHelper.pl
+### HOW TO COMPILE TO EXE (FOR M$-WINDOWS USERS WITHOUT PERL INSTALLED (NEARLY ALL)):
+###pp --gui -o FauxdaciousLyricsHelper.exe -M utf8_heavy.pl -M lyrichelper_modules -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousLyricsHelper.pl
+
+###(lyrichelper_modules.pm contains):
+###use Lyrics::Fetcher;
+###use Lyrics::Fetcher::AZLyrics;
+###use Lyrics::Fetcher::Genius;
+###use Lyrics::Fetcher::Musixmatch;
+###1;
 
 #FAUXDACIOUS "HELPER" SCRIPT TO FETCH Lyrics FROM sites supported by David Precious's Lyrics::Fetcher module:
 
@@ -62,6 +70,11 @@ die "e:$0: No lyric fetchers found!\n"  unless ($#fetchers >= 0);
 my $random_fetcher;
 
 if ($#ARGV >= 1) {
+	for (my $a=0;$a<=$#ARGV;$a++) {  #STRIP QUOTES AROUND ARGUMENTS OFF (M$-Windows EXE)!:
+		$ARGV[$a] =~ s/^[\'\"]//;
+		$ARGV[$a] =~ s/[\'\"]$//;
+	}
+
 	unlink "$ARGV[2]/_tmp_lyrics.txt"  if ($ARGV[2] && -d $ARGV[2] && -f "$ARGV[2]/_tmp_lyrics.txt");
 	print STDERR "..LYRICS:Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
