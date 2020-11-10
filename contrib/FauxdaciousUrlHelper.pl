@@ -87,6 +87,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 	if ($configPath && open IN, "<${configPath}/FauxdaciousUrlHelper.ini") {
 		while (<IN>) {
+			s/\r//go;
 			chomp;
 			next  if (/^\#/o);
 			next  unless (/\S/o);

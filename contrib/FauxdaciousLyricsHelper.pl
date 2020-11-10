@@ -84,6 +84,7 @@ if ($#ARGV >= 1) {
 		## USER-CONFIGURED SITE-SKIP LIST:
 		if (open IN, "<$ARGV[2]/FauxdaciousLyricsHelper.ini") {
 			while (<IN>) {
+				s/\r//go;
 				chomp;
 				next  if (/^\#/o);
 				next  unless (/\S/o);
@@ -107,7 +108,7 @@ if ($#ARGV >= 1) {
 	}
 
 	unlink "$ARGV[2]/_tmp_lyrics.txt"  if ($ARGV[2] && -d $ARGV[2] && -f "$ARGV[2]/_tmp_lyrics.txt");
-	print STDERR "..LYRICS:Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
+	print STDERR "..LYRICS HELPER:Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E$/i) {

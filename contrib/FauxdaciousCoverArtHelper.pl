@@ -424,6 +424,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 		## USER-CONFIGURED SITE-SKIP LIST:
 		if (open IN, "<${configPath}/FauxdaciousCoverArtHelper.ini") {
 			while (<IN>) {
+				s/\r//go;
 				chomp;
 				next  if (/^\#/o);
 				next  unless (/\S/o);

@@ -1,3 +1,32 @@
+Version 4.1-final
+
+* LyricWiki plugins:  Add options to turn off internet lyric fetching, and 
+to try first to save lyrics to song file name first (ie. "./songfile.lrc") as 
+opposed to the global lyrics cache 
+("~/.config/fauxdacious[_instancename]/lyrics/ARTIST NAME/TITLE.lrc").  This 
+onlyy affects songs playing from disk, as opposed to URLs, etc.
+
+* LyricWiki plugins:  Save lyrics to the global lyrics cache directory as: 
+"lyrics/ARTIST NAME/Title.lrc" instead of just title (lyrics/TITLE.lrc), like 
+Audacious does.  This needed b/c there are songs with the same title by 
+different artists that are completely different songs & different lyrics!
+
+* Helpers:  Add a corresponding "helper-script-name.ini" file for each of the 
+current 3 helper programs, ie. "FauxdaciousUrlHelper.ini".  Comments in the 
+top of each of the templates (in /contrib/) describe what the user can 
+configure.  This was previously hard-coded in the scripts, and Windows users, 
+with no Perl on their systems and using the compiled binary versions had no 
+way to edit.  NOTE:  Windows users will find this in the same directory the 
+installer installed the program in 
+(default is:  C:\Program Files (x86)\Fauxdacious\bin\) and will need to copy 
+the ones they wish to edit to their (usually): 
+C:\Users\<username>\AppData\Local\Fauxdacious[_instancename]\ directory.  
+All others will need to copy them from the /contrib/ directory to the same 
+place in order to edit and use.
+
+* Skins:  Add "Add Files" and "Add URL" options to the main menu, making it 
+easier to add stuff to the playlist without the playlist being displayed.
+
 Version 4.1-beta3
 
 * Add [Song Info] option to search for cover-art file name matching the 
