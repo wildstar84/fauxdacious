@@ -5,7 +5,12 @@
 
 #FAUXDACIOUS "HELPER" SCRIPT TO HANDLE URLS THAT FAUXDACIOUS CAN'T PLAY DIRECTLY:
 
-#USAGE:  ~/.config/audacious[_instancename]/config:  [audacious].url_helper=FauxdaciousUrlHelper.pl
+#USAGE:  $0 URL [download-path]
+
+#NOTE:  SEE ALSO THE CONFIG (.ini) FILE: FauxdaciousLyricsHelper.ini in /contrib/, 
+#       MOVE OVER TO ~/.config/fauxdacious[_instancename]/ AND EDIT TO SUIT YOUR NEEDS!
+
+#CONFIGURE:  ~/.config/fauxdacious[_instancename]/config:  [audacious].url_helper=FauxdaciousUrlHelper.pl
 
 #THIS SCRIPT WORKS BY TAKING THE URL THAT FAUXDACIOUS IS ATTEMPTING TO ADD TO IT'S
 #PLAYLIST AND TRIES TO MATCH IT AGAINST USER-WRITTEN REGEX PATTERNS.  IF IT MATCHES
@@ -64,9 +69,9 @@ use StreamFinder;
 
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
 #FORMAT:  '//www.problemserver.com' [, ...]
-my @downloadServerList = ();  #USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE.
+my @downloadServerList = ();  #USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE OR IN FauxdaciousUrlHelper.ini.
 
-die "..usage: $0 url\n"  unless ($ARGV[0]);
+die "..usage: $0 URL [download-path]\n"  unless ($ARGV[0]);
 exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
 
 my $configPath = '';
@@ -80,14 +85,28 @@ my $client = 0;
 my $downloadit = 0;
 my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
-#BEGIN USER-DEFINED PATTERN-MATCHING CODE:
-
+	if ($configPath && open IN, "<${configPath}/FauxdaciousUrlHelper.ini") {
+		while (<IN>) {
+			chomp;
+			next  if (/^\#/o);
+			next  unless (/\S/o);
+			s/^\s+//o;
+			s/\,$//o;
+			s/^[\'\"]//o;
+			s/[\'\"]$//o;
+			push @downloadServerList, $_;
+		}
+		close IN;
+	}
 	foreach my $s (@downloadServerList) {
-		if ($ARGV[0] =~ /$s/) {
+		if ($ARGV[0] =~ /\Q$s\E/) {
 			$downloadit = 1;
 			last;
 		}
 	}
+
+#BEGIN USER-DEFINED PATTERN-MATCHING CODE:
+
 	if ($downloadit) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
 		my $fn = $1  if ($ARGV[0] =~ m#([^\/]+)$#);
 		exit (0)  unless ($fn);
@@ -148,8 +167,10 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		}
 	}
 
-&writeTagData($client, $comment, $downloadit);
+    &writeTagData($client, $comment, $downloadit);
+
 #END USER-DEFINED PATTERN-MATCHING CODE.
+
 exit (0)  unless ($newPlaylistURL);
 
 if ($configPath) {

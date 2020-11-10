@@ -15,7 +15,10 @@
 
 #USAGE:  $0 artist title [configpath]
 
-#CONFIGURE:  ~/.config/audacious[_instancename]/config:  [audacious].lyrics_helper=FauxdaciousLyricsHelper.pl
+#NOTE:  SEE ALSO THE CONFIG (.ini) FILE: FauxdaciousLyricsHelper.ini in /contrib/, 
+#       MOVE OVER TO ~/.config/fauxdacious[_instancename]/ AND EDIT TO SUIT YOUR NEEDS!
+
+#CONFIGURE:  ~/.config/fauxdacious[_instancename]/config:  [audacious].lyrics_helper=FauxdaciousLyricsHelper.pl
 
 #THIS SCRIPT ATTEMPTS TO FETCH THE LYRICS FOR THE CURRENT SONG PLAYING IN FAUXDACIOUS FOR THE NEW
 #"PURE PERL" VERSIONS OF THE LYRICWIKI PLUGINS USING A VERIETY OF LYRICS SITES (SUPPORTD BY PERL'S
@@ -56,11 +59,17 @@ use strict;
 use warnings;
 use Lyrics::Fetcher;
 
-#USER: ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
+#USER: EDIT ~/.config/fauxdacious[_instancename]/FauxdaciousLyricsHelper.txt TO
+#ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
 #NEXT SONG IN ORDER TO AVOID RE-SEARCHING THE LYRICS SITES FOR LIKELY NON-EXISTANT "TITLE" EVERY SONG!
-#FORMAT:  'artist name\|title name' [, ...]
-my @SKIPTHESE = (
-);
+#FORMAT:  artist name|title name (one pair per line).
+
+#YOU CAN ALSO ADD A USER-AGENT LINE TO SEND TO THE LYRICS SITES HERE:
+#SEE Lyrics::Fetcher DOCS FOR THE DEFAULT USER-AGENT VALUE:
+#(CURRENTLY:  "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0").
+#FORMAT:  agent="user-agent string"
+my @SKIPTHESE = ();
+my $agent = '';
 
 my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
@@ -71,6 +80,27 @@ die "e:$0: No lyric fetchers found!\n"  unless ($#fetchers >= 0);
 my $random_fetcher;
 
 if ($#ARGV >= 1) {
+	if ($ARGV[2] && -d $ARGV[2]) {
+		## USER-CONFIGURED SITE-SKIP LIST:
+		if (open IN, "<$ARGV[2]/FauxdaciousLyricsHelper.ini") {
+			while (<IN>) {
+				chomp;
+				next  if (/^\#/o);
+				next  unless (/\S/o);
+				s/^\s+//o;
+				s/\,$//o;
+				if (s/^agent\s*\=\s*[\'\"]?//o) {
+					($agent = $_) =~ s/[\'\"]$//;
+					next;
+				}
+				s/^[\'\"]//o;
+				s/[\'\"]$//o;
+				push @SKIPTHESE, $_;
+			}
+			close IN;
+		}
+	}
+
 	for (my $a=0;$a<=$#ARGV;$a++) {  #STRIP QUOTES AROUND ARGUMENTS OFF (M$-Windows EXE)!:
 		$ARGV[$a] =~ s/^[\'\"]//;
 		$ARGV[$a] =~ s/[\'\"]$//;
@@ -80,7 +110,7 @@ if ($#ARGV >= 1) {
 	print STDERR "..LYRICS:Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
-		if ("$ARGV[0]|$ARGV[1]" =~ /^${skipit}$/i) {
+		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E$/i) {
 			print STDERR "i:LYRICS HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			exit (0);  #QUIT - WE KNOW THERE'S NO LYRICS TO FETCH FOR THE *STATION*!
 		}

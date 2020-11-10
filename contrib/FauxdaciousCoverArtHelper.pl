@@ -6,7 +6,10 @@
 
 #USAGE:  $0 {CD[T] diskID | DVD title | ALBUM album} [configpath] | DELETE COVERART configpath
 
-#CONFIGURE:  ~/.config/audacious[_instancename]/config:  [audacious].cover_helper=FauxdaciousCoverArtHelper.pl
+#NOTE:  SEE ALSO THE CONFIG (.ini) FILE: FauxdaciousCoverArtHelper.ini in /contrib/, 
+#       MOVE OVER TO ~/.config/fauxdacious[_instancename]/ AND EDIT TO SUIT YOUR NEEDS!
+
+#CONFIGURE:  ~/.config/fauxdacious[_instancename]/config:  [audacious].cover_helper=FauxdaciousCoverArtHelper.pl
 
 #THIS SCRIPT ATTEMPTS TO FETCH THE COVER ART FOR CDs AND DVDs AND, IF NEEDED, THE TRACK TITLES AND ARTISTS 
 #FOR CDs.  IT ALSO HANDLES DELETING TEMPORARY COVER-ART IMAGES FOR FAUXDACIOUS.
@@ -381,11 +384,11 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 }
 elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICBRAINZ:
 {
-    #USER: ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
+    #ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
     #NEXT SONG IN ORDER TO AVOID RE-SEARCHING MUSIC-BRAINZ FOR LIKELY NON-EXISTANT "TITLE" EVERY SONG!
-    #FORMAT:  'album%20name\|title%20name' [, ...]
-	my @SKIPTHESE = (
-	);
+    #FORMAT:  'album name|title name' [, ...]
+    #SEE FauxdaciousCoverArtHelper.ini (MOVE FROM /contrib/ TO ~/.config/fauxdacious[_instancename]/
+	my @SKIPTHESE = ();
 
 	(my $album = $ARGV[1]) =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $artist = defined($ARGV[3]) ? $ARGV[3] : '_';
@@ -417,23 +420,41 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	}
 	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 
-	print STDERR "i:ART:DOING: ALBUM=$album= TITLE=$title= ARTIST=$artist=\n"  if ($DEBUG);
+	if ($configPath) {
+		## USER-CONFIGURED SITE-SKIP LIST:
+		if (open IN, "<${configPath}/FauxdaciousCoverArtHelper.ini") {
+			while (<IN>) {
+				chomp;
+				next  if (/^\#/o);
+				next  unless (/\S/o);
+				s/^\s+//o;
+				s/\,$//o;
+				s/^[\'\"]//o;
+				s/[\'\"]$//o;
+				push @SKIPTHESE, $_;
+			}
+			close IN;
+		}
+	}
+
+	my $album_uesc = uri_unescape($album);
+	my $artist_uesc = uri_unescape($artist);
+	my $title_uesc = uri_unescape($title);
+	print STDERR "i:ART HELPER: DOING: ALBUM=$album_uesc= TITLE=$title_uesc= ARTIST=$artist_uesc=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
-		if ("$album|$title" =~ /^${skipit}$/) {
+		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			exit (0);  #QUIT - WE ALREADY HAVE THIS IMAGE STORED!
 		}
 	}
 	if ($artist && $artist ne '_' && $title) {  #TRY genius.com FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
-		my $artist_uesc = uri_unescape($artist);
-		my $title_uesc = uri_unescape($title);
 		($url = $artist_uesc) =~ s#\s*\/.*$##;
 		$url .= " ${title_uesc}-lyrics";
 		$url =~ s/\&/and/g;
 		$url =~ s/ +/\-/g;
 		$url =~ s/[^a-zA-Z0-9\-]+//g;
 		$url = 'https://genius.com/' . $url;
-		print STDERR "i:ART:TRYING GENIUS($url)!\n"  if ($DEBUG);
+		print STDERR "i:ART HELPER: TRYING GENIUS($url)!\n"  if ($DEBUG);
 		$response = $ua->get($url);
 		if ($response->is_success) {
 			$html = $response->decoded_content;
@@ -462,7 +483,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 		$release =~ s/(?:\%20)+$//o;  #CHOMPIT!
 		$html = '';
 		$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$release";
-		print STDERR "i:ART: SEARCHURL=$url=\n"  if ($DEBUG);
+		print STDERR "i:ART HELPER:SEARCHURL=$url=\n"  if ($DEBUG);
 		$response = $ua->get($url);
 		if ($response->is_success) {
 			$html = $response->decoded_content
