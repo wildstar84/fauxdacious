@@ -1,4 +1,4 @@
-.TH FAUXDACIOUS "1" "May 2018" "Version @PACKAGE_VERSION@" "Fauxdacious"
+.TH FAUXDACIOUS "1" "Nov 2020" "Version @PACKAGE_VERSION@" "Fauxdacious"
 
 .SH NAME
 fauxdacious \- a fork of the Audacious audio player.

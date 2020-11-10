@@ -146,6 +146,6 @@ SEE ALSO
        fauxdtool(1)
 
 WEBSITE
-       https://wildstar84.wordpress.com/fauxdacious http://fauxdacious-media-player.org
+       https://wildstar84.wordpress.com/fauxdacious https://audacious-media-player.org
 
-Version 3.7-beta1                  May 2016                     FAUXDACIOUS(1)
+Version 4.1-final                  Nov 2020                     FAUXDACIOUS(1)

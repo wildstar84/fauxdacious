@@ -1,4 +1,4 @@
-.TH FAUXDTOOL "1" "May 2018" "Version @PACKAGE_VERSION@"
+.TH FAUXDTOOL "1" "Nov 2020" "Version @PACKAGE_VERSION@"
 
 .SH NAME
 .B fauxdtool

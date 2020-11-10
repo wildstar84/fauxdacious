@@ -5,6 +5,7 @@
 
 ###(lyrichelper_modules.pm contains):
 ###use Lyrics::Fetcher;
+###use Lyrics::Fetcher::ApiLyricsOph;
 ###use Lyrics::Fetcher::AZLyrics;
 ###use Lyrics::Fetcher::Genius;
 ###use Lyrics::Fetcher::Musixmatch;

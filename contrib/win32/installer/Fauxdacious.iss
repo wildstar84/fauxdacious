@@ -21,10 +21,10 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=C:\fauxdacious-4.0\COPYING.txt
-InfoAfterFile=C:\fauxdacious-4.0\fauxdacious.txt
+LicenseFile=C:\fauxdacious-4.1\COPYING.txt
+InfoAfterFile=C:\fauxdacious-4.1\fauxdacious.txt
 OutputBaseFilename=Fauxdacious_install
-SetupIconFile=C:\fauxdacious-4.0\images\fauxdacious.ico
+SetupIconFile=C:\fauxdacious-4.1\images\fauxdacious.ico
 Compression=lzma
 SolidCompression=yes
 
