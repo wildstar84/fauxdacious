@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2015 Audacious developers -->
 <component type="desktop">
-  <id>audacious.desktop</id>
+  <id>fauxdacious.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>BSD-2-Clause</project_license>
   <name>Fauxdacious</name>
@@ -18,7 +18,7 @@
       playlists. Listen to CD’s or stream music from the Internet. Tweak the
       sound with the graphical equalizer or experiment with LADSPA
       effects. Enjoy the modern GTK-themed interface or change things up with
-      Winamp Classic skins. Use the plugins included with Audacious to fetch
+      Winamp Classic skins. Use the plugins included with Fauxdacious to fetch
       lyrics for your music, to set an alarm in the morning, and more.
     </p>
   </description>
