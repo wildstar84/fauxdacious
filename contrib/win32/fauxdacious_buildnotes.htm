@@ -3,15 +3,17 @@
 <html>
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-<title>Notes for Building Fauxdacious on Windows</title>
+<title>Notes for Building Fauxdacious (GTK vsn.) on M$-on Windows</title>
 </head>
 <body>
 
-<h2>Notes for Building Fauxdacious on Windows</h2>
+<h2>Notes for Building Fauxdacious (GTK vsn.) on M$-Windows</h2>
 
 <p><em>Jim Turner<br>
 Nov 18, 2019<br>from "Building Audacious (v. 3.8) on Windows", by: John Lindgren<br>
 May 16, 2015</em></p>
+
+<p>NOTE:  This builds the GTK and skins-GTK version for Fauxdacious (The Qt version is currently not supported in M$-Windows).</p>
 
 <p>Several patch files should accompany this document.</p>
 
@@ -602,13 +604,13 @@ make install</tt></p></blockquote>
 
 <h3>Install Fauxdacious</h3>
 
-<p>Download and unzip to <tt>C:\fauxdacious</tt>:<br>
-<a href="http://phoenixcomm.net/~jturner/">
-<tt>http://phoenixcomm.net/~jturner/</tt></a></p>
+<p>Create the directory: <tt>C:\fauxdacious</tt> and grab the source off of GitHub:<br>
+(<a href="https://github.com/wildstar84/fauxdacious">
+<tt>git clone --single-branch git://github.com/wildstar84/fauxdacious.git fauxdacious</tt></a>)</p>
 
 <p>In the MinGW shell:</p>
 <blockquote><p><tt>cd /C/fauxdacious<br>
-Fauxdacious Note:&nbsp;  You should make sure that the "-win32.*" versions of the image files are used in /C/fauxdacious/src/images/about-logo.*!</B><br><br>
+Fauxdacious Note:&nbsp;  You should make sure that the "-win32.*" versions of the image files are used in (copied over) /C/fauxdacious/src/images/about-logo.*!</B><br><br>
 ./autogen.sh<br>
 ./configure --prefix=/C/aud --with-buildstamp=Fauxdacious<br>
 make<br>
@@ -616,14 +618,14 @@ make install</tt></p></blockquote>
 
 <h3>Install Fauxdacious Plugins</h3>
 
-<p>Download and unzip to <tt>C:\fauxdacious-plugins</tt>:<br>
-<a href="http://phoenixcomm.net/~jturner/">
-<tt>http://phoenixcomm.net/~jturner/</tt></a></p>
+<p>Create the directory: <tt>C:\fauxdacious-plugins</tt> and grab the source off of GitHub:<br>
+(<a href="https://github.com/wildstar84/fauxdacious-plugins">
+<tt>git clone --single-branch git://github.com/wildstar84/fauxdacious-plugins.git fauxdacious-plugins</tt></a>)</p>
 
 <p>In the MinGW shell:</p>
 <blockquote><p><tt>cd /C/fauxdacious-plugins<br>
 ./autogen.sh<br>
-./configure --prefix=/C/aud [--with-libsdl=2]<br>
+./configure --prefix=/C/aud --with-libsdl=2<br>
 make<br>
 make install<br>
 cd /C/fauxdacious-plugins/src/waveout #(to add the new Windows native audio output plugin)<br>
@@ -634,10 +636,10 @@ make install</tt></p></blockquote>
 
 <h3>(Optional) Create executable Fauxdacious Windows Binary Install Wizard</h3>
 
-<p>To build the installable binary (for use on other MS-Windows systems), download and untar the file <a href="http://phoenixcomm.net/~jturner/faud.tar.bz2">http://phoenixcomm.net/~jturner/faud.tar.bz2</a> in your root directory (C:\).  It will create a directory called C:\faud\.</p>
+<p>To build the installable binary (for use on other MS-Windows systems), download and untar the file <a href="https://github.com/wildstar84/fauxdacious-windows-easyinstaller/blob/main/faud.zip">faud.zip</a> from GitHub into your root directory (C:\).  It will create a directory called C:\faud\.  See the <a href="https://github.com/wildstar84/fauxdacious-windows-easyinstaller">README</a> for further information about Fauxdacious for Windows.</p>
 
 <p>Download the <a href="http://www.jrsoftware.org/isinfo.php">Inno Setup Wizard(tm)</a>, and install it.</p>
 
-<p>In the gui / editor window, open the file C:\fauxdacious-3.8\contrib\win32\installer\Fauxdacious.iss, then select [Build].[Cimpile] to create the executable binary "Fauxdacious_install.zip".  By defauit it creates and puts it in a folder called "Output" in "My Documents".  It combines what's in C:\fauxdacious-[vsn#]\, C:\fauxdacious-plugins-[vsn#], and C:\faud\ to build the fully-independent stand-alone binary executable.  When run on another M$-Windows machine, it installs Fauxdacious, fauxdtool, and all the necessary libraries needed to run Fauxdacious (and nothing else - no crapware!).  To configure Fauxdacious on systems where it is installed, the default configuration file (editable with Notepad, Wordpad, etc.) is installed as C:\Users\[user-id]\AppData\Local\fauxdacious\config. (at least on Windows-7).</p>
+<p>In the gui / editor window, open the file C:\fauxdacious\contrib\win32\installer\Fauxdacious.iss, then select [Build].[Cimpile] to create the executable binary "Fauxdacious_install.zip".  By defauit it creates and puts it in a folder called "Output" in "My Documents".  It combines what's in C:\fauxdacious-[vsn#]\, C:\fauxdacious-plugins-[vsn#], and C:\faud\ to build the fully-independent stand-alone binary executable.  When run on another M$-Windows machine, it installs Fauxdacious, fauxdtool, and all the necessary libraries needed to run Fauxdacious (and nothing else - no crapware!).  To configure Fauxdacious on systems where it is installed, the default configuration file (editable with Notepad, Wordpad, etc.) is installed as C:\Users\[user-id]\AppData\Local\fauxdacious\config. (at least on Windows-7).</p>
 </body>
 </html>

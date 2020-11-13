@@ -7,7 +7,7 @@
 
 #USAGE:  $0 URL [download-path]
 
-#NOTE:  SEE ALSO THE CONFIG (.ini) FILE: FauxdaciousLyricsHelper.ini in /contrib/, 
+#NOTE:  SEE ALSO THE CONFIG (.ini) FILE: FauxdaciousUrlHelper.ini in /contrib/, 
 #       MOVE OVER TO ~/.config/fauxdacious[_instancename]/ AND EDIT TO SUIT YOUR NEEDS!
 
 #CONFIGURE:  ~/.config/fauxdacious[_instancename]/config:  [audacious].url_helper=FauxdaciousUrlHelper.pl
