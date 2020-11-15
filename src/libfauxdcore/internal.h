@@ -43,7 +43,7 @@ void art_clear_current ();
 void art_cleanup ();
 
 /* art-search.cc */
-String art_search (const char * filename);
+String art_search (const char * filename, Tuple & tuple);
 
 /* charset.cc */
 void chardet_init ();

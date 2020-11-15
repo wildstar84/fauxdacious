@@ -98,31 +98,8 @@ void ScanRequest::run ()
         if (! image_data.len ())
         {
             if (need_image)
-                image_file = art_search (audio_file);
+                image_file = art_search (audio_file, rtuple);
 
-            /* JWT:IF SEARCH FOUND NO OTHER ART IMAGE BASED ON FILE NAME, SEARCH FOR FILE MATCHING Album TAG: */
-            if (! image_file && aud_get_bool (nullptr, "use_album_tag_cover"))
-            {
-                String album_tag = rtuple.get_str (Tuple::Album);
-                if (album_tag && album_tag[0])
-                {
-                    StringBuf local_fid = uri_to_filename (audio_file);
-                    if (local_fid)  // WE'RE A LOCAL FILE NAME (file://...)
-                    {
-                        StringBuf path = filename_get_parent (local_fid);
-                        Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
-                        for (auto & tryext : extlist)
-                        {
-                            StringBuf tryimg = str_concat ({path, "/", album_tag, ".", tryext});
-                            if (g_file_test (tryimg, G_FILE_TEST_EXISTS))
-                            {
-                                image_file = String (tryimg);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 

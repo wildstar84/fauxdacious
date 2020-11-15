@@ -25,6 +25,7 @@
 
 #include "audstrings.h"
 #include "index.h"
+#include "tuple.h"
 #include "runtime.h"
 
 struct SearchParams {
@@ -58,7 +59,7 @@ static bool cover_name_filter (const char * name,
 }
 
 static String fileinfo_recursive_get_image (const char * path,
- const SearchParams * params, int depth)
+        const SearchParams * params, int depth, Tuple & tuple)
 {
     GDir * d = g_dir_open (path, 0, nullptr);
     if (! d)
@@ -66,25 +67,44 @@ static String fileinfo_recursive_get_image (const char * path,
 
     const char * name;
 
-    if (aud_get_bool (nullptr, "use_file_cover") && ! depth)
+    if (! depth)
     {
-        /* Look for images matching file name */
-        while ((name = g_dir_read_name (d)))
+        bool use_file_cover = aud_get_bool (nullptr, "use_file_cover");
+        bool use_album_tag_cover = false;
+        String album_tag = tuple.get_str (Tuple::Album);
+        String album_artfile = String ("");
+
+        if (aud_get_bool (nullptr, "use_album_tag_cover") && album_tag && album_tag[0])
+            use_album_tag_cover = true;
+
+        if (use_file_cover || use_album_tag_cover)
         {
-            StringBuf newpath = filename_build ({path, name});
-
-            if (! g_file_test (newpath, G_FILE_TEST_IS_DIR) &&
-             has_front_cover_extension (name) &&
-             same_basename (name, params->filename))
+            /* Look for images matching file name */
+            while ((name = g_dir_read_name (d)))
             {
-                g_dir_close (d);
-                return String (newpath);
+                StringBuf newpath = filename_build ({path, name});
+
+                if (! g_file_test (newpath, G_FILE_TEST_IS_DIR) &&
+                        has_front_cover_extension (name))
+                {
+                    if (use_file_cover && same_basename (name, params->filename))
+                    {
+                        g_dir_close (d);
+                        return String (newpath);
+                    }
+                    else if (use_album_tag_cover && same_basename (name, album_tag))
+                        album_artfile = String (newpath);
+                }
             }
+
+            g_dir_rewind (d);
         }
-
-        g_dir_rewind (d);
+        if (album_artfile && album_artfile[0])
+        {
+            g_dir_close (d);
+            return album_artfile;
+        }
     }
-
     /* Search for files using filter */
     while ((name = g_dir_read_name (d)))
     {
@@ -111,7 +131,7 @@ static String fileinfo_recursive_get_image (const char * path,
 
             if (g_file_test (newpath, G_FILE_TEST_IS_DIR))
             {
-                String tmp = fileinfo_recursive_get_image (newpath, params, depth + 1);
+                String tmp = fileinfo_recursive_get_image (newpath, params, depth + 1, tuple);
 
                 if (tmp)
                 {
@@ -126,7 +146,7 @@ static String fileinfo_recursive_get_image (const char * path,
     return String ();
 }
 
-String art_search (const char * filename)
+String art_search (const char * filename, Tuple & tuple)
 {
     StringBuf local = uri_to_filename (filename);
     if (! local)
@@ -147,6 +167,6 @@ String art_search (const char * filename)
 
     cut_path_element (local, elem - local);
 
-    String image_local = fileinfo_recursive_get_image (local, & params, 0);
+    String image_local = fileinfo_recursive_get_image (local, & params, 0, tuple);
     return image_local ? String (filename_to_uri (image_local)) : String ();
 }
