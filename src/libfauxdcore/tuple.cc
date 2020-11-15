@@ -673,6 +673,8 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
             bool albumisset = ! split_titles;
             fauxd_set_prevmeta (0, val);
             const char * ttloffset = strstr ((const char *) val, " - text=\"");
+
+            unset (Lyrics); //JWT:REMOVE ANY RESIDUAL "LYRICS" FROM TAGFILE (LIKELY FROM URLHELPER) SO SONG CHG. CAN OVERRIDE!
             if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
             {
                 const char * endquote = strstr (ttloffset+10, "\"");
