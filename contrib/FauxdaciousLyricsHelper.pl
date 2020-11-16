@@ -128,7 +128,7 @@ if ($#ARGV >= 1) {
 				$lyrics .= "${doschar}\n(Lyrics courtesy: $fetchers[$random_fetcher])";
 				if ($ARGV[2] && -d $ARGV[2] && open OUT, ">$ARGV[2]/_tmp_lyrics.txt") {
 					binmode OUT;
-					print OUT "${lyrics}\0";
+					print OUT $lyrics;
 					close OUT;
 				} else {
 					print STDERR $lyrics;
