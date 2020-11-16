@@ -443,6 +443,8 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM MUSICB
 	my $title_uesc = uri_unescape($title);
 	print STDERR "i:ART HELPER: DOING: ALBUM=$album_uesc= TITLE=$title_uesc= ARTIST=$artist_uesc=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
+		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
+		$skipit =~ s/^\_\|/$album_uesc\|/;
 		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			exit (0);  #QUIT - WE ALREADY HAVE THIS IMAGE STORED!
