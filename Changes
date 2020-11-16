@@ -1,3 +1,58 @@
+Version 4.1.1-beta1
+
+FIXES:
+
+* neon: Add workaround for frequent 416-server errors that seem to plegue 
+some podcast sites that cause podcasts to seemingly randomly fail to start.  
+(The server reports that it can accept byte range offsets for seeking, then 
+will sometimes return a 416 error when we attempt to seek to get metadata.  
+Retrying startup (this workaround) without seeking seems to work!
+
+* cover art: The new [Song Info]."Search for images matching Album tag..." 
+option was being overridden by the first image found matching the keyword 
+search feature, if both were found.  Fixed to ensure precedence (when all 
+search options are enabled) is:  1) art image file matching the song entry's 
+file name (ie. song.png for song.mp3); 2) Album name image (ie. Album Name.jpg 
+if the Album tag is "Album Name", and then 3) "*<keyword>*" (ie. "*cover*.png", 
+"*album*.jpg", etc. searched recursively down thru the subdirectories.
+
+* Lyrics: Null-terminate lyrics to avoid trailing "garbage characters" showing 
+up at the bottom of the lyrics display screen.
+
+* ogg/vorbis: Only allow "streams", not song files of this type to update 
+(change) the tag metadata (from what was probed) when playback starts.  This 
+now is consistant with mp3 files and streams.  Problem manifested when the 
+user created a "user tag data" file entry for a song file with Precedence set 
+to "ONLY" or "OVERRIDE" meaning use THESE values, then starting play would 
+override these values with the metadata in the tags.  We WANT this for streams, 
+ie. streaming radio stations that CHANGE titles, etc. regularly, but NOT for 
+files, where the song metadata is fetched once on scan.
+
+* user tag files: The "Precedence" field in these tag files was not working 
+properly in certain cases, namely when a higher priority (more local) tag file, 
+ie. "./user_tag_data.tag" had an "OVERRIDE" precedence, but a lower-priority 
+tag file, ie. "fauxdacious/user_tag_data" had an "ONLY" precedence.  Now, the 
+tag files are processed in proper order with only the FIRST matching entry 
+used, and the song's metadata tags are read (and processed against "DEFAULT" 
+or "OVERRIDE") unless the matching entry's precedence is "ONLY".  A new 
+precedence option was added:  "NONE" means ignore the entry (as if commented 
+out) and continue searching.  The priority is:  
+1) "<fauxdacious-instance>/tmp_tag_data", 2) "./<song-file>.<mp3>.tag", 
+3) "./user_tag_data.tag", 4) "<fauxdacious-instance>/user_tag_data", 
+and 5) Tags embeded in the entry.  (Tags with precedence="DEFAULT" 
+are overwritten by non-empty tag fields from the entry).
+
+ADDED:
+
+* URL Helper:  Place the "Description" text from StreamFinder::* fetched URLs 
+into the "Lyrics" tag (in the tag file).  This is very useful for videos and 
+podcasts, as these almost never have matching "lyrics"!  However, for streaming 
+radio stations that play songs, these "lyrics" will (properly) be overritten 
+by those related to the currently-playing song title whenever the "title" 
+field changes during play (as was before).  Some podcasts DO have embedded 
+"lyrics"/description, and those also will overwrite this Description "lyrics" 
+put into the tag file by the helper script.
+
 Version 4.1-final
 
 * LyricWiki plugins:  Add options to turn off internet lyric fetching, and 
