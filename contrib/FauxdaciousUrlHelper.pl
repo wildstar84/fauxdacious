@@ -136,6 +136,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 		$title = $client->getTitle();
 		my $art_url = $client->getIconURL();
+		my $desc = $client->getTitle('desc');
 
 		#NOTE:  MOST PODCAST EPISODE mp3's SEEM TO COME WITH THEIR OWN EMBEDDED ICONS OR RELY ON THE ALBUM'S ICON:
 		#(SO OPTIONS #1 & #2 ARE PBLY POINTLESS (CREATE USELESS REDUNDANT ICON FILES):
@@ -152,6 +153,13 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		$comment .= 'AlbumArtist='.$client->{albumartist}."\n"  if (defined($client->{albumartist}) && $client->{albumartist} =~ /\w/);
 		$comment .= 'Year='.$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
 		$comment .= 'Genre='.$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
+		#PUT DESCRIPTION FIELD, IF ANY INTO THE "Lyrics" FOR DISPLAY IN LYRICS PLUGINS.
+		#NOTE:  IF THE STREAM HAS LYRICS IN id3 TAGS, THEY WILL REPLACE THIS, REGARDLESSOF "Precedence".
+		#COMMENT OUT NEXT 4 LINES IF THIS IS NOT DESIRED:
+		if (defined($desc) && $desc =~ /\w/) {
+			(my $lyrics = "Lyrics=Description:  $desc\n") =~ s/\R/ /gs; #MUST WRAP (ONLY SINGLE LINE ALLOWED IN TAGFILES!
+			$comment .= "$lyrics\n";
+		}
 		if ($art_url) {
 			my ($image_ext, $art_image) = $client->getIconData;
 			if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
