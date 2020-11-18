@@ -21,6 +21,7 @@
 #include "probe.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <glib.h>  /* for GKeyFile */
 extern "C" {
@@ -692,12 +693,23 @@ EXPORT bool aud_file_write_tuple (const char * filename,
         if (! strncmp (actual_filename, "cdda://", 7) || ! strncmp (actual_filename, "dvd://", 6))  // FILE IS A DISK:
         {
             String diskID = aud_get_str (nullptr, "playingdiskid");
-            String tag_file = String (str_concat ({diskID, ".tag"}));
+            String tag_file = strstr ((const char *) diskID, "tmp_tag_data")
+                    ? diskID : String (str_concat ({diskID, ".tag"}));
+
             success = aud_write_tag_to_tagfile (actual_filename, tuple, tag_file);
             if (success)
             {
-                aud_set_bool (nullptr, "_disktagrefresh", TRUE);
-                aud_playlist_rescan_file (actual_filename);
+                int track;
+                if (! (strncmp (filename, "cdda://?", 8) || sscanf (filename + 8, "%d", &track) != 1))
+                {
+                    aud_set_int (nullptr, "_disktagrefresh", track);
+                    aud_playlist_rescan_file (actual_filename);
+                }
+                else if (! (strncmp (filename, "dvd://?", 7) || sscanf (filename + 7, "%d", &track) != 1))
+                {
+                    aud_set_int (nullptr, "_disktagrefresh", track+1); // OFF-BY-ONE B/C THERE'S A TRACK ZERO & ZERO==NO REFRESH!
+                    aud_playlist_rescan_file (actual_filename);
+                }
             }
 
             return success;
