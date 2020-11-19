@@ -321,9 +321,13 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
         tuple.set_int (Tuple::Track, atoi (instr));
     else
         tuple.unset (Tuple::Track);
-    instr = g_key_file_get_string (rcfile, song_filename, "Lyrics", nullptr);
-    if (instr)
-        tuple.set_str (Tuple::Lyrics, instr);
+    char * instrc = g_key_file_get_string (rcfile, song_filename, "Lyrics", nullptr);
+    if (instrc)
+    {
+        str_replace_char (instrc, 0x02, '\n');  // JWT:UNDO URLHELPER'S WORKAROUND FOR ILLEGAL MULTILINE "LYRICS" IN TAG FILES!
+        tuple.set_str (Tuple::Lyrics, instrc);
+        g_free (instrc);
+    }
     else
         tuple.unset (Tuple::Lyrics);
 

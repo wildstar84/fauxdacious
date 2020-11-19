@@ -1,6 +1,33 @@
 Version 4.1.1-beta1
 
+I now believe that v4.1-final was slightly rushed (should've released a 
+4.1-beta4 in hindsight), as (is typical) when the dust settled, I thought 
+of a cpl. (minor, I thought) features to add for the next release that ended 
+up resulting in a bunch of testing and revealed (or created) issues (bugs) 
+that needed fixing!  Therefore, with Audacious development seeming to be 
+in hibernation at the moment, I want to get all this out into an eventual 
+v4.1.1-final eventually (before Audacious wakes back up), then maybe pause 
+myself for a while.  We're also waiting on the Lyrics::Fetcher developer to 
+merge our changes into his code.  Anyway, go apply those commits and test! ;)
+
 FIXES:
+
+* Url Helper script:  Handle non-ascii characters that come from a few 
+websites vis StreamFinder in the description text, and possibly the title, 
+that don't play nice with Glib's g_key_file_get_string () function, which is 
+used to fetch this data from the tag files.
+
+* CDs/DVDs: Fix some issues involving updating & saving tag metadata via 
+the [Song Info] screen, and harden the code to prevent potential crashes 
+if the disk has no disk-ID / title.  For CDs, track metadata can be fetched 
+from the disk (cdda) or from the web (cddb, or the (cover art) helper script 
+the first time a disk is played.  We save any such fetched track data in 
+a custom tag file (~/.config/Fauxdacious[-instancename]/<DISK-ID>.tag), if 
+the plugin option "Allow Custom Tag-files" is checked, so that on subsequent 
+play, the data is already saved locally.  Users can modify this data for 
+individual tracks using the [Song Info] box, as is true for other music 
+files.  For DVDs, only cover art is fetched, but the displayed title and 
+cover art image can be changed, artist, year, etc. can be added the same way.
 
 * neon: Add workaround for frequent 416-server errors that seem to plegue 
 some podcast sites that cause podcasts to seemingly randomly fail to start.  

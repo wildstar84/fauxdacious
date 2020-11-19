@@ -33,8 +33,6 @@
 #         #IT'S URI/URL HERE AS "Comment=<art_uri>" SEE THE PREDEFINED PATTERNS FOR EXAMPLES:
 #    &writeTagData($comment);
 #}
-#YOU CAN CHANGE "DEFAULT" TO "OVERRIDE" IN writeTagData() TO KEEP STATION TITLE FROM BEING 
-#OVERWRITTEN BY CURRENT SONG TITLE:
 
 #===================================================================================================
 
@@ -155,9 +153,12 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		$comment .= 'Genre='.$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
 		#PUT DESCRIPTION FIELD, IF ANY INTO THE "Lyrics" FOR DISPLAY IN LYRICS PLUGINS.
 		#NOTE:  IF THE STREAM HAS LYRICS IN id3 TAGS, THEY WILL REPLACE THIS, REGARDLESSOF "Precedence".
-		#COMMENT OUT NEXT 4 LINES IF THIS IS NOT DESIRED:
-		if (defined($desc) && $desc =~ /\w/) {
-			(my $lyrics = "Lyrics=Description:  $desc\n") =~ s/\R/ /gs; #MUST WRAP (ONLY SINGLE LINE ALLOWED IN TAGFILES!
+		#COMMENT OUT NEXT 7 LINES IF THIS IS NOT DESIRED:
+		if (defined($desc) && $desc =~ /\w/ && $desc ne $title) {
+			$desc =~ s/\R/\x02/gs; #MUST BE A SINGLE LINE, SO WORKAROUND FOR PRESERVING MULTILINE DESCRIPTIONS!
+			$desc =~ s#\<(?:br|p)\s*\/?\>#\x02#igs;
+			$desc =~ s#\<[^\>]+\>##gs;
+			my $lyrics = "Lyrics=Description:  $desc";
 			$comment .= "$lyrics\n";
 		}
 		if ($art_url) {
@@ -174,6 +175,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
 			}
 		}
+		$comment =~ s/\0/ /gs;          #NO NULLS ALLOWED!
+		$comment =~ s/[\x80-\xff]//gs;  #MUST ALSO STRIP OUT ALL NON-ASCII CHARACTERS!
 	}
 
     &writeTagData($client, $comment, $downloadit);
@@ -224,7 +227,6 @@ sub writeTagData {
 		while (@tagdata) {
 			print TAGDATA shift(@tagdata);
 		}
-		# USER:CHANGE "DEFAULT" TO "OVERRIDE" BELOW TO KEEP STATION TITLE FROM BEING OVERWRITTEN BY CURRENT SONG TITLE:
 		print TAGDATA <<EOF;
 [$newPlaylistURL]
 Precedence=DEFAULT
