@@ -10,12 +10,16 @@ v4.1.1-final eventually (before Audacious wakes back up), then maybe pause
 myself for a while.  We're also waiting on the Lyrics::Fetcher developer to 
 merge our changes into his code.  Anyway, go apply those commits and test! ;)
 
-FIXES:
+FIXED:
 
 * Url Helper script:  Handle non-ascii characters that come from a few 
 websites vis StreamFinder in the description text, and possibly the title, 
 that don't play nice with Glib's g_key_file_get_string () function, which is 
 used to fetch this data from the tag files.
+
+* CDs/DVDs: (LyricWiki) - Make LyricWiki plugin's [Save Locally] button 
+work correctly for disks when the [Try to save by song file-name first] 
+option is set.
 
 * CDs/DVDs: Fix some issues involving updating & saving tag metadata via 
 the [Song Info] screen, and harden the code to prevent potential crashes 
@@ -85,8 +89,8 @@ Version 4.1-final
 * LyricWiki plugins:  Add options to turn off internet lyric fetching, and 
 to try first to save lyrics to song file name first (ie. "./songfile.lrc") as 
 opposed to the global lyrics cache 
-("~/.config/fauxdacious[_instancename]/lyrics/ARTIST NAME/TITLE.lrc").  This 
-onlyy affects songs playing from disk, as opposed to URLs, etc.
+("~/.config/fauxdacious[-instancename]/lyrics/ARTIST NAME/TITLE.lrc").  This 
+only affects songs playing from disk, as opposed to URLs, etc.
 
 * LyricWiki plugins:  Save lyrics to the global lyrics cache directory as: 
 "lyrics/ARTIST NAME/Title.lrc" instead of just title (lyrics/TITLE.lrc), like 
@@ -102,7 +106,7 @@ way to edit.  NOTE:  Windows users will find this in the same directory the
 installer installed the program in 
 (default is:  C:\Program Files (x86)\Fauxdacious\bin\) and will need to copy 
 the ones they wish to edit to their (usually): 
-C:\Users\<username>\AppData\Local\Fauxdacious[_instancename]\ directory.  
+C:\Users\<username>\AppData\Local\Fauxdacious[-instancename]\ directory.  
 All others will need to copy them from the /contrib/ directory to the same 
 place in order to edit and use.
 

@@ -20,6 +20,15 @@ libmpg123-dev libneon27-gnutls-dev libnotify-dev libpulse-dev \
 libsamplerate0-dev libsdl2-dev libsidplayfp-dev libsndfile1-dev libsoxr-dev \
 libvorbis-dev libwavpack-dev libxml2-dev libswscale-dev
 
+If building the Qt version, you'll also need at least the following (which 
+should also bring in their dependencies):
+
+qtbase5-dev, qt5-qmake, libglu-dev, libvulkan-dev, libxext-dev, 
+libqt5opengl5-dev, and libqt5x11extras5-dev.
+
+Please report any others it reports as missing when building, so I can make 
+sure they're included here too!
+
 Download and install from Github:
 
 	cd /tmp
@@ -60,7 +69,10 @@ Now run fauxdacious:
 	fauxdacious &
 
 Fauxdacious should now start up.  Enjoy Fauxdacious!
-Be sure to read the "FAQ" file and the GIT commits for the latest Fauxdacious 
-features, fixes, changes, and how to configure to take best advantage of them!
+Be sure to read the "FAQ" and "Changes" file, and the GIT commits for the 
+latest Fauxdacious features, fixes, changes, and how to configure to take 
+best advantage of them!
 
 FAQ:  https://wildstar84.github.io/fauxdacious/FAQ.htm
+Latest Changes:  https://github.com/wildstar84/fauxdacious/blob/master/Changes
+Main website:  https://github.com/wildstar84/fauxdacious
