@@ -7,7 +7,7 @@ How to build:
 (For additional general info, see:  http://redmine.audacious-media-player.org/boards/1/topics/788?r=1762#message-1762 - 
 Building Audacious)
 
-(For building on M$-Windows systems, see:  http://phoenixcomm.net/~jturner/fauxdacious_buildnotes.htm
+(For building on M$-Windows systems, see:  https://github.com/wildstar84/fauxdacious/blob/master/contrib/win32/fauxdacious_buildnotes.htm
 
 Install the following Dependencies:
 
@@ -75,4 +75,4 @@ best advantage of them!
 
 FAQ:  https://wildstar84.github.io/fauxdacious/FAQ.htm
 Latest Changes:  https://github.com/wildstar84/fauxdacious/blob/master/Changes
-Main website:  https://github.com/wildstar84/fauxdacious
+Main website:  https://wildstar84.wordpress.com/fauxdacious/

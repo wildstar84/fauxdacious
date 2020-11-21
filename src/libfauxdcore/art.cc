@@ -282,7 +282,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
     if (item && item->flag)
     {
         if (check_for_user_art (filename, item, true) > 0)  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
-            item->flag = FLAG_SENT;
+            item->flag = FLAG_DONE;
 
         item->refcount ++;
         return item;
@@ -355,7 +355,7 @@ void art_cleanup ()
     assert (! current_item);
 
     if (art_items.n_items ())
-        AUDWARN ("Album art reference count not zero at exit!\n");
+        AUDWARN ("Album art reference count not zero at exit (%d)!\n", art_items.n_items ());
 }
 
 EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
