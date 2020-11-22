@@ -433,6 +433,7 @@ static const PreferencesWidget advanced_page_widgets[] = {
     WidgetSpin (N_("Adjust volume by:"),
         WidgetInt (0, "volume_delta"),
         {1, 25, 1, N_("percent")}),
+    WidgetLabel (N_("<b>Fauxdacious Extras</b>")),
     WidgetCombo (N_("Allow URL-helper:"),
         WidgetInt (0, "url_helper_allow"),
         {{url_helper_allow}}),
@@ -441,7 +442,9 @@ static const PreferencesWidget advanced_page_widgets[] = {
     WidgetLabel (N_("CD/DVD Cover Art-helper program?:")),
     WidgetEntry (0, WidgetString (0, "cover_helper")),
     WidgetLabel (N_("Lyricwiki plugins helper program?:")),
-    WidgetEntry (0, WidgetString (0, "lyric_helper"))
+    WidgetEntry (0, WidgetString (0, "lyric_helper")),
+    WidgetCheck (N_("Quirky window-managers (ie. AfterStep)?"),
+        WidgetBool (0, "afterstep"))
 };
 
 #define TITLESTRING_NPRESETS 8
