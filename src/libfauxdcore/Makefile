@@ -2,7 +2,8 @@ SHARED_LIB = ${LIB_PREFIX}fauxdcore${LIB_SUFFIX}
 LIB_MAJOR = 5
 LIB_MINOR = 2
 
-SRCS = adder.cc \
+SRCS = sdl_window.cc \
+       adder.cc \
        art.cc \
        art-search.cc \
        audio.cc \
@@ -54,7 +55,8 @@ SRCS = adder.cc \
        vis-runner.cc \
        visualization.cc
 
-INCLUDES = audio.h \
+INCLUDES = sdl_window.h \
+           audio.h \
            audstrings.h \
            drct.h \
            equalizer.h \
@@ -89,7 +91,7 @@ includesubdir = libfauxdcore
 
 LD = ${CXX}
 
-CPPFLAGS := -I.. -I../.. \
+CPPFLAGS := ${SDL_CFLAGS} -I.. -I../.. \
             ${CPPFLAGS} \
             ${GLIB_CFLAGS} \
             ${GMODULE_CFLAGS} \
@@ -105,7 +107,7 @@ CPPFLAGS := -I.. -I../.. \
 CFLAGS += ${LIB_CFLAGS}
 
 LIBS := ../libguess/libguess.a \
-        ${LIBS} -lm \
+        ${LIBS} -lm ${SDL_LIBS} \
         ${GLIB_LIBS} \
         ${GMODULE_LIBS} \
         ${QTCORE_LIBS}

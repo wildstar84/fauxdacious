@@ -24,6 +24,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include <libfauxdcore/sdl_window.h>
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/runtime.h>
@@ -83,6 +84,33 @@ EXPORT void init ()
         equalizer_show ();
 
     log_init ();
+
+    /* JWT:IN Qt WE HAVE TO INITIALIZE SDL ONCE HERE INSTEAD OF fauxdacious/main.cc TO AVOID "dbus warnings" ON EXIT! */
+#define SDL_MAIN_HANDLED
+    if (! SDL_WasInit (SDL_INIT_VIDEO))
+    {
+        SDL_SetMainReady ();
+        if (SDL_InitSubSystem (SDL_INIT_VIDEO))
+            AUDERR ("e:Failed to init SDL (no video playing): %s.\n", SDL_GetError ());
+        else
+        {
+            Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE;
+            if (aud_get_bool ("ffaudio", "allow_highdpi"))
+                flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+
+            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", 1, 1,
+                100, 100, flags);
+            if (! sdl_window)
+                AUDERR ("Failed to create SDL window (no video playing): %s.\n", SDL_GetError ());
+            else
+            {
+#if SDL_COMPILEDVERSION >= 2004
+                SDL_SetHint (SDL_HINT_VIDEO_X11_NET_WM_PING, "0");
+#endif
+                fauxd_set_sdl_window (sdl_window);
+            }
+        }
+    }
 }
 
 EXPORT void run ()

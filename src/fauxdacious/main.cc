@@ -28,7 +28,7 @@
 #endif
 
 #ifdef USE_SDL2
-#include "SDL.h"
+#include <libfauxdcore/sdl_window.h>
 #endif
 
 #define AUD_GLIB_INTEGRATION
@@ -597,10 +597,28 @@ int main (int argc, char * * argv)
 #endif
     {
 #ifdef USE_SDL2
+        fauxd_set_sdl_window (nullptr);
         if (SDL_Init (SDL_INIT_VIDEO))  // GTK REQUIRES INIT HERE TO AVOID SEGFAULTS, QT PUKES ON EXIT IF SO!:
             AUDERR ("e:Failed to init SDL in main(): (no video playing): %s.\n", SDL_GetError ());
         else
+        {
             sdl_initialized = true;
+            Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE;
+            if (aud_get_bool ("ffaudio", "allow_highdpi"))
+                flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+
+            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", 1, 1,
+                100, 100, flags);
+            if (! sdl_window)
+            {
+                AUDERR ("Failed to create SDL window (no video playing): %s.\n", SDL_GetError ());
+                return false;
+            }
+#if SDL_COMPILEDVERSION >= 2004
+            SDL_SetHint (SDL_HINT_VIDEO_X11_NET_WM_PING, "0");
+#endif
+            fauxd_set_sdl_window (sdl_window);
+        }
 #endif
     }
 #endif

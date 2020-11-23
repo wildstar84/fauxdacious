@@ -50,12 +50,13 @@ LD = ${CXX}
 CPPFLAGS := -I.. -I../.. \
             ${CPPFLAGS} \
             ${QT_CFLAGS} \
+            ${SDL_CFLAGS} \
             -DLIBAUDQT_BUILD
 
 CFLAGS += ${LIB_CFLAGS}
 
 LIBS := -L../libfauxdcore -lfauxdcore \
-        ${LIBS} -lm \
+        ${LIBS} ${SDL_LIBS} -lm \
         ${QT_LIBS}
 
 images.cc: images.qrc

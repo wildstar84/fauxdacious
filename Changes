@@ -33,7 +33,7 @@ individual tracks using the [Song Info] box, as is true for other music
 files.  For DVDs, only cover art is fetched, but the displayed title and 
 cover art image can be changed, artist, year, etc. can be added the same way.
 
-* neon: Add workaround for frequent 416-server errors that seem to plegue 
+* neon: Add workaround for frequent 416-server errors that seem to plague 
 some podcast sites that cause podcasts to seemingly randomly fail to start.  
 (The server reports that it can accept byte range offsets for seeking, then 
 will sometimes return a 416 error when we attempt to seek to get metadata.  
@@ -74,6 +74,22 @@ and 5) Tags embeded in the entry.  (Tags with precedence="DEFAULT"
 are overwritten by non-empty tag fields from the entry).
 
 ADDED:
+
+* Video Display (visualization plugin):  This plugin now works like all the 
+other "visualization plugins", allowing the user to dynamically toggle the 
+video window (for both the FFmpeg and the DVD plugins)!  Video is toggleable 
+if the plugin's own existing [Play video in popup window] option is checked.  
+Previously, the user had to stop and restart any currently-playing video 
+stream in order for toggling this plugin to take effect.
+
+NOTE:  When upgrading to this version vrom v4.1-final, you'll probably need 
+to go into the FFmpeg and DVD plugins' configuration options screens and 
+re-check the box for [Play video stream in popup window]!
+
+* Made the [skins].afterstep configuration flag global and added an option 
+box to the [Settings].[Advanced] screen labeled [Quirky window-managers 
+)ie. AfterStep)?].  Users who had the old option set in their config file(s) 
+will need to go and check this box!
 
 * URL Helper:  Place the "Description" text from StreamFinder::* fetched URLs 
 into the "Lyrics" tag (in the tag file).  This is very useful for videos and 
