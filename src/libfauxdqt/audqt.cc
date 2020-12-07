@@ -46,6 +46,7 @@ static const char * const audqt_defaults[] = {
     "eq_presets_visible", "FALSE",
     "equalizer_visible", "FALSE",
     "queue_manager_visible", "FALSE",
+    "restore_floating_dockapps_late", "TRUE",
     nullptr
 };
 
@@ -96,9 +97,6 @@ EXPORT void init ()
     QApplication::setFont (QApplication::font ("QTipLabel"), "QStatusBar");
 #endif
 
-    if (aud_get_bool ("qtui", "equalizer_visible"))
-        equalizer_show ();
-
     log_init ();
 
     /* JWT:IN Qt WE HAVE TO INITIALIZE SDL ONCE HERE INSTEAD OF fauxdacious/main.cc TO AVOID "dbus warnings" ON EXIT! */
@@ -144,8 +142,6 @@ EXPORT void cleanup ()
     if (-- init_count)
         return;
 
-    bool equalizer_was_visible = aud_get_bool ("qtui", "equalizer_visible");
-
     aboutwindow_hide ();
     eq_presets_hide ();
     infopopup_hide_now ();
@@ -153,8 +149,6 @@ EXPORT void cleanup ()
     log_inspector_hide ();
     plugin_prefs_hide ();
     prefswin_hide ();
-    if (equalizer_was_visible)
-        aud_set_bool ("qtui", "equalizer_visible", true);
 
     log_cleanup ();
 
