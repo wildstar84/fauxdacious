@@ -42,10 +42,19 @@ static PixelMargins margins_local;
 EXPORT const PixelSizes & sizes = sizes_local;
 EXPORT const PixelMargins & margins = margins_local;
 
+static const char * const audqt_defaults[] = {
+    "eq_presets_visible", "FALSE",
+    "equalizer_visible", "FALSE",
+    "queue_manager_visible", "FALSE",
+    nullptr
+};
+
 EXPORT void init ()
 {
     if (init_count ++)
         return;
+
+    aud_config_set_defaults ("audqt", audqt_defaults);
 
     static char app_name[] = "fauxdacious";
     static int dummy_argc = 1;
@@ -74,6 +83,13 @@ EXPORT void init ()
     margins_local.FourPt = QMargins (sizes.FourPt, sizes.FourPt, sizes.FourPt, sizes.FourPt);
     margins_local.EightPt = QMargins (sizes.EightPt, sizes.EightPt, sizes.EightPt, sizes.EightPt);
 
+#ifdef _WIN32
+    // On Windows, Qt uses 9 pt in specific places (such as QMenu) but
+    // 8 pt as the application font, resulting in an inconsistent look.
+    // First-party Windows applications (and GTK applications too) seem
+    // to use 9 pt in most places so let's try to do the same.
+    QApplication::setFont (QApplication::font("QMenu"));
+#endif
 #ifdef Q_OS_MAC  // Mac-specific font tweaks
     QApplication::setFont (QApplication::font ("QSmallFont"), "QDialog");
     QApplication::setFont (QApplication::font ("QSmallFont"), "QTreeView");
@@ -98,8 +114,8 @@ EXPORT void init ()
             if (aud_get_bool ("ffaudio", "allow_highdpi"))
                 flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 
-            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", 1, 1,
-                100, 100, flags);
+            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", SDL_WINDOWPOS_UNDEFINED,
+                SDL_WINDOWPOS_UNDEFINED, 1, 1, flags);
             if (! sdl_window)
                 AUDERR ("Failed to create SDL window (no video playing): %s.\n", SDL_GetError ());
             else
@@ -132,13 +148,11 @@ EXPORT void cleanup ()
 
     aboutwindow_hide ();
     eq_presets_hide ();
-    equalizer_hide ();
     infopopup_hide_now ();
     infowin_hide ();
     log_inspector_hide ();
     plugin_prefs_hide ();
     prefswin_hide ();
-    queue_manager_hide ();
     if (equalizer_was_visible)
         aud_set_bool ("qtui", "equalizer_visible", true);
 
