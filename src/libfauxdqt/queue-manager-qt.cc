@@ -17,6 +17,7 @@
  * the use of this software.
  */
 
+#include "libfauxdqt-internal.h"
 #include "libfauxdqt.h"
 
 #include <QAbstractListModel>
@@ -138,44 +139,43 @@ void QueueManagerModel::selectionChanged (const QItemSelection & selected,
          aud_playlist_queue_get_entry (list, index.row ()), false);
 }
 
-class QueueManagerDialog : public QDialog
+class QueueManager : public QWidget
 {
 public:
-    QueueManagerDialog (QWidget * parent = nullptr);
+    QueueManager (QWidget * parent = nullptr);
+
+    QSize sizeHint () const override
+    {
+        return {4 * sizes.OneInch, 3 * sizes.OneInch};
+    }
 
 private:
     QTreeView m_treeview;
-    QDialogButtonBox m_buttonbox;
     QPushButton m_btn_unqueue;
-    QPushButton m_btn_close;
     QueueManagerModel m_model;
 
     void removeSelected ();
     void update () { m_model.update (m_treeview.selectionModel ()); }
 
-    const HookReceiver<QueueManagerDialog>
-     update_hook {"playlist update", this, & QueueManagerDialog::update},
-     activate_hook {"playlist activate", this, & QueueManagerDialog::update};
+    const HookReceiver<QueueManager> update_hook{"playlist update", this,
+                                                 & QueueManager::update},
+        activate_hook{"playlist activate", this, & QueueManager::update};
 };
 
-QueueManagerDialog::QueueManagerDialog (QWidget * parent) :
-    QDialog (parent)
+QueueManager::QueueManager(QWidget * parent) : QWidget(parent)
 {
-    setWindowTitle (_("Queue Manager"));
-    setContentsMargins (margins.TwoPt);
-
     m_btn_unqueue.setText (translate_str (N_("_Unqueue")));
-    m_btn_close.setText (translate_str (N_("_Close")));
 
-    connect (& m_btn_close, & QAbstractButton::clicked, this, & QWidget::hide);
-    connect (& m_btn_unqueue, & QAbstractButton::clicked, this, & QueueManagerDialog::removeSelected);
+    connect (& m_btn_unqueue, & QAbstractButton::clicked, this, & QueueManager::removeSelected);
 
-    m_buttonbox.addButton (& m_btn_close, QDialogButtonBox::AcceptRole);
-    m_buttonbox.addButton (& m_btn_unqueue, QDialogButtonBox::AcceptRole);
+    auto hbox = audqt::make_hbox(nullptr);
+    hbox->setContentsMargins(audqt::margins.TwoPt);
+    hbox->addStretch(1);
+    hbox->addWidget(&m_btn_unqueue);
 
-    auto layout = make_vbox (this);
+    auto layout = make_vbox (this, 0);
     layout->addWidget (& m_treeview);
-    layout->addWidget (& m_buttonbox);
+    layout->addLayout (hbox);
 
     m_treeview.setAllColumnsShowFocus(true);
     m_treeview.setIndentation (0);
@@ -188,11 +188,9 @@ QueueManagerDialog::QueueManagerDialog (QWidget * parent) :
     connect (m_treeview.selectionModel (),
      & QItemSelectionModel::selectionChanged, & m_model,
      & QueueManagerModel::selectionChanged);
-
-    resize (4 * sizes.OneInch, 3 * sizes.OneInch);
 }
 
-void QueueManagerDialog::removeSelected ()
+void QueueManager::removeSelected ()
 {
     int list = aud_playlist_get_active ();
     int count = aud_playlist_queue_count (list);
@@ -212,22 +210,15 @@ void QueueManagerDialog::removeSelected ()
     }
 }
 
-static QPointer<QueueManagerDialog> s_queuemgr;
-
 EXPORT void queue_manager_show ()
 {
-    if (! s_queuemgr)
-    {
-        s_queuemgr = new QueueManagerDialog;
-        s_queuemgr->setAttribute (Qt::WA_DeleteOnClose);
-    }
-
-    window_bring_to_front (s_queuemgr);
+    dock_show_simple ("queue_manager", _("Queue Manager"),
+                     []() -> QWidget * { return new QueueManager; });
 }
 
 EXPORT void queue_manager_hide ()
 {
-    delete s_queuemgr;
+    dock_hide_simple ("queue_manager");
 }
 
 } // namespace audqt
