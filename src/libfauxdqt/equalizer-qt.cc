@@ -18,7 +18,6 @@
  */
 
 #include <QCheckBox>
-#include <QDialog>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -34,7 +33,11 @@
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/runtime.h>
 
+#include "libfauxdqt-internal.h"
 #include "libfauxdqt.h"
+
+namespace audqt
+{
 
 class VLabel : public QLabel
 {
@@ -92,7 +95,7 @@ public:
     }
 };
 
-class EqualizerWindow : public QDialog
+class EqualizerWindow : public QWidget
 {
 public:
     EqualizerWindow ();
@@ -168,8 +171,7 @@ EqualizerWindow::EqualizerWindow () :
     layout->addLayout (hbox);
     layout->addWidget (slider_container);
 
-    setWindowTitle (_("Equalizer"));
-    setContentsMargins (audqt::margins.EightPt);
+    setContentsMargins (audqt::margins.TwoPt);
 
     m_onoff_checkbox.setFocus ();
 
@@ -244,41 +246,15 @@ void EqualizerWindow::updateSongAuto ()
     }
 }
 
-static EqualizerWindow * s_equalizer = nullptr;
-
-namespace audqt {
-
 EXPORT void equalizer_show ()
 {
-    if (! s_equalizer)
-    {
-        s_equalizer = new EqualizerWindow;
-        s_equalizer->setAttribute (Qt::WA_DeleteOnClose);
-
-        QObject::connect (s_equalizer, & QObject::destroyed, [] () {
-            aud_set_int ("qtui", "equalizer_x", s_equalizer->geometry().x());
-            aud_set_int ("qtui", "equalizer_y", s_equalizer->geometry().y());
-            aud_set_bool ("qtui", "equalizer_visible", false);
-            s_equalizer = nullptr;
-        });
-
-        int x = aud_get_int ("qtui", "equalizer_x");
-        int y = aud_get_int ("qtui", "equalizer_y");
-        if (y <= 0)
-            y = 25; /* JWT:MAKE SURE THE WINDOW TITLEBAR (WHICH USUALLY ALLOWS abUSER TO MOVE) ISN'T OFF THE SCREEN!: */
-        s_equalizer->move (x, y);
-    }
-
-    if (s_equalizer)
-    {
-        aud_set_bool ("qtui", "equalizer_visible", true);
-        window_bring_to_front (s_equalizer);
-    }
+    dock_show_simple ("equalizer", _("Equalizer"),
+                     []() -> QWidget * { return new EqualizerWindow; });
 }
 
 EXPORT void equalizer_hide ()
 {
-    delete s_equalizer;
+    dock_hide_simple("equalizer");
 }
 
 } // namespace audqt
