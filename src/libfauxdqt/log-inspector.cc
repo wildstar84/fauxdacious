@@ -193,7 +193,7 @@ private:
 LogEntryInspector::LogEntryInspector (QWidget * parent) :
     QDialog (parent)
 {
-    setWindowTitle (_("Log Inspector"));
+    setWindowTitle (_("Log Inspector - Fauxdacious"));
     setContentsMargins (margins.TwoPt);
 
     auto view = new QTreeView (this);

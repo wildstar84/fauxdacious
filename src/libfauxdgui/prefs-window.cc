@@ -912,7 +912,7 @@ static void create_prefs_window ()
     prefswin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_type_hint ((GtkWindow *) prefswin, GDK_WINDOW_TYPE_HINT_DIALOG);
     gtk_container_set_border_width ((GtkContainer *) prefswin, 12);
-    gtk_window_set_title ((GtkWindow *) prefswin, _("Fauxdacious Settings"));
+    gtk_window_set_title ((GtkWindow *) prefswin, _("Settings - Fauxdacious"));
 
     GtkWidget * vbox = gtk_vbox_new (false, 0);
     gtk_container_add ((GtkContainer *) prefswin, vbox);

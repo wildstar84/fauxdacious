@@ -128,7 +128,7 @@ static void displayTupleImage (void * image_fn, void * hookarg);
 
 InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
 {
-    setWindowTitle (_("Song Info"));
+    setWindowTitle (_("Song Info - Fauxdacious"));
     setContentsMargins (margins.TwoPt);
 
     m_image.setAlignment (Qt::AlignCenter);

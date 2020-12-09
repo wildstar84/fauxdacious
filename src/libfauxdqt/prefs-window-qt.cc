@@ -668,7 +668,7 @@ PrefsWindow::PrefsWindow () :
      .find (aud_plugin_get_current (PluginType::Output));
 
     setAttribute (Qt::WA_DeleteOnClose);
-    setWindowTitle (_("Fauxdacious Settings"));
+    setWindowTitle (_("Settings - Fauxdacious"));
     setContentsMargins (0, 0, 0, 0);
 
     QToolBar * toolbar = new QToolBar;

@@ -68,7 +68,7 @@ EXPORT void init ()
     qapp->setAttribute (Qt::AA_UseStyleSheetPropagationInWidgetStyles);
 #endif
 
-    qapp->setApplicationName (_("Fauxdacious"));
+    qapp->setApplicationName (_("Fauxdacious_Qt"));
     if (qapp->windowIcon ().isNull ())
         qapp->setWindowIcon (audqt::get_icon (app_name));
 
