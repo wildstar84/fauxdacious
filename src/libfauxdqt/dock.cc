@@ -95,7 +95,7 @@ EXPORT void DockItem::grab_focus()
     s_host->focus_dock_item(this);
 }
 
-EXPORT DockItem * DockItem::find_by_plugin(PluginHandle * plugin)
+EXPORT DockItem * DockItem::find_by_plugin (PluginHandle * plugin)
 {
     return PluginItem::lookup(plugin);
 }
@@ -127,7 +127,8 @@ void dock_show_simple(const char * id, const char * name, QWidget * create())
     if (!item)
         item = new SimpleDockItem(id, name, create());
 
-    item->grab_focus();
+    if (! aud_get_bool ("qtui", "_nofocusgrab"))  // JWT:DON'T GRAB FOCUS WHEN RESTARTING UP (MAIN WINDOW WON'T GET IT BACK - Qt SUX AT THIS)!\n"
+        item->grab_focus();
 }
 
 void dock_hide_simple(const char * id)
