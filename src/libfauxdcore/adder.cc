@@ -346,7 +346,8 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
         if (error)
             AUDERR ("%s: %s\n", (const char *) file, (const char *) error);
 
-        if (mode & VFS_IS_SYMLINK)
+        // to prevent infinite recursion, skip symlinks to folders
+        if ((mode & (VFS_IS_SYMLINK | VFS_IS_DIR)) == (VFS_IS_SYMLINK | VFS_IS_DIR))
             continue;
 
         if (mode & VFS_IS_REGULAR)
