@@ -12,6 +12,11 @@ merge our changes into his code.  Anyway, go apply those commits and test! ;)
 
 FIXED:
 
+* Minor issue with Albumart's "Hide info bar art icon unless separate 
+album cover fetched" option that caused non-"dup" (internet-fetched) 
+album-art to still show in info bar when [View].[Show Info Bar Album Art] 
+was unchecked (hide always).
+
 * Url Helper script:  Handle non-ascii characters that come from a few 
 websites vis StreamFinder in the description text, and possibly the title, 
 that don't play nice with Glib's g_key_file_get_string () function, which is 
@@ -75,6 +80,58 @@ are overwritten by non-empty tag fields from the entry).
 
 ADDED:
 
+* Ability to hide album-art icon in info bar ([View].[Show Info Bar Album Art]) 
+option and Albumart plugin's [Hide info bar art icon unless separate album 
+cover fetched] options to the Gtk side (long ago added to Qt side) when 
+Audacious added this to their Gtk side recently.
+
+* Merged in recent Audacious changes, mostly cosmetic.  However, one big 
+change was a redesign of their Qt plugin "dock windows", but also, the 
+equalizer and the "queue manager".  This created some window-management 
+issues due to the fact that Qt restores whatever active plugins you were 
+running when you last exited, but also which plugin windows were "docked" or 
+"undocked", and if "undocked", their window-locations on the screen.  This 
+is great, but the way Qt handles this causes issues with many window-managers. 
+Qt creates all the plugin windows slightly before mapping the main window, 
+which thwarts window-managers' attempts to group all the windows with the main 
+(master) window, since they often expect the master window to be mapped first.
+The results were that the undocked dock windows started out in "limbo" being 
+placed always on top of other application's windows, and not raising and 
+lowering when the main window (the playlist window) was clicked on.  The only 
+way to fix this was for the user to manually dock and then undock each of 
+these windows.
+
+We added a workaround config option: [audqt]."restore_floating_dockapps_late", 
+and made it default: TRUE.  This option forces Fauxdacious-Qt to save a list 
+of all plugins with undocked dock windows, and deactivate them on exit.  When 
+restarted, the main window is first created with any (previously) docked 
+plugins restarted first, then manually checks the list and restarts all the 
+docked ones afterwards (this appears almost instantaniously to the user).  The 
+only remaining issue is that I have been unable to get the main window to 
+start out focused, but the last restored undocked plugin window has the 
+keyboard focus (until user clickes on the main window).
+
+We've now added a second workaround for this using window-managers' 
+"FocusOnMap" options (for ones, such as AfterStep which allow app-specific 
+window-management options) by changing the Qt application's "name" from 
+"Fauxdacios" to "Fauxdacious_Qt" to differenciated it from the GTK interface, 
+so that using the following AfterStep "database" config options, one can have 
+this configured for the Qt plugin windows work properly, but still have the 
+GTK version of the windows still work well too:
+
+AfterStep database config options for best results with Fauxdacious (configure 
+similar options on other WMs for this workaround).  This works because 
+AfterStep looks at WM_NAME (window title), then WM_CLASS (application name) to 
+match "Style"s, and applies matching one from first to last:
+
+Style  "*"              FocusOnMap
+Style  "Fauxdacious_Qt" NoFocusOnMap, Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
+Style  "*Fauxdacious"   FocusOnMap, Sticky, HonorPPosition, HonorExtWMHints
+Style  "*dacious Video" NoFocusOnMap, Sticky, HonorPPosition
+Style  "*dacious DVD"   FocusOnMap, Sticky, FocusOnMap, HonorPPosition
+
+While at it, fixed GTK side to NOT put Equalizer window "AlwaysOnTop".
+
 * Video Display (visualization plugin):  This plugin now works like all the 
 other "visualization plugins", allowing the user to dynamically toggle the 
 video window (for both the FFmpeg and the DVD plugins)!  Video is toggleable 
@@ -82,13 +139,13 @@ if the plugin's own existing [Play video in popup window] option is checked.
 Previously, the user had to stop and restart any currently-playing video 
 stream in order for toggling this plugin to take effect.
 
-NOTE:  When upgrading to this version vrom v4.1-final, you'll probably need 
+NOTE:  When upgrading to this version from v4.1-final, you'll probably need 
 to go into the FFmpeg and DVD plugins' configuration options screens and 
 re-check the box for [Play video stream in popup window]!
 
 * Made the [skins].afterstep configuration flag global and added an option 
 box to the [Settings].[Advanced] screen labeled [Quirky window-managers 
-)ie. AfterStep)?].  Users who had the old option set in their config file(s) 
+(ie. AfterStep)?].  Users who had the old option set in their config file(s) 
 will need to go and check this box!
 
 * URL Helper:  Place the "Description" text from StreamFinder::* fetched URLs 
