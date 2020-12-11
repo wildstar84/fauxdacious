@@ -47,6 +47,16 @@ static const char * const audqt_defaults[] = {
     "equalizer_visible", "FALSE",
     "queue_manager_visible", "FALSE",
     "restore_floating_dockapps_late", "TRUE",
+/* JWT:HACK FOR OLDER Qt'S (I KNOW THRU 5.7.1) WHERE MAIN WINDOW "WALKS" DOWN BY WINDOW DECORATION HEIGHT 
+   IF *ANY* DOCKED PLUGINS OTHER THAN albumart-qt AND search-tool-qt ARE ACTIVE AT STARTUP!
+   SEE:  Audacious ISSUE #1036 AND https://doc.qt.io/qt-5/application-windows.html#window-geometry!
+   FIXME:ADJUST NEXT LINE AS REPORTS COME IN FOR Qt VERSIONS BETWEEN 5.7.1(FAILS) AND 5.15.1(WORKS)!:
+*/
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+    "qt_mainwindow_walks", "TRUE",
+#else
+    "qt_mainwindow_walks", "FALSE",
+#endif
     nullptr
 };
 
