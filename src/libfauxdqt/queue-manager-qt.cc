@@ -26,6 +26,7 @@
 #include <QPushButton>
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QKeyEvent>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QPointer>
@@ -149,6 +150,9 @@ public:
         return {4 * sizes.OneInch, 3 * sizes.OneInch};
     }
 
+protected:
+    void keyPressEvent(QKeyEvent * event) override;
+
 private:
     QTreeView m_treeview;
     QPushButton m_btn_unqueue;
@@ -161,6 +165,14 @@ private:
                                                  & QueueManager::update},
         activate_hook{"playlist activate", this, & QueueManager::update};
 };
+
+void QueueManager::keyPressEvent(QKeyEvent * event)
+{
+    if (event->key() == Qt::Key_Delete)
+        removeSelected();
+
+    QWidget::keyPressEvent(event);
+}
 
 QueueManager::QueueManager(QWidget * parent) : QWidget(parent)
 {
