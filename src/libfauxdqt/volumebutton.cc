@@ -65,7 +65,6 @@ VolumeButton::VolumeButton (QWidget * parent)
     : QToolButton (parent), m_action (this), m_slider (Qt::Vertical)
 {
     m_slider.setMinimumHeight (audqt::sizes.OneInch);
-    m_slider.setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
     m_slider.setRange (0, 100);
 
     setUpButton (& m_buttons[0], 1);
@@ -76,6 +75,7 @@ VolumeButton::VolumeButton (QWidget * parent)
     layout->addWidget (& m_buttons[0]);
     layout->addWidget (& m_slider);
     layout->addWidget (& m_buttons[1]);
+    layout->setAlignment (&m_slider, Qt::AlignHCenter);
 
     m_action.setDefaultWidget (& m_container);
     m_menu.addAction (& m_action);
