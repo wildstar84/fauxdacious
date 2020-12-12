@@ -89,8 +89,7 @@ EXPORT void vfs_async_file_get_contents (const char * filename, VFSConsumer2 con
 
 EXPORT void vfs_async_file_get_contents (const char * filename, VFSConsumer cons_f, void * user)
 {
-    auto functor = [cons_f, user] (const char * filename, const Index<char> & buf)
-        { cons_f (filename, buf, user); };
+    using namespace std::placeholders;
 
-    vfs_async_file_get_contents (filename, functor);
+    vfs_async_file_get_contents(filename, std::bind(cons_f, _1, _2, user));
 }
