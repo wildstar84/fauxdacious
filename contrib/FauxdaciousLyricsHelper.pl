@@ -4,14 +4,15 @@
 ###pp --gui -o FauxdaciousLyricsHelper.exe -M utf8_heavy.pl -M lyrichelper_modules -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousLyricsHelper.pl
 
 ###(lyrichelper_modules.pm contains):
-###use Lyrics::Fetcher;
-###use Lyrics::Fetcher::ApiLyricsOph;
-###use Lyrics::Fetcher::AZLyrics;
-###use Lyrics::Fetcher::Genius;
-###use Lyrics::Fetcher::Musixmatch;
+###use LyricFinder;
+###use LyricFinder::ApiLyricsOph;
+###use LyricFinder::AZLyrics;
+###use LyricFinder::Cache;
+###use LyricFinder::Genius;
+###use LyricFinder::Musixmatch;
 ###1;
 
-#FAUXDACIOUS "HELPER" SCRIPT TO FETCH Lyrics FROM sites supported by David Precious's Lyrics::Fetcher module:
+#FAUXDACIOUS "HELPER" SCRIPT TO FETCH Lyrics FROM sites supported by the LyricFinder CPAN module:
 
 #USAGE:  $0 artist title [configpath]
 
@@ -22,10 +23,10 @@
 
 #THIS SCRIPT ATTEMPTS TO FETCH THE LYRICS FOR THE CURRENT SONG PLAYING IN FAUXDACIOUS FOR THE NEW
 #"PURE PERL" VERSIONS OF THE LYRICWIKI PLUGINS USING A VERIETY OF LYRICS SITES (SUPPORTD BY PERL'S
-#Lyrics::Fetcher::* MODULES).  SITE CHANGES ARE NOW MAINTAINED THERE.  THIS REPLACES THE HARDCODED
+#LyricFinder MODULE).  SITE CHANGES ARE NOW MAINTAINED THERE.  THIS REPLACES THE HARDCODED
 #USE OF THE SINGLE SITE: https://lyrics.fandom.com/ (NOW DEFUNCT) FROM AUDACIOUS.
 #SUPPORTED LYRICS SITES ARE TRIED IN RANDOM ORDER TO REDUCE EXCESS ACTIVITY ON ANY ONE SITE.
-#NEW SITES CAN BE ADDED BY UPDATES TO Lyrics::Fetcher RATHER THAN HAVING TO UPDATE C CODE AND
+#NEW SITES CAN BE ADDED BY UPDATES TO LyricFinder RATHER THAN HAVING TO UPDATE C CODE AND
 #REBUILDNG FAUXDACIOUS!
 
 #===================================================================================================
@@ -57,7 +58,7 @@ BEGIN
 }
 use strict;
 use warnings;
-use Lyrics::Fetcher;
+use LyricFinder;
 
 #USER: EDIT ~/.config/fauxdacious[_instancename]/FauxdaciousLyricsHelper.txt TO
 #ADD STREAMING STATIONS THAT SWITCH BACK TO THEIR STATION TITLE NEAR END OF SONG BEFORE SWITCHING TO
@@ -65,19 +66,13 @@ use Lyrics::Fetcher;
 #FORMAT:  artist name|title name (one pair per line).
 
 #YOU CAN ALSO ADD A USER-AGENT LINE TO SEND TO THE LYRICS SITES HERE:
-#SEE Lyrics::Fetcher DOCS FOR THE DEFAULT USER-AGENT VALUE:
+#SEE LyricFinder DOCS FOR THE DEFAULT USER-AGENT VALUE:
 #(CURRENTLY:  "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0").
 #FORMAT:  agent="user-agent string"
 my @SKIPTHESE = ();
 my $agent = '';
 
 my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
-
-# To find out which fetchers are available:
-my @fetchers = Lyrics::Fetcher->available_fetchers;
-
-die "e:$0: No lyric fetchers found!\n"  unless ($#fetchers >= 0);
-my $random_fetcher;
 
 if ($#ARGV >= 1) {
 	if ($ARGV[2] && -d $ARGV[2]) {
@@ -108,7 +103,7 @@ if ($#ARGV >= 1) {
 	}
 
 	unlink "$ARGV[2]/_tmp_lyrics.txt"  if ($ARGV[2] && -d $ARGV[2] && -f "$ARGV[2]/_tmp_lyrics.txt");
-	print STDERR "..LYRICS HELPER:Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
+	print STDERR "..LYRICS HELPER: Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
 	foreach my $skipit (@SKIPTHESE) {
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E$/i) {
@@ -116,28 +111,30 @@ if ($#ARGV >= 1) {
 			exit (0);  #QUIT - WE KNOW THERE'S NO LYRICS TO FETCH FOR THE *STATION*!
 		}
 	}
-	my %tried = ();
-	my $triedcnt = 0;
-	while ($triedcnt <= $#fetchers) {
-		$random_fetcher = int(rand(scalar @fetchers));
-		unless ($tried{$fetchers[$random_fetcher]}) {
-			print STDERR "..LYRICS:TRYING $fetchers[$random_fetcher]...\n"  if ($DEBUG);
-			my $lyrics = Lyrics::Fetcher->fetch($ARGV[0], $ARGV[1], $fetchers[$random_fetcher]);
-			if ($lyrics) {
-				my $doschar = ($^O =~ /Win/) ? "\r" : '';
-				$lyrics .= "${doschar}\n(Lyrics courtesy: $fetchers[$random_fetcher])";
-				if ($ARGV[2] && -d $ARGV[2] && open OUT, ">$ARGV[2]/_tmp_lyrics.txt") {
-					binmode OUT;
-					print OUT $lyrics;
-					close OUT;
-				} else {
-					print STDERR $lyrics;
-				}
-				exit (0);
+	my $lf = new LyricFinder();
+	if ($lf) {
+		$lf->agent($agent)  if ($agent);
+		my $lyrics = $lf->fetch($ARGV[0], $ARGV[1], 'random');
+		if (defined($lyrics) && $lyrics) {
+			my $doschar = ($^O =~ /Win/) ? "\r" : '';
+			$lyrics .= "${doschar}\n(Lyrics courtesy: ".$lf->source().")${doschar}\n".$lf->site();
+			if ($ARGV[2] && -d $ARGV[2] && open OUT, ">$ARGV[2]/_tmp_lyrics.txt") {
+				binmode OUT;
+				print OUT $lyrics;  #MUST NULL-TERMINATE FOR FAUXDACIOUS'S C CODE!
+				close OUT;
+			} else {
+				print STDERR $lyrics;
 			}
-			$tried{$fetchers[$random_fetcher]} = 1;
-			++$triedcnt;
+			exit (0);
 		}
+		else
+		{
+			print STDERR "w:No lyrics found (url=".$lf->url()."): ".$lf->message()."\n";
+		}
+	}
+	else
+	{
+		print STDERR "s:Could not find/load required LyricFinder module!\n";
 	}
 } else {
 	print STDERR "..usage: $0 artist title [output_directory]\n";

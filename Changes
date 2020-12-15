@@ -1,3 +1,11 @@
+Version 4.1.1-beta2
+
+Switched the lyric helper and plugins to now use my new LyricFinder CPAN 
+module instead of the much-older Lyrics::Fetcher::* modules maintained by 
+David Precious.  This makes installation much easier as all the supported 
+side modules are now bundled together!  We also added some new features, and 
+we now have full contol over updates / maintenance!
+
 Version 4.1.1-beta1
 
 I now believe that v4.1-final was slightly rushed (should've released a 
