@@ -1,5 +1,12 @@
 Version 4.1.1-beta2
 
+Lyrics - Added "Album" field to argument list passed to the Lyric Helper 
+script, and modified the script to enable skipping specific "albums" from 
+trying to fetch lyrics.  This makes it possible to prevent streaming 
+stations (very few change the Album field) that play say, instramental 
+music, etc. that don't have lyrics, from uselessly hitting the lyrics 
+sites for lyrics without having to close the LyricWiki plugin down.
+
 Switched the lyric helper and plugins to now use my new LyricFinder CPAN 
 module instead of the much-older Lyrics::Fetcher::* modules maintained by 
 David Precious.  This makes installation much easier as all the supported 

@@ -7,7 +7,6 @@
 ###use LyricFinder;
 ###use LyricFinder::ApiLyricsOph;
 ###use LyricFinder::AZLyrics;
-###use LyricFinder::Cache;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Musixmatch;
 ###1;
@@ -70,6 +69,7 @@ use LyricFinder;
 #(CURRENTLY:  "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0").
 #FORMAT:  agent="user-agent string"
 my @SKIPTHESE = ();
+my @SKIPALBUMS = ();
 my $agent = '';
 
 my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
@@ -91,7 +91,11 @@ if ($#ARGV >= 1) {
 				}
 				s/^[\'\"]//o;
 				s/[\'\"]$//o;
-				push @SKIPTHESE, $_;
+				if (/\|/o) {
+					push @SKIPTHESE, $_;
+				} else {
+					push @SKIPALBUMS, $_;
+				}
 			}
 			close IN;
 		}
@@ -104,13 +108,27 @@ if ($#ARGV >= 1) {
 
 	unlink "$ARGV[2]/_tmp_lyrics.txt"  if ($ARGV[2] && -d $ARGV[2] && -f "$ARGV[2]/_tmp_lyrics.txt");
 	print STDERR "..LYRICS HELPER: Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
+
+	#SKIP ANY ALBUMS (STATIONS) THE USER DOESN'T WANT LYRICS FETCHED FOR:
+	if ($#ARGV >= 3) {
+		foreach my $skipit (@SKIPALBUMS) {
+			print STDERR "-???- ALB=$ARGV[3]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
+			if ("$ARGV[3]" =~ /^\Q${skipit}\E$/i) {
+				print STDERR "i:LYRICS HELPER: SKIPPING ALBUM ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+				exit (0);  #QUIT
+			}
+		}
+	}
+
+	#SKIP ANY SONGS THE USER DOESN'T WANT LYRICS FETCHED FOR:
 	foreach my $skipit (@SKIPTHESE) {
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E$/i) {
 			print STDERR "i:LYRICS HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-			exit (0);  #QUIT - WE KNOW THERE'S NO LYRICS TO FETCH FOR THE *STATION*!
+			exit (0);  #QUIT
 		}
 	}
+
 	my $lf = new LyricFinder();
 	if ($lf) {
 		$lf->agent($agent)  if ($agent);
