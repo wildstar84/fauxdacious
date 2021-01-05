@@ -41,7 +41,7 @@ static QueuedFunc queued_func;
 static List<QueuedData> queue;
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static void send_data (void *)
+static void send_data ()
 {
     pthread_mutex_lock (& mutex);
 
@@ -73,7 +73,7 @@ static void * read_worker (void * data0)
     pthread_mutex_lock (& mutex);
 
     if (! queue.head ())
-        queued_func.queue (send_data, nullptr);
+        queued_func.queue (send_data);
 
     queue.append (data);
 

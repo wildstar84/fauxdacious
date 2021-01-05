@@ -17,9 +17,9 @@
  * the use of this software.
  */
 
-#include "playlist-internal.h"
 #include "mainloop.h"
 #include "multihash.h"
+#include "playlist-internal.h"
 
 #include <pthread.h>
 
@@ -46,7 +46,7 @@ EXPORT void aud_playlist_cache_selected (int playlist)
             cache.add (filename, {filename, std::move (tuple), decoder});
     }
 
-    clear_timer.queue (30000, (QueuedFunc::Func) playlist_cache_clear, nullptr);
+    clear_timer.queue (30000, playlist_cache_clear);
 
     pthread_mutex_unlock (& mutex);
 }

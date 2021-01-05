@@ -19,6 +19,7 @@
 
 #include "runtime.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <locale.h>
 #include <stdlib.h>
@@ -71,11 +72,8 @@ static String prevmeta[2];       /* JWT */
 static int fudge_gain;           /* JWT */
 static int stdout_fmt;           /* JWT */
 
-#if defined(USE_QT) && ! defined(USE_GTK)
-static MainloopType mainloop_type = MainloopType::Qt;
-#else
 static MainloopType mainloop_type = MainloopType::GLib;
-#endif
+static bool mainloop_type_set = false;
 
 static aud::array<AudPath, String> aud_paths;
 
@@ -117,9 +115,15 @@ EXPORT bool fauxd_is_prevmeta (int which, String newmeta)
 }
 
 EXPORT void aud_set_mainloop_type (MainloopType type)
-    { mainloop_type = type; }
+{
+    assert (! mainloop_type_set);
+    mainloop_type = type;
+    mainloop_type_set = true;
+}
+
 EXPORT MainloopType aud_get_mainloop_type ()
 {
+    assert (mainloop_type_set);
     return mainloop_type;
 }
 
@@ -344,6 +348,24 @@ EXPORT void aud_init ()
 
     config_load ();
 
+    if (! mainloop_type_set)
+    {
+#ifdef USE_QT
+#ifdef USE_GTK
+        if (aud_get_bool ("audacious", "use_qt"))
+            aud_set_mainloop_type (MainloopType::Qt);
+        else  /* WE HAVE BOTH, SO DEFAULT IS GTK (WE DIDN'T SPECIFY "-Q"!: */
+            aud_set_mainloop_type (MainloopType::GLib);
+#else
+        /* WE ONLY HAVE Qt!: */
+        aud_set_mainloop_type (MainloopType::Qt);
+#endif
+#else
+        /* WE ONLY HAVE GTK!: */
+        aud_set_mainloop_type (MainloopType::GLib);
+#endif
+    }
+
     chardet_init ();
     eq_init ();
     output_init ();
@@ -356,7 +378,7 @@ EXPORT void aud_init ()
     load_playlists ();
 }
 
-static void do_autosave (void *)
+static void do_autosave ()
 {
     hook_call ("config save", nullptr);
     save_playlists (false);
@@ -373,7 +395,7 @@ EXPORT void aud_run ()
     start_plugins_two ();
 
     static QueuedFunc autosave;
-    autosave.start (AUTOSAVE_INTERVAL, do_autosave, nullptr);
+    autosave.start (AUTOSAVE_INTERVAL, do_autosave);
 
     /* calls "config save" before returning */
     interface_run ();

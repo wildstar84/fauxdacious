@@ -30,8 +30,7 @@
 #include "runtime.h"
 
 struct QueuedFuncParams {
-    QueuedFunc::Func func;
-    void * data;
+    QueuedFunc::Func2 func;
     int interval_ms;
     bool repeat;
 };
@@ -143,7 +142,7 @@ void QueuedFuncHelper::run ()
     func_table.lookup (queued, ptr_hash (queued), r);
 
     if (r.okay_to_run)
-        params.func (params.data);
+        params.func ();
 }
 
 // GLib implementation -- simple wrapper around g_timeout_add_full()
@@ -280,24 +279,39 @@ static void start_func (QueuedFunc * queued, const QueuedFuncParams & params)
     func_table.lookup (queued, ptr_hash (queued), s);
 }
 
+EXPORT void QueuedFunc::queue(Func2 func)
+{
+    start_func (this, {func, 0, false});
+    _running = false;
+}
+
 EXPORT void QueuedFunc::queue (Func func, void * data)
 {
-    start_func (this, {func, data, 0, false});
+    queue(std::bind(func, data));
+}
+
+EXPORT void QueuedFunc::queue (int delay_ms, Func2 func)
+{
+    g_return_if_fail (delay_ms >= 0);
+    start_func (this, {func, delay_ms, false});
     _running = false;
 }
 
 EXPORT void QueuedFunc::queue (int delay_ms, Func func, void * data)
 {
-    g_return_if_fail (delay_ms >= 0);
-    start_func (this, {func, data, delay_ms, false});
-    _running = false;
+    queue(delay_ms, std::bind (func, data));
 }
 
-EXPORT void QueuedFunc::start (int interval_ms, Func func, void * data)
+EXPORT void QueuedFunc::start (int interval_ms, Func2 func)
 {
     g_return_if_fail (interval_ms > 0);
-    start_func (this, {func, data, interval_ms, true});
+    start_func(this, {func, interval_ms, true});
     _running = true;
+}
+
+EXPORT void QueuedFunc::start(int interval_ms, Func func, void * data)
+{
+    start(interval_ms, std::bind(func, data));
 }
 
 // "stop" logic executed within the hash table lock
@@ -344,7 +358,10 @@ EXPORT void mainloop_run ()
         static int dummy_argc = 1;
         static char * dummy_argv[] = {app_name, nullptr};
 
-        QCoreApplication (dummy_argc, dummy_argv).exec ();
+        if (qApp) // did audqt create a QApplication already?
+            qApp->exec ();
+        else
+            QCoreApplication (dummy_argc, dummy_argv).exec ();
     }
     else
 #endif

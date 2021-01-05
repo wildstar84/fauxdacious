@@ -79,7 +79,7 @@ static Index<AudArtItem *> get_queued ()
     return queued;
 }
 
-static void send_requests (void *)
+static void send_requests ()
 {
     auto queued = get_queued ();
     for (AudArtItem * item : queued)
@@ -99,7 +99,7 @@ static void finish_item_locked (AudArtItem * item, Index<char> && data, String &
     item->art_file = std::move (art_file);
     item->flag = FLAG_DONE;
 
-    queued_requests.queue (send_requests, nullptr);
+    queued_requests.queue (send_requests);
 }
 
 static void request_callback (ScanRequest * request)

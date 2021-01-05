@@ -100,11 +100,6 @@ static void send_audio (void *)
     pthread_mutex_unlock (& mutex);
 }
 
-static void send_clear (void *)
-{
-    vis_send_clear ();
-}
-
 static void flush_locked ()
 {
     delete current_node;
@@ -114,7 +109,7 @@ static void flush_locked ()
     vis_pool.clear ();
 
     if (enabled)
-        queued_clear.queue (send_clear, nullptr);
+        queued_clear.queue (vis_send_clear);
 }
 
 void vis_runner_flush ()

@@ -84,7 +84,7 @@ static char status_path[512];
 static int status_count;
 static bool status_shown = false;
 
-static void status_cb (void * unused)
+static void status_cb ()
 {
     pthread_mutex_lock (& mutex);
 
@@ -116,7 +116,7 @@ static void status_update (const char * filename, int found)
     status_count = found;
 
     if (! status_timer.running ())
-        status_timer.start (250, status_cb, nullptr);
+        status_timer.start (250, status_cb);
 
     pthread_mutex_unlock (& mutex);
 }
@@ -347,7 +347,8 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
             AUDERR ("%s: %s\n", (const char *) file, (const char *) error);
 
         // to prevent infinite recursion, skip symlinks to folders
-        if ((mode & (VFS_IS_SYMLINK | VFS_IS_DIR)) == (VFS_IS_SYMLINK | VFS_IS_DIR))
+        if ((mode & (VFS_IS_SYMLINK | VFS_IS_DIR)) ==
+                (VFS_IS_SYMLINK | VFS_IS_DIR))
             continue;
 
         if (mode & VFS_IS_REGULAR)
@@ -444,7 +445,7 @@ static void stop_thread_locked ()
     }
 }
 
-static void add_finish (void * unused)
+static void add_finish ()
 {
     pthread_mutex_lock (& mutex);
 
@@ -550,7 +551,7 @@ static void * add_worker (void * unused)
         current_playlist_id = -1;
 
         if (! add_results.head ())
-            queued_add.queue (add_finish, nullptr);
+            queued_add.queue (add_finish);
 
         add_results.append (result);
     }

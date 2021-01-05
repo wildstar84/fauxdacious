@@ -328,7 +328,7 @@ static Entry * lookup_entry (PlaylistData * p, int i)
     return (i >= 0 && i < p->entries.len ()) ? p->entries[i].get () : nullptr;
 }
 
-static void update (void *)
+static void update ()
 {
     ENTER;
 
@@ -387,7 +387,7 @@ static void queue_update (UpdateLevel level, PlaylistData * p, int at, int count
     {
         if (! update_level)
         {
-            queued_update.queue (250, update, nullptr);
+            queued_update.queue (250, update);
             update_delayed = true;
         }
     }
@@ -395,7 +395,7 @@ static void queue_update (UpdateLevel level, PlaylistData * p, int at, int count
     {
         if (! update_level || update_delayed)
         {
-            queued_update.queue (update, nullptr);
+            queued_update.queue (update);
             update_delayed = false;
         }
     }
@@ -525,7 +525,7 @@ static void scan_check_complete (PlaylistData * playlist)
 
     if (update_delayed)
     {
-        queued_update.queue (update, nullptr);
+        queued_update.queue (update);
         update_delayed = false;
     }
 

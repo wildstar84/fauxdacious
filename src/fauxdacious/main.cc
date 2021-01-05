@@ -17,6 +17,7 @@
  * the use of this software.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,7 +64,10 @@ static struct {
     int mainwin, show_jump_box;
     int headless, quit_after_play;
     int verbose;
+#if defined(USE_QT) && defined(USE_GTK)
+    int gtk;
     int qt;
+#endif
     int clearplaylist, newinstance, pauseismute, forcenoequalizer, forcenogainchg, deleteallplaylists,
             force_recording, outstd;  /* JWT:NEW COMMAND-LINE OPTIONS */
 } options;
@@ -86,6 +90,9 @@ static const struct {
     {"enqueue-to-temp", 'E', & options.enqueue_to_temp, N_("Add files to a temporary playlist")},
     {"fwd", 'f', & options.fwd, N_("Skip to next song")},
     {"gain", 'g', & options.forcenogainchg, N_("Fudge Additional Gain Adjustment")},  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
+#if defined(USE_QT) && defined(USE_GTK)
+    {"gtk", 'G', &options.gtk, N_("Run in GTK mode (default)")},
+#endif
     {"help", 'h', & options.help, N_("Show command-line help")},
     {"headless", 'H', & options.headless, N_("Start without a graphical interface")},
     {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window")},
@@ -281,8 +288,14 @@ static bool parse_options (int argc, char * * argv)
     /* JWT:DON'T DO ANYTHING HERE THAT CALLS aud_set_<type> () AND FRIENDS - CAUSES "LEAK" ERRORS WHEN 
        REMOTE SESSION IS ALREADY RUNNING! */
 
-    if (options.qt)
+#if defined(USE_QT) && defined(USE_GTK)
+    if (options.qt && options.gtk)
+        fprintf(stderr, "-G and -Q are mutually exclusive, ignoring\n");
+    else if (options.qt)
         aud_set_mainloop_type (MainloopType::Qt);
+    else
+        aud_set_mainloop_type (MainloopType::GLib);
+#endif
 
     return true;
 }
@@ -607,8 +620,8 @@ int main (int argc, char * * argv)
             if (aud_get_bool ("ffaudio", "allow_highdpi"))
                 flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 
-            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", 1, 1,
-                100, 100, flags);
+            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", SDL_WINDOWPOS_UNDEFINED,
+                SDL_WINDOWPOS_UNDEFINED, 1, 1, flags);
             if (! sdl_window)
             {
                 AUDERR ("Failed to create SDL window (no video playing): %s.\n", SDL_GetError ());

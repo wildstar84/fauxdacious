@@ -49,7 +49,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static List<Event> events;
 static QueuedFunc queued_events;
 
-static void events_execute (void *)
+static void events_execute ()
 {
     pthread_mutex_lock (& mutex);
 
@@ -74,7 +74,7 @@ EXPORT void event_queue (const char * name, void * data, EventDestroyFunc destro
     pthread_mutex_lock (& mutex);
 
     if (! events.head ())
-        queued_events.queue (events_execute, nullptr);
+        queued_events.queue (events_execute);
 
     events.append (new Event (name, data, destroy));
 
