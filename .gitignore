@@ -26,6 +26,7 @@ win32/fauxdacious.nsi
 win32/override/README.txt
 .deps
 *.a
+*.dep
 *.diff
 *.dll
 *.dylib

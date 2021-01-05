@@ -25,3 +25,7 @@ src/libfauxdcore/audio.h
 *~
 *.patch
 *.diff
+*.dep
+*.dbg
+*.lng
+*.EXPERIMENTAL
