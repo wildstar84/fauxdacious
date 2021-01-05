@@ -85,7 +85,11 @@ constexpr int n_elems (const T (&) [N])
 template<class T>
 inline void * to_ptr (T t)
 {
-    union { void * v; T t; } u = {nullptr};
+    union
+    {
+        void * v;
+        T t;
+    } u = {nullptr};
     static_assert (sizeof u == sizeof (void *), "Type cannot be stored in a pointer");
     u.t = t; return u.v;
 }
@@ -93,7 +97,11 @@ inline void * to_ptr (T t)
 template<class T>
 inline T from_ptr (void * v)
 {
-    union { void * v; T t; } u = {v};
+    union
+    {
+        void * v;
+        T t;
+    } u = {v};
     static_assert (sizeof u == sizeof (void *), "Type cannot be stored in a pointer");
     return u.t;
 }
@@ -284,38 +292,38 @@ typedef void (* EraseFunc) (void * data, int len);
 template<class T>
 static constexpr FillFunc fill_func ()
 {
-    return std::is_trivial<T>::value ? (FillFunc) nullptr :
-     [] (void * data, int len) {
-        T * iter = (T *) data;
-        T * end = (T *) ((char *) data + len);
-        while (iter < end)
-            new (iter ++) T ();
-    };
+    return std::is_trivial<T>::value ? (FillFunc) nullptr : //
+               [](void * data, int len) {
+                   T * iter = (T *)data;
+                   T * end = (T *)((char *)data + len);
+                   while (iter < end)
+                       new (iter++) T();
+               };
 }
 
 template<class T>
 static constexpr CopyFunc copy_func ()
 {
-    return std::is_trivial<T>::value ? (CopyFunc) nullptr :
-     [] (const void * from, void * to, int len) {
-        const T * src = (const T *) from;
-        T * dest = (T *) to;
-        T * end = (T *) ((char *) to + len);
-        while (dest < end)
-            new (dest ++) T (* src ++);
-    };
+    return std::is_trivial<T>::value ? (CopyFunc) nullptr : //
+               [](const void * from, void * to, int len) {
+                   const T * src = (const T *)from;
+                   T * dest = (T *)to;
+                   T * end = (T *)((char *)to + len);
+                   while (dest < end)
+                       new (dest++) T(*src++);
+               };
 }
 
 template<class T>
 static constexpr EraseFunc erase_func ()
 {
-    return std::is_trivial<T>::value ? (EraseFunc) nullptr :
-     [] (void * data, int len) {
-        T * iter = (T *) data;
-        T * end = (T *) ((char *) data + len);
-        while (iter < end)
-            (* iter ++).~T ();
-    };
+    return std::is_trivial<T>::value ? (EraseFunc) nullptr : //
+               [](void * data, int len) {
+                   T * iter = (T *)data;
+                   T * end = (T *)((char *)data + len);
+                   while (iter < end)
+                       (*iter++).~T();
+               };
 }
 
 } // namespace aud
