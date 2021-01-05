@@ -20,8 +20,8 @@
 #include <stdlib.h>
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QPushButton>
+#include <QScreen>
 #include <QVBoxLayout>
 
 #include <libfauxdcore/sdl_window.h>
@@ -42,6 +42,7 @@ static PixelMargins margins_local;
 EXPORT const PixelSizes & sizes = sizes_local;
 EXPORT const PixelMargins & margins = margins_local;
 
+/* clang-format off */
 static const char * const audqt_defaults[] = {
     "eq_presets_visible", "FALSE",
     "equalizer_visible", "FALSE",
@@ -59,6 +60,7 @@ static const char * const audqt_defaults[] = {
 #endif
     nullptr
 };
+/* clang-format on */
 
 EXPORT void init ()
 {
@@ -73,7 +75,12 @@ EXPORT void init ()
 
     auto qapp = new QApplication (dummy_argc, dummy_argv);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     qapp->setAttribute (Qt::AA_UseHighDpiPixmaps);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    qapp->setAttribute (Qt::AA_DisableWindowContextHelpButton);
+#endif // >= 5.10
+#endif // < 6.0
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     qapp->setAttribute (Qt::AA_UseStyleSheetPropagationInWidgetStyles);
 #endif
@@ -84,8 +91,7 @@ EXPORT void init ()
 
     qapp->setQuitOnLastWindowClosed (false);
 
-    auto desktop = qapp->desktop ();
-    sizes_local.OneInch = aud::max (96, (desktop->logicalDpiX () + desktop->logicalDpiY ()) / 2);
+    sizes_local.OneInch = aud::max (96, (int) qapp->primaryScreen ()->logicalDotsPerInch ());
     sizes_local.TwoPt = aud::rescale (2, 72, sizes_local.OneInch);
     sizes_local.FourPt = aud::rescale (4, 72, sizes_local.OneInch);
     sizes_local.EightPt = aud::rescale (8, 72, sizes_local.OneInch);
@@ -209,7 +215,7 @@ EXPORT QGradientStops dark_bg_gradient (const QColor & base)
 
 EXPORT QColor vis_bar_color (const QColor & hue, int bar, int n_bars)
 {
-    qreal h, s, v;
+    decltype(hue.hueF()) h, s, v;
     hue.getHsvF (& h, & s, & v);
 
     if (s < 0.1) /* monochrome? use blue instead */

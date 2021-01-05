@@ -64,7 +64,7 @@ public:
 
         QRect box (-height (), 0, height (), width ());
         style ()->drawItemText (& p, box, (int) alignment (), palette (),
-         isEnabled (), text (), QPalette::Foreground);
+         isEnabled (), text (), QPalette::WindowText);
     }
 };
 

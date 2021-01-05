@@ -101,11 +101,11 @@ AC_REQUIRE([AC_SYS_LARGEFILE])
 
 if test "x$GCC" = "xyes"; then
     CFLAGS="$CFLAGS -std=gnu99 -ffast-math -Wall -pipe"
-    if test "x$HAVE_DARWIN" = "xyes"; then
-        CXXFLAGS="$CXXFLAGS -std=gnu++11 -ffast-math -Wall -pipe"
-        LDFLAGS="$LDFLAGS"
-    else
-        CXXFLAGS="$CXXFLAGS -std=gnu++11 -ffast-math -Wall -pipe"
+    CXXFLAGS="$CXXFLAGS -ffast-math -Wall -pipe"
+    # use C++17 if possible (Qt 6 requires it)
+    AUD_CHECK_CXXFLAGS(-std=gnu++17)
+    if test "${CXXFLAGS%gnu++17}" = "$CXXFLAGS" ; then
+        CXXFLAGS="$CXXFLAGS -std=gnu++11"
     fi
     AUD_CHECK_CFLAGS(-Wtype-limits)
     AUD_CHECK_CFLAGS(-Wno-stringop-truncation)
@@ -212,8 +212,8 @@ dnl Qt support
 dnl ==========
 
 AC_ARG_ENABLE(qt,
- AS_HELP_STRING(--enable-qt, [Enable Qt support (default=disabled)]),
- USE_QT=$enableval, USE_QT=no)
+ AS_HELP_STRING(--disable-qt, [Disable Qt support (default=enabled)]),
+ USE_QT=$enableval, USE_QT=yes)
 
 if test $USE_QT = yes ; then
     PKG_CHECK_MODULES([QTCORE], [Qt5Core >= 5.2])
