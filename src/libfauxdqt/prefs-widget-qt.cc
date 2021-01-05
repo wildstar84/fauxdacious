@@ -39,8 +39,7 @@ HookableWidget::HookableWidget (const PreferencesWidget * parent, const char * d
     m_parent (parent), m_domain (domain)
 {
     if (m_parent->cfg.hook)
-        hook.capture (new HookReceiver<HookableWidget>
-         {m_parent->cfg.hook, this, & HookableWidget::update_from_cfg});
+        hook.connect (m_parent->cfg.hook);
 }
 
 void HookableWidget::update_from_cfg ()

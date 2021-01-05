@@ -40,7 +40,7 @@ private:
     void update ();
 
     const MenuItem & m_item;
-    SmartPtr<HookReceiver<MenuAction>> m_hook;
+    HookReceiver<MenuAction> m_hook{this, &MenuAction::update};
 };
 
 MenuAction::MenuAction (const MenuItem & item, const char * domain, QWidget * parent) :
@@ -63,7 +63,7 @@ MenuAction::MenuAction (const MenuItem & item, const char * domain, QWidget * pa
         QObject::connect (this, & QAction::toggled, this, & MenuAction::toggle);
 
         if (item.cfg.hook)
-            m_hook.capture (new HookReceiver<MenuAction> (item.cfg.hook, this, & MenuAction::update));
+            m_hook.connect (item.cfg.hook);
     }
     else if (item.func)
         QObject::connect (this, & QAction::triggered, item.func);
