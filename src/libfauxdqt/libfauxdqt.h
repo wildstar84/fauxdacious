@@ -100,8 +100,8 @@ static inline int to_portable_dpi (int x)
     { return aud::rescale (x, sizes.OneInch, 96); }
 
 void init ();
-void run ();
-void quit ();
+void run() __attribute__((deprecated)); /* use QApplication::exec() */
+void quit() __attribute__((deprecated)); /* use QApplication::quit() */
 void cleanup ();
 
 QIcon get_icon (const char * name);
