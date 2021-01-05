@@ -1,6 +1,6 @@
 SHARED_LIB = ${LIB_PREFIX}fauxdcore${LIB_SUFFIX}
 LIB_MAJOR = 5
-LIB_MINOR = 2
+LIB_MINOR = 3
 
 SRCS = sdl_window.cc \
        adder.cc \
