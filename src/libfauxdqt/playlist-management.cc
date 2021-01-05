@@ -54,13 +54,13 @@ static QDialog * buildRenameDialog (int playlist)
 static QDialog * buildDeleteDialog (int playlist)
 {
     auto dialog = new QMessageBox;
-    auto skip_prompt = new QCheckBox (translate_str (N_("_Don’t ask again")), dialog);
+    auto skip_prompt = new QCheckBox (translate_str (N_("_Do not ask again")), dialog);
     auto remove = new QPushButton (translate_str (N_("_Remove")), dialog);
     auto cancel = new QPushButton (translate_str (N_("_Cancel")), dialog);
 
     dialog->setIcon (QMessageBox::Question);
     dialog->setWindowTitle (_("Remove Playlist"));
-    dialog->setText ((const char *) str_printf (_("Do you want to permanently remove “%s”?"),
+    dialog->setText ((const char *) str_printf (_("Do you want to permanently remove %s?"),
      (const char *) aud_playlist_get_title (playlist)));
     dialog->setCheckBox (skip_prompt);
     dialog->addButton (remove, QMessageBox::AcceptRole);
