@@ -1,3 +1,26 @@
+Version 4.1.1-final
+
+Fix playlist-tabs to work properly (make deleted tabs disappear, allow 
+keyboard focus/minipulation, remove sort-indicators on column headers when 
+multiple tabs are shown (to avoid confusion due to the fact that different 
+tabs can be sorted by different columns, but can not display different sort 
+indicators per column due to Audacious design (Audacious does not support 
+column sort indicators!)).  Added [Import] and [Add Files] menu options to 
+playlist tabs for convenience.
+
+Numerous Audacious retooling and rewiring under the hood changes merged.
+
+Fix several window-manager issues.
+
+Merge Audacious's new "dock-window" interface for Qt plugin windows.
+
+LyricWiki plugin improvements, namely better caching and restoring lyrics, 
+and displaying "description" text for podcasts and videos in Lyricwiki in 
+lieu of song lyrics (since they don't have "lyrics", but a "description".
+
+Helper plugins can now be user-configured more easily via new corresponding 
+".ini" files (templates included for users to edit to their requirements).
+
 Version 4.1.1-beta2
 
 Lyrics - Added "Album" field to argument list passed to the Lyric Helper 
