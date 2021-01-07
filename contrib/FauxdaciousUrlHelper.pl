@@ -3,6 +3,24 @@
 #MUST INSTALL youtube-dl FOR Youtube to work!
 #pp --gui -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
+###(urlhelper_modules.pm contains):
+###use StreamFinder;
+###use StreamFinder::Apple;
+###use StreamFinder::Bitchute;
+###use StreamFinder::Blogger;
+###use StreamFinder::Brighteon;
+###use StreamFinder::Castbox;
+###use StreamFinder::Google;
+###use StreamFinder::IHeartRadio;
+###use StreamFinder::RadioNet;
+###use StreamFinder::Rumble;
+###use StreamFinder::SermonAudio;
+###use StreamFinder::Spreaker;
+###use StreamFinder::Tunein;
+###use StreamFinder::Vimeo;
+###use StreamFinder::Youtube;
+###1;
+
 #FAUXDACIOUS "HELPER" SCRIPT TO HANDLE URLS THAT FAUXDACIOUS CAN'T PLAY DIRECTLY:
 
 #USAGE:  $0 URL [download-path]

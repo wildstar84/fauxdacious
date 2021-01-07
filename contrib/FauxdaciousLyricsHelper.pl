@@ -7,6 +7,7 @@
 ###use LyricFinder;
 ###use LyricFinder::ApiLyricsOph;
 ###use LyricFinder::AZLyrics;
+###use LyricFinder::Cache;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Musixmatch;
 ###1;
