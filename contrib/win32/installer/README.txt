@@ -1,15 +1,16 @@
-Fauxdacious 4.0.0 for Windows
+Fauxdacious 4.1.1-final for Windows
 
+    https://github.com/wildstar84/fauxdacious-windows-easyinstaller
     https://wildstar84.wordpress.com/fauxdacious
 
 Fauxdacious is free and open source software.  By installing Fauxdacious, you agree
 to be bound by various licenses governing its use and redistribution.
 
-Build date: 18 November, 2019
+Build date: 07 January, 2021
 
 LICENSE
 
-Copyright (C) 2001-2019 Jim Turner, Audacious developers and others
+Copyright (C) 2001-2021 Jim Turner, Audacious developers and others
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
