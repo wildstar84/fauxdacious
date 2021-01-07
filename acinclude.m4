@@ -146,7 +146,7 @@ AC_SUBST([BIGENDIAN])
 
 dnl Prevent symbol collisions
 dnl =========================
-if test "x$HAVE_MSWINDOWS" = "xyes" ; then
+if test $HAVE_MSWINDOWS = yes ; then
     EXPORT="__declspec(dllexport)"
 elif test "x$GCC" = "xyes" ; then
     CFLAGS="$CFLAGS -fvisibility=hidden"
@@ -211,9 +211,15 @@ AC_SUBST(GTK_LIBS)
 dnl Qt support
 dnl ==========
 
-AC_ARG_ENABLE(qt,
- AS_HELP_STRING(--disable-qt, [Disable Qt support (default=enabled)]),
- USE_QT=$enableval, USE_QT=yes)
+if test $HAVE_MSWINDOWS = yes ; then
+    AC_ARG_ENABLE(qt,
+     AS_HELP_STRING(--enable-qt, [Enable Qt support (default=disabled)]),
+     USE_QT=$enableval, USE_QT=no)
+else
+    AC_ARG_ENABLE(qt,
+     AS_HELP_STRING(--disable-qt, [Disable Qt support (default=enabled)]),
+     USE_QT=$enableval, USE_QT=yes)
+fi
 
 if test $USE_QT = yes ; then
     PKG_CHECK_MODULES([QTCORE], [Qt5Core >= 5.2])
