@@ -58,6 +58,14 @@ Build Fauxdacious Plugins:
 	sudo update-desktop-database
 	sudo update-icon-caches /usr/share/icons/hicolor
 
+Install the Perl helper scripts (non-Windows):
+
+	sudo cp fauxdacious/contrib/Fauxdacious*.pl /usr/local/bin/
+	sudo chmod 755 Fauxdacious*.pl
+	Install prerequesite Perl modules (see FAQ #36 for details):
+		File::Copy, HTML::Entities, HTML::Strip, HTTP::Request, 
+		LWP::UserAgent, URI::Escape, StreamFinder, and LyricFinder.
+
 Optional (copy your existing Audacious profile to Fauxdacious):  
 
 	cd ~/.config; mkdir fauxdacious; cp -R audacious/. fauxdacious
