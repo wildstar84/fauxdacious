@@ -1,6 +1,17 @@
 Version 4.1.1-final
 
-Fix playlist-tabs to work properly (make deleted tabs disappear, allow 
+This version adds several minor features and numerous minor tweaks and fixes, 
+particularly for users using multiple playlist tabs, the LyricWiki plugin, and 
+the Qt plugins.  Audacious came out of hybernation just after v4.1-final was 
+released and did a ton of retooling under the hood, and we have merged (most) 
+of them here (Audacious v4.1-beta1 commits from Dec. 7 through Jan. 7 2021).  
+We are now "ahead" version-number wise of Audacious due to our release 
+schedule and numerous Fauxdacious commits of late and their unexpected delay 
+in releasing a final 4.1 before we needed a final release).
+
+Short log:
+
+* Fix playlist-tabs to work properly (make deleted tabs disappear, allow 
 keyboard focus/minipulation, remove sort-indicators on column headers when 
 multiple tabs are shown (to avoid confusion due to the fact that different 
 tabs can be sorted by different columns, but can not display different sort 
@@ -8,18 +19,29 @@ indicators per column due to Audacious design (Audacious does not support
 column sort indicators!)).  Added [Import] and [Add Files] menu options to 
 playlist tabs for convenience.
 
-Numerous Audacious retooling and rewiring under the hood changes merged.
+* Numerous Audacious retooling and rewiring under the hood changes merged.
 
-Fix several window-manager issues.
+* Fix several window-manager issues.
 
-Merge Audacious's new "dock-window" interface for Qt plugin windows.
+* Merge Audacious's new "dock-window" interface for Qt plugin windows.
 
-LyricWiki plugin improvements, namely better caching and restoring lyrics, 
+* LyricWiki plugin improvements, namely better caching and restoring lyrics, 
 and displaying "description" text for podcasts and videos in Lyricwiki in 
 lieu of song lyrics (since they don't have "lyrics", but a "description".
 
-Helper plugins can now be user-configured more easily via new corresponding 
+* Helper plugins can now be user-configured more easily via new corresponding 
 ".ini" files (templates included for users to edit to their requirements).
+
+* Doc / FAQ improvements, particularly how to properly install and test the 
+three Perl "helper" scripts, and get them working after I had to walk a user 
+through that process after he attempted to install them by following the docs.
+
+To-do (next release):
+
+* Make the "About" window not "always-on-top".
+
+* Remove "LWP::Simple" from FauxdaciousUrlHelper.pl's prerequesite Perl 
+modules (no longer needed).
 
 Version 4.1.1-beta2
 
