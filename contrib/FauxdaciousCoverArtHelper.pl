@@ -45,7 +45,6 @@ BEGIN
 use strict;
 use File::Copy;
 use HTML::Entities ();
-#use LWP::Simple qw();
 use LWP::UserAgent ();
 use URI::Escape;
 

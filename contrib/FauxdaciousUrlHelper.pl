@@ -80,7 +80,6 @@ BEGIN
 	}
 }
 use strict;
-use LWP::Simple qw();
 use StreamFinder;
 
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
