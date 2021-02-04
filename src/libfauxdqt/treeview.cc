@@ -24,7 +24,7 @@
 #include <QMouseEvent>
 #include <QProxyStyle>
 
-#include <libaudcore/index.h>
+#include <libfauxdcore/index.h>
 
 namespace audqt {
 

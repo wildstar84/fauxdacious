@@ -23,8 +23,8 @@
 #include <QLineEdit>
 #include <QPointer>
 
-#include <libaudcore/audstrings.h>
-#include <libaudcore/i18n.h>
+#include <libfauxdcore/audstrings.h>
+#include <libfauxdcore/i18n.h>
 
 namespace audqt {
 
