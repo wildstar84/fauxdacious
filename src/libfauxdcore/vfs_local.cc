@@ -397,7 +397,13 @@ Index<String> LocalTransport::read_folder (const char * uri, String & error)
 
     const char * name;
     while ((name = g_dir_read_name (folder)))
-        entries.append (String (filename_to_uri (filename_build ({path, name}))));
+    {
+// JWT:MY OPINION IS WE SHOULD SKIP "dotfiles" ON WINBLOWS TOO!:  #ifndef _WIN32
+        // skip hidden files (may need revisiting)
+        if (name[0] != '.')
+// JWT #endif
+            entries.append (String (filename_to_uri (filename_build ({path, name}))));
+    }
 
     g_dir_close (folder);
 
