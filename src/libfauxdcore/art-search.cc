@@ -44,10 +44,10 @@ static bool has_front_cover_extension (const char * name)
 }
 
 static bool cover_name_filter (const char * name,
- const Index<String> & keywords, bool ret_on_empty)
+ const Index<String> & keywords)
 {
     if (! keywords.len ())
-        return ret_on_empty;
+        return false;
 
     for (const String & keyword : keywords)
     {
@@ -110,10 +110,10 @@ static String fileinfo_recursive_get_image (const char * path,
     {
         StringBuf newpath = filename_build ({path, name});
 
-        if (! g_file_test (newpath, G_FILE_TEST_IS_DIR) &&
-         has_front_cover_extension (name) &&
-         cover_name_filter (name, params->include, true) &&
-         ! cover_name_filter (name, params->exclude, false))
+        if (! g_file_test (newpath, G_FILE_TEST_IS_DIR)
+                && has_front_cover_extension (name)
+                && cover_name_filter (name, params->include)
+                && ! cover_name_filter (name, params->exclude))
         {
             g_dir_close (d);
             return String (newpath);
