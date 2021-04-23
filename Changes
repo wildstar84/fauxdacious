@@ -1,3 +1,20 @@
+Version 4.1.2-beta1
+
+* Add ability to play flac streams w/embedded ogg-vorbis (addresses Audacious 
+support/feature request# 1075).
+
+* Add threading to the lyricwiki plugins to move the lyric-fetching from the 
+web (the helper script), which is slow so that the gui is not temporarily 
+frozen whilst fetching lyrics from the web.
+
+* Add "Hide Info Bar Fallback Art" (View option) to only show an icon in the 
+info bar shown for the currently-playing entry only if there actually is one 
+(like the info popup currently works).
+
+* Apply the (Fauxdacious-only) "Split Artist - Title in streams" option to 
+Vorbis comments (ogg-bast streams), which may use vorbis-comments instead of 
+icy to embed metadata.
+
 Version 4.1.1-final
 
 This version adds several minor features and numerous minor tweaks and fixes, 
