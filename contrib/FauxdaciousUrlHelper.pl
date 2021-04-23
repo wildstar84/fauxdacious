@@ -141,7 +141,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			exit (0);
 		}
 	} else {
-		exit (0)  if ($ARGV[0] =~ /\.\w{2,4}$/);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE EXTENSION!
+		exit (0)  if ($ARGV[0] =~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp4|m4a|flac|flv|ogg|ogv|rtmp)$/i);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE VALID EXTENSION!
 
 		$client = new StreamFinder($ARGV[0], -debug => $DEBUG);
 		die "f:Could not open streamfinder or no streams found!"  unless ($client);
