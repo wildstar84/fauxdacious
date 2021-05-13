@@ -414,16 +414,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 		}
 		exit (0)  if ($found);
 	}
-	if (defined $ARGV[5]) {
-	    exit (0)  if ($ARGV[5] =~ /^NOWEB$/i); #ONLY CHECK CACHE, DON'T SEARCH WEB!
-	    #OTHERWISE, ASSUME WE HAVE A COVER-ART URL ALREADY, SO GRAB IT INSTEAD OF SEARCHING!
-		print STDERR "i:FETCHING ($ARGV[5]) FOUND IN STREAM!\n"  if ($DEBUG);
-        &writeArtImage($ARGV[5], "albumart/${albart_FN}", '_tmp_albumart')  if ($ARGV[5] =~ /^http/);
-    }
-	print STDERR "---ART HELPER WILL SEARCH THE WEB...\n"  if ($DEBUG);
-	#STEP 2:  IF LAST ARG[5] IS NOT "NOWEB", USER WANTS TO SEARCH WEB FOR ALBUM COVER (WASN'T IN CACHE)!:
-	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
-	my @SKIPTHESE = ();
+	my %SKIPTHESE = ();
 
 	if ($configPath) {
 		## USER-CONFIGURED SITE-SKIP LIST:
@@ -435,9 +426,10 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 				next  unless (/\S/o);
 				s/^\s+//o;
 				s/\,$//o;
+				my $key = (s/^(\w+?)\s*\=\s*//) ? $1 : 'skip';
 				s/^[\'\"]//o;
 				s/[\'\"]$//o;
-				push @SKIPTHESE, $_;
+				push @{$SKIPTHESE{$key}}, $_;
 			}
 			close IN;
 		}
@@ -447,7 +439,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 	my $artist_uesc = uri_unescape($artist);
 	my $title_uesc = uri_unescape($title);
 	print STDERR "i:ART HELPER: DOING: ALBUM=$album_uesc= TITLE=$title_uesc= ARTIST=$artist_uesc=\n"  if ($DEBUG);
-	foreach my $skipit (@SKIPTHESE) {
+	foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
 		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/$album_uesc\|/;
 		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
@@ -455,6 +447,26 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 			exit (0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME/TITLE THOUGH!
 		}
 	}
+
+	if (defined $ARGV[5]) {
+		exit (0)  if ($ARGV[5] =~ /^NOWEB$/i); #ONLY CHECK CACHE, DON'T SEARCH WEB!
+		#OTHERWISE, ASSUME WE HAVE A COVER-ART URL ALREADY, SO GRAB IT INSTEAD OF SEARCHING!
+		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {
+			$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
+			$skipit =~ s/^\_\|/$album_uesc\|/;
+			if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
+				print STDERR "i:ART HELPER: SKIPPING ART TAG ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+				goto WEBSEARCH;  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME/TITLE THOUGH!
+			}
+		}
+		print STDERR "i:FETCHING ($ARGV[5]) FOUND IN STREAM!\n"  if ($DEBUG);
+		&writeArtImage($ARGV[5], "albumart/${albart_FN}", '_tmp_albumart')  if ($ARGV[5] =~ /^http/);
+    }
+
+WEBSEARCH:
+	print STDERR "---ART HELPER WILL SEARCH THE WEB...\n"  if ($DEBUG);
+	#STEP 2:  IF LAST ARG[5] IS NOT "NOWEB", USER WANTS TO SEARCH WEB FOR ALBUM COVER (WASN'T IN CACHE)!:
+	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 	if ($artist && $artist ne '_' && $title) {  #TRY genius.com FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
 		($url = $artist_uesc) =~ s#\s*\/.*$##;
 		$url .= " ${title_uesc}-lyrics";
@@ -483,7 +495,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 	foreach my $release ($album, $title) {
 		next  if ($release eq '_');
 		if ($release eq $album) {
-			foreach my $skipit (@SKIPTHESE) {
+			foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
 				next  if ($skipit =~ /^${release}\|/);
 			}
 		}

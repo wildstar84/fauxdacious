@@ -674,6 +674,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
             fauxd_set_prevmeta (0, val);
             const char * ttloffset = strstr ((const char *) val, " - text=\"");
 
+            aud_set_str (nullptr, "_cover_art_link", "");
             unset (Lyrics); //JWT:REMOVE ANY RESIDUAL "LYRICS" FROM TAGFILE (LIKELY FROM URLHELPER) SO SONG CHG. CAN OVERRIDE!
             if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
             {
@@ -694,6 +695,20 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                             set_str (Title, str_printf ("%.*s - %.*s", artlen,
                                     (const char *) val, (int) (endquote-ttloffset9), ttloffset9));
                         updated = true;
+                    }
+
+                    /* JWT:SOME iHeart STATIONS INCLUDE COVER-ART!: */
+                    const char * coverart = strstr (endquote, "ArtworkURL=\"");
+                    if (coverart)
+                    {
+                        const char * coveroffset = coverart + 12;
+                        const char * endquote = strstr (coveroffset, "\"");
+                        if (endquote)
+                        {
+                            int coverlen = endquote - coveroffset;
+                            if (coverlen > 0)
+                                aud_set_str (nullptr, "_cover_art_link", str_printf ("%.*s", coverlen, coveroffset));
+                        }
                     }
                 }
             }
@@ -808,6 +823,22 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                 }
                 else if (val != get_str (Title))
                     set_str (Title, val);
+
+                /* JWT:SOME WEIRD STREAMS PUT A COVER-ART LINK AS THEIR "STREAM-URL"?! */
+                ::String stream_url = stream.get_metadata ("stream-url");
+                if (stream_url && stream_url[0])
+                {
+                    Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+                    StringBuf uriext = uri_get_extension (stream_url);
+                    for (auto & ext : extlist)
+                    {
+                        if (! strcmp_nocase (uriext, ext))
+                        {
+                            aud_set_str (nullptr, "_cover_art_link", stream_url);
+                            break;
+                        }
+                    }
+                }
 
                 updated = true;
             }

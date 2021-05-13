@@ -1,5 +1,23 @@
 Version 4.1.2-beta1
 
+* Greatly improve the GUI performance and overall efficiency when using the 
+AlbumArt and/or Lyric plugins by separating out to separate threads, the 
+calling of their respective Perl helper scripts for fetching cover-art and 
+lyrics respectively from the web (The GUI should no longer briefly "freeze" 
+while the helper script(s) are searching for and fetching data from the web!
+
+* Refactor the FFMpeg plugin for better video playing via a separate reader-
+thread to fill the buffer queues and redo the way the queueing takes place.  
+This slightly improves video play in general and greatly improves HLS videos 
+(m3u8 and mpd).  Also add option to specify that these "dash"-style videos 
+(or any other based on user-choice) be handled by FFMpeg itself rather than 
+by the Neon transport plugin.
+
+* Add ability to use cover-art links embedded in ICY metadata tags or 
+specified in the "StreamURL" metadata field for streaming radio stations, 
+saving the need to search the web for the Title and Album fields (when using 
+the Cover Art plugins.
+
 * Add ability to play flac streams w/embedded ogg-vorbis (addresses Audacious 
 support/feature request# 1075).
 
