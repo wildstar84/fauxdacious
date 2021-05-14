@@ -237,7 +237,18 @@ static void add_playlist (const char * filename, PlaylistFilterFunc filter,
         return;
 
     if (save_title)
+    {
+        /* JWT:IF NO TITLE AND PLAYLIST IS A FILE, USE FILENAME AS PLAYLIST NAME: */
+        if ((! title || ! title[0]) && filename && ! strncmp (filename, "file://", 7))
+        {
+            const char * fn;
+            const char * ext;
+            uri_parse (filename, & fn, & ext, nullptr, nullptr);
+            if (fn)
+                title = String (ext ? str_copy (fn, ext - fn) : filename);
+        }
         result->title = title;
+    }
 
     for (auto & item : items)
         add_generic (std::move (item), filter, user, result, false, true);
