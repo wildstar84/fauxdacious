@@ -26,6 +26,7 @@ SRCS = about-qt.cc \
        prefs-window-qt.cc \
        prefs-pluginlist-model.cc \
        queue-manager-qt.cc \
+       song-window-qt.cc \
        url-opener-qt.cc \
        util-qt.cc \
        treeview.cc \
@@ -57,7 +58,9 @@ CPPFLAGS := -I.. -I../.. \
 
 CFLAGS += ${LIB_CFLAGS}
 
-LIBS := -L../libfauxdcore -lfauxdcore \
+LIB_LDFLAGS := -L../libfauxdcore $(LIB_LDFLAGS)
+
+LIBS := -lfauxdcore \
         ${LIBS} ${SDL_LIBS} -lm \
         ${QT_LIBS}
 

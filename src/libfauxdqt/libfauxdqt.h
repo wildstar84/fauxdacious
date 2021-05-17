@@ -40,9 +40,11 @@ enum class PluginType;
 class PluginHandle;
 struct PreferencesWidget;
 
-namespace audqt {
+namespace audqt
+{
 
-enum class FileMode {
+enum class FileMode
+{
     Open,
     OpenFolder,
     Add,
@@ -52,14 +54,16 @@ enum class FileMode {
     count
 };
 
-struct PixelSizes {
+struct PixelSizes
+{
     int OneInch;
     int TwoPt;
     int FourPt;
     int EightPt;
 };
 
-struct PixelMargins {
+struct PixelMargins
+{
     QMargins TwoPt;
     QMargins FourPt;
     QMargins EightPt;
@@ -90,14 +94,18 @@ void fileopener_show (FileMode mode);
 void urlopener_show (bool open);
 
 /* audqt.cc */
-
 extern const PixelSizes & sizes;
 extern const PixelMargins & margins;
 
 static inline int to_native_dpi (int x)
-    { return aud::rescale (x, 96, sizes.OneInch); }
+{
+    return aud::rescale (x, 96, sizes.OneInch);
+}
+
 static inline int to_portable_dpi (int x)
-    { return aud::rescale (x, sizes.OneInch, 96); }
+{
+    return aud::rescale (x, sizes.OneInch, 96);
+}
 
 void init ();
 void run() __attribute__((deprecated)); /* use QApplication::exec() */
@@ -121,12 +129,14 @@ QString translate_str (const char * str, const char * domain);
 
 #ifdef PACKAGE
 static inline QString translate_str (const char * str)
-    { return translate_str (str, PACKAGE); }
+{
+    return translate_str (str, PACKAGE);
+}
 #endif
 
 /* file-entry.cc */
 QLineEdit * file_entry_new (QWidget * parent, const char * title,
- QFileDialog::FileMode file_mode, QFileDialog::AcceptMode accept_mode);
+        QFileDialog::FileMode file_mode, QFileDialog::AcceptMode accept_mode);
 String file_entry_get_uri (QLineEdit * entry);
 void file_entry_set_uri (QLineEdit * entry, const char * uri);
 
@@ -147,6 +157,10 @@ void prefswin_show ();
 void prefswin_hide ();
 void prefswin_show_page (int id, bool show = true);
 void prefswin_show_plugin_page (PluginType type);
+
+/* song-window-qt.cc */
+void songwin_show();
+void songwin_hide();
 
 /* log-inspector.cc */
 void log_inspector_show ();

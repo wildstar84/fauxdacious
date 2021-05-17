@@ -20,8 +20,10 @@
 #include <stdlib.h>
 
 #include <QApplication>
+#include <QLibraryInfo>
 #include <QPushButton>
 #include <QScreen>
+#include <QTranslator>
 #include <QVBoxLayout>
 
 #include <libfauxdcore/sdl_window.h>
@@ -32,7 +34,8 @@
 #include "libfauxdqt-internal.h"
 #include "libfauxdqt.h"
 
-namespace audqt {
+namespace audqt
+{
 
 static int init_count;
 
@@ -61,6 +64,24 @@ static const char * const audqt_defaults[] = {
     nullptr
 };
 /* clang-format on */
+
+static void load_qt_translations()
+{
+    static QTranslator translators[2];
+
+    QLocale locale = QLocale::system();
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QString dir = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+#else
+    QString dir = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+#endif
+
+    if (translators[0].load(locale, "qt", "_", dir))
+        QApplication::installTranslator(&translators[0]);
+    if (translators[1].load(locale, "qtbase", "_", dir))
+        QApplication::installTranslator(&translators[1]);
+}
 
 EXPORT void init ()
 {
@@ -99,6 +120,8 @@ EXPORT void init ()
     margins_local.TwoPt = QMargins (sizes.TwoPt, sizes.TwoPt, sizes.TwoPt, sizes.TwoPt);
     margins_local.FourPt = QMargins (sizes.FourPt, sizes.FourPt, sizes.FourPt, sizes.FourPt);
     margins_local.EightPt = QMargins (sizes.EightPt, sizes.EightPt, sizes.EightPt, sizes.EightPt);
+
+    load_qt_translations();
 
 #ifdef _WIN32
     // On Windows, Qt uses 9 pt in specific places (such as QMenu) but
@@ -294,6 +317,7 @@ EXPORT void simple_message (const char * title, const char * text, QMessageBox::
     auto msgbox = new QMessageBox (icon, title, text, QMessageBox::Close);
     msgbox->button (QMessageBox::Close)->setText (translate_str (N_("_Close")));
     msgbox->setAttribute (Qt::WA_DeleteOnClose);
+    msgbox->setTextInteractionFlags (Qt::TextSelectableByMouse);
     msgbox->show ();
 }
 
