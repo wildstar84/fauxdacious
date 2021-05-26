@@ -141,7 +141,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			exit (0);
 		}
 	} else {
-		exit (0)  if ($ARGV[0] =~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp4|m4a|flac|flv|ogg|ogv|rtmp)$/i);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE VALID EXTENSION!
+		exit (0)  if ($ARGV[0] =~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta)$/i);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE VALID EXTENSION!
 
 		$client = new StreamFinder($ARGV[0], -debug => $DEBUG);
 		die "f:Could not open streamfinder or no streams found!"  unless ($client);
@@ -172,9 +172,9 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		#NOTE:  IF THE STREAM HAS LYRICS IN id3 TAGS, THEY WILL REPLACE THIS, REGARDLESSOF "Precedence".
 		#COMMENT OUT NEXT 7 LINES IF THIS IS NOT DESIRED:
 		if (defined($desc) && $desc =~ /\w/ && $desc ne $title) {
+			$desc =~ s/\R+$//s;
 			$desc =~ s/\R/\x02/gs; #MUST BE A SINGLE LINE, SO WORKAROUND FOR PRESERVING MULTILINE DESCRIPTIONS!
-			$desc =~ s#\<(?:br|p)\s*\/?\>#\x02#igs;
-			$desc =~ s#\<[^\>]+\>##gs;
+			$desc =~ s#(p|br)\>\s*\x02\s*\<(p|br)#$1\>\<$2#ig;  #TRY TO REMOVE SOME TRIPLE-SPACING.
 			my $lyrics = "Lyrics=Description:  $desc";
 			$comment .= "$lyrics\n";
 		}

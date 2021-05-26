@@ -485,6 +485,10 @@ WEBSEARCH:
 					print STDERR "i:found (GENIUS) IMAGE ($imgurl)?\n"  if ($DEBUG);
 					&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart');
 				}
+			} elsif ($html =~ m#\<noscript\>\s*\<img\s+src\=\"([^\"]+)#) {
+				my $imgurl = $1;
+				print STDERR "i:found (GENIUS) IMAGE2 ($imgurl)?\n"  if ($DEBUG);
+				&writeArtImage($imgurl, "albumart/${albart_FN}", '_tmp_albumart');
 			}
 		} else {
 			print STDERR $response->status_line;
