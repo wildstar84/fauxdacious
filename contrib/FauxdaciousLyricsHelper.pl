@@ -14,7 +14,7 @@
 
 #FAUXDACIOUS "HELPER" SCRIPT TO FETCH Lyrics FROM sites supported by the LyricFinder CPAN module:
 
-#USAGE:  $0 artist title [configpath]
+#USAGE:  $0 artist title [configpath] [album [flags]]
 
 #NOTE:  SEE ALSO THE CONFIG (.ini) FILE: FauxdaciousLyricsHelper.ini in /contrib/, 
 #       MOVE OVER TO ~/.config/fauxdacious[_instancename]/ AND EDIT TO SUIT YOUR NEEDS!
@@ -75,7 +75,12 @@ my $agent = '';
 
 my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
+print STDERR "-LyricHelper(".join('|',@ARGV)."=\n"  if ($DEBUG);
+unlink "$ARGV[2]/_albumart_done.tmp"	if ($ARGV[2] && -d $ARGV[2] && -e "$ARGV[2]/_albumart_done.tmp");
+
+my $flags = '';
 if ($#ARGV >= 1) {
+	$flags = $ARGV[4]  if (defined $ARGV[4]);
 	if ($ARGV[2] && -d $ARGV[2]) {
 		## USER-CONFIGURED SITE-SKIP LIST:
 		if (open IN, "<$ARGV[2]/FauxdaciousLyricsHelper.ini") {
@@ -130,7 +135,44 @@ if ($#ARGV >= 1) {
 		}
 	}
 
-	my $lf = new LyricFinder();
+	my $omit = '';
+	if ($flags =~ /ALBUMART/ && -d $ARGV[2]) {  #ALBUMART PLUG IS ALSO ACTIVE & SET TO PULL FROM WEB.
+		#WAIT FOR 5" & AND SEE IF ALBUMART ALREADY PULLED LYRICS WHILST PULLING AN ALBUM-COVER:
+		#(THIS STRATEGY IS USED TO AVOID HITTING A LYRIC SITE TWICE, SINCE BOTH ALBUM-ART AND
+		#LYRICWIKI SHARE SOME SITES (CURRENTLY:  Genius.com and Musixmatch.com, AS THESE CAN
+		#PROVIDE BOTH COVER-ART IMAGES AND LYRICS!:
+		my $timeout = 6;
+		our $quit = 0;
+
+		local $SIG{ALRM} = sub { print STDERR "--QUIT!--\n"; $quit = 1; };
+		alarm $timeout;
+
+		my $checklyrics = 0;
+		while (1) {  #WAIT 5 SECONDS TO GIVE ALBUMART A CHANCE TO FETCH THE LYRICS FOR US:
+			last  if ($quit);
+			if (-e "$ARGV[2]/_albumart_done.tmp") {
+				if (open IN, "$ARGV[2]/_albumart_done.tmp") {
+					$omit = <IN>;  #CONTAINS A STRING OF LYRICS SITES ALBUMART ALREADY TRIED (IF ANY):
+					close IN;
+					$omit = ''  unless (defined $omit);
+				}
+				unlink "$ARGV[2]/_albumart_done.tmp";
+				$checklyrics = 1;
+				last;
+			}
+			sleep (1);
+		}
+		alarm 0;
+
+		#IF ALBUMART COMPLETED WITHIN THE ALLOWED TIME & SAVED SOME LYRICS FOR US, USE THEM!:
+		if ($checklyrics && -e "$ARGV[2]/_tmp_lyrics_from_albumart.txt") {
+			unlink("$ARGV[2]/_tmp_lyrics.txt")  if (-e "$ARGV[2]/_tmp_lyrics.txt");
+			rename "$ARGV[2]/_tmp_lyrics_from_albumart.txt", "$ARGV[2]/_tmp_lyrics.txt";
+			exit (0);
+		}
+	}
+
+	my $lf = $omit ? new LyricFinder(-omit => $omit) : new LyricFinder();
 	if ($lf) {
 		$lf->agent($agent)  if ($agent);
 		my $lyrics = $lf->fetch($ARGV[0], $ARGV[1], 'random');
@@ -144,11 +186,12 @@ if ($#ARGV >= 1) {
 			} else {
 				print STDERR $lyrics;
 			}
+			unlink("$ARGV[2]/_tmp_lyrics_from_albumart.txt")  if (-d $ARGV[2] && -e "$ARGV[2]/_tmp_lyrics_from_albumart.txt");
 			exit (0);
 		}
 		else
 		{
-			print STDERR "w:No lyrics found (url=".$lf->url()."): ".$lf->message()."\n";
+			print STDERR "w:No lyrics found (last tried=".$lf->url()."): ".$lf->message()."\n";
 		}
 	}
 	else
@@ -156,5 +199,6 @@ if ($#ARGV >= 1) {
 		print STDERR "s:Could not find/load required LyricFinder module!\n";
 	}
 } else {
-	print STDERR "..usage: $0 artist title [output_directory]\n";
+	print STDERR "..usage: $0 artist title [output_directory [album [flags]]]\n";
 }
+unlink("$ARGV[2]/_tmp_lyrics_from_albumart.txt")  if (-d $ARGV[2] && -e "$ARGV[2]/_tmp_lyrics_from_albumart.txt");

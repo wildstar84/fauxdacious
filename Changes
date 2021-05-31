@@ -1,5 +1,19 @@
 Version 4.1.2-beta1
 
+* Refactor CoverArtHelper script to take advantage of the latest v1.20 of 
+LyricFinder's ability to fetch a cover art image from some lyrics sites, and 
+also reduce hits on the lyrics sites by fetching lyrics along with the cover 
+art image, and integrating with the LyricWiki plugin to avoid having to re-
+call the lyric site furnishing the cover art image for lyrics (when both 
+plugins are active.  Also fix failure of Musicbrainz to return cover art 
+images due to slight changes in their site.  The CoverArtHelper will now first 
+try the LyricFinder module for cover art (and lyrics), then, failing that, 
+will try to fetch from Musicbrainz (previously it always hit Genius.com 
+(one of the "lyrics" sites first, then Musicbrainz.  
+
+NOTE:  As a result, users must upgrade LyricFinder to v. 1.20 or better to 
+take advantage of this integration!
+
 * Greatly improve the GUI performance and overall efficiency when using the 
 AlbumArt and/or Lyric plugins by separating out to separate threads, the 
 calling of their respective Perl helper scripts for fetching cover-art and 
