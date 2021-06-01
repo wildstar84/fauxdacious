@@ -144,7 +144,7 @@ if ($#ARGV >= 1) {
 		my $timeout = 6;
 		our $quit = 0;
 
-		local $SIG{ALRM} = sub { print STDERR "--QUIT!--\n"; $quit = 1; };
+		local $SIG{ALRM} = sub { print STDERR "--QUIT!--\n"  if ($DEBUG); $quit = 1; };
 		alarm $timeout;
 
 		my $checklyrics = 0;
