@@ -93,7 +93,7 @@ EXPORT void playlist_show_rename (int playlist)
 
 EXPORT void playlist_confirm_delete (int playlist)
 {
-    if (aud_get_bool ("audgui", "no_confirm_playlist_delete"))
+    if (aud_get_bool ("audgui", "no_confirm_playlist_delete") || aud_playlist_entry_count (playlist) < 1)
     {
         aud_playlist_delete (playlist);
         return;

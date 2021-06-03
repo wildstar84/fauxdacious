@@ -64,7 +64,7 @@ static void confirm_delete_cb (void * data)
 
 EXPORT void audgui_confirm_playlist_delete (int playlist)
 {
-    if (aud_get_bool ("audgui", "no_confirm_playlist_delete"))
+    if (aud_get_bool ("audgui", "no_confirm_playlist_delete") || aud_playlist_entry_count (playlist) < 1)
     {
         aud_playlist_delete (playlist);
         return;
