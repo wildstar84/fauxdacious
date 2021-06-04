@@ -1,10 +1,15 @@
 #!/usr/bin/perl
 
 #MUST INSTALL youtube-dl FOR Youtube to work!
-#pp --gui -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
+#pp --gui -o FauxdaciousUrlHelper.exe -M utf8_heavy.pl -M urlhelper_mods.pm -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
-###(urlhelper_modules.pm contains):
+###(urlhelper_mods.pm contains):
+###use URI::Escape;
+###use HTML::Entities;
+###use LWP::UserAgent;
 ###use StreamFinder;
+###use StreamFinder::_Class;
+###use StreamFinder::Anystream;
 ###use StreamFinder::Apple;
 ###use StreamFinder::Bitchute;
 ###use StreamFinder::Blogger;
@@ -13,6 +18,7 @@
 ###use StreamFinder::Google;
 ###use StreamFinder::IHeartRadio;
 ###use StreamFinder::RadioNet;
+###use StreamFinder::Reciva;
 ###use StreamFinder::Rumble;
 ###use StreamFinder::SermonAudio;
 ###use StreamFinder::Spreaker;

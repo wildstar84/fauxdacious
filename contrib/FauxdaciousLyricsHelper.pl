@@ -4,11 +4,17 @@
 ###pp --gui -o FauxdaciousLyricsHelper.exe -M utf8_heavy.pl -M lyrichelper_modules -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousLyricsHelper.pl
 
 ###(lyrichelper_modules.pm contains):
+###use Carp;
+###use HTML::Strip;
+###use URI::Escape;
+###use HTML::Entities;
+###use LWP::UserAgent;
 ###use LyricFinder;
-###use LyricFinder::ApiLyricsOph;
+###use LyricFinder::_Class;
+###use LyricFinder::ApiLyricsOvh;
 ###use LyricFinder::AZLyrics;
-###use LyricFinder::Cache;
 ###use LyricFinder::Genius;
+###use LyricFinder::Letras;
 ###use LyricFinder::Musixmatch;
 ###1;
 

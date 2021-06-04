@@ -1,4 +1,40 @@
-Version 4.1.2-beta1
+Version 4.1.2-final
+
+This release is a smaller release than previous ones (much fewer changes) as 
+Fauxdacious has somewhat matured and Audacious development has greatly 
+slowed.  Most of the changes center around improving efficiency and smoother 
+user experience, particularly by threading calls to the helper scripts out 
+from the main GUI thread.  Most of the changes this release involved the 
+Lyricwiki and Albumart plugins and their associated helper scripts.  Besides 
+user-experience, much of the efficiency improvements involved significant 
+effort to minimize the number of "hits" placed against websites providing 
+album-art images and / or lyrics when playing streaming radio stations that 
+change songs every few minutes.  Besides speed, this effort is directed at 
+lowering the risk of a user who frequently listens to such stations using 
+these plugins from getting noticed and possibly blocked by any of these 
+websites for "overusage".  Anyway, all users are encouraged to upgrade to 
+v4.1.2-final as soon as practical!  
+
+NOTE:  There appears to be a bug in recent versions of libtasn (upstream 
+library) that can in rare cases crash Fauxdacious when user jumps from a 
+playing fixed-length https stream to another stream while freeing 
+certificate data when the previous connection is closed (freed).  We added 
+an attempt to the Neon plugin to use a Try/Catch fuse on the offending 
+function call that frees the session.  This might lead to a possible memory-
+leak but not much else.  Due to the rarity of this bug, I haven't been able 
+to thoroughly test the work-around.
+
+Detailed changelog below:
+
+* I believe that the recent threading improvements seemed to have eliminated 
+the long-standing bug involving the skins-GTK interface sometimes becoming 
+unresponsive to user-interaction (mostly the Windows version), as I haven't 
+seen this manifest in quite some time now.
+
+* Remove confirmation popup when deleting an empty playlist.  Just seemed 
+somewhat annoying and silly to me when the playlist is empty, and There's 
+already a user-option to turn this off anyway, but perhaps now fewer users 
+will be inclined to turn it off.  
 
 * Refactor CoverArtHelper script to take advantage of the latest v1.20 of 
 LyricFinder's ability to fetch a cover art image from some lyrics sites, and 
@@ -9,7 +45,7 @@ plugins are active.  Also fix failure of Musicbrainz to return cover art
 images due to slight changes in their site.  The CoverArtHelper will now first 
 try the LyricFinder module for cover art (and lyrics), then, failing that, 
 will try to fetch from Musicbrainz (previously it always hit Genius.com 
-(one of the "lyrics" sites first, then Musicbrainz.  
+(one of the "lyrics" sites) first), then Musicbrainz.
 
 NOTE:  As a result, users must upgrade LyricFinder to v. 1.20 or better to 
 take advantage of this integration!

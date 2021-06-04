@@ -1,6 +1,22 @@
 #!/usr/bin/perl -w
 
-#pp --gui -o FauxdaciousCoverArtHelper.exe -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousCoverArtHelper.pl
+### HOW TO COMPILE TO EXE (FOR M$-WINDOWS USERS WITHOUT PERL INSTALLED (NEARLY ALL)):
+###pp --gui -o FauxdaciousCoverArtHelper.exe -M utf8_heavy.pl -M lyrichelper_modules -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousCoverArtHelper.pl
+
+###(lyrichelper_modules.pm contains):
+###use Carp;
+###use HTML::Strip;
+###use URI::Escape;
+###use HTML::Entities;
+###use LWP::UserAgent;
+###use LyricFinder;
+###use LyricFinder::_Class;
+###use LyricFinder::ApiLyricsOvh;
+###use LyricFinder::AZLyrics;
+###use LyricFinder::Genius;
+###use LyricFinder::Letras;
+###use LyricFinder::Musixmatch;
+###1;
 
 #FAUXDACIOUS "HELPER" SCRIPT TO FETCH COVER ART FOR CDs/DVSs FROM coverartarchive and dvdcover.com:
 
@@ -121,6 +137,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 
 	while ($html =~ s#^.*?\<tr[^\>]*\>##is)  #MAY BE MULTIPLE MATCHES, TRY TO FIND ONE THAT'S A "CD" (VS. A "DVD", ETC.):
 	{
+#x		$html =~ s#^.*?\<tr[^\>]*\>##is;
 		if ($html =~ s#^.*?\<a\s+href\=\"([^\"]+)\"\>\s*\<bdi\>([^\<]+)\<\/bdi\>##is) {
 			$tmpurl2 = $1;
 			$tmptitle = $2;
@@ -439,12 +456,13 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 		}
 	}
 
+	#STEP 2:  IF WE HAVE AN ART LINK FROM TAGS (IN $ARGV[5]), USE THAT:
 	if (defined $ARGV[5]) {
 		if ($ARGV[5] =~ /^NOWEB$/i) { #ONLY CHECK CACHE, DON'T SEARCH WEB!
 			&albumart_done();
 			exit(0);
 		}
-		#OTHERWISE, ASSUME WE HAVE A COVER-ART URL ALREADY, SO GRAB IT INSTEAD OF SEARCHING!
+		#OTHERWISE, ASSUME WE HAVE A COVER-ART URL FROM TAG-DATA, SO GRAB IT INSTEAD OF SEARCHING!
 		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {
 			$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 			$skipit =~ s/^\_\|/$album_uesc\|/;
@@ -463,13 +481,16 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 
 WEBSEARCH:
 	print STDERR "---ART HELPER WILL SEARCH THE WEB...\n"  if ($DEBUG);
-	#STEP 2:  IF ARG[5] IS NOT "NOWEB", USER WANTS TO SEARCH WEB FOR ALBUM COVER (WASN'T IN CACHE)!:
+	#($ARGV[5] IS NOT "NOWEB"): USER WANTS TO SEARCH WEB FOR ALBUM COVER (WASN'T IN CACHE OR TAGS)!:
 	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 	my $tried = '';
 	unless (-d "${configPath}/albumart") {
 		mkdir ("${configPath}/albumart",0755) || die "f:Could not create directory (${configPath}/albumart) ($!)!\n";;
 	}
-	if ($artist && $artist ne '_' && $title) {  #TRY LyricFinder FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
+
+	#STEP 3:  TRY LYRICFINDER'S SITES THAT CAN RETURN COVER-ART LINKS FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
+	#(REQUIRES BOTH AN ARTIST AND A TITLE, NOT JUST ARTIST+ALBUM):
+	if ($artist && $artist ne '_' && $title) {
 		#FIRST TRY LYRICFINDER (WHICH CAN ALSO QUICKLY FETCH ALBUM ART (+LYRICS), WHICH MAY ALSO BE NEEDED):
 		my $haveLyricFinder = 0;
 		eval "use LyricFinder; \$haveLyricFinder = \$LyricFinder::VERSION; 1";
@@ -503,16 +524,23 @@ WEBSEARCH:
 	}
 	&albumart_done($tried);
 
+	#STEP 4:  SEARCH MUSICBRAINZ - BY ALBUM, THEN TITLE (SLOWER BUT MORE COMPREHENSIVE):
+	#USER NOTE:  IF YOU MOSTLY JUST LISTEN TO STREAMING STATIONS (THAT USUALLY JUST SET THE ALBUM FIELD
+	#TO THE STATION NAME), YOU MIGHT WANT TO REVERSE THIS LIST (IE. $title, /* then */ $album)
+	#FOR EFFICIENCY'S SAKE!!
 	#LYRICFINDER DID NOT RETURN A COVER IMAGE, SO SEARCH MUSICBRAINZ (FIRST TRY ARTIST/ALBUM, THEN ARTIST/TITLE):
+RELEASETYPE:
 	foreach my $release ($album, $title) {
 		next  if ($release eq '_');
+		chomp $release;
+		$release =~ s/(?:\%20)+$//o;    #CHOMPIT (TRAILING ESCAPED SPACES)!
+		$release =~ s/\%C2\%B4/\%27/g;  #FIX UNICODE QUOTES.
 		if ($release eq $album) {
-			foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
-				next  if ($skipit =~ /^${release}\|/);
+			foreach my $skipit (@{$SKIPTHESE{'noalbum'}}) {
+				$skipit = uri_escape($skipit);
+				next RELEASETYPE  if ($skipit =~ /^$release$/i);
 			}
 		}
-		chomp $release;
-		$release =~ s/(?:\%20)+$//o;  #CHOMPIT!
 		$html = '';
 		$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$release";
 		print STDERR "i:ART HELPER:SEARCHURL=$url=\n"  if ($DEBUG);
@@ -545,32 +573,37 @@ WEBSEARCH:
 				(my $thisartist = $1) =~ s/\&\#x([0-9A-Fa-f]{2})\;/chr(hex($1))/eg;  #THEY HAVE SOME "&#X..;" STUFF TOO!
 				$primaryArtistFactor -= 3;
 				print STDERR "i:ART:found ARTIST=$thisartist= ESCAPED=$artistEscaped=\n"  if ($DEBUG > 1);
-				next  unless ($artistEscaped =~ /$thisartist/is
-						|| $thisartist =~ /(?:$artistEscaped|various)/is);
+				next  unless ($artistEscaped =~ /$thisartist/i
+						|| $thisartist =~ /(?:$artistEscaped|various)/i);
 
 				$priority = 0;
-				$priority += $primaryArtistFactor if ($thisartist =~ /$artistEscaped/is
-						|| $artistEscaped =~ /$thisartist/is);
+				$priority += $primaryArtistFactor if ($primaryArtistFactor > 0
+						&& ($thisartist =~ /^$artistEscaped/i
+						|| $artistEscaped =~ /^$thisartist/i));
 				$rowhtml =~ s#^.*?\<td\>##iso;
 				if ($rowhtml =~ m#([^\<]+)\<\/td\>#iso) {
 					my $type = $1;
 					print STDERR "i:ART:TYPE=$type=\n"  if ($DEBUG);
-					next  if ($type =~ m#(?:cassette|\>)#io);   #SKIP CASSETTES & UNKNOWNS!:
+					next  if ($type =~ m#(?:cassette|\>)#io);   #SKIP CASSETTES (CRAPPY VERTICAL IMAGES)!:
 
+					++$priority  unless ($thisartist =~ /various/io);
 					++$priority  unless ($type =~ /unknown/io);
-					++$priority  if ($type =~ /CD/o);
-					print STDERR "i:ART:KEEPING TYPE=$type= PRIO:$priority!\n"  if ($DEBUG);
+					++$priority  if ($type =~ /CD/o);   #CDs GET HIGHER PRIORITY.
+					++$priority  if ($type =~ /^CD$/o); #SINGLE-CD COVERS GET EVEN HIGHER PRIORITY.
+					print STDERR "i:*** ART:KEEPING TYPE=$type= ARTIST:$thisartist PRIO:$priority!\n"  if ($DEBUG);
 				}
 				$mbHash{$mbzid} = $priority;
 			}
 		}
+		print STDERR '..ART: '.scalar(%mbHash)." potential Musicbrainz entries found...\n"  if ($DEBUG);
+		#LOOK UP ART LINKS FOR EACH MATCHING MUSICBRAINZ ID IN ORDER OF DESCENDING PRIORITY, STOPPING IF ONE FOUND:
 		foreach $mbzid (sort { $mbHash{$b} <=> $mbHash{$a} } keys %mbHash) {
 			$art_url = &lookup_art_on_mb_release_by_mbid("https://musicbrainz.org/release/$mbzid");
 			&writeArtImage($art_url, "albumart/${albart_FN}", '_tmp_albumart')  if ($art_url);
 		}
 		print STDERR "-----ART:AT END OF FOR-LOOP($release), CONTINUE OR PUNT...\n"  if ($DEBUG > 1);
 	}
-	print STDERR "w:NO COVER-ART FOUND ON MUSICBRAINZ!\n"  if ($DEBUG);
+	print STDERR "w:NO COVER-ART FOUND ON MUSICBRAINZ!\n\n"  if ($DEBUG);
 	exit (0);
 }
 else

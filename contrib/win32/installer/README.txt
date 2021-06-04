@@ -1,4 +1,4 @@
-Fauxdacious 4.1.1-final for Windows
+Fauxdacious 4.1.2-final for Windows
 
     https://github.com/wildstar84/fauxdacious-windows-easyinstaller
     https://wildstar84.wordpress.com/fauxdacious
