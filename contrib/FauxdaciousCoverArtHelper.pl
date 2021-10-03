@@ -100,24 +100,27 @@ print STDERR "-CoverArtHelper(".join('|',@ARGV)."=\n"  if ($DEBUG);
 
 if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE REMOVING ALL OLD COVERART IMAGE FILES:
 	if (open TAGDATA, "<${configPath}/tmp_tag_data") {
-		my $fid;
+		my ($comment, @fids);
 		my $skipdisks = 0;
 		while (<TAGDATA>) {
 			if (m#^\[([^\]]+)#o) {
 				my $one = $1;
 				$skipdisks = ($one =~ m#^(?:cdda|dvd)\:\/\/#o) ? 1 : 0;
 			} elsif (!$skipdisks && m#^Comment\=file\:\/\/\/(.+)#o) {  #THIS ELIMINATES ANY EXISTING CD TAGS (WILL ALL BE REPLACED!):
-				$fid = $1;
-				next  if ($fid =~ /[\*\?]/o);  #GUARD AGAINST WILDCARDS, ETC!!
-				next  unless ($fid =~ /(?:png|jpe?g|gif)$/io);  #MAKE SURE WE ONLY DELETE IMAGE FILES!
-				$fid =~ s/^(\w)\%3A/$1\:/;
-				if ($bummer && $fid =~ /^\w\:/) {   #BUMMER, WE'RE ON WINDOWS:
-					$fid =~ s#\/#\\#go;  #MAY NOT BE NECESSARY?
-				} else {
-					$fid = '/' . $fid  unless ($fid =~ m#^\/#o);
+				$comment = $1;
+				@fids = split(m#\;file\:\/\/\/#o, $comment);  #NOW MAY HAVE MORE THAN ONE (CHANNEL ICON)!
+				foreach my $fid (@fids) {
+					next  if ($fid =~ /[\*\?]/o);  #GUARD AGAINST WILDCARDS, ETC!!
+					next  unless ($fid =~ /(?:png|jpe?g|gif|com|webp)$/io);  #MAKE SURE WE ONLY DELETE IMAGE FILES!
+					$fid =~ s/^(\w)\%3A/$1\:/;
+					if ($bummer && $fid =~ /^\w\:/) {   #BUMMER, WE'RE ON WINDOWS:
+						$fid =~ s#\/#\\#go;  #MAY NOT BE NECESSARY?
+					} else {
+						$fid = '/' . $fid  unless ($fid =~ m#^\/#o);
+					}
+					print STDERR "i:$0: DELETED temp. image file ($fid)!\n";
+					unlink $fid;
 				}
-				print STDERR "i:$0: DELETED temp. image file ($fid)!\n";
-				unlink $fid;
 			}
 		}
 		close TAGDATA;

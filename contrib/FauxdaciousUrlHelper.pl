@@ -1,12 +1,9 @@
 #!/usr/bin/perl
 
 #MUST INSTALL youtube-dl FOR Youtube to work!
-#pp --gui -o FauxdaciousUrlHelper.exe -M utf8_heavy.pl -M urlhelper_mods.pm -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
+#pp --gui -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
-###(urlhelper_mods.pm contains):
-###use URI::Escape;
-###use HTML::Entities;
-###use LWP::UserAgent;
+###(urlhelper_modules.pm contains):
 ###use StreamFinder;
 ###use StreamFinder::_Class;
 ###use StreamFinder::Anystream;
@@ -18,7 +15,6 @@
 ###use StreamFinder::Google;
 ###use StreamFinder::IHeartRadio;
 ###use StreamFinder::RadioNet;
-###use StreamFinder::Reciva;
 ###use StreamFinder::Rumble;
 ###use StreamFinder::SermonAudio;
 ###use StreamFinder::Spreaker;
@@ -120,36 +116,14 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		}
 		close IN;
 	}
-	foreach my $s (@downloadServerList) {
-		if ($ARGV[0] =~ /\Q$s\E/) {
-			$downloadit = 1;
-			last;
-		}
-	}
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-	if ($downloadit) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
-		my $fn = $1  if ($ARGV[0] =~ m#([^\/]+)$#);
-		exit (0)  unless ($fn);
-		unless (-f "/tmp/$fn") {
-			my $cmd = "curl -o /tmp/$fn \"$ARGV[0]\"";
-			`$cmd`;
-		}
-		if (-f "/tmp/$fn") {
-			$newPlaylistURL = "file:///tmp/$fn";
-			my $getTitle = `ffprobe -loglevel error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 /tmp/$fn`;
-			if ($getTitle =~ /\w/) {
-				chomp $getTitle;
-				$title = $getTitle;
-			}
-		} else {
-			exit (0);
-		}
-	} else {
-		exit (0)  if ($ARGV[0] =~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta)$/i);  #NO NEED TO FETCH STREAMS FOR URLS THAT ALREADY HAVE VALID EXTENSION!
-
-		$client = new StreamFinder($ARGV[0], -debug => $DEBUG);
+	if ($ARGV[0] !~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta)$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
+		$client = new StreamFinder($ARGV[0], -debug => $DEBUG,
+				-log => '/tmp/FauxdaciousUrlHelper.log',
+				-logfmt => '[time] "[title]" - [site]: [url] ([total])'
+		);
 		die "f:Could not open streamfinder or no streams found!"  unless ($client);
 
 		$newPlaylistURL = $client->getURL('-nopls');
@@ -167,7 +141,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 #2		if ($stationID =~ m#^([^\/]+)\/#) {
 #2			my $substationDIR = $1;
 #2			`mkdir ${configPath}/${substationDIR}`  unless (-d "${configPath}/${substationDIR}");
-#2		}                                                 #END #2.
+#2		}
 
 		$comment = 'Album=' . ((defined($client->{album}) && $client->{album} =~ /\S/) ? ($client->{album}." - $ARGV[0]") : $ARGV[0]) . "\n";
 		$comment .= 'Artist='.$client->{artist}."\n"  if (defined($client->{artist}) && $client->{artist} =~ /\w/);
@@ -186,6 +160,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		}
 		if ($art_url) {
 			my ($image_ext, $art_image) = $client->getIconData;
+			$image_ext =~ tr/A-Z/a-z/;
 			if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}.$image_ext") {
 				binmode IMGOUT;
 				print IMGOUT $art_image;
@@ -195,11 +170,55 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 					$path =~ s#^(\w)\:#\/$1\%3A#;
 					$path =~ s#\\#\/#g;
 				}
-				$comment .= "Comment=file://${path}/${stationID}.$image_ext\n";
+				$comment .= "Comment=file://${path}/${stationID}.$image_ext";
+				my $art_url2 = $client->getIconURL('artist');
+				if ($art_url2 && $art_url2 ne $art_url) {
+					my ($image_ext, $art_image) = $client->getIconData('artist');
+					$image_ext =~ tr/A-Z/a-z/;
+					if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}_channel.$image_ext") {
+						binmode IMGOUT;
+						print IMGOUT $art_image;
+						close IMGOUT;
+						my $path = $configPath;
+						if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+							$path =~ s#^(\w)\:#\/$1\%3A#;
+							$path =~ s#\\#\/#g;
+						}
+						$comment .= ";file://${path}/${stationID}_channel.$image_ext";
+					}
+				}
+				$comment .= "\n";
 			}
 		}
 		$comment =~ s/\0/ /gs;          #NO NULLS ALLOWED!
 		$comment =~ s/[\x80-\xff]//gs;  #MUST ALSO STRIP OUT ALL NON-ASCII CHARACTERS!
+	} else {
+		$newPlaylistURL = $ARGV[0];
+	}
+
+	foreach my $s (@downloadServerList) {
+		if ($newPlaylistURL =~ /\Q$s\E/) {
+			$downloadit = 1;
+			last;
+		}
+	}
+	if ($downloadit) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
+		my $fn = $1  if ($newPlaylistURL =~ m#([^\/]+)$#);
+		exit (0)  unless ($fn);
+		unless (-f "/tmp/$fn") {
+			my $cmd = "curl -o /tmp/$fn \"$newPlaylistURL\"";
+			`$cmd`;
+		}
+		if (-f "/tmp/$fn") {
+			$newPlaylistURL = "file:///tmp/$fn";
+			my $getTitle = `ffprobe -loglevel error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 /tmp/$fn`;
+			if ($getTitle =~ /\w/) {
+				chomp $getTitle;
+				$title = $getTitle;
+			}
+		} else {
+			exit (0);
+		}
 	}
 
     &writeTagData($client, $comment, $downloadit);

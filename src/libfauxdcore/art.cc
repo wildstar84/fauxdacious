@@ -149,9 +149,11 @@ static bool check_tag_file (const String & filename, AudArtItem * item, bool ite
     {
         /* SEARCH TAG FILE FOR ART *UNLESS* "DEFAULT" PRECEDENCE AND ART ITEM ALREADY EXISTS AND HAS DATA: */
         String tfld = img_tuple.get_str (Tuple::Comment);
-        if (tfld && tfld[0] && ! strncmp ((const char *) tfld, "file://", 7))
+        const char * tfld_charptr = (const char *) tfld;
+        if (tfld_charptr && ! strncmp (tfld_charptr, "file://", 7))
         {
-            item->art_file = tfld;
+            const char * sep = strstr (tfld_charptr, ";");
+            item->art_file = sep ? String(str_printf ("%.*s", (int)(sep - tfld_charptr), tfld_charptr)) : tfld;
             VFSFile file (item->art_file, "r");
             if (file)
             {
@@ -175,7 +177,7 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
     {
         bool fileIsImage = false;
         String ext = String (uri_get_extension (filename));
-        Index<String> extlist = str_list_to_index ("jpg,png,jpeg,gif", ",");
+        Index<String> extlist = str_list_to_index ("jpg,png,jpeg,gif,com,webp", ",");
         for (auto & tryext : extlist)
         {
             if (strcmp_nocase (ext, tryext))
