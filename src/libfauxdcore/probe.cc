@@ -415,12 +415,17 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             override_tuple->set_filename (filename);
             override_tuple->set_state (Tuple::Valid);
             tuple = std::move (* override_tuple);
-            if (startTime > 0)  // JWT:DON'T CLOBBER START-TIME OR LENGTH IF ALREADY SET!:
+            // JWT:TAG FILES PBLY. DON'T HAVE START TIME OR LENGTH, SO IGNORE THE "ONLY" RULE FOR THOSE!:
+            if (tupleLength <= 0 && fileorNOTstdin && ip->read_tag (filename, file, song_tuple, image))
             {
-                tuple.set_int (Tuple::StartTime, startTime);
-                if (tupleLength > 0)
-                    tuple.set_int (Tuple::Length, tupleLength);
+                // JWT:STILL NEED TO PROBE SONG FOR LENGTH & START TIME!:
+                startTime = song_tuple.is_set (Tuple::StartTime) ? song_tuple.get_int (Tuple::StartTime) : -1;
+                tupleLength = song_tuple.is_set (Tuple::Length) ? song_tuple.get_int (Tuple::Length) : -1;
             }
+            if (tupleLength > 0)
+                tuple.set_int (Tuple::Length, tupleLength);
+            if (startTime > 0)
+                tuple.set_int (Tuple::StartTime, startTime);
         }
         else if (highest_mode > 0 && override_tuple)  // (1 OR 2) TAG FILE(S) FOUND (ALL DEFAULT OR OVERRIDE):
         {
@@ -558,13 +563,12 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
         {
             int startTime = tuple.is_set (Tuple::StartTime) ? tuple.get_int (Tuple::StartTime) : -1;
             int tupleLength = tuple.is_set (Tuple::Length) ? tuple.get_int (Tuple::Length) : -1;
-            tuple = std::move (song_tuple);
-            if (startTime > 0)  // JWT:DON'T CLOBBER START-TIME OR LENGTH IF ALREADY SET!:
-            {
+            tuple = std::move (song_tuple);  // REPLACE TUPLE W/THAT FROM SONG,
+            // JWT:BUT DON'T CLOBBER START-TIME OR LENGTH IF ALREADY SET!:
+            if (tupleLength > 0)
+                tuple.set_int (Tuple::Length, tupleLength);
+            if (startTime > 0)
                 tuple.set_int (Tuple::StartTime, startTime);
-                if (tupleLength > 0)
-                    tuple.set_int (Tuple::Length, tupleLength);
-            }
         }
 
         filename_only = String ("");
