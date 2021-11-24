@@ -24,6 +24,7 @@
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/runtime.h>
+#include <libfauxdcore/audstrings.h>
 
 #include <libfauxdqt/libfauxdqt.h>
 
@@ -87,14 +88,26 @@ EXPORT void fileopener_show (FileMode mode)
         dialog->setAttribute (Qt::WA_DeleteOnClose);
         dialog->setFileMode (modes[mode]);
         dialog->setLabelText (QFileDialog::Accept, _(labels[mode]));
+        dialog->setLabelText (QFileDialog::Reject, _("Cancel"));
+
+        int playlist = aud_playlist_get_active ();
 
         if (mode == FileMode::ExportPlaylist)
+        {
             dialog->setAcceptMode (QFileDialog::AcceptSave);
+            String filename = aud_playlist_get_filename (playlist);
+            if (filename)
+            {
+                StringBuf local = uri_to_filename (filename);
+                if (local)
+                    dialog->selectFile ((const char *) local);
+                else
+                    dialog->selectUrl (QUrl ((const char *) filename));
+            }
+        }
 
         QObject::connect (dialog.data (), & QFileDialog::directoryEntered, [] (const QString & path)
             { aud_set_str ("audgui", "filesel_path", path.toUtf8 ().constData ()); });
-
-        int playlist = aud_playlist_get_active ();
 
         QObject::connect (dialog.data (), & QFileDialog::accepted, [dialog, mode, playlist] ()
         {
