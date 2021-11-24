@@ -87,6 +87,7 @@ use StreamFinder;
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
 #FORMAT:  '//www.problemserver.com' [, ...]
 my @downloadServerList = ();  #USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE OR IN FauxdaciousUrlHelper.ini.
+my %setPrecedence = ();
 
 die "..usage: $0 URL [download-path]\n"  unless ($ARGV[0]);
 exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
@@ -110,16 +111,21 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			next  unless (/\S/o);
 			s/^\s+//o;
 			s/\,$//o;
+			my $key = (s/^(\w+?)\s*\=\s*//o) ? $1 : '';
 			s/^[\'\"]//o;
 			s/[\'\"]$//o;
-			push @downloadServerList, $_;
+			if ($key) {
+				$setPrecedence{$_} = $key;
+			} else {
+				push @downloadServerList, $_;
+			}
 		}
 		close IN;
 	}
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-	if ($ARGV[0] !~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta)$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
+	if ($ARGV[0] !~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta|mk[av])$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
 		$client = new StreamFinder($ARGV[0], -debug => $DEBUG,
 				-log => '/tmp/FauxdaciousUrlHelper.log',
 				-logfmt => '[time] "[title]" - [site]: [url] ([total])'
@@ -221,7 +227,15 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		}
 	}
 
-    &writeTagData($client, $comment, $downloadit);
+	my $precedence = 'DEFAULT';
+	foreach my $s (keys %setPrecedence) {   #ALLOW USER TO OVERRIDE TAG-SOURCE PRECEDENCE IN INI FILE:
+		if ($ARGV[0] =~ /\Q$s\E/) {
+			$precedence = "\U$setPrecedence{$s}\E";
+			last;
+		}
+	}
+	$precedence = 'DEFAULT'  unless ($precedence =~ /^(?:OVERRIDE|ONLY|NONE)$/);
+    &writeTagData($client, $precedence, $comment, $downloadit);
 
 #END USER-DEFINED PATTERN-MATCHING CODE.
 
@@ -245,6 +259,7 @@ exit(0);
 
 sub writeTagData {
 	my $client = shift;
+	my $precedence = shift;
 	my $comment = shift || '';
 	my $downloadit = shift || 0;
 	my @tagdata = ();
@@ -271,7 +286,7 @@ sub writeTagData {
 		}
 		print TAGDATA <<EOF;
 [$newPlaylistURL]
-Precedence=DEFAULT
+Precedence=$precedence
 Title=$title
 $comment
 EOF
