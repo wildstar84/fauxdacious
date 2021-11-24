@@ -239,6 +239,7 @@ static void add_playlist (const char * filename, PlaylistFilterFunc filter,
     if (save_title)
     {
         /* JWT:IF NO TITLE AND PLAYLIST IS A FILE, USE FILENAME AS PLAYLIST NAME: */
+        /* JWT:UPDATE:  THIS MAY NOW BE REDUNDANT, AS AUD. FIXED THIS IN FOLLOWING LINE (AUD BUG#1129)! */
         if ((! title || ! title[0]) && filename && ! strncmp (filename, "file://", 7))
         {
             const char * fn;
@@ -247,7 +248,7 @@ static void add_playlist (const char * filename, PlaylistFilterFunc filter,
             if (fn)
                 title = String (ext ? str_copy (fn, ext - fn) : filename);
         }
-        result->title = title;
+        result->title = title ? title : String (uri_get_display_base (filename));
     }
 
     for (auto & item : items)
