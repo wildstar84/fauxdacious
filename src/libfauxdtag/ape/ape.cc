@@ -264,6 +264,8 @@ bool APETagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * imag
             tuple.set_int (Tuple::Track, atoi (pair.value.begin ()));
         else if (! strcmp_nocase (pair.key, "Year"))
             tuple.set_int (Tuple::Year, atoi (pair.value.begin ()));
+        else if (! strcmp_nocase (pair.key, "Lyrics"))
+            tuple.set_str (Tuple::Lyrics, pair.value.begin ());
         else if (! strcmp_nocase (pair.key, "REPLAYGAIN_TRACK_GAIN"))
             tuple.set_gain (Tuple::TrackGain, Tuple::GainDivisor, pair.value.begin ());
         else if (! strcmp_nocase (pair.key, "REPLAYGAIN_TRACK_PEAK"))
@@ -436,7 +438,8 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
      ! write_string_item (tuple, Tuple::Album, handle, "Album", & length, & items) ||
      ! write_string_item (tuple, Tuple::Genre, handle, "Genre", & length, & items) ||
      ! write_integer_item (tuple, Tuple::Track, handle, "Track", & length, & items) ||
-     ! write_integer_item (tuple, Tuple::Year, handle, "Year", & length, & items))
+     ! write_integer_item (tuple, Tuple::Year, handle, "Year", & length, & items) ||
+     ! write_string_item (tuple, Tuple::Lyrics, handle, "Lyrics", & length, & items))
         return false;
 
     String comment = tuple.get_str (Tuple::Comment);
@@ -464,7 +467,8 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
         if (! strcmp_nocase (pair.key, "Artist") || ! strcmp_nocase (pair.key, "Title") ||
          ! strcmp_nocase (pair.key, "Album") || ! strcmp_nocase (pair.key, "Comment") ||
          ! strcmp_nocase (pair.key, "Genre") || ! strcmp_nocase (pair.key, "Track") ||
-         ! strcmp_nocase (pair.key, "Year") || (wrote_art && ! strcmp_nocase (pair.key, "Cover Art", 9)))
+         ! strcmp_nocase (pair.key, "Year") || ! strcmp_nocase (pair.key, "Lyrics") ||
+         (wrote_art && ! strcmp_nocase (pair.key, "Cover Art", 9)))
             continue;
 
         if (! strcmp_nocase (pair.key, "Cover Art", 9))
