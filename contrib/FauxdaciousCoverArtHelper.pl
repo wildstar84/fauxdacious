@@ -135,6 +135,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 		print STDERR "! (https://musicbrainz.org/otherlookup/freedbid?other-lookup.freedbid=$ARGV[1])\n";
 	}
 	die "f:failed to find title ($ARGV[1]) on musicbrainz.com!\n"  unless ($html);
+
 	my $url2 = '';
 	my ($tmpurl2, $tmptitle, $tmpartist);
 
@@ -181,26 +182,28 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 		my $trk = 0;
 		my $haveTrackData = 0;
 		if ($ARGV[0] =~ /^CDT/i) {  #WE NEED TRACK TITLES ALSO, FIND & GRAB 'EM ALL:
-			$html =~ s#^.+?\<span class\=\"name\-variation\"\>##gs;
-			while ($html =~ s#^.+?\<a\s+href\=\"https\:\/\/musicbrainz\.org\/track\/[^\"]+\"\>(\d+)\<\/a\>\s+\<\/td\>[^\<]+\<td\>.*?\<bdi>([^\<]+)\<\/bdi\>##s) {
-				my $t = HTML::Entities::decode_entities($2);  #WE MUST DE-HTML & MAKE ALL-ASCII FOR Fauxdacious:
+			my @titlerows = split(m#<a\s+href\=\"(?:https\:\/\/musicbrainz\.org)?\/track\/[^\"]+\"\>#s, $html);
+			shift @titlerows;  #REMOVE STUFF ABOVE 1ST TITLE.
+			while (@titlerows) {
+				my $rowhtml = shift @titlerows;
+				next  unless ($rowhtml =~ m#^\d+\<\/a\>\s*\<\/td\>[^\<]*\<td.*?\<bdi>([^\<]+)#s);
+
+				my $t = HTML::Entities::decode_entities($1);  #WE MUST DE-HTML & MAKE ALL-ASCII FOR Fauxdacious:
 				print STDERR "--track$trk($1)=$t=\n"  if ($DEBUG);   #WE MAKE ASCII BY REMOVING ALL ACCENTS!:
-				$t =~ tr/ŠšžŸÀÁÂÃÅÄÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðñòóôõöùúüûýø×°/SszYAAAAAACEEEEIIIIDNOOOOOUUUUYaaaaaaceeeeiiiionooooouuuuy0x /;
 				$t =~ s/[\x80-\xff]//g;
 				$tracktitle[$trk] = $t;
 				$haveTrackData++;
-				if ($html =~ s#\<td\>\s*\<a\s+href\=\"\/artist\/[^\"]*\" title\=\"[^\"]*\"\>\<bdi\>([^\<]*)\<\/bdi\>##s) {
+				$trackartist[$trk] = '';
+				while ($rowhtml =~ s#\<a\s+href\=\"\/artist\/[^\"]*\"\s+title\=\"[^\"]*\"\>\<bdi\>([^\<]*)\<\/bdi\>##s) {
 					my $t = HTML::Entities::decode_entities($1);
-					$t =~ tr/ŠšžŸÀÁÂÃÅÄÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðñòóôõöùúüûýø×°/SszYAAAAAACEEEEIIIIDNOOOOOUUUUYaaaaaaceeeeiiiionooooouuuuy0x /;
 					$t =~ s/[\x80-\xff]//g;
-					$trackartist[$trk] = $t;
+					$trackartist[$trk] .= "$t, ";
 				}
-				$trackartist[$trk] ||= $artist;
+				$trackartist[$trk] =~ s/\, $//o;
+				$trackartist[$trk] = $artist  unless ($trackartist[$trk] =~ /[a-z]/io);
 				print STDERR "-4.1: artist($trk)=$trackartist[$trk]=\n"  if ($DEBUG);
 				++$trk;
 			}
-		} else {
-			die "f:No cover art url found!\n"  unless ($art_url);
 		}
 		
 		$comment = "Album=$title\n";
@@ -619,7 +622,7 @@ exit(0);
 sub lookup_art_on_mb_release_by_mbid {
 	my $url = shift;
 
-	my $html = '';
+	$html = '';
 	my $art_url = '';
 
 	print STDERR "ART:FIRST TRY ($url)...\n"  if ($DEBUG);
@@ -653,17 +656,17 @@ sub lookup_art_on_mb_release_by_mbid {
 			return $art_url;
 		}
 	}
-	$html = '';
+	my $html2 = '';
 	$url .= '/cover-art';
 	print STDERR "ART:NOW TRY ($url)...\n"  if ($DEBUG);
 	$response = $ua->get($url);
 	if ($response->is_success) {
-		$html = $response->decoded_content;
+		$html2 = $response->decoded_content;
 	} else {
 		print STDERR $response->status_line;
 		print STDERR "! ($url)\n";
 	}
-	if ($html =~ s#class\=\"artwork-image\"\s+href\=\"([^\"]+)\"##s) {
+	if ($html2 =~ s#class\=\"artwork-image\"\s+href\=\"([^\"]+)\"##s) {
 		$art_url = $1;
 		$art_url = 'https:' . $art_url  if ($art_url =~ m#^\/\/#);
 		print STDERR "i:ART:FOUND ALT COVERART ARCHIVE IMAGE ($art_url)\n";
@@ -729,12 +732,12 @@ sub writeTagData {   #FOR CDs:  WRITE ALL TAG-DATA FOUND FOR EACH TRACK TO user_
 		while (@tagdata) {
 			print TAGDATA shift(@tagdata);
 		}
-		# USER:CHANGE "DEFAULT" TO "OVERRIDE" BELOW TO KEEP STATION TITLE FROM BEING OVERWRITTEN BY CURRENT SONG TITLE:
+		# USER:CHANGE "DEFAULT" TO "OVERRIDE" BELOW TO OVERRIDE METADA FROM CDDA|B OR FROM CUSTOM TAG FILE:
 		my $trk = 1;
 		while (1) {
 			print TAGDATA <<EOF;
 [cdda://?$trk]
-Precedence=OVERRIDE
+Precedence=DEFAULT
 Title=$trktitle
 ${trkartist}Track=${trk}
 $comment

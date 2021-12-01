@@ -343,21 +343,25 @@ static void coverart_entry_response_cb (GtkWidget * dialog, int response, GtkWid
 {
     if (response == GTK_RESPONSE_ACCEPT)
     {
-        const char * text (gtk_file_chooser_get_uri ((GtkFileChooser *) dialog));
-        if (text)
+        const char * coverart_fid (gtk_file_chooser_get_uri ((GtkFileChooser *) dialog));
+        if (coverart_fid)
         {
             force_image = true;
-            if (strstr (text, "://"))
+            const char * prev_comment = gtk_entry_get_text ((GtkEntry *) entry);
+            String coverart_uri = (strstr (coverart_fid, "://"))
+                    ? String (coverart_fid)
+                    : String (filename_to_uri (filename_normalize (filename_expand (str_copy (coverart_fid)))));
+            String coverart_str = coverart_uri;
+            if (prev_comment)
             {
-                infowin_display_image (text);  // THEY PICKED AN IMAGE FILE, SHOW IT IN THE WINDOW!
-                gtk_entry_set_text ((GtkEntry *) entry, text);
+                const char * album_img_index = strstr (prev_comment, ";file:");
+                /* IF COMMENT FIELD HAS AN ALBUM-ART (2ND) IMAGE: KEEP IT BUT REPLACE
+                    WHAT'S BEFORE IT WITH SELECTED IMAGE FILE: */
+                if (album_img_index)
+                    coverart_str = String (str_concat ({(const char *) coverart_uri, album_img_index}));
             }
-            else
-            {
-                String uri = String (filename_to_uri (filename_normalize (filename_expand (str_copy (text)))));
-                infowin_display_image (uri);   // THEY PICKED AN IMAGE FILE, SHOW IT IN THE WINDOW!
-                gtk_entry_set_text ((GtkEntry *) entry, uri);
-            }
+            infowin_display_image (coverart_uri);  // THEY PICKED AN IMAGE FILE, SHOW IT IN THE WINDOW!
+            gtk_entry_set_text ((GtkEntry *) entry, coverart_str);
         }
     }
 

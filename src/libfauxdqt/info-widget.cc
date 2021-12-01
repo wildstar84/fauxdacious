@@ -234,8 +234,26 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
             if (position == -1)
                 return;
 
+            auto prev_comment = m_model->data (this->createModelIndex (6, 1), Qt::DisplayRole).toString ();
+            if (! prev_comment.isEmpty ())
+            {
+                int album_img_index = prev_comment.indexOf (";file:");
+                if (album_img_index >= 0)
+                {
+                    /* COMMENT FIELD HAS AN ALBUM-ART (2ND) IMAGE: KEEP IT BUT REPLACE
+                        WHAT'S BEFORE IT WITH SELECTED IMAGE FILE: */
+                    if (album_img_index > 0)
+                        prev_comment.remove(0, album_img_index);
+                    prev_comment.prepend (coverart_fid);
+                }
+                else
+                    prev_comment = coverart_fid;
+            }
+            else
+                prev_comment = coverart_fid;
+
             /* JWT:PUT THE IMAGE FILE INTO THE Comment FIELD & UPDATE FIELD AND IMAGE DISPLAYED: */
-            m_model->setData (this->createModelIndex (6, 1), coverart_fid.constData (), Qt::EditRole);
+            m_model->setData (this->createModelIndex (6, 1), prev_comment.toUtf8 ().constData (), Qt::EditRole);
             hook_call ("image change", aud::to_ptr (coverart_fid.constData ()));
             dialog->deleteLater ();
 

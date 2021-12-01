@@ -701,10 +701,14 @@ EXPORT bool aud_file_write_tuple (const char * filename,
         if (! strncmp (actual_filename, "cdda://", 7) || ! strncmp (actual_filename, "dvd://", 6))  // FILE IS A DISK:
         {
             String diskID = aud_get_str (nullptr, "playingdiskid");
-            String tag_file = strstr ((const char *) diskID, "tmp_tag_data")
-                    ? diskID : String (str_concat ({diskID, ".tag"}));
 
-            success = aud_write_tag_to_tagfile (actual_filename, tuple, tag_file);
+            /* JWT:MUST WRITE TO BOTH DISK-SPECIFIC AND TEMP. TAG FILES, SINCE aud_file_read_tag ONLY READS LATTER! */
+            success = aud_write_tag_to_tagfile (actual_filename, tuple, "tmp_tag_data");
+            if (! strstr ((const char *) diskID, "tmp_tag_data"))
+            {
+                String tag_file = String (str_concat ({diskID, ".tag"}));
+                success = aud_write_tag_to_tagfile (actual_filename, tuple, tag_file);
+            }
             if (success)
             {
                 int track;
