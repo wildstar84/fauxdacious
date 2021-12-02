@@ -1,3 +1,34 @@
+Version 4.1.3-beta1 (so far):
+
+* Add support for a second "art icon" for the album/video/podcast channel/ 
+audio CD-disk to be displayed in the song-info section when the Album Art 
+plugin is active and displaying a different (video/podcast/CD track-specific) 
+image.  This is supported in the "Comment" metadata field - to add the second 
+(album artist icon) image file, append a semicolon followed by the file URI, 
+ie. "Comment=file:///path/CoverArtImageFile;file:///path/albumArtistIconFile". 
+This works similar to the separate song album-cover art and the streaming 
+station icon feature we added awhile back.  The Song-Info edit screen 
+"Art Lookup" feature will only replace the first file, if any (before the 
+semicolon) leaving that second album-artist image link intact.
+
+* Add support for embedded lyric tags to APE tags (wavpack plugin), Vorbis 
+comments (flac, vorbis plugins) and for formats handled by FFMpeg via the 
+ffaudio plugin, such as opus, ogv, etc.  Fetching these embedded lyrics tags 
+should now be supported for all file formats the underlying plugins' upstream 
+libraries, but saving lyrics to embedded tags is limited to files with the 
+following extensions for now:  .mp3, .ogg, .ogm, .oga, .flac, .fla, and .wv.
+
+* Add a user-agent config option and an option to completely ignore SSL 
+certificate checking/verification to the neon transport plugin to deal with 
+fussy streams.
+
+* Fix and improve track metadata handling for Audio-CDs, particularly 
+when using custom disk-specific tag files.
+
+* Merge in (most of) recent Audacious commits and fixes (see GIT commits).
+
+* Fix several misc. minor bugs (see GIT commits for details).
+
 Version 4.1.2-final
 
 This release is a smaller release than previous ones (much fewer changes) as 
