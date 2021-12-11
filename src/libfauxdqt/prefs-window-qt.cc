@@ -358,8 +358,6 @@ static const PreferencesWidget playlist_page_widgets[] = {
         WidgetBool (0, "clear_playlist")),
     WidgetCheck (N_("Open files in a temporary playlist"),
         WidgetBool (0, "open_to_temporary")),
-    WidgetCheck (N_("Pause mutes instead of pausing"),
-        WidgetBool (0, "_pausedoesmute")),
     WidgetLabel (N_("<b>Song Display</b>")),
     WidgetCheck (N_("Show song numbers"),
         WidgetBool (0, "show_numbers_in_pl", send_title_change)),
@@ -367,12 +365,17 @@ static const PreferencesWidget playlist_page_widgets[] = {
         WidgetBool (0, "leading_zero", send_title_change)),
     WidgetCheck (N_("Show hours separately (1:30:00 vs. 90:00)"),
         WidgetBool (0, "show_hours", send_title_change)),
-    WidgetCheck (N_("Split Artist - Title in streams"),
-        WidgetBool (0, "split_titles")),
     WidgetCustomQt (create_titlestring_table),
     WidgetLabel (N_("<b>Export</b>")),
     WidgetCheck (N_("Use relative paths when possible"),
-        WidgetBool (0, "export_relative_paths"))
+        WidgetBool (0, "export_relative_paths")),
+    WidgetLabel (N_("<b>Fauxdacious Extras</b>")),
+    WidgetCheck (N_("Pause mutes instead of pausing"),
+        WidgetBool (0, "_pausedoesmute")),
+    WidgetCheck (N_("Split Artist - Title in streams"),
+        WidgetBool (0, "split_titles")),
+    WidgetCheck (N_("Advance to next selected entry in list"),
+        WidgetBool (0, "advance_2_next_selected"))
 };
 
 static const PreferencesWidget song_info_page_widgets[] = {
