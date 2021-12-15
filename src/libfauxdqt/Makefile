@@ -15,6 +15,7 @@ SRCS = about-qt.cc \
        images.cc \
        infopopup-qt.cc \
        infowin-qt.cc \
+       info_bar.cc \
        info-widget.cc \
        log-inspector.cc \
        menu-qt.cc \
@@ -36,6 +37,7 @@ INCLUDES = colorbutton.h \
            dock.h \
            export.h \
            iface.h \
+           info_bar.h \
            info-widget.h \
            libfauxdqt.h \
            menu.h \
