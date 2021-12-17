@@ -17,6 +17,7 @@
  * the use of this software.
  */
 
+#include <libfauxdcore/runtime.h>
 #include <libfauxdgui/libfauxdgui-gtk.h>
 
 static GdkPixbuf * get_scaled (GtkWidget * widget, int maxwidth, int maxheight)
@@ -29,7 +30,7 @@ static GdkPixbuf * get_scaled (GtkWidget * widget, int maxwidth, int maxheight)
     int width = gdk_pixbuf_get_width (unscaled);
     int height = gdk_pixbuf_get_height (unscaled);
 
-    if (width > maxwidth || height > maxheight)
+    if (width > maxwidth || height > maxheight || aud_get_bool ("albumart", "scale_to_fill"))
     {
         if (width * maxheight > height * maxwidth)
         {
