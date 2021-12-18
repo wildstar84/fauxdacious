@@ -8,6 +8,7 @@ SRCS = about.cc \
        equalizer.cc \
        file-opener.cc \
        images.c \
+       ui_infoarea.cc \
        infopopup.cc \
        infowin.cc \
        init.cc \
@@ -33,6 +34,7 @@ SRCS = about.cc \
 
 INCLUDES = libfauxdgui.h \
            libfauxdgui-gtk.h \
+           ui_infoarea.h \
            list.h \
            menu.h
 

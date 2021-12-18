@@ -15,6 +15,17 @@ window when docked.  I have not been able to remove the Qt-provided titlebar
 though.  This is currently only available for the Qt interfaces, as I have 
 not (yet?) done it for the GTK side (as this looks to require more work).
 
+* Add GTK version of Mini-Fauxdacious plugin (info-bar-plugin-gtk).  NOTE:  
+Unlike the Qt version, it is not possible to display both the classic info-
+bar and this plugin at the same time (due to the GTK version not being fully 
+object-oriented code, thus not possible to have more than one instance active!
+(Both plugins auto-hide the classic info-bar when plugin is activated, and 
+restore it (if previously not hidden) on deactivation (as this should be the 
+preferred appearance, and you can dock the plugin anyway - top or bottom).
+
+* Added a tool-tip balloon to both on hover to show the valid key-actions 
+possible from within Mini-Fauxdacious.
+
 * Add Albumart (plugins) option to also scale images UP to fill the size of 
 the containing widget to address Audacious forum request dated 09/17/21.  
 This option will apply to all GTK art icons/images and Qt ones in the 
