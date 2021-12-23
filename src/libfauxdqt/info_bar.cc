@@ -34,6 +34,7 @@
 #include <libfauxdcore/drct.h>
 #include <libfauxdcore/interface.h>
 #include <libfauxdcore/plugins.h>
+#include <libfauxdcore/plugin.h>
 #include <libfauxdcore/runtime.h>
 #include <libfauxdcore/probe.h>
 
@@ -439,45 +440,100 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
         return;
 
     auto CtrlShiftAlt = Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier;
+
     if (! (event->modifiers () & CtrlShiftAlt))
     {
         switch (event->key ())
         {
-        case Qt::Key_Right:
+          case Qt::Key_Right:
             aud_drct_seek (aud_drct_get_time () + aud_get_int (0, "step_size") * 1000);
-            return;
-        case Qt::Key_Left:
+            break;
+          case Qt::Key_Left:
             aud_drct_seek (aud_drct_get_time () - aud_get_int (0, "step_size") * 1000);
-            return;
-        case Qt::Key_Up:
+            break;
+          case Qt::Key_Up:
             aud_drct_set_volume_main (aud_drct_get_volume_main () + aud_get_int (0, "volume_delta"));
-            return;
-        case Qt::Key_Down:
+            break;
+          case Qt::Key_Down:
             aud_drct_set_volume_main (aud_drct_get_volume_main () - aud_get_int (0, "volume_delta"));
-            return;
-        case Qt::Key_Space:
+            break;
+          case Qt::Key_Space:
             aud_drct_play_pause ();
-            return;
-        case Qt::Key_Z:
+            break;
+          case Qt::Key_Z:
             aud_drct_pl_prev ();
-            return;
-        case Qt::Key_X:
+            break;
+          case Qt::Key_X:
             aud_drct_play ();
-            return;
-        case Qt::Key_C:
+            break;
+          case Qt::Key_C:
             aud_drct_pause ();
-            return;
-        case Qt::Key_V:
+            break;
+          case Qt::Key_V:
             aud_drct_stop ();
-            return;
-        case Qt::Key_B:
+            break;
+          case Qt::Key_B:
             aud_drct_pl_next ();
-            return;
-        case Qt::Key_Q:
-            aud_quit ();
-            return;
+            break;
         }
     }
+    else if (event->modifiers () & Qt::AltModifier)
+    {
+        PluginHandle * plugin;
+
+        switch (event->key ())
+        {
+          case Qt::Key_A:
+            plugin = aud_plugin_lookup_basename ("albumart-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+          case Qt::Key_B:
+            plugin = aud_plugin_lookup_basename ("blur_scope-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+          case Qt::Key_L:
+            plugin = aud_plugin_lookup_basename ("lyricwiki-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+          case Qt::Key_M:
+            plugin = aud_plugin_lookup_basename ("info-bar-plugin-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+          case Qt::Key_O:
+            plugin = aud_plugin_lookup_basename ("gl-spectrum-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+          case Qt::Key_P:
+            plugin = aud_plugin_lookup_basename ("playlist-manager-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+//DOESN'T WORK, BUT Ctrl-Q DOES!:          case Qt::Key_Q:
+//            aud_quit ();
+//            break;
+          case Qt::Key_S:
+            plugin = aud_plugin_lookup_basename ("search-tool-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+          case Qt::Key_U:
+            plugin = aud_plugin_lookup_basename ("vumeter-qt");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+          case Qt::Key_V:
+            plugin = aud_plugin_lookup_basename ("video_display");
+            if (plugin)
+                aud_plugin_enable (plugin, (! aud_plugin_get_enabled (plugin)));
+            break;
+        }
+    }
+    return;
 }
 
 void InfoBar::mouseDoubleClickEvent (QMouseEvent * e)
