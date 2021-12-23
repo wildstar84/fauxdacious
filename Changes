@@ -12,8 +12,7 @@ minipulation from this mini-window while the main-window is hidden.  This
 window can also be docked (either top of bottom) replacing the embedded 
 version, but unlike it, the docked plugin will fill the width of the main 
 window when docked.  I have not been able to remove the Qt-provided titlebar 
-though.  This is currently only available for the Qt interfaces, as I have 
-not (yet?) done it for the GTK side (as this looks to require more work).
+though.  
 
 * Add GTK version of Mini-Fauxdacious plugin (info-bar-plugin-gtk).  NOTE:  
 Unlike the Qt version, it is not possible to display both the classic info-
