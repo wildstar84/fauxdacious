@@ -127,7 +127,8 @@ if ($#ARGV >= 1) {
 			print STDERR "-???- ALB=$ARGV[3]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 			if ("$ARGV[3]" =~ /^\Q${skipit}\E$/i) {
 				print STDERR "i:LYRICS HELPER: SKIPPING ALBUM ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-				exit (0);  #QUIT
+				exit (0)  if ($^O =~ /MSWin/);
+				exit (4);  #QUIT
 			}
 		}
 	}
@@ -137,7 +138,8 @@ if ($#ARGV >= 1) {
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E$/i) {
 			print STDERR "i:LYRICS HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-			exit (0);  #QUIT
+			exit (0)  if ($^O =~ /MSWin/);
+			exit (4);  #QUIT
 		}
 	}
 
