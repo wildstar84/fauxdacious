@@ -1,12 +1,3 @@
-* Fix APPEARANCE of occasional gui "hang" when using dynamic album art:
-Problem is more common in Windows, but sometimes happens in Linux.
-Workaround is to pop up and pop back down the "About Fauxdacious" screen.
-I have tried numerous things and spent copious amounts of labor to fix this
-but have been unable to so far...
-
-* Package all this into four separate Debian packages (source and binary for
-both Fauxdacious and Fauxdacious Plugins.
-
 * (Qt): Make Effects plugin screen (checkboxes) update when song change (with
 custom equalizer and effects settings) changes the active effects plugins.
 The effect plugins get properly turned off and on, but the QT screen does NOT

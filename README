@@ -1,4 +1,4 @@
-NOTE:  You NO LONGER NEED to uninstall Audacious and all audacious packages, 
+NOTE:  You NO LONGER NEED to uninstall Audacious or any audacious packages,
 ie. libaudcore, libaudgui, libaudtag, etc.  before installing Fauxdacious!
 Both programs can now happily reside on the same system and root path.
 
@@ -58,7 +58,7 @@ Build Fauxdacious Plugins:
 	sudo update-desktop-database
 	sudo update-icon-caches /usr/share/icons/hicolor
 
-Install the Perl helper scripts (non-Windows):
+Install the Perl helper scripts (non-M$-Windows versions):
 
 	sudo cp fauxdacious/contrib/Fauxdacious*.pl /usr/local/bin/
 	sudo chmod 755 Fauxdacious*.pl
@@ -74,12 +74,12 @@ Optional (copy your existing Audacious profile to Fauxdacious):
 
 Now run fauxdacious:
 
-	fauxdacious &
+	fauxdacious &   #(GTK) -OR-     fauxdacious -Q &   #(Qt)
 
 Fauxdacious should now start up.  Enjoy Fauxdacious!
 Be sure to read the "FAQ" and "Changes" file, and the GIT commits for the 
 latest Fauxdacious features, fixes, changes, and how to configure to take 
-best advantage of them!
+best advantage of them (many/most Fauxdacious extras are off by default)!
 
 FAQ:  https://wildstar84.github.io/fauxdacious/FAQ.htm
 Latest Changes:  https://github.com/wildstar84/fauxdacious/blob/master/Changes
