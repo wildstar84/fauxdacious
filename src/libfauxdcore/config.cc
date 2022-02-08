@@ -281,6 +281,9 @@ void config_load ()
         aud_set_int (0, "volume_delta", volume_delta);
         aud_set_str ("statusicon", "volume_delta", "");
     }
+
+    /* JWT:THESE NEED TO BE RESET ON STARTUP (MAY BE LEFT DANGLING FROM CRASH, ETC.: */
+    aud_set_bool ("audacious", "_video_playing", false);
 }
 
 void config_save ()
