@@ -383,9 +383,7 @@ SongsWindow::SongsWindow()
         this->jumpToSelected();
     });
 
-    QObject::connect(bbox, &QDialogButtonBox::rejected, []() {
-        destroy_instance();
-    });
+    QObject::connect(bbox, &QDialogButtonBox::rejected, destroy_instance);
     // **** END Bottom button bar ****
 
     resize(500, 500);
