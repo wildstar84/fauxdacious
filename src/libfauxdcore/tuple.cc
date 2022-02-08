@@ -205,6 +205,9 @@ static const FieldDictEntry field_dict[] = {
 
 static_assert (aud::n_elems (field_dict) == Tuple::n_fields, "Update field_dict");
 
+static const char * find_domain (const char * name);
+static StringBuf extract_domain (const char * start);
+
 static constexpr bool is_valid_field (int field)
     { return field > Tuple::Invalid && field < Tuple::n_fields; }
 
@@ -662,6 +665,7 @@ EXPORT ReplayGainInfo Tuple::get_replay_gain () const
 EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
 {
     bool updated = false;
+    bool haveArtworkUrl = false;
     int value;
     bool split_titles = aud_get_bool (nullptr, "split_titles");
 
@@ -670,7 +674,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
     {
         if (! fauxd_is_prevmeta (0, val))
         {
-            bool albumisset = ! split_titles;
+            bool albumisset = false;  /* JWT:TRUE IF STREAM METADATA ITSELF CONTAINS AN ALBUM FIELD. */
             fauxd_set_prevmeta (0, val);
             const char * ttloffset = strstr ((const char *) val, " - text=\"");
 
@@ -692,8 +696,11 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                             set_str (Artist, str_printf ("%.*s", artlen, (const char *) val));
                         }
                         else
+                        {
                             set_str (Title, str_printf ("%.*s - %.*s", artlen,
                                     (const char *) val, (int) (endquote-ttloffset9), ttloffset9));
+                            set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
+                        }
                         updated = true;
                     }
 
@@ -707,12 +714,15 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                         {
                             int coverlen = endquote - coveroffset;
                             if (coverlen > 0)
+                            {
                                 aud_set_str (nullptr, "_cover_art_link", str_printf ("%.*s", coverlen, coveroffset));
+                                haveArtworkUrl = true;
+                            }
                         }
                     }
                 }
             }
-            else
+            else  /* LOOK FOR:  'Title: ... Artist: ...' etc.: */
             {
                 ttloffset = strstr_nocase ((const char *) val, "Title: ");
                 if (ttloffset)  //JWT:FIXUP STREAM TILES IN FORMAT: "[[Artist: ]artist - ]Title: title [Album: album]:
@@ -760,103 +770,227 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                         set_str (Title, str_copy (metaptr[titleindx]+7, titlelen));
                         if (metaptr[artistindx])
                             set_str (Artist, str_copy (metaptr[artistindx]+8, artistlen));
-
-                        if (metaptr[albumindx])
-                        {
-                            int albumlen = (metaptr[albumindx] && albumindx < metaindx)
-                                    ? metaptr[albumindx+1] - (metaptr[albumindx]+10) : -1;
-
-                            albumisset = true;
-                            ::String stream_name = stream.get_metadata ("stream-name");
-                            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
-                                set_str (Album, str_printf ("%s%s%s",
-                                        (const char *) str_copy (metaptr[albumindx]+7, albumlen), " - ",
-                                        (const char *) stream_name));
-                            else
-                                set_str (Album, str_copy (metaptr[albumindx]+7, albumlen));
-                        }
                     }
                     else
                     {
+                        set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
                         if (metaptr[artistindx])
                             set_str (Title, str_printf ("%.*s%s%.*s", artistlen, metaptr[artistindx]+8,
                                     " - ", titlelen, metaptr[titleindx]+7));
                         else
                             set_str (Title, (const char *) val);
 
-                        if (metaptr[albumindx])
-                        {
-                            int albumlen = (metaptr[albumindx] && albumindx < metaindx)
-                                    ? metaptr[albumindx+1] - (metaptr[albumindx]+10) : -1;
+                    }
+                    if (metaptr[albumindx])
+                    {
+                        int albumlen = (metaptr[albumindx] && albumindx < metaindx)
+                                ? metaptr[albumindx+1] - (metaptr[albumindx]+10) : -1;
 
-                            albumisset = true;
+                        albumisset = true;
+                        ::String stream_name = stream.get_metadata ("stream-name");
+                        if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+                            set_str (Album, str_printf ("%s%s%s",
+                                    (const char *) str_copy (metaptr[albumindx]+7, albumlen), " - ",
+                                    (const char *) stream_name));
+                        else
                             set_str (Album, str_copy (metaptr[albumindx]+7, albumlen));
-                        }
                     }
                     if (metaptr[yearindx])
                         set_int (Year, atoi (str_copy (metaptr[yearindx]+6, ((yearindx < metaindx)
                                 ? (metaptr[yearindx+1] - (metaptr[yearindx]+6)) : -1))));
                 }
-                else if (split_titles)
+                else  /* LOOK FOR:  'artist="..." title="..."': */
                 {
-                    const char * artoffset = (const char *) val;
-                    const char * ttloffset = strstr (artoffset, " - ");
-                    const char * junkoffset = strstr (artoffset, " || "); // JWT:CLEAN UP TITLES W/" || #### S", ETC?!
+                    ttloffset = strstr_nocase ((const char *) val, "title=\"");
                     if (ttloffset)
                     {
-                        ttloffset += 3;
-                        if (junkoffset && junkoffset > ttloffset)
-                            set_str (Title, (const char *) str_printf ("%.*s",
-                                (int) (junkoffset-ttloffset), ttloffset));
-                        else
-                            set_str (Title, ttloffset);
-
-                        set_str (Artist, (const char *) str_printf ("%.*s",
-                                (int) ((ttloffset-artoffset)-3), artoffset));
-                    }
-                    else if (junkoffset)
-                        set_str (Title, (const char *) str_printf ("%.*s",
-                                (int) (junkoffset-artoffset), artoffset));
-                    else
-                        set_str (Title, artoffset);
-
-                }
-                else if (val != get_str (Title))
-                    set_str (Title, val);
-
-                /* JWT:SOME WEIRD STREAMS PUT A COVER-ART LINK AS THEIR "STREAM-URL"?! */
-                ::String stream_url = stream.get_metadata ("stream-url");
-                if (stream_url && stream_url[0])
-                {
-                    Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
-                    StringBuf uriext = uri_get_extension (stream_url);
-                    for (auto & ext : extlist)
-                    {
-                        if (! strcmp_nocase (uriext, ext))
+                        ttloffset += 7;
+                        const char * endquote = strstr (ttloffset+1, "\"");
+                        if (endquote)
                         {
-                            aud_set_str (nullptr, "_cover_art_link", stream_url);
-                            break;
+                            int ttllen = (int) (endquote-ttloffset);
+                            const char * artoffset = strstr_nocase ((const char *) val, "artist=\"");
+                            if (artoffset)  //WE HAVE A SEPARATE ARTIST FIELD:
+                            {
+                                artoffset += 8;
+                                endquote = strstr (artoffset+1, "\"");
+                                if (endquote)
+                                {
+                                    int artlen = (int) (endquote-artoffset);
+                                    if (split_titles)
+                                    {
+                                        if (ttllen > 0)
+                                            set_str (Title, (const char *) str_printf ("%.*s",
+                                                    ttllen, ttloffset));
+                                        if (artlen > 0)
+                                            set_str (Artist, (const char *) str_printf ("%.*s",
+                                                    artlen, artoffset));
+                                    }
+                                    else if (ttllen > 0)
+                                        set_str (Title, str_printf ("%.*s - %.*s", artlen,
+                                                artoffset, ttllen, ttloffset));
+                                }
+                            }
+                            else if (split_titles)  //NO ARTIST FIELD, CHECK TITLE:
+                            {
+                                const char * split = strstr (ttloffset, " - ");
+                                if (split && endquote > split + 3)
+                                {
+                                    set_str (Artist, (const char *) str_printf ("%.*s",
+                                            (int) (split - ttloffset), ttloffset));
+                                    split += 3;
+                                    if (endquote > split)
+                                        set_str (Title, (const char *) str_printf ("%.*s",
+                                                (int) (endquote - split), split));
+                                }
+                                else if (ttllen > 0)
+                                    set_str (Title, (const char *) str_printf ("%.*s",
+                                            ttllen, ttloffset));
+                            }
+                            else
+                            {
+                                set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
+                                if (ttllen > 0)
+                                    set_str (Title, (const char *) str_printf ("%.*s",
+                                            ttllen, ttloffset));
+                            }
                         }
+                        ttloffset = strstr_nocase ((const char *) val, "album=\"");
+                        if (ttloffset)  //WE HAVE A SEPARATE ALBUM FIELD:
+                        {
+                            ttloffset += 7;
+                            const char * endquote = strstr (ttloffset+1, "\"");
+                            if (endquote)
+                            {
+                                int albumlen = (int) (endquote-ttloffset);
+                                if (albumlen > 0)
+                                {
+                                    albumisset = true;
+                                    ::String stream_name = stream.get_metadata ("stream-name");
+                                    if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+                                        set_str (Album, (const char *) str_printf ("%.*s%s%s",
+                                                albumlen, ttloffset, " - ",
+                                                (const char *) stream_name));
+                                    else
+                                        set_str (Album, (const char *) str_printf ("%.*s",
+                                                albumlen, ttloffset));
+                                }
+                            }
+                        }
+                    }
+                    else if (split_titles)
+                    {
+                        const char * artoffset = (const char *) val;
+                        const char * ttloffset = strstr (artoffset, " - ");
+                        const char * junkoffset = strstr (artoffset, " || "); // JWT:CLEAN UP TITLES W/" || #### S", ETC?!
+                        if (ttloffset)
+                        {
+                            ttloffset += 3;
+                            if (junkoffset && junkoffset > ttloffset)
+                                set_str (Title, (const char *) str_printf ("%.*s",
+                                    (int) (junkoffset-ttloffset), ttloffset));
+                            else
+                                set_str (Title, ttloffset);
+
+                            set_str (Artist, (const char *) str_printf ("%.*s",
+                                    (int) ((ttloffset-artoffset)-3), artoffset));
+                        }
+                        else if (junkoffset && junkoffset > artoffset)
+                            set_str (Title, (const char *) str_printf ("%.*s",
+                                    (int) (junkoffset-artoffset), artoffset));
+                        else
+                            set_str (Title, artoffset);
+
+                    }
+                    else
+                    {
+                        set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
+                        if (val != get_str (Title))
+                            set_str (Title, val);
                     }
                 }
 
                 updated = true;
             }
+
             if (! albumisset)
             {
                 ::String stream_name = stream.get_metadata ("stream-name");
                 if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
-                    set_str (Album, stream_name);
+                {
+                    const char * s;
+                    auto streampath = get_str (Path);
+                    ::String album = get_str (Album);
+                    if (split_titles)
+                    {
+                        if (!album || !album[0])
+                            set_str (Album, stream_name);
+
+                        ::String albumartist = get_str (AlbumArtist);
+                        if ((!albumartist || !albumartist[0]) && (s = find_domain (streampath)))
+                            set_str (AlbumArtist, extract_domain (s));  //JWT:MOVE STREAM URL DOMAIN-NAME DOWN TO ALBUMARTIST.
+                    }
+                    else
+                    {
+                        set_str (Artist, stream_name);
+                        if (!album || !album[0] || album == stream_name)
+                        {
+                            if ((s = find_domain (streampath)))
+                                set_str (Album, extract_domain (s));
+                            set_str (AlbumArtist, ::String (""));
+                        }
+                    }
+                }
+                updated = true;
+            }
+            /* JWT:AVOID DUPLICATES: */
+            ::String artist = get_str (Artist);
+            ::String album = get_str (Album);
+            if (artist == album)
+            {
+                if (split_titles)
+                    set_str (Album, ::String (""));
+                else
+                    set_str (Artist, ::String (""));
+                updated = true;
+            }
+            if (split_titles)
+            {
+                ::String albumartist = get_str (AlbumArtist);
+                if (albumartist == album)
+                {
+                    set_str (AlbumArtist, ::String (""));
+                    updated = true;
+                }
+            }
+        }
+    }
+
+    if (! haveArtworkUrl && aud_get_str (nullptr, "_cover_art_link") == ::String (""))
+    {
+        /* JWT:SOME WEIRD STREAMS PUT A COVER-ART LINK AS THEIR "STREAM-URL"?! */
+        ::String stream_url = stream.get_metadata ("stream-url");
+        if (stream_url && stream_url[0])
+        {
+            Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+            StringBuf uriext = uri_get_extension (stream_url);
+            for (auto & ext : extlist)
+            {
+                if (! strcmp_nocase (uriext, ext))
+                {
+                    aud_set_str (nullptr, "_cover_art_link", stream_url);
+                    break;
+                }
             }
         }
     }
 
     val = stream.get_metadata ("stream-name");
-    if (split_titles)
+    if (val && val[0] && ! fauxd_is_prevmeta (1, val))
     {
-        if (val && val[0] && ! fauxd_is_prevmeta (1, val))
+        fauxd_set_prevmeta (1, val);
+        if (split_titles)
         {
-            fauxd_set_prevmeta (1, val);
             ::String tuple_album = get_str (Album);
             if (! tuple_album || tuple_album == ::String("(null)"))
             {
@@ -864,10 +998,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                 updated = true;
             }
         }
-    }
-    else
-    {
-        if (val && val[0] && val != get_str (Artist))
+        else if (val != get_str (Artist))
         {
             set_str (Artist, val);
             updated = true;
