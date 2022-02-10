@@ -61,6 +61,7 @@ EXPORT void aud_drct_play_pause ()
 
 EXPORT void aud_drct_stop ()
 {
+    hook_call ("stopped by user", nullptr);  /* JWT:CREATED FOR DVD MENUS WAITLOOP, BUT MAY USE ELSEWHERE LATER! */
     aud_playlist_play (-1);
 }
 
