@@ -1,4 +1,77 @@
-Version 4.1.3-beta2 (so far):
+Version 4.1.3-final:
+
+This version should be up to date with Audacious's recent v4.1-beta1 release.  
+Otherwise, Audacious development has been very slow & quiet of late.  All users 
+are encouraged to upgrade to this release, and it is reccomended to update 
+to and build with their distro's latest FFmpeg version.  This release brings 
+a shiny new plugin ("mini-Fauxdacious"), improvements to several Fauxdacious 
+features, the most recent Audacious changes, and improved stability.  
+Video-playing sees better memory-managemt.  It's otherwise mostly a polish and 
+maintenance release.  
+
+NOTE:  As always, "final" does NOT mean the final (last) release we'll do, but 
+rather the latest final (ie. finished) production release, as opposed to a 
+beta or development ("devel") release (and a fresh MS-Windows binary build)!  
+
+Change log:
+
+* Numerous minor tweaks and fixes to the DVD plugin as we found a few issues 
+(bugs) while testing out the FFmpeg function changes mentioned below.  The 
+most serious of these was due to recent FFmpeg versions now returning ERROR 
+instead of the separate EOF value when reading packets hits the end of a menu 
+channel.  A second issue has been somewhat long-standing that there was no 
+graceful way to shut down Fauxdacious when it was "stuck" in a silent menu 
+awaiting user input (without first pressing a menu button to "play", then 
+pressing the "Stop" button.  I determined to fix this whilst at it.  The 
+other issues involved the Windows version and the fifo pipe not always being 
+shut down and becoming unusable (requiring editing the config file and 
+changing the pipe name).  It now properly closes on exit (unless a crash 
+occurs) and uses a random name to eliminate reuse.  These issues and testing 
+delayed this release by several days.  FFAudio seems to be working fine.  
+Only fix needed there was a small memory leak.
+
+* Refactor ffaudio and DVD plugins to replace FFmpeg-depreciated API functions.
+Whilst at it, plug a significant memory-leak that had crept into the ffaudio 
+plugin.  WARNING:  Most likely breaks backward-compatability w/significantly 
+older libav/FFMpeg versions due to the the significant refactoring needed to 
+cope with the modern FFmpeg API, but building w/"ffmpeg=libav" still seems 
+to build if modern enough though (primarily due to the fact that FFMpeg now 
+returns a pointer to initialize AVPackets instead of the data).
+
+* Fix Fauxdacious not stopping play properly (being left stuck "buffering" and 
+requiring a "kill" command from the command line) when an audio-less DVD menu 
+is displayed and waiting for user-input (user had to select a play option in 
+the menu to start play, then press the [Stop (play)] button to properly stop 
+DVD play).
+
+* Refactor stream metadata processing:  1) Handle cases of 
+'title=".." artist=".."...'.  2) Fix minor issues when option to split 
+title/artist fields NOT in effect (I always use the option, so hadn't gotten 
+enough testing love with it off!  3) Better emulate Audacious's handling of 
+empty album field using stream domain-name; and we move it to the albumartist 
+field when splitting title/artist.  4) try harder to catch cover-art embedded 
+in metadata.  5) Be more consistant, especially if user toggles the split 
+title/artist option after a playlist has been loaded (update metadata fields 
+to the proper arrangement for the option on next metadata change).
+
+* Merge Audacious's update to the Qt popup error message window so that when 
+multiple errors occur, they are now displayed in a single popup window, now 
+requiring a single acknowledgment (the popup window is modal).
+
+* Merge Audacious's titlebar text dimming on focus-out on the Skins-Qt 
+interface windows.
+
+- One notable Audacious enhancement omitted is the addition of the "Moonstone" 
+interface plugin - WITHHELD for now from Fauxdacious due to it's lack of an 
+option or Settings menu access button to switch back out of it - requiring 
+the user to close down and manually edit their config file to get back to 
+the previous interface - YUCK!  I have not had time to try to add such an 
+option to it due to it's code-reusage.  Also, our new "Mini-Fauxdacious" 
+plugin provides a better alternative anyway (for both Qt and Gtk), imho!
+
+* Several other minor bug-fixes and cleanups.
+
+Version 4.1.3-beta2:
 
 * Add "Mini-Fauxdacious" plugin (info-bar-plugin-qt) to address Audacious 
 feature request# 1116.  This creates a standalone dockable version of the 

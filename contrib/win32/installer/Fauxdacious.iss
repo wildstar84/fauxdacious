@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Fauxdacious"
-#define MyAppVersion "4.1.2-final"
+#define MyAppVersion "4.1.3-final"
 #define MyAppPublisher "Jim Turner"
 #define MyAppURL "https://wildstar84.wordpress.com/fauxdacious"
 #define MyAppExeName "fauxdacious.exe"
@@ -21,10 +21,10 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=C:\fauxdacious-4.1\COPYING.txt
-InfoAfterFile=C:\fauxdacious-4.1\fauxdacious.txt
+LicenseFile=C:\fauxdacious-4.1.3f\COPYING.txt
+InfoAfterFile=C:\fauxdacious-4.1.3f\fauxdacious.txt
 OutputBaseFilename=Fauxdacious_install
-SetupIconFile=C:\fauxdacious-4.1\images\fauxdacious.ico
+SetupIconFile=C:\fauxdacious-4.1.3f\images\fauxdacious.ico
 Compression=lzma
 SolidCompression=yes
 
