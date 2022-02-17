@@ -22,7 +22,7 @@ instead of the separate EOF value when reading packets hits the end of a menu
 channel.  A second issue has been somewhat long-standing that there was no 
 graceful way to shut down Fauxdacious when it was "stuck" in a silent menu 
 awaiting user input (without first pressing a menu button to "play", then 
-pressing the "Stop" button.  I determined to fix this whilst at it.  The 
+pressing the "Stop" button).  I determined to fix this whilst at it.  The 
 other issues involved the Windows version and the fifo pipe not always being 
 shut down and becoming unusable (requiring editing the config file and 
 changing the pipe name).  It now properly closes on exit (unless a crash 
@@ -47,7 +47,7 @@ DVD play).
 * Refactor stream metadata processing:  1) Handle cases of 
 'title=".." artist=".."...'.  2) Fix minor issues when option to split 
 title/artist fields NOT in effect (I always use the option, so hadn't gotten 
-enough testing love with it off!  3) Better emulate Audacious's handling of 
+enough testing love with it off)!  3) Better emulate Audacious's handling of 
 empty album field using stream domain-name; and we move it to the albumartist 
 field when splitting title/artist.  4) try harder to catch cover-art embedded 
 in metadata.  5) Be more consistant, especially if user toggles the split 
@@ -102,7 +102,7 @@ possible from within Mini-Fauxdacious.
 the containing widget to address Audacious forum request dated 09/17/21.  
 This option will apply to all GTK art icons/images and Qt ones in the 
 Albumart-Qt plugin (GTK uses central code to scale images, but Qt does it in 
-the Albumart plugin itself, and perhaps info-area, et. al., but those are 
+the Albumart plugin itself, and perhaps info-area, et. al.), but those are 
 all small enough that it's pbly not worth bothering there!  *dacious already 
 scale (too large) images DOWN to fit automaticly, but not UP.
 
@@ -147,7 +147,7 @@ semicolon) leaving that second album-artist image link intact.
 comments (flac, vorbis plugins) and for formats handled by FFMpeg via the 
 ffaudio plugin, such as opus, ogv, etc.  Fetching these embedded lyrics tags 
 should now be supported for all file formats the underlying plugins' upstream 
-libraries, but saving lyrics to embedded tags is limited to files with the 
+libraries do, but saving lyrics to embedded tags is limited to files with the 
 following extensions for now:  .mp3, .ogg, .ogm, .oga, .flac, .fla, and .wv.
 
 * Add a user-agent config option and an option to completely ignore SSL 
@@ -243,7 +243,7 @@ info bar shown for the currently-playing entry only if there actually is one
 (like the info popup currently works).
 
 * Apply the (Fauxdacious-only) "Split Artist - Title in streams" option to 
-Vorbis comments (ogg-bast streams), which may use vorbis-comments instead of 
+Vorbis comments (ogg-based streams), which may use vorbis-comments instead of 
 icy to embed metadata.
 
 Version 4.1.1-final
@@ -326,7 +326,7 @@ album-art to still show in info bar when [View].[Show Info Bar Album Art]
 was unchecked (hide always).
 
 * Url Helper script:  Handle non-ascii characters that come from a few 
-websites vis StreamFinder in the description text, and possibly the title, 
+websites via StreamFinder in the description text, and possibly the title, 
 that don't play nice with Glib's g_key_file_get_string () function, which is 
 used to fetch this data from the tag files.
 
