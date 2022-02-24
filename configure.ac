@@ -6,7 +6,7 @@ dnl Initialize
 dnl ==========
 
 AC_PREREQ([2.59])
-AC_INIT([fauxdacious], [4.1.3-final])
+AC_INIT([fauxdacious], [4.2-beta1])
 AC_COPYRIGHT([Copyright (C) 2001-2022 Jim Turner, Audacious developers and others])
 
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE_NAME", [Name of package])
@@ -132,7 +132,6 @@ define(GENERATED_FILES,
        man/fauxdacious.1
        src/libfauxdcore/audio.h
        src/libfauxdcore/tinylock.h
-       win32/fauxdacious.nsi
        win32/override/README.txt)
 
 [GENERATED_FILES]="m4_normalize(GENERATED_FILES)"
