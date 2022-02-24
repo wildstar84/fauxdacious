@@ -162,17 +162,7 @@ static void add_dock_plugin(void * plugin_, void *)
 static void remove_dock_plugin(void * plugin_, void *)
 {
     auto plugin = (PluginHandle *)plugin_;
-    bool is_infobar = (strstr (aud_plugin_get_basename (plugin), "info-bar-plugin-qt"));
     delete PluginItem::lookup(plugin);
-    if (is_infobar)  /* JWT:HAD TO DO THIS HERE INSTEAD OF IN PLUGIN DUE TO SEGFAULTS?! */
-    {
-        if (aud_get_bool ("qtui", "_infoarea_was_visible"))
-        {
-            aud_set_bool ("qtui", "infoarea_visible", true);
-            hook_call ("qtui toggle infoarea", nullptr);
-            aud_set_bool ("qtui", "infoarea_visible", true);
-        }
-    }
 }
 
 EXPORT void register_dock_host(DockHost * host)

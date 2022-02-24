@@ -1,3 +1,38 @@
+Version 4.2-beta1:
+
+* Album Art plugins:  Fix bug that caused wrong album art image to be displayed 
+for song files that did not have valid album art.  Problem only ocurred when 
+playing a stream with an embedded cover art image url and the user jumped 
+directly to play a song *file* that had no cover art image associated for it 
+and the image for the previously-playing stream would be used due to a failure 
+by the helper thread to properly and timely clear an internal variable.
+Fixed by re-clearing in main thread portion of the plugins.
+
+* Mini-Fauxdacious plugin (Qt):  Fix occasional failure to restore the infobar 
+when the plugin is deactivated.
+
+* Mini-Fauxdacious plugin (GTK):  Do not set initial undocked window as 
+"transient" so that the plugin window in the M$-Windows version will not be 
+minimized when the main window is (all other dockable plugins will continue to 
+default to transient).  The other side-effect of transient windows is that they 
+also remain on top of the main window (in most window-managers).  To make any 
+undocked plugin window NOT transient, simply select "Undock" from the menu 
+(even if it's already undocked), as the transient flag is only set when the 
+window is first created undocked.
+
+* DVD plugin:  Fix bug that still occasionally failed to terminate the reader 
+thread when the user pressed the [Stop (play)] button.
+
+* Neon transport plugin:  Check for user pressage of the [Stop (play)] button 
+whilst waiting to connect to a streaming server, stop trying, and clean up.  
+Problem was that if the server took many tries and or a long time to connect, 
+Fauxdacious would just display "Buffering...", user could get tired of waiting, 
+stop play at the "wrong" moment" and leave the reader thread still running in 
+the background while the user attempted to play another entry, which would 
+either crash Fauxdacious or also become hung in "infinite Buffering" until 
+Fauxdacious was shut down and restarted.  We used our new "hook" we created for 
+the recent DVD "audio-less menu" stop fix to handle this case as well.
+
 Version 4.1.3-final:
 
 This version should be up to date with Audacious's recent v4.1-beta1 release.  
