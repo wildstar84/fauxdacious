@@ -963,23 +963,23 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                     updated = true;
                 }
             }
-        }
-    }
 
-    if (! haveArtworkUrl && aud_get_str (nullptr, "_cover_art_link") == ::String (""))
-    {
-        /* JWT:SOME WEIRD STREAMS PUT A COVER-ART LINK AS THEIR "STREAM-URL"?! */
-        ::String stream_url = stream.get_metadata ("stream-url");
-        if (stream_url && stream_url[0])
-        {
-            Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
-            StringBuf uriext = uri_get_extension (stream_url);
-            for (auto & ext : extlist)
+            if (! haveArtworkUrl && aud_get_str (nullptr, "_cover_art_link") == ::String (""))
             {
-                if (! strcmp_nocase (uriext, ext))
+                /* JWT:SOME WEIRD STREAMS PUT A COVER-ART LINK AS THEIR "STREAM-URL"?! */
+                ::String stream_url = stream.get_metadata ("stream-url");
+                if (stream_url && stream_url[0])
                 {
-                    aud_set_str (nullptr, "_cover_art_link", stream_url);
-                    break;
+                    Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+                    StringBuf uriext = uri_get_extension (stream_url);
+                    for (auto & ext : extlist)
+                    {
+                        if (! strcmp_nocase (uriext, ext))
+                        {
+                            aud_set_str (nullptr, "_cover_art_link", stream_url);
+                            break;
+                        }
+                    }
                 }
             }
         }
