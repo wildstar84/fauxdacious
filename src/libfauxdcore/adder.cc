@@ -392,7 +392,17 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
 
     /* If the item has a valid tuple or known decoder, or it's a subtune, then
      * assume it's a playable file and skip some checks. */
-    if (item.tuple.valid () || item.decoder || is_subtune (item.filename))
+    const char * fn = (const char *) item.filename;
+    const char * split;
+    if (! strncmp (fn, "file://", 7) && (split = strstr_nocase (fn, ".cue%3F")) && split[7] > 0)
+    {
+        split += 4;
+        /* JWT:HANDLE ESCAPED CUESHEET ENTRIES ("file://...fn.cue%3F#" => "file://...fn.cue?#"): */
+        int fnpartln = (int) (split-fn);
+        item.filename = String (str_printf ("%.*s%s%s", fnpartln, fn, "?", split+3));
+        add_file (std::move (item), filter, user, result, false);
+    }
+    else if (item.tuple.valid () || item.decoder || is_subtune (item.filename))
         add_file (std::move (item), filter, user, result, false);
     else
     {
