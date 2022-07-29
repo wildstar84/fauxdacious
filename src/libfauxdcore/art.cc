@@ -140,12 +140,15 @@ static void clear_current_locked ()
 
 /* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS: CHECK FOR ART FILE MATCHING BASE URL: */
 
-static bool check_tag_file (const String & filename, AudArtItem * item, bool itemExists, const char * tagfile)
+static int check_tag_file (const String & filename, AudArtItem * item, bool itemExists, const char * tagfile, int prevprec)
 {
     /* JWT:LOOK FOR IMAGE IN TAG DATA FILE(S) UNDER "Comment": */
     Tuple img_tuple = Tuple ();
     int precedence = aud_read_tag_from_tagfile (filename, tagfile, img_tuple);
-    if (precedence && (precedence < 2 || ! itemExists || item->data.len () <= 0))
+
+    if (precedence <= prevprec)
+        return prevprec;
+    else
     {
         /* SEARCH TAG FILE FOR ART *UNLESS* "DEFAULT" PRECEDENCE AND ART ITEM ALREADY EXISTS AND HAS DATA: */
         String tfld = img_tuple.get_str (Tuple::Comment);
@@ -153,17 +156,18 @@ static bool check_tag_file (const String & filename, AudArtItem * item, bool ite
         if (tfld_charptr && ! strncmp (tfld_charptr, "file://", 7))
         {
             const char * sep = strstr (tfld_charptr, ";");
-            item->art_file = sep ? String(str_printf ("%.*s", (int)(sep - tfld_charptr), tfld_charptr)) : tfld;
+            item->art_file = sep ? String (str_printf ("%.*s", (int)(sep - tfld_charptr), tfld_charptr)) : tfld;
             VFSFile file (item->art_file, "r");
             if (file)
             {
                 item->data = file.read_all ();
                 if (item->data.len () > 0)
-                    return true;
+                    return precedence;
             }
         }
     }
-    return false;
+
+    return prevprec;
 }
 
 /* JWT:THIS FUNCTION NOW SUPPORTS DIRECT REQUESTS FOR SPECIFIC IMAGE FILES (filename IS A JPG|PNG, ETC.):
@@ -206,20 +210,22 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
     }
     if (! foundArt && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG FILES IF USER WANTS TO USE THEM:
     {
-        foundArt = check_tag_file (filename, item, itemExists, "tmp_tag_data");  // 1ST, CHECK TEMP TAGFILE
-        if (! foundArt && ! strncmp (filename, "file://", 7))  // 2ND, CHECK DIRECTORY TAGFILE (IF FILE)
+        int prevprec = check_tag_file (filename, item, itemExists, "tmp_tag_data", 0);  // 1ST, CHECK TEMP TAGFILE
+        if (prevprec <= 2 && ! strncmp (filename, "file://", 7))  // 2ND, CHECK DIRECTORY TAGFILE (IF FILE AND NOT "ONLY")
         {
             StringBuf tag_fid = uri_to_filename (filename);
             StringBuf path = filename_get_parent (tag_fid);
             String filename_only = String (filename_get_base (tag_fid));
-            foundArt = check_tag_file (filename_only, item, itemExists,
-                    filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})));
-            if (! foundArt)
-                foundArt = check_tag_file (filename_only, item, itemExists,
-                        filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
+            prevprec = check_tag_file (filename_only, item, itemExists,
+                    filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})), prevprec);
+            if (prevprec <= 2)
+                prevprec = check_tag_file (filename_only, item, itemExists,
+                        filename_to_uri (str_concat ({path, "/user_tag_data.tag"})), prevprec);
         }
-        if (! foundArt)
-            foundArt = check_tag_file (filename, item, itemExists, "user_tag_data");  // 3RD, CHECK USER TAGFILE
+        if (prevprec <= 2)
+            prevprec = check_tag_file (filename, item, itemExists, "user_tag_data", prevprec);  // 3RD, CHECK USER TAGFILE
+
+        foundArt = (prevprec > 0);
     }
     if (! foundArt && item->data.len () <= 0 && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
     {
@@ -302,7 +308,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
             item->flag = FLAG_SENT;  // ART FOUND IN TAG FILE, WE'RE DONE, DON'T SCAN NON-PLAYING ENTRY (SLOW)!
             return item;
         }
-        else if (! chkres)
+        else if (chkres == 0)
             scanner_request (new ScanRequest (filename, SCAN_IMAGE, request_callback));
         else
         {
