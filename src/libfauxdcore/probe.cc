@@ -270,6 +270,7 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
         return 0;
     }
 
+    AUDINFO ("fetching metadata from tagfile=%s (entry=%s)\n", tagdata_filename, song_filename);
     const char * instr;
     instr = g_key_file_get_string (rcfile, song_filename, "Title", nullptr);
     if (instr)
@@ -401,6 +402,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             {
                 override_tuple = & tuples[i];
                 highest_mode = from[i];
+                AUDINFO ("Tag data from source# %d, mode=%d.\n", i, highest_mode);
                 break;
             }
         }
