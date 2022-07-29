@@ -375,7 +375,11 @@ static const PreferencesWidget playlist_page_widgets[] = {
     WidgetCheck (N_("Split Artist - Title in streams"),
         WidgetBool (0, "split_titles")),
     WidgetCheck (N_("Advance to next selected entry in list"),
-        WidgetBool (0, "advance_2_next_selected"))
+        WidgetBool (0, "advance_2_next_selected")),
+    WidgetCheck (N_("Keep playlist metadata (like cuesheets do)"),
+        WidgetBool (0, "keep_playlist_metadata")),
+    WidgetCheck (N_("Don't allow streams to change metadata"),
+        WidgetBool (0, "no_dynamic_stream_metadata"))
 };
 
 static const PreferencesWidget song_info_page_widgets[] = {

@@ -153,6 +153,8 @@ public:
     bool is_set (Field field) const
         { return get_value_type (field) != Empty; }
 
+    bool is_fallback (Field field) const;
+
     /* Returns the integer value of a field if set, otherwise -1.  If you need
      * to distinguish between a value of -1 and an unset value, use
      * get_value_type(). */

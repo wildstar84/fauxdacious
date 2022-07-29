@@ -464,6 +464,27 @@ EXPORT Tuple::ValueType Tuple::get_value_type (Field field) const
     return Empty;
 }
 
+EXPORT bool Tuple::is_fallback (Field field) const
+{
+    assert (is_valid_field (field));
+
+    if (field_info[field].fallback < 0)
+        return false;
+
+    TupleVal * val = data ? data->lookup (field, false, false) : nullptr;
+    if (! val)
+        return false;
+
+    TupleVal * fbval = data->lookup (field_info[field].fallback, false, false);
+    if (! fbval)
+        return false;
+
+    if (field_info[field].type == Int)
+        return (val->x == fbval->x);
+    else
+        return (val->str == fbval->str);
+}
+
 EXPORT int Tuple::get_int (Field field) const
 {
     assert (is_valid_field (field) && field_info[field].type == Int);

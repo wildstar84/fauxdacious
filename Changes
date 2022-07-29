@@ -1,5 +1,41 @@
 Version 4.2-beta1:
 
+* Playlist metadata:  Add two new options under [File].[Settings].[Playlist] 
+tab (Fauxdacious Extras):  [] Keep playlist metadata (like cuesheets do); and 
+[] Don't allow streams to change metadata.  Previously, when a metadata-
+supporting playlist was added to Fauxdacious, the metadata for each entry would 
+be overwritten by what was embedded in the file or stream, or with what was 
+found in user tag files.  The first option (if checked) prevents this and keeps 
+the entrie's metadata provided from the playlist.  This has always been the 
+behaviour of multi-entry (playlist-like) cuesheets.  Unlike cuesheets, any 
+metadata fields found in the entry or user tag files but omitted from the 
+playlist metadata will still be filled in.  Note, when streaming online radio 
+stations (which dynamically change the metadata when the streaming song 
+changes) will still override the original playlist-provided metadata (usually 
+desirable).  Check the second new option to also prevent this and maintain 
+display of the playlist-set metadata for all entries.  
+
+NOTE, that changing metadata fields via the Song Info. edit screen WILL still 
+override whatever was set regardless, and blanking a field will either restore 
+it to it's "fallback" value (if any, ie. filename for the Title field) or blank 
+it out.
+
+NOTE2:  The "Playlist.Refresh" and "Refresh Selected" options no longer really 
+do anything as this is all handled properly now when an entry is added, loaded 
+for play, scanned, or edited.  
+
+NOTE3:  We also fixed editing to also update immediately even if the 
+[File].[Settings].[Advanced] tab option "Do not load metadata for songs until 
+played" option is checked.
+
+* Fix apparently long-standing failure of the cover-art system to load cover-
+art files specified in user tag files when "OVERRIDE" or "ONLY" precedence was 
+set and cover-art was found embedded in the entry due to changes I believe 
+occured under the Nov. 13, 2020 commit entitled "Fix ancient minor bug handling 
+user tag files:" which I neglected to make a similar, needed change here.  This 
+should also result in the highest priority cover-art image found in tag files 
+being used if multiple matching tag-files are found using different precedences.
+
 * Album Art plugins:  Fix bug that caused wrong album art image to be displayed 
 for song files that did not have valid album art.  Problem only ocurred when 
 playing a stream with an embedded cover art image url and the user jumped 

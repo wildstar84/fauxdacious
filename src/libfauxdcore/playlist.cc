@@ -119,7 +119,7 @@ struct PlaylistData {
     PlaylistData (int id);
     ~PlaylistData ();
 
-    void set_entry_tuple (Entry * entry, Tuple && tuple);
+    void set_entry_tuple (Entry * entry, Tuple && tuple, int calledfrom);
 
     int number, unique_id;
     String filename, title;
@@ -222,31 +222,67 @@ void Entry::set_tuple (Tuple && new_tuple)
     format ();
 }
 
-void PlaylistData::set_entry_tuple (Entry * entry, Tuple && tuple)
+/* JWT:IN FUTURE, CONSIDER MOVING THIS + A HEADER TO tuple.cc & tuple.h! */
+static void tuple_field_copy(Tuple & dest, const Tuple & src,
+                             Tuple::Field field)
 {
+    switch (src.get_value_type(field))
+    {
+    case Tuple::String:
+        dest.set_str(field, src.get_str(field));
+        break;
+    case Tuple::Int:
+        dest.set_int(field, src.get_int(field));
+        break;
+    default:
+        dest.unset(field);
+        break;
+    }
+}
+
+void PlaylistData::set_entry_tuple (Entry * entry, Tuple && tuple, int calledfrom)
+{
+    bool keep_playlist_metadata = aud_get_bool (nullptr, "keep_playlist_metadata");
+
     total_length -= entry->length;
     if (entry->selected)
         selected_length -= entry->length;
 
-    /* JWT: KEEP (DON'T OVERWRITE/BLANK OUT) ENTRY'S EXTENDED M3U DATA IF TUPLE'S CORRESPONDING DATA IS NOT SET!
-       (NEEDED FOR EXTENDED M3U PLAYLIST ITEMS THAT SET METADATA WITH #EXT*** TAGS!)
-       (POSSIBILITIES ARE:  TITLE, ALBUM, ARTIST, & GENRE) - SEE:  https://en.wikipedia.org/wiki/Extended_M3U#M3U8)
-       (NOTE:  MAY STILL BE OVERWRITTEN BY METADATA TAGS IN FILE OR USER TAG FILES!)
+    /* JWT: KEEP (DON'T OVERWRITE/BLANK OUT) ENTRY'S EXTENDED M3U DATA IF TUPLE'S
+       CORRESPONDING DATA IS NOT SET!
+       (NEEDED FOR PLAYLIST PLUGINS THAT SET METADATA TAGS (audpl, xspf, extended M3U, cuesheets!)
+       (POSSIBILITIES ARE:  TITLE, ALBUM, ARTIST, & GENRE) -
+       SEE:  https://en.wikipedia.org/wiki/Extended_M3U#M3U8)
+       NOTE:  MAY STILL BE OVERWRITTEN BY METADATA TAGS IN FILE OR USER TAG FILES
+       (UNLESS "keep_playlist_metadata)!
+       WE DON'T REFRESH WHEN USER EDITED, BUT IF "KEEP PLAYLIST METADATA", WE WAIT UNTIL SCAN COMPLETES
+       AND RESET IT THERE (WHEN WE HAVE THE DATA) (THE CALLS ON USER-EDIT ARE:  2, THEN 0).
+       AFTERWARDS, IF "KEEP PLAYLIST METADATA", WE FORCE-VALIDATE TUPLE TO SKIP THE SUBSEQUENT RESCAN ON
+       USER-REFRESH (THE CALLS FOR MANUAL USER-REFRESH ARE:  1, THEN 0, BUT WE ONLY WANT 1).
+       NOTE:  WE STILL ALWAYS ALLOW STREAMING STATIONS TO CHANGE METADATA (CALL=3) FOR NOW.
     */
-    String Title = entry->tuple.get_str (Tuple::Title);
-    if (! tuple.is_set (Tuple::Title))
-        tuple.set_str (Tuple::Title, Title);
-    String Album = entry->tuple.get_str (Tuple::Album);
-    if (! tuple.is_set (Tuple::Album))
-        tuple.set_str (Tuple::Album, Album);
-    String Artist = entry->tuple.get_str (Tuple::Artist);
-    if (! tuple.is_set (Tuple::Artist))
-        tuple.set_str (Tuple::Artist, Artist);
-    String Genre = entry->tuple.get_str (Tuple::Genre);
-    if (! tuple.is_set (Tuple::Genre))
-        tuple.set_str (Tuple::Genre, Genre);
+    if (calledfrom == 0)
+    {
+        if (keep_playlist_metadata)
+        {
+            for (auto field : Tuple::all_fields())
+            {
+                if (entry->tuple.is_set (field) && ! entry->tuple.is_fallback (field))
+                    tuple_field_copy (tuple, entry->tuple, field);
+            }
+        }
+        else
+        {
+            for (auto field : Tuple::all_fields())
+            {
+                if (! tuple.is_set (field) || tuple.is_fallback (field))
+                    tuple_field_copy (tuple, entry->tuple, field);
+            }
+        }
+    }
 
-    entry->set_tuple (std::move (tuple));
+    if (calledfrom != 1)
+        entry->set_tuple (std::move (tuple));
 
     total_length += entry->length;
     if (entry->selected)
@@ -624,7 +660,7 @@ static void scan_finish (ScanRequest * request)
         if (oldTitle && oldTitle[0] && isub_p > 0 && strncmp ((const char *) oldTitle, base, baselen))
             request->tuple.set_str (Tuple::Title, oldTitle);
 
-        playlist->set_entry_tuple (entry, std::move (request->tuple));
+        playlist->set_entry_tuple (entry, std::move (request->tuple), 0);  // STARTUP, OR AFTER EDIT|REFRESH.
         if (cuesetlength > 0)  // JWT:MAKE SURE RECALCULATED LENGTH FROM CUESHEETS DOESN'T GET CLOBBERED!
             entry->tuple.set_int (Tuple::Length, cuesetlength);
 
@@ -1813,7 +1849,7 @@ static void playlist_rescan_real (int playlist_num, bool selected)
     for (auto & entry : playlist->entries)
     {
         if (! selected || entry->selected)
-            playlist->set_entry_tuple (entry.get (), Tuple ());
+            playlist->set_entry_tuple (entry.get (), Tuple (), 1);  // USER-REFRESHED ENTRY OR PLAYLIST.
     }
 
     queue_update (Metadata, playlist, 0, playlist->entries.len ());
@@ -1847,7 +1883,7 @@ EXPORT void aud_playlist_rescan_file (const char * filename)
         {
             if (! strcmp (entry->filename, filename))
             {
-                playlist->set_entry_tuple (entry.get (), Tuple ());
+                playlist->set_entry_tuple (entry.get (), Tuple (), 2);  // USER EDITED ENTRY'S SONG-INFO.
                 queue_update (Metadata, playlist.get (), entry->number, 1);
                 queue = true;
             }
@@ -1861,7 +1897,12 @@ EXPORT void aud_playlist_rescan_file (const char * filename)
     }
 
     if (restart)
+    {
+        bool save_scan_enabled = scan_enabled;
+        scan_enabled = scan_enabled_nominal;  // JWT: FORCE RESCAN AFTER USER-EDIT!
         scan_restart ();
+        scan_enabled = save_scan_enabled;
+    }
 
     LEAVE;
 }
@@ -2340,9 +2381,11 @@ void playback_entry_set_tuple (int serial, Tuple && tuple)
 
     /* don't update cuesheet entries with stream metadata */
     /* JWT:FIXED!(STRICTER CUESHEET TEST):    if (entry && ! entry->tuple.is_set (Tuple::StartTime)) */
-    if (entry && (strncmp (entry->filename, "file://", 7) || ! strstr_nocase ((const char *) entry->filename, ".cue?")))
+    if (entry && ! aud_get_bool (nullptr, "no_dynamic_stream_metadata")
+            && (strncmp (entry->filename, "file://", 7)
+            || ! strstr_nocase ((const char *) entry->filename, ".cue?")))
     {
-        playing_playlist->set_entry_tuple (entry, std::move (tuple));
+        playing_playlist->set_entry_tuple (entry, std::move (tuple), 3);  // STREAM UPDATED METADATA.
         queue_update (Metadata, playing_playlist, entry->number, 1);
     }
 
