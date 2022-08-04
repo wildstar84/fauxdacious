@@ -166,7 +166,20 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 
     if (mime)
     {
-        for (PluginHandle * plugin : (ext_matches.len () ? ext_matches : list))
+        /* JWT:TEMP. HACK TO HANDLE ".flac.ogg" STREAMS, WHICH ARE ACTUALLY FLAC AND NOT OGG (AUD. BUG#1176)!: */
+        bool extmatchonly = true;
+        if (mime == String ("audio/ogg"))
+        {
+            const char * flacogg = strstr (filename, ".flac.ogg");
+            if (flacogg && ! strcmp (flacogg, ".flac.ogg"))
+            {
+                AUDWARN ("w:JWT:WE'RE A 'FLAC.OGG' SO FORCE MIME:=audio/flac!\n");
+                mime = String ("audio/flac");
+                extmatchonly = false;
+            }
+        }
+        //JWT:HACK: for (PluginHandle * plugin : (ext_matches.len () ? ext_matches : list))
+        for (PluginHandle * plugin : (extmatchonly && ext_matches.len () ? ext_matches : list))
         {
             if (! aud_plugin_get_enabled (plugin))
                 continue;
@@ -675,6 +688,34 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
     return success;
 }
 
+/* JWT: NEW FUNCTION TO REMOVE A TITLE FROM THE GLOBAL (NOT LOCAL) TAG FILES: */
+EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename, const char * tagdata_filename)
+{
+    GKeyFile * rcfile = g_key_file_new ();
+    StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
+
+    if (! g_key_file_load_from_file (rcfile, filename, 
+            (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))
+    {
+        g_key_file_free (rcfile);
+        return false;
+    }
+
+    bool success = g_key_file_remove_group (rcfile, song_filename, nullptr);
+
+    if (success)
+    {
+        size_t len;
+        char * data = g_key_file_to_data (rcfile, & len, nullptr);
+        success = g_file_set_contents (filename, data, len, nullptr);
+        g_key_file_free (rcfile);
+        g_free (data);
+    }
+    else
+        g_key_file_free (rcfile);
+    return true;
+}
+
 EXPORT bool aud_file_write_tuple (const char * filename,
  PluginHandle * decoder, const Tuple & tuple)
 {
@@ -783,41 +824,17 @@ EXPORT bool aud_file_write_tuple (const char * filename,
             }
         }
         if (! success)  //use Global tag file (ie. for streams/URLs):
+        {
             success = aud_write_tag_to_tagfile (filename, tuple, "user_tag_data");
+            if (success)
+                aud_delete_tag_from_tagfile (filename, "tmp_tag_data");  // REMOVE ANY PREV. REFERENCE IN tmp_tag_file!
+        }
     }
 
     if (success)
         aud_playlist_rescan_file (filename);
 
     return success;
-}
-
-/* JWT: NEW FUNCTION TO REMOVE A TITLE FROM THE GLOBAL (NOT LOCAL) TAG FILES: */
-EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename, const char * tagdata_filename)
-{
-    GKeyFile * rcfile = g_key_file_new ();
-    StringBuf filename = filename_build ({aud_get_path (AudPath::UserDir), tagdata_filename});
-
-    if (! g_key_file_load_from_file (rcfile, filename, 
-            (GKeyFileFlags)(G_KEY_FILE_KEEP_COMMENTS), nullptr))
-    {
-        g_key_file_free (rcfile);
-        return false;
-    }
-
-    bool success = g_key_file_remove_group (rcfile, song_filename, nullptr);
-
-    if (success)
-    {
-        size_t len;
-        char * data = g_key_file_to_data (rcfile, & len, nullptr);
-        success = g_file_set_contents (filename, data, len, nullptr);
-        g_key_file_free (rcfile);
-        g_free (data);
-    }
-    else
-        g_key_file_free (rcfile);
-    return true;
 }
 
 EXPORT bool aud_custom_infowin (const char * filename, PluginHandle * decoder)
