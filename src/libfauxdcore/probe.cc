@@ -114,7 +114,9 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
             ext_matches.append (plugin);
     }
 
-    if (ext_matches.len () == 1 || (ext_matches.len () > 1 && ! strncmp (filename, "stdin://", 8)))
+    /* NOTE:Must not return Vorbis plugin without probing first, since not all .ogg entries are Vorbis! */
+    if ((ext_matches.len () == 1 && ! strstr(aud_plugin_get_name (ext_matches[0]), "Ogg Vorbis Decoder"))
+            || (ext_matches.len () > 1 && ! strncmp (filename, "stdin://", 8)))
     {
         AUDINFO ("Matched %s by extension.\n", aud_plugin_get_name (ext_matches[0]));
         if (! strncmp (filename, "stdin://", 8) && ! open_input_file (filename, "r", nullptr, file, error))
@@ -164,22 +166,18 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 
     String mime = file.get_metadata ("content-type");
 
+    /* NOTE: OGG-MEMED (WRAPPED) DATA REQUIRES CAREFUL HANDLING, SINCE FLAC OR VORBIS CAN GRAB THE
+       ENTRY, BUT LATER FAIL TO PLAY (LONG AFTER WE'RE DONE PROBING)!  WE CAN TEST VORBIS HERE "BY CONTENT"
+       BUT FLAC CAN PLAY FLAC DATA EMBEDDED IN OGG FILES, BUT WILL FAIL THESE "BY CONTENT" TEST, HOWEVER,
+       OTHER STUFF, IE. OPUS CAN BE EMBEDDED IN OGG FILES, WHICH BOTH WILL GRAB(MIME), THEN FAIL TO PLAY,
+       SO WE MUST CATCH THESE HERE TOO AND "FALL THROUGH", WHICH ALLOWS FFAUDIO TO CATCH AND PLAY LATER!
+       WE PREFER TO TRY & MATCH THE "GOOD" ONES W/FLAC OR VORBIS IF POSSIBLE AS THEY ARE GENERALLY PREFFERED
+       (HIGHER PRIORITY) OVER FFAUDIO.
+    */
     if (mime)
     {
-        /* JWT:TEMP. HACK TO HANDLE ".flac.ogg" STREAMS, WHICH ARE ACTUALLY FLAC AND NOT OGG (AUD. BUG#1176)!: */
-        bool extmatchonly = true;
-        if (mime == String ("audio/ogg"))
-        {
-            const char * flacogg = strstr (filename, ".flac.ogg");
-            if (flacogg && ! strcmp (flacogg, ".flac.ogg"))
-            {
-                AUDWARN ("w:JWT:WE'RE A 'FLAC.OGG' SO FORCE MIME:=audio/flac!\n");
-                mime = String ("audio/flac");
-                extmatchonly = false;
-            }
-        }
-        //JWT:HACK: for (PluginHandle * plugin : (ext_matches.len () ? ext_matches : list))
-        for (PluginHandle * plugin : (extmatchonly && ext_matches.len () ? ext_matches : list))
+        const char * mime_is_oggish = strstr_nocase (mime, "ogg"); // MUST CHECK BOTH FLAC & VORBIS FOR OGG MIMES!
+        for (PluginHandle * plugin : (! mime_is_oggish && ext_matches.len () ? ext_matches : list))
         {
             if (! aud_plugin_get_enabled (plugin))
                 continue;
@@ -187,8 +185,25 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
             if (input_plugin_has_key (plugin, InputKey::MIME, mime))
             {
                 AUDINFO ("Matched %s by MIME type %s.\n",
-                 aud_plugin_get_name (plugin), (const char *) mime);
-                return plugin;
+                        aud_plugin_get_name (plugin), (const char *) mime);
+                if (! mime_is_oggish)  // NOT AN OGG MIMETYPE, SO WE'RE GOOD.
+                    return plugin;  // SO WE'LL USE FIRST MATCHING PLUGIN.
+                else if (strstr (aud_plugin_get_name (plugin), "FLAC Decoder")) // TRYING FLAC DECODER FOR OGG:
+                {
+                    /* JWT:MUST PROBE FLAC HERE B/C FLAC'S "our_file()" CAN FAIL SOME VALID OGG-WRAPPED FLAC! */
+                    char buf[35];
+                    if (! file.fseek (0, VFS_SEEK_SET) && file.fread (buf, 1, sizeof buf) == sizeof buf
+                            && (! strncmp (buf+29, "FLAC", 4) || ! strncmp (buf+29, "Flac", 4)
+                            || ! strncmp (buf+29, "flac", 4)))
+                        return plugin;  // WILL USE FLAC PLUGIN.
+                }
+                else if (strstr (aud_plugin_get_name (plugin), "Ogg Vorbis Decoder")) // TRYING VORBIS DECODER FOR OGG:
+                {
+                    /* JWT:WE NOW TEST VORBIS IN IT'S "our_file" FN AS IT SHOULD ACCEPT ANY VORBIS DATA. */
+                    auto ip = (InputPlugin *) aud_plugin_get_header (plugin);
+                    if (ip && ip->is_our_file (filename, file))
+                        return plugin;  // WILL USE VORBIS PLUGIN.
+                }
             }
         }
     }
@@ -688,7 +703,7 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
     return success;
 }
 
-/* JWT: NEW FUNCTION TO REMOVE A TITLE FROM THE GLOBAL (NOT LOCAL) TAG FILES: */
+/* JWT: ADDED FUNCTION TO REMOVE A TITLE FROM A TAG FILE (IF IT EXISTS THERE): */
 EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename, const char * tagdata_filename)
 {
     GKeyFile * rcfile = g_key_file_new ();
