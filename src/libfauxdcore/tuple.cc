@@ -991,7 +991,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                 ::String stream_url = stream.get_metadata ("stream-url");
                 if (stream_url && stream_url[0])
                 {
-                    Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+                    Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg,webp", ",");
                     StringBuf uriext = uri_get_extension (stream_url);
                     for (auto & ext : extlist)
                     {
@@ -1022,6 +1022,12 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
         else if (val != get_str (Artist))
         {
             set_str (Artist, val);
+            updated = true;
+        }
+        ::String stream_genre = stream.get_metadata ("stream-genre");
+        if (stream_genre && stream_genre[0] && stream_genre != get_str (Genre))
+        {
+            set_str (Genre, stream_genre);
             updated = true;
         }
     }

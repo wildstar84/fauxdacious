@@ -1,5 +1,17 @@
 Version 4.2-beta1:
 
+* Media format-probing:  Add/Fix handling of non-Vorbis data "wrapped" in ogg 
+files/streams (ones with .ogg extension or "*/ogg" mimetypes).  This addresses 
+both Audacious issues #1160 (embedded Flac) and #1176 (embedded Opus, et. al.).
+
+* Fix bug related to user-editing of meta-tag data from streams downloaded as 
+temporary playlists (in "tmp_tag_data" file).  The edits are saved in the 
+"user_tag_data" global tag file, but the old values in tmp_tag_data still 
+override the new values, so now upon successful edit, any corresponding entry 
+in tmp_tag_data is now removed and the new values should now be displayed.
+
+* Stream metadata:  Add Genre to icy-metadata returned from many streams.
+
 * Playlist metadata:  Add two new options under [File].[Settings].[Playlist] 
 tab (Fauxdacious Extras):  [] Keep playlist metadata (like cuesheets do); and 
 [] Don't allow streams to change metadata.  Previously, when a metadata-
