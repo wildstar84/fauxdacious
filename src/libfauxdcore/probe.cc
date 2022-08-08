@@ -191,10 +191,9 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
                 else if (strstr (aud_plugin_get_name (plugin), "FLAC Decoder")) // TRYING FLAC DECODER FOR OGG:
                 {
                     /* JWT:MUST PROBE FLAC HERE B/C FLAC'S "our_file()" CAN FAIL SOME VALID OGG-WRAPPED FLAC! */
-                    char buf[35];
+                    char buf[33];
                     if (! file.fseek (0, VFS_SEEK_SET) && file.fread (buf, 1, sizeof buf) == sizeof buf
-                            && (! strncmp (buf+29, "FLAC", 4) || ! strncmp (buf+29, "Flac", 4)
-                            || ! strncmp (buf+29, "flac", 4)))
+                            && ! strncasecmp (buf+29, "FLAC", 4))
                         return plugin;  // WILL USE FLAC PLUGIN.
                 }
                 else if (strstr (aud_plugin_get_name (plugin), "Ogg Vorbis Decoder")) // TRYING VORBIS DECODER FOR OGG:
@@ -424,14 +423,14 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             || (usrtag && (from[3] = aud_read_tag_from_tagfile (filename, "user_tag_data", tuples[3])) > 2)
             || (fileorNOTstdin && ip->read_tag (filename, file, song_tuple, image)))
     {
-        for (int i=0;i<4;i++)
+        for (int i=0;i<4;i++)  /* HIGH TO LOW PRIORITY */
         {
-            if (from[i] >= 1)  /* HIGH TO LOW PRIORITY, STOP AS SOON AS WE FIND ENTRY IN A MATCHING TAG FILE! */
+            if (from[i] >= 1)  /* USE MATCHING TAG FILE W/HIGHEST PRECEDENCE, (HIGHEST PRIORITY IF TIE) */
             {
-                override_tuple = & tuples[i];
+                if (from[i] > highest_mode)
+                    override_tuple = & tuples[i];
                 highest_mode = from[i];
-                AUDINFO ("Tag data from source# %d, mode=%d.\n", i, highest_mode);
-                break;
+                AUDINFO ("Tag data source# %d, mode=%d (Only 1st src. w/highest mode used!).\n", i, highest_mode);
             }
         }
 
