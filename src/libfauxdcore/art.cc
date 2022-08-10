@@ -140,14 +140,14 @@ static void clear_current_locked ()
 
 /* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS: CHECK FOR ART FILE MATCHING BASE URL: */
 
-static int check_tag_file (const String & filename, AudArtItem * item, bool itemExists, const char * tagfile, int prevprec)
+static int check_tag_file (const String & filename, AudArtItem * item, const char * tagfile, int prevprec)
 {
     /* JWT:LOOK FOR IMAGE IN TAG DATA FILE(S) UNDER "Comment": */
     Tuple img_tuple = Tuple ();
     int precedence = aud_read_tag_from_tagfile (filename, tagfile, img_tuple);
 
     if (precedence <= prevprec)
-        return prevprec;  // SKIP THIS TAG FILE, WE ALREADY HAVE IMG. FROM ONE W/HIGHER PRECEDENCE!
+        return prevprec;  // SKIP THIS TAG FILE, WE ALREADY HAVE IMG. FROM ONE W/SAME OR HIGHER PRECEDENCE!
     else
     {
         /* SEARCH TAG FILE FOR ART: */
@@ -156,11 +156,11 @@ static int check_tag_file (const String & filename, AudArtItem * item, bool item
         if (tfld_charptr && ! strncmp (tfld_charptr, "file://", 7))  // TAG FILE COMMENT CONTAINS A FILE (ASSUME IMG!)!
         {
             const char * sep = strstr (tfld_charptr, ";");  // IF "file1;file2" ONLY EXTRACT "file1"!:
-            bool fileIsImage = false;
-            Index<String> extlist = str_list_to_index ("jpg,png,jpeg,gif,com,webp", ",");
             String art_file = sep ? String (str_printf ("%.*s", (int)(sep - tfld_charptr), tfld_charptr)) : tfld;
-            if (art_file && art_file[0] )
+            if (art_file && art_file[0])
             {
+                bool fileIsImage = false;
+                Index<String> extlist = str_list_to_index ("jpg,png,jpeg,gif,com,webp", ",");
                 String ext = String (uri_get_extension (art_file));
                 for (auto & tryext : extlist)
                 {
@@ -172,14 +172,16 @@ static int check_tag_file (const String & filename, AudArtItem * item, bool item
                 }
                 if (fileIsImage)  // WE'RE A VALID IMAGE FILE (BY EXTENSION)!:
                 {
-                    item->art_file = art_file;
-                    VFSFile file (item->art_file, "r");
+                    VFSFile file (art_file, "r");
                     if (file)
                     {
                         AUDINFO ("Art img. from %s, prec=%d file=%s.\n", tagfile, precedence, (const char *) art_file);
                         item->data = file.read_all ();
                         if (item->data.len () > 0)
+                        {
+                            item->art_file = art_file;
                             return precedence;
+                        }
                     }
                 }
             }
@@ -194,9 +196,10 @@ static int check_tag_file (const String & filename, AudArtItem * item, bool item
 */
 static int check_for_user_art (const String & filename, AudArtItem * item, bool itemExists)
 {
-    bool foundArt = false;
+    bool foundArt = false;     // TRUE IF HAVE EXISTING ART DATA.
+    int forcetagcheck = false; // TRUE TO FORCE FULL TAG-FILE CHECK, OTHERWISE, ONLY CHECK FOR "OVERRIDE" OR "ONLY".
 
-    if (! itemExists)  // NEW ITEM, SEE IF FILE IS ALREADY AN IMAGE FILE:
+    if (! itemExists || item->data.len () <= 0)  // NEW ITEM, SEE IF REQUESTED FILE IS ALREADY AN IMAGE FILE:
     {
         bool fileIsImage = false;
         String ext = String (uri_get_extension (filename));
@@ -215,33 +218,46 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
             StringBuf coverart_file = uri_to_filename (filename);
             if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE EXISTS, FETCH IT AS-IS!:
             {
-                item->art_file = filename;
-                VFSFile file (item->art_file, "r");
+                VFSFile file (filename, "r");
                 if (file)
                 {
                     item->data = file.read_all ();
                     if (item->data.len () > 0)
+                    {
+                        item->art_file = filename;
                         return 1;  // FILE IS AN IMAGE, SO WE'RE DONE (FLAG_SENT - DON'T BOTHER SENDING "art ready")!
+                    }
                 }
             }
             return -1;  // FILE IS AN IMAGE (NOT A SONG ENTRY), BUT COULDN'T READ? SO WE'RE DONE (DON'T SCAN)!
         }
     }
-    if (! foundArt && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG FILES IF USER WANTS TO USE THEM:
+    else  // WE HAVE IMAGE DATA ALREADY:
     {
-        int prevprec = check_tag_file (filename, item, itemExists, "tmp_tag_data", 0);  // 1ST, CHECK TEMP TAGFILE
+        foundArt = true;
+        if (aud_get_bool (nullptr, "no_dynamic_stream_metadata")
+                && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
+            forcetagcheck = true;  // FOR STREAMS, FORCE FULL TAG-FILE CHECK IF WE PROHIBIT STREAMS TO SET WHEN PLAYING!
+    }
+
+    if (! item->art_file && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG-FILES IF USER WANTS TO USE THEM:
+    {
+        /* NORMALLY ONLY CHECK TAG-FILES "OVERRIDE"|"ONLY" IF HAVE EXISTING ART FILE, UNLESS FULL CHECK FORCED! */
+        int minprec = (! foundArt || forcetagcheck) ? 0 : 1;  // CONSIDER TAG-FILE ONLY IF PRECEDENCE EXCEEDS.
+        int prevprec = check_tag_file (filename, item, "tmp_tag_data", minprec);  // 1ST, CHECK TEMP TAGFILE
         if (! strncmp (filename, "file://", 7))  // 2ND, CHECK DIRECTORY TAGFILE (IF ENTRY IS FILE)
         {
             StringBuf tag_fid = uri_to_filename (filename);
             StringBuf path = filename_get_parent (tag_fid);
             String filename_only = String (filename_get_base (tag_fid));
-            prevprec = check_tag_file (filename_only, item, itemExists,
+            prevprec = check_tag_file (filename_only, item,
                     filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})), prevprec);
-            prevprec = check_tag_file (filename_only, item, itemExists,
+            prevprec = check_tag_file (filename_only, item,
                     filename_to_uri (str_concat ({path, "/user_tag_data.tag"})), prevprec);
         }
-        prevprec = check_tag_file (filename, item, itemExists, "user_tag_data", prevprec);  // 3RD, CHECK USER TAGFILE
-        foundArt = (prevprec > 0);
+        prevprec = check_tag_file (filename, item, "user_tag_data", prevprec);  // 3RD, CHECK USER TAGFILE
+        if (! foundArt)
+            foundArt = prevprec > minprec;  // SET TRUE ONLY IF MATCHED TAG-FILE W/SUFFICIENT PRECEDENCE!
     }
     if (! foundArt && item->data.len () <= 0 && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
     {
