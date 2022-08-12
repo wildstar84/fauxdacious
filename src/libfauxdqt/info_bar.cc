@@ -73,6 +73,7 @@ public:
     ~InfoVis ();
 
     void enable (bool enabled);
+    void set_parent (QWidget * parent);
 
     const QGradient & gradient () const
         { return m_gradient; }
@@ -86,9 +87,11 @@ protected:
     void paintEvent (QPaintEvent *);
 
 private:
+    bool infovis_active;  /* JWT:TRUE IF "BOUNCY-BAR" VIS SUBWIDGET IS ACTIVE (ACCEPTING INPUTS). */
     void update_colors ();
 
     const My_PixelSizes ps;
+    QWidget * is_the_infobar;  /* JWT:DIFFERENTIATE INFOBAR FROM MINI-FAUXD (SET IF INFOBAR, NULL OTHERWISE) */
     QLinearGradient m_gradient;
     BarColors m_bar_colors[VisBands];
 
@@ -116,6 +119,7 @@ InfoVis::InfoVis (QWidget * parent) :
     ps (audqt::sizes.OneInch),
     m_gradient (0, 0, 0, ps.Height)
 {
+    infovis_active = true;
     update_colors ();
     setAttribute (Qt::WA_OpaquePaintEvent);
     resize (ps.VisWidth + 2 * ps.Spacing, ps.Height);
@@ -124,10 +128,21 @@ InfoVis::InfoVis (QWidget * parent) :
 InfoVis::~InfoVis ()
 {
     enable (false);
+    if (! is_the_infobar)
+        infovis_active = false;
+}
+
+void InfoVis::set_parent (QWidget * parent)
+{
+    is_the_infobar = parent;  /* JWT: *InfoBar's* parent if INFOBAR, NULL if MINI-FAUXDACIOUS! */
 }
 
 void InfoVis::render_freq (const float * freq)
 {
+    if (! infovis_active || ! isVisible ())
+        return;
+
+//x if (is_the_infobar) AUDERR("render INFOBAR!\n"); else AUDERR("render MINI-FAUXDACIOUS!\n");
     /* xscale[i] = pow (256, i / VIS_BANDS) - 0.5; */
     const float xscale[VisBands + 1] = {0.5, 1.09, 2.02, 3.5, 5.85, 9.58,
      15.5, 24.9, 39.82, 63.5, 101.09, 160.77, 255.5};
@@ -157,11 +172,15 @@ void InfoVis::clear ()
     memset (m_bars, 0, sizeof m_bars);
     memset (m_delay, 0, sizeof m_delay);
 
-    update ();
+    if (infovis_active)
+        update ();
 }
 
 void InfoVis::changeEvent (QEvent * event)
 {
+    if (! infovis_active)
+        return;
+
     if (event->type () == QEvent::PaletteChange)
         update_colors ();
 
@@ -170,6 +189,9 @@ void InfoVis::changeEvent (QEvent * event)
 
 void InfoVis::paintEvent (QPaintEvent *)
 {
+    if (! infovis_active)
+        return;
+
     QPainter p (this);
     p.fillRect (0, 0, ps.VisWidth, ps.Height, m_gradient);
 
@@ -190,8 +212,8 @@ void InfoVis::enable (bool enabled)
         aud_visualizer_add (this);
     else
     {
-        aud_visualizer_remove (this);
         clear ();
+        aud_visualizer_remove (this);
     }
 
     setVisible (enabled);
@@ -203,9 +225,9 @@ EXPORT InfoBar::InfoBar (QWidget * parent) :
     ps (m_vis->pixelSizes ()),
     m_stopped (true)
 {
+    m_parent = parent;
     update_vis ();
     setFixedHeight (ps.Height);
-    m_parent = parent;
 
     m_art_enabled = aud_get_bool ("qtui", "infoarea_show_art");
     m_fbart_hidden = aud_get_bool ("qtui", "infoarea_hide_fallback_art");
@@ -420,6 +442,7 @@ EXPORT void InfoBar::reellipsize_title ()
 
 EXPORT void InfoBar::update_vis ()
 {
+    m_vis->set_parent (m_parent);
     reellipsize_title ();
 
     m_vis->enable (aud_get_bool ("qtui", "infoarea_show_vis"));
