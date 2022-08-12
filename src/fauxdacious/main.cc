@@ -69,7 +69,7 @@ static struct {
     int qt;
 #endif
     int clearplaylist, newinstance, pauseismute, forcenoequalizer, forcenogainchg, deleteallplaylists,
-            force_recording, outstd;  /* JWT:NEW COMMAND-LINE OPTIONS */
+            force_recording, outstd, addplaylist;  /* JWT:NEW COMMAND-LINE OPTIONS */
 } options;
 
 static bool initted = false;
@@ -84,6 +84,7 @@ static const struct {
     int * value;
     const char * desc;
 } arg_map[] = {
+    {"add-list", 'a', & options.addplaylist, N_("Add Playlist (May appear >once to separate entries)")},
     {"clear", 'c', & options.clearplaylist, N_("Clear Playlist")},
     {"delete", 'D', & options.deleteallplaylists, N_("DELETE all playlists!")},
     {"enqueue", 'e', & options.enqueue, N_("Add files to the playlist")},
@@ -228,9 +229,12 @@ static bool parse_options (int argc, char * * argv)
                                 instancename = String (parmpos);
                             else if (! strcmp (arg_info.long_arg, "out"))      /* JWT:ADD OPTIONAL STDOUT OUTPUT */
                                 out_ext = String (parmpos);
-                            else if (! strcmp (arg_info.long_arg, "gain"))  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
+                            else if (! strcmp (arg_info.long_arg, "gain"))     /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
                                 starting_gain = atoi (parmpos);
                         }
+                        else if (! strcmp (arg_info.long_arg, "add-list")) /* JWT:ADD SUBSEQUENT ITEMS TO A NEW PLAYLIST */
+                            filenames.append (String ("|"));
+
                         break;
                     }
                 }
@@ -242,6 +246,8 @@ static bool parse_options (int argc, char * * argv)
                 }
             }
         }
+        else if (arg[1] == 'a')  /* PLAYLIST SEPARATOR (MUST BE STANDALONE & MAY APPEAR MULTIPLE TIMES) */
+            filenames.append (String ("|"));
         else  /* -short option list (single letters and/or digit) */
         {
             for (int c = 1; arg[c]; c ++)  /* loop to check each character in the option string */
@@ -342,25 +348,71 @@ static void do_remote ()
 
     /* if no command line options, then present running instance */
     if (! (filenames.len () || options.play || options.pause ||
-     options.play_pause || options.stop || options.rew || options.fwd ||
-     options.show_jump_box || options.mainwin))
+            options.play_pause || options.stop || options.rew || options.fwd ||
+            options.show_jump_box || options.mainwin))
         options.mainwin = true;
 
     if (filenames.len ())
     {
+        bool isFirst = true;
+        bool emptyList = false;
         Index<const char *> list;
 
         for (auto & item : filenames)
-            list.append (item.filename);
+        {
+            if (item.filename == String ("|"))
+            {
+                if (list.len () > 0)
+                {
+                    list.append (nullptr);
+                    if (options.enqueue_to_temp)
+                        obj_fauxdacious_call_open_list_to_temp_sync (obj, list.begin (), nullptr, nullptr);
+                    else if (isFirst)
+                    {
+                        if (options.enqueue)
+                            obj_fauxdacious_call_add_list_sync (obj, list.begin (), nullptr, nullptr);
+                        else
+                            obj_fauxdacious_call_open_list_sync (obj, list.begin (), nullptr, nullptr);
+                    }
+                    else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
+                    {
+                        obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
+                        obj_fauxdacious_call_add_list_sync (obj, list.begin (), nullptr, nullptr);
+                    }
+                    list.resize (0);
+                }
+                else if (emptyList)
+                    obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
 
-        list.append (nullptr);
-
-        if (options.enqueue_to_temp)
-            obj_fauxdacious_call_open_list_to_temp_sync (obj, list.begin (), nullptr, nullptr);
-        else if (options.enqueue)
-            obj_fauxdacious_call_add_list_sync (obj, list.begin (), nullptr, nullptr);
-        else
-            obj_fauxdacious_call_open_list_sync (obj, list.begin (), nullptr, nullptr);
+                emptyList = true;
+                isFirst = false;
+            }
+            else
+            {
+                list.append (item.filename);
+                emptyList = false;
+            }
+        }
+        if (list.len () > 0)  // GET ANY REMAINING.
+        {
+            list.append (nullptr);
+            if (options.enqueue_to_temp)
+                obj_fauxdacious_call_open_list_to_temp_sync (obj, list.begin (), nullptr, nullptr);
+            else if (isFirst)
+            {
+                if (options.enqueue)
+                    obj_fauxdacious_call_add_list_sync (obj, list.begin (), nullptr, nullptr);
+                else
+                    obj_fauxdacious_call_open_list_sync (obj, list.begin (), nullptr, nullptr);
+            }
+            else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
+            {
+                obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
+                obj_fauxdacious_call_add_list_sync (obj, list.begin (), nullptr, nullptr);
+            }
+        }
+        else if (emptyList)
+            obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
     }
 
     if (options.play)
@@ -472,18 +524,75 @@ static void do_commands ()
 
     if (filenames.len ())
     {
-        if (options.enqueue_to_temp)
+        bool isFirst = true;
+        bool emptyList = false;
+        Index<PlaylistAddItem> list;
+
+        for (auto & item : filenames)
         {
-            aud_drct_pl_open_temp_list (std::move (filenames));
-            resume = false;
+            if (item.filename == String ("|"))
+            {
+                if (list.len () > 0)
+                {
+                    if (options.enqueue_to_temp)
+                    {
+                        aud_drct_pl_open_temp_list (std::move (list));
+                        resume = false;
+                    }
+                    else if (isFirst)
+                    {
+                        if (options.enqueue)
+                            aud_drct_pl_add_list (std::move (list), -1);
+                        else
+                            aud_drct_pl_open_list (std::move (list));
+                        resume = false;
+                    }
+                    else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
+                    {
+                        aud_playlist_new ();
+                        aud_drct_pl_add_list (std::move (list), -1);
+                        resume = false;
+                    }
+                }
+                else if (emptyList)
+                    aud_playlist_new ();
+
+                emptyList = true;
+                isFirst = false;
+            }
+            else
+            {
+                list.append (item.filename);
+                emptyList = false;
+            }
         }
-        else if (options.enqueue)
-            aud_drct_pl_add_list (std::move (filenames), -1);
-        else
+        if (list.len () > 0)  // GET ANY REMAINING.
         {
-            aud_drct_pl_open_list (std::move (filenames));
-            resume = false;
+            if (options.enqueue_to_temp)
+            {
+                aud_drct_pl_open_temp_list (std::move (list));
+                resume = false;
+            }
+            else if (isFirst)
+            {
+                if (options.enqueue)
+                    aud_drct_pl_add_list (std::move (list), -1);
+                else
+                    aud_drct_pl_open_list (std::move (list));
+                resume = false;
+            }
+            else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
+            {
+                aud_playlist_new ();
+                aud_drct_pl_add_list (std::move (list), -1);
+                resume = false;
+            }
         }
+        else if (emptyList)
+            aud_playlist_new ();
+
+        if (! isFirst)
+            resume = false;
     }
 
     if (resume)

@@ -1,5 +1,23 @@
 Version 4.2-beta1:
 
+* Add command-line option (-a) to load command-line entries to be loaded into 
+multiple playlists.  The long-name is "--add-list".  For example:
+
+$>fauxdacious [-other_options] entry1 entry2 -a entry3 entry4
+
+-OR-
+
+$>fauxdacious [-other_options] entry1 entry2 --add-list entry3 entry4
+
+This command would (depending on other playlist options) add entry1 and entry2 
+to the current (or a new "Now Playing") playlist, then create a new separate 
+"New Playlist" playlist and load entry3 and entry4 into it.  A trailing "-a" 
+(with no entries following it) will add an extra blank playlist tab.  Each new 
+playlist created will have the default name "New Playlist".
+
+NOTE:  Unlike other options, this one is "standalone" (must always be preceeded 
+by it's own dash ("-")), and can be used multiple times in the same command.
+
 * Media format-probing:  Add/Fix handling of non-Vorbis data "wrapped" in ogg 
 files/streams (ones with .ogg extension or "*/ogg" mimetypes).  This addresses 
 both Audacious issues #1160 (embedded Flac) and #1176 (embedded Opus, et. al.).
