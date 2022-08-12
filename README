@@ -2,12 +2,17 @@ NOTE:  You NO LONGER NEED to uninstall Audacious or any audacious packages,
 ie. libaudcore, libaudgui, libaudtag, etc.  before installing Fauxdacious!
 Both programs can now happily reside on the same system and root path.
 
-How to build:
+NOTE (M$-Windows users):  You do NOT need to build Fauxdacious from scratch!  
+Instead, just download and run the Fauxdacious Windows Easy-Installer and run 
+it to install Fauxdacious with your mouse!:  
+https://github.com/wildstar84/fauxdacious-windows-easyinstaller
+
+How to build (generally only needed for non-Windows users):
 
 (For additional general info, see:  http://redmine.audacious-media-player.org/boards/1/topics/788?r=1762#message-1762 - 
 Building Audacious)
 
-(For building on M$-Windows systems, see:  https://github.com/wildstar84/fauxdacious/blob/master/contrib/win32/fauxdacious_buildnotes.htm
+(For building on M$-Windows systems (if you insist), see:  https://github.com/wildstar84/fauxdacious/blob/master/contrib/win32/fauxdacious_buildnotes.htm
 
 Install the following Dependencies:
 
