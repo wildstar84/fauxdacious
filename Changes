@@ -9,6 +9,10 @@ $>fauxdacious [-other_options] entry1 entry2 -a entry3 entry4
 
 $>fauxdacious [-other_options] entry1 entry2 --add-list entry3 entry4
 
+-OR-
+
+$>fauxdacious [-other_options] entry1 entry2 --add-list="pl. name" entry3 entry4
+
 This command would (depending on other playlist options) add entry1 and entry2 
 to the current (or a new "Now Playing") playlist, then create a new separate 
 "New Playlist" playlist and load entry3 and entry4 into it.  A trailing "-a" 
@@ -17,6 +21,12 @@ playlist created will have the default name "New Playlist".
 
 NOTE:  Unlike other options, this one is "standalone" (must always be preceeded 
 by it's own dash ("-")), and can be used multiple times in the same command.
+
+NOTE2:  If using the long form of the option, you can optionally include an 
+argument specifying a playlist name to use (the default is "New Playlist").  
+This optional name is a default, but if the next entry is a playlist file 
+containing a playlist title, then that will override any name specified here, 
+as is normal when importing playlist files.  
 
 * Media format-probing:  Add/Fix handling of non-Vorbis data "wrapped" in ogg 
 files/streams (ones with .ogg extension or "*/ogg" mimetypes).  This addresses 
