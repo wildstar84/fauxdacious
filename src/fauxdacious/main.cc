@@ -84,7 +84,7 @@ static const struct {
     int * value;
     const char * desc;
 } arg_map[] = {
-    {"add-list", 'a', & options.addplaylist, N_("Add Playlist (May appear >once to separate entries)")},
+    {"add-list", 'a', & options.addplaylist, N_("Add Playlist: each use creates new pl. (-a | --add-list[=\"pl name\"])")},
     {"clear", 'c', & options.clearplaylist, N_("Clear Playlist")},
     {"delete", 'D', & options.deleteallplaylists, N_("DELETE all playlists!")},
     {"enqueue", 'e', & options.enqueue, N_("Add files to the playlist")},
@@ -98,7 +98,7 @@ static const struct {
     {"headless", 'H', & options.headless, N_("Start without a graphical interface")},
     {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window")},
     {"show-main-window", 'm', & options.mainwin, N_("Display the main window")},
-    {"new", 'n', & options.newinstance, N_("New Instance:  number, name, or unnamed (ie: -# | --new=name | -n)")}, 
+    {"new", 'n', & options.newinstance, N_("New Instance: number, name, or unnamed (-# | --new=name | -n)")},
     {"out", 'o', & options.outstd, N_("Output to stdout (extension)")},  /* JWT:FORCE PIPING TO STDOUT, (default "wav"). */
     {"play", 'p', & options.play, N_("Start playback")},
     {"pause-mute", 'P', & options.pauseismute, N_("Pause mutes instead of pausing")},  /* JWT:ADD PAUSEMUTE OPTION */
@@ -231,8 +231,10 @@ static bool parse_options (int argc, char * * argv)
                                 out_ext = String (parmpos);
                             else if (! strcmp (arg_info.long_arg, "gain"))     /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
                                 starting_gain = atoi (parmpos);
+                            else if (! strcmp (arg_info.long_arg, "add-list")) /* JWT:ADD SUBSEQUENT ITEMS TO A NEW NAMED PLAYLIST */
+                                filenames.append (String (str_printf ("|%s", parmpos)));
                         }
-                        else if (! strcmp (arg_info.long_arg, "add-list")) /* JWT:ADD SUBSEQUENT ITEMS TO A NEW PLAYLIST */
+                        else if (! strcmp (arg_info.long_arg, "add-list")) /* JWT:ADD SUBSEQUENT ITEMS TO A NEW PLAYLIST ("New Playlist") */
                             filenames.append (String ("|"));
 
                         break;
@@ -355,12 +357,13 @@ static void do_remote ()
     if (filenames.len ())
     {
         bool isFirst = true;
-        bool emptyList = false;
+        bool emptyList = false;  // TRUE IF PENDING ENTRIES (NEED THIS, JUST USING LIST LENGTH DOESN'T WORK)!
+        const char * playlist_name = NULL;
         Index<const char *> list;
 
         for (auto & item : filenames)
         {
-            if (item.filename == String ("|"))
+            if (item.filename[0] == '|')  // -a SEPARATOR, FINISH PLAYLIST & START NEW ONE.
             {
                 if (list.len () > 0)
                 {
@@ -377,15 +380,22 @@ static void do_remote ()
                     else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
                     {
                         obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
+                        if (playlist_name && playlist_name[0])
+                            obj_fauxdacious_call_set_active_playlist_name_sync (obj, playlist_name, nullptr, nullptr);
                         obj_fauxdacious_call_add_list_sync (obj, list.begin (), nullptr, nullptr);
                     }
                     list.resize (0);
                 }
                 else if (emptyList)
+                {
                     obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
+                    if (playlist_name && playlist_name[0])
+                        obj_fauxdacious_call_set_active_playlist_name_sync (obj, playlist_name, nullptr, nullptr);
+                }
 
                 emptyList = true;
                 isFirst = false;
+                playlist_name = (const char *) item.filename + 1; // USER-SPECIFIED DEFAULT PL. NAME || "New Playlist"
             }
             else
             {
@@ -393,7 +403,7 @@ static void do_remote ()
                 emptyList = false;
             }
         }
-        if (list.len () > 0)  // GET ANY REMAINING.
+        if (list.len () > 0)  // GET ANY REMAINING ENTRIES.
         {
             list.append (nullptr);
             if (options.enqueue_to_temp)
@@ -408,11 +418,17 @@ static void do_remote ()
             else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
             {
                 obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
+                if (playlist_name && playlist_name[0])
+                    obj_fauxdacious_call_set_active_playlist_name_sync (obj, playlist_name, nullptr, nullptr);
                 obj_fauxdacious_call_add_list_sync (obj, list.begin (), nullptr, nullptr);
             }
         }
         else if (emptyList)
+        {
             obj_fauxdacious_call_new_playlist_sync (obj, nullptr, nullptr);
+            if (playlist_name && playlist_name[0])
+                obj_fauxdacious_call_set_active_playlist_name_sync (obj, playlist_name, nullptr, nullptr);
+        }
     }
 
     if (options.play)
@@ -525,12 +541,13 @@ static void do_commands ()
     if (filenames.len ())
     {
         bool isFirst = true;
-        bool emptyList = false;
+        bool emptyList = false;  // TRUE IF PENDING ENTRIES (NEED THIS, JUST USING LIST LENGTH DOESN'T WORK)!
+        const char * playlist_name = NULL;
         Index<PlaylistAddItem> list;
 
         for (auto & item : filenames)
         {
-            if (item.filename == String ("|"))
+            if (item.filename[0] == '|')  // -a SEPARATOR, FINISH PLAYLIST & START NEW ONE.
             {
                 if (list.len () > 0)
                 {
@@ -549,16 +566,23 @@ static void do_commands ()
                     }
                     else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
                     {
-                        aud_playlist_new ();
+                        int playlist_num = aud_playlist_new ();
+                        if (playlist_name && playlist_name[0])
+                            aud_playlist_set_title (playlist_num, playlist_name);
                         aud_drct_pl_add_list (std::move (list), -1);
                         resume = false;
                     }
                 }
                 else if (emptyList)
-                    aud_playlist_new ();
+                {
+                    int playlist_num = aud_playlist_new ();
+                    if (playlist_name && playlist_name[0])
+                        aud_playlist_set_title (playlist_num, playlist_name);
+                }
 
                 emptyList = true;
                 isFirst = false;
+                playlist_name = (const char *) item.filename + 1; // USER-SPECIFIED DEFAULT PL. NAME || "New Playlist"
             }
             else
             {
@@ -566,7 +590,7 @@ static void do_commands ()
                 emptyList = false;
             }
         }
-        if (list.len () > 0)  // GET ANY REMAINING.
+        if (list.len () > 0)  // GET ANY REMAINING ENTRIES.
         {
             if (options.enqueue_to_temp)
             {
@@ -583,13 +607,19 @@ static void do_commands ()
             }
             else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
             {
-                aud_playlist_new ();
+                int playlist_num = aud_playlist_new ();
+                if (playlist_name && playlist_name[0])
+                    aud_playlist_set_title (playlist_num, playlist_name);
                 aud_drct_pl_add_list (std::move (list), -1);
                 resume = false;
             }
         }
         else if (emptyList)
-            aud_playlist_new ();
+        {
+            int playlist_num = aud_playlist_new ();
+            if (playlist_name && playlist_name[0])
+                aud_playlist_set_title (playlist_num, playlist_name);
+        }
 
         if (! isFirst)
             resume = false;
