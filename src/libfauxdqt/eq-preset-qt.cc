@@ -309,6 +309,13 @@ static void show_import_dialog (QDialog * parent, PresetView * view, QPushButton
     set_default_preset_dir ();
     dialog->setDirectory (QString (aud_get_str (nullptr, "_preset_dir")));
 
+    /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
+    int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");
+    String icon_theme = aud_get_str ("audqt", "icon_theme");
+    if (use_native_sysdialogs == 2 || (use_native_sysdialogs == 1
+            && (!strcmp (aud_get_str ("audqt", "theme"), "dark") || (icon_theme && icon_theme[0]))))
+        dialog->setOption(QFileDialog::DontUseNativeDialog);
+
     auto do_import = [dialog, view, revert_btn]() {
         auto urls = dialog->selectedUrls ();
         if (urls.size () != 1)
@@ -345,6 +352,13 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
     dialog->setFileMode (QFileDialog::AnyFile);
     dialog->setLabelText (QFileDialog::Accept, _("Save"));
     dialog->setNameFilter (_(name_filter));
+
+    /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
+    int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");
+    String icon_theme = aud_get_str ("audqt", "icon_theme");
+    if (use_native_sysdialogs == 2 || (use_native_sysdialogs == 1
+            && (!strcmp (aud_get_str ("audqt", "theme"), "dark") || (icon_theme && icon_theme[0]))))
+        dialog->setOption(QFileDialog::DontUseNativeDialog);
 
     /* TODO: replace other illegal characters on Win32 */
 

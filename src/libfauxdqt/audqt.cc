@@ -1,6 +1,6 @@
 /*
- * util.cc
- * Copyright 2014 Ariadne Conill
+ * audqt.cc
+ * Copyright 2014-2022 Ariadne Conill and John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -21,8 +21,10 @@
 
 #include <QApplication>
 #include <QLibraryInfo>
+#include <QProxyStyle>
 #include <QPushButton>
 #include <QScreen>
+#include <QStyleFactory>
 #include <QTranslator>
 #include <QVBoxLayout>
 
@@ -61,6 +63,10 @@ static const char * const audqt_defaults[] = {
 #else
     "qt_mainwindow_walks", "FALSE",
 #endif
+#ifdef _WIN32
+    "theme", "dark",
+    "icon_theme", "fauxdacious-flat-dark",
+#endif
     nullptr
 };
 /* clang-format on */
@@ -81,6 +87,37 @@ static void load_qt_translations()
         QApplication::installTranslator(&translators[0]);
     if (translators[1].load(locale, "qtbase", "_", dir))
         QApplication::installTranslator(&translators[1]);
+}
+
+void set_icon_theme (void)
+{
+    QIcon::setThemeName ((QString) aud_get_str ("audqt", "icon_theme"));
+
+    // make sure we have a valid icon theme
+    auto isValid = [](QString theme) {
+        return ! theme.isEmpty () && theme != "hicolor";
+    };
+
+    if (! isValid (QIcon::themeName()))
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        QString fallback = QIcon::fallbackThemeName ();
+        if (isValid (fallback))
+            QIcon::setThemeName (fallback);
+        else
+#endif
+            QIcon::setThemeName ("fauxdacious-flat");
+    }
+
+    // add fallback icons just to be sure
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    auto paths = QIcon::fallbackSearchPaths ();
+    auto path = ":/icons/fauxdacious-flat/scalable";
+    if (! paths.contains (path))
+        QIcon::setFallbackSearchPaths (paths << path);
+#endif
+
+    qApp->setWindowIcon (QIcon::fromTheme ("fauxdacious"));
 }
 
 EXPORT void init ()
@@ -107,9 +144,6 @@ EXPORT void init ()
 #endif
 
     qapp->setApplicationName (_("Fauxdacious_Qt"));
-    if (qapp->windowIcon ().isNull ())
-        qapp->setWindowIcon (audqt::get_icon (app_name));
-
     qapp->setQuitOnLastWindowClosed (false);
 
     sizes_local.OneInch = aud::max (96, (int) qapp->primaryScreen ()->logicalDotsPerInch ());
@@ -121,7 +155,11 @@ EXPORT void init ()
     margins_local.FourPt = QMargins (sizes.FourPt, sizes.FourPt, sizes.FourPt, sizes.FourPt);
     margins_local.EightPt = QMargins (sizes.EightPt, sizes.EightPt, sizes.EightPt, sizes.EightPt);
 
-    load_qt_translations();
+    load_qt_translations ();
+    set_icon_theme ();
+
+    if (! strcmp (aud_get_str ("audqt", "theme"), "dark"))
+        enable_dark_theme ();
 
 #ifdef _WIN32
     // On Windows, Qt uses 9 pt in specific places (such as QMenu) but
@@ -264,6 +302,19 @@ EXPORT QVBoxLayout * make_vbox (QWidget * parent, int spacing)
     layout->setContentsMargins (0, 0, 0, 0);
     layout->setSpacing (spacing);
     return layout;
+}
+
+EXPORT void setup_proxy_style (QProxyStyle * style)
+{
+    // set the correct base style ("fusion" or native)
+    if (! strcmp (aud_get_str ("audqt", "theme"), "dark"))
+        style->setBaseStyle (QStyleFactory::create ("fusion"));
+    else
+        style->setBaseStyle (nullptr);
+
+    // detect and respond to application-wide style change
+    QObject::connect (qApp->style(), &QObject::destroyed, style,
+            [style]() { setup_proxy_style (style); });
 }
 
 EXPORT void enable_layout (QLayout * layout, bool enabled)

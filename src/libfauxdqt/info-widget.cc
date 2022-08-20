@@ -212,6 +212,13 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
     dialog->setNameFilter (_(name_filter));
     dialog->setDirectory (QString (aud_get_path (AudPath::UserDir)));
 
+    /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
+    int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");
+    String icon_theme = aud_get_str ("audqt", "icon_theme");
+    if (use_native_sysdialogs == 2 || (use_native_sysdialogs == 1
+            && (!strcmp (aud_get_str ("audqt", "theme"), "dark") || (icon_theme && icon_theme[0]))))
+        dialog->setOption(QFileDialog::DontUseNativeDialog);
+
     QObject::connect (dialog, & QFileDialog::accepted, [this, dialog, parent] () {
         auto urls = dialog->selectedUrls ();
         String error;

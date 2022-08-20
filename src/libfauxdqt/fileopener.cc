@@ -87,8 +87,17 @@ EXPORT void fileopener_show (FileMode mode)
 
         dialog->setAttribute (Qt::WA_DeleteOnClose);
         dialog->setFileMode (modes[mode]);
+        if (modes[mode] == QFileDialog::FileMode::Directory)
+            dialog->setOption (QFileDialog::ShowDirsOnly);
         dialog->setLabelText (QFileDialog::Accept, _(labels[mode]));
         dialog->setLabelText (QFileDialog::Reject, _("Cancel"));
+
+        /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
+        int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");
+        String icon_theme = aud_get_str ("audqt", "icon_theme");
+        if (use_native_sysdialogs == 2 || (use_native_sysdialogs == 1
+                && (!strcmp (aud_get_str ("audqt", "theme"), "dark") || (icon_theme && icon_theme[0]))))
+            dialog->setOption(QFileDialog::DontUseNativeDialog);
 
         int playlist = aud_playlist_get_active ();
 

@@ -1,6 +1,6 @@
 /*
  * libfauxdqt-internal.h
- * Copyright 2016-2018 John Lindgren
+ * Copyright 2016-2022 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,6 +28,13 @@ class QString;
 
 namespace audqt {
 
+/* audqt.cc */
+void set_icon_theme ();
+
+/* dark-theme.cc */
+void enable_dark_theme ();
+void disable_dark_theme ();
+
 /* dock.cc */
 void dock_show_simple (const char * id, const char * name, QWidget * create ());
 void dock_hide_simple (const char * id);
@@ -54,8 +61,8 @@ protected:
 };
 
 void show_copy_context_menu (QWidget * parent, const QPoint & global_pos,
- const QString & text_to_copy);
+        const QString & text_to_copy);
 
 } // namespace audqt
 
-#endif // LIBAUDQT_INTERNAL_H
+#endif // LIBFAUXDQT_INTERNAL_H

@@ -25,6 +25,7 @@
 
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/i18n.h>
+#include <libfauxdcore/runtime.h>
 
 namespace audqt {
 
@@ -61,6 +62,13 @@ QFileDialog * FileEntry::create_dialog ()
     dialog->setAttribute (Qt::WA_DeleteOnClose);
     dialog->setFileMode (m_file_mode);
     dialog->setAcceptMode (m_accept_mode);
+
+    /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
+    int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");
+    String icon_theme = aud_get_str ("audqt", "icon_theme");
+    if (use_native_sysdialogs == 2 || (use_native_sysdialogs == 1
+            && (!strcmp (aud_get_str ("audqt", "theme"), "dark") || (icon_theme && icon_theme[0]))))
+        dialog->setOption(QFileDialog::DontUseNativeDialog);
 
     String uri = file_entry_get_uri (this);
     if (uri)
@@ -102,12 +110,16 @@ EXPORT String file_entry_get_uri (QLineEdit * entry)
 {
     QByteArray text = entry->text ().toUtf8 ();
 
-    if (text.isEmpty ())
+    if (text.isNull () || text.isEmpty ())
         return String ();
-    else if (strstr (text, "://"))
+// JWT: CHGD. TO NEXT 2 TO REMOVE NEW COMPILER WARNING:    else if (strstr (text, "://"))
+    const char * textchars = text.constData ();
+    if (textchars && strstr (textchars, "://"))
         return String (text);
+    else if (textchars)
+        return String (filename_to_uri (filename_normalize (filename_expand (str_copy (textchars)))));
     else
-        return String (filename_to_uri (filename_normalize (filename_expand (str_copy (text)))));
+        return String ();
 }
 
 EXPORT void file_entry_set_uri (QLineEdit * entry, const char * uri)

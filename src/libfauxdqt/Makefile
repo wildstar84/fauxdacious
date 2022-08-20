@@ -1,11 +1,12 @@
 SHARED_LIB = ${LIB_PREFIX}fauxdqt${LIB_SUFFIX}
 LIB_MAJOR = 2
-LIB_MINOR = 3
+LIB_MINOR = 4
 
 SRCS = about-qt.cc \
        art-qt.cc \
        audqt.cc \
        colorbutton.cc \
+       dark-theme.cc \
        dock.cc \
        eq-preset-qt.cc \
        equalizer-qt.cc \

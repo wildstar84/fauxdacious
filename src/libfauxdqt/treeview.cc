@@ -18,6 +18,7 @@
  */
 
 #include "treeview.h"
+#include "libfauxdqt.h"
 
 #include <QApplication>
 #include <QKeyEvent>
@@ -26,7 +27,8 @@
 
 #include <libfauxdcore/index.h>
 
-namespace audqt {
+namespace audqt
+{
 
 /*
  * On some platforms (mainly KDE), there is a feature where
@@ -43,9 +45,7 @@ class TreeViewStyleOverrides : public QProxyStyle
 public:
     TreeViewStyleOverrides ()
     {
-        // detect and respond to application-wide style change
-        connect (qApp->style (), &QObject::destroyed, this,
-                &TreeViewStyleOverrides::resetBaseStyle);
+        setup_proxy_style (this);
     }
 
     int styleHint (StyleHint hint, const QStyleOption * option = nullptr,
@@ -76,22 +76,13 @@ public:
 
         QProxyStyle::drawPrimitive(element, option, painter, widget);
     }
-
-private:
-    void resetBaseStyle ()
-    {
-        setBaseStyle (nullptr);
-        connect (qApp->style (), &QObject::destroyed, this,
-                &TreeViewStyleOverrides::resetBaseStyle);
-    }
 };
 
-EXPORT TreeView::TreeView (QWidget * parent) :
-    QTreeView (parent)
+EXPORT TreeView::TreeView (QWidget * parent) : QTreeView (parent)
 {
     auto style = new TreeViewStyleOverrides;
-    connect (this, &QObject::destroyed, [style]() { delete style; });
-    setStyle (style);
+    style->setParent(this);
+    setStyle(style);
 
     connect (this, & QTreeView::activated, this, & TreeView::activate);
 }
@@ -118,8 +109,7 @@ EXPORT void TreeView::removeSelectedRows ()
         rows.append (idx.row ());
 
     // sort in reverse order
-    rows.sort ([] (const int & a, const int & b)
-        { return b - a; });
+    rows.sort ([] (const int & a, const int & b) { return b - a; });
 
     // remove rows in reverse order
     auto m = model ();

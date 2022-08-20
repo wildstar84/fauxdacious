@@ -1,6 +1,6 @@
 /*
  * prefs-window.cc
- * Copyright 2006-2019 William Pitcock, Tomasz Moń, Michael Färber, and
+ * Copyright 2006-2022 Ariadne Conill, Tomasz Moń, Michael Färber, and
  *                     John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
@@ -19,6 +19,7 @@
  */
 
 #include <QAction>
+#include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
@@ -51,26 +52,31 @@
 
 #include "libguess/libguess.h"
 
+#include "libfauxdqt-internal.h"
 #include "libfauxdqt.h"
 #include "prefs-pluginlist-model.h"
 
-namespace audqt {
+namespace audqt
+{
 
 class PrefsWindow : public QDialog
 {
 public:
-    static PrefsWindow * get_instance () {
+    static PrefsWindow * get_instance ()
+    {
         if (! instance)
             (void) new PrefsWindow;
         return instance;
     }
 
-    static void destroy_instance () {
+    static void destroy_instance ()
+    {
         if (instance)
             delete instance;
     }
 
-    static ArrayRef<ComboItem> get_output_combo () {
+    static ArrayRef<ComboItem> get_output_combo ()
+    {
         return {instance->output_combo_elements.begin (),
                 instance->output_combo_elements.len ()};
     }
@@ -105,25 +111,28 @@ private:
     void prefswindow_update ();
 
     const HookReceiver<PrefsWindow>
-     record_hook {"enable record", this, & PrefsWindow::record_update},
-     effects_hook {"set _autoeffects_loaded", this, & PrefsWindow::prefswindow_update};
+            record_hook {"enable record", this, & PrefsWindow::record_update},
+            effects_hook {"set _autoeffects_loaded", this, & PrefsWindow::prefswindow_update};
 };
 
 /* static data */
 PrefsWindow * PrefsWindow::instance = nullptr;
 int PrefsWindow::output_combo_selected;
 
-struct Category {
+struct Category
+{
     const char * icon;
     const char * name;
 };
 
-struct TitleFieldTag {
+struct TitleFieldTag
+{
     const char * name;
     const char * tag;
 };
 
-enum {
+enum
+{
     CATEGORY_APPEARANCE = 0,
     CATEGORY_AUDIO,
     CATEGORY_NETWORK,
@@ -225,10 +234,52 @@ static ArrayRef<ComboItem> iface_combo_fill ();
 static void iface_combo_changed ();
 static void * iface_create_prefs_box ();
 
+static const ComboItem theme_elements[] = {ComboItem (N_("Native"), ""),
+        ComboItem (N_("Dark"), "dark")};
+
+static void theme_changed ()
+{
+    if (! strcmp (aud_get_str ("audqt", "theme"), "dark"))
+        enable_dark_theme ();
+    else
+        disable_dark_theme ();
+}
+
+static const ComboItem icon_theme_elements[] = {
+#ifndef _WIN32
+    ComboItem (N_("Native"), ""),
+#endif
+    ComboItem (N_("Flat"), "fauxdacious-flat"),
+    ComboItem (N_("Flat (dark)"), "fauxdacious-flat-dark")
+};
+
+static void icon_theme_changed ()
+{
+    set_icon_theme ();
+    for (auto w : qApp->allWidgets ())
+        w->update ();
+}
+
+static const ComboItem use_native_sysdialogs[] = {
+    ComboItem (N_("Native"), 0),
+    ComboItem (N_("Native unless alt theme or icons"), 1),
+    ComboItem (N_("Qt"), 2)
+};
+
 static const PreferencesWidget appearance_page_widgets[] = {
     WidgetCombo (N_("Interface:"),
         WidgetInt (iface_combo_selected, iface_combo_changed),
         {0, iface_combo_fill}),
+    WidgetCombo (N_("Theme:"), WidgetString ("audqt", "theme", theme_changed),
+                {{theme_elements}}),
+    WidgetCombo (N_("Icon theme:"),
+                WidgetString ("audqt", "icon_theme", icon_theme_changed),
+                {{icon_theme_elements}}),
+    WidgetCheck (N_("Use Classic icons for this dialog's tabs (next time)"),
+        WidgetBool (0, "use_classic_icons")),
+    WidgetCombo (N_("File Dialog Windows:"),
+        WidgetInt ("audqt", "use_native_sysdialogs"),
+        {{use_native_sysdialogs}}),
     WidgetSeparator ({true}),
     WidgetCustomQt (iface_create_prefs_box)
 };
