@@ -1,5 +1,19 @@
 Version 4.2-beta1:
 
+* Merge Audacious's new alternate "dark theme" and "flat" icons.  We also 
+added additional options in the [File].[Settings].[Appearance] tab to include 
+both a GUI checkbox for the old option to use Fauxdacious's "classic" icons for 
+the icons atop the [File].[Settings] window (previously had to be set in the 
+config file), plus an option to choose between "Native" and "Qt"'s version of 
+file-chooser windows.  This was needed due to the tradeoff of "Native" window 
+style being generally preferred (more native platform-looking and 
+full-featured), but ignoring user-set alternate themes and icons (such as the 
+ones we just added).  Audacious just uses the OS-Native ones always, resulting 
+in those windows NOT being rethemed, so we leave it to the user to choose.  
+There are 3 choices:  "Native" (the default, like Audacious), "Native unless 
+alt. theme or icons" (use Qt's less-featured version only if theme or icon 
+theme are set to non-"Native" options; and "Qt" (use Qt's version always).  
+
 * Add command-line option (-a) to load command-line entries to be loaded into 
 multiple playlists.  The long-name is "--add-list".  For example:
 

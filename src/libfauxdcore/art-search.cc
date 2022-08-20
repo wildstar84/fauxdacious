@@ -39,8 +39,15 @@ static bool has_front_cover_extension (const char * name)
     if (! ext)
         return false;
 
-    return ! strcmp_nocase (ext, ".jpg") || ! strcmp_nocase (ext, ".jpeg") ||
-     ! strcmp_nocase (ext, ".png");
+    Index<String> extlist = str_list_to_index (".jpg,.png,.jpeg,.gif,.webp", ",");
+    for (auto & tryext : extlist)
+    {
+        if (strcmp_nocase (ext, tryext))
+            continue;
+
+        return true;
+    }
+    return false;
 }
 
 static bool cover_name_filter (const char * name,
