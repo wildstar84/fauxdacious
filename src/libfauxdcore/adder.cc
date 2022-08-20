@@ -331,7 +331,8 @@ static void add_folder (const char * filename, PlaylistFilterFunc filter,
 
     if (save_title)
     {
-        const char * slash = strrchr (filename, '/');
+        StringBuf dir_normalized_buf = filename_normalize (str_copy (filename));
+        const char * slash = strrchr ((const char *) dir_normalized_buf, '/');
         if (slash)
             result->title = String (str_decode_percent (slash + 1));
     }
