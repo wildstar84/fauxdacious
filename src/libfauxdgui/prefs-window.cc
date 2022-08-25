@@ -182,6 +182,8 @@ static const PreferencesWidget appearance_page_widgets[] = {
     WidgetCombo (N_("Interface:"),
         WidgetInt (iface_combo_selected, iface_combo_changed),
         {0, iface_combo_fill}),
+    WidgetCheck (N_("Use Classic icons for this dialog's tabs (next time)"),
+        WidgetBool (0, "use_classic_icons")),
     WidgetSeparator ({true}),
     WidgetCustomGTK (iface_create_prefs_box)
 };
