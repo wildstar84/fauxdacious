@@ -23,8 +23,10 @@
 #include <QWidget>
 #include <QKeyEvent>
 #include <QStaticText>
+#include <QDockWidget>
 
 #include <libfauxdcore/hook.h>
+#include <libfauxdqt/dock.h>
 #include "export.h"
 
 namespace audqt {
@@ -46,6 +48,7 @@ protected:
     void mouseDoubleClickEvent (QMouseEvent * e) override;
 
 private:
+    bool infobar_active;  /* JWT:TRUE IF INFO_BAR/MINI-FAUXDACIOUS IS ACTIVE (ACCEPTING INPUTS). */
     void update_title ();
     void update_album_art ();
     void next_song ();
@@ -71,6 +74,7 @@ private:
 
     InfoVis * m_vis;
     QWidget * m_parent;
+    QDockWidget * m_dockwidget;
     const My_PixelSizes & ps;
 
     struct SongData {
@@ -85,6 +89,7 @@ private:
     SongData sd[2];
     bool m_stopped;
     bool m_art_enabled;
+    bool m_art_force_dups;
     bool m_fbart_hidden;
 };
 

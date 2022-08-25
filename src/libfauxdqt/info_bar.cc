@@ -142,7 +142,6 @@ void InfoVis::render_freq (const float * freq)
     if (! infovis_active || ! isVisible ())
         return;
 
-//x if (is_the_infobar) AUDERR("render INFOBAR!\n"); else AUDERR("render MINI-FAUXDACIOUS!\n");
     /* xscale[i] = pow (256, i / VIS_BANDS) - 0.5; */
     const float xscale[VisBands + 1] = {0.5, 1.09, 2.02, 3.5, 5.85, 9.58,
      15.5, 24.9, 39.82, 63.5, 101.09, 160.77, 255.5};
@@ -226,11 +225,14 @@ EXPORT InfoBar::InfoBar (QWidget * parent) :
     m_stopped (true)
 {
     m_parent = parent;
+    m_dockwidget = nullptr;
     update_vis ();
     setFixedHeight (ps.Height);
 
     m_art_enabled = aud_get_bool ("qtui", "infoarea_show_art");
+    m_art_force_dups = true;  // JWT:FORCE ART ON FLOATING MINI-FAUXD IF "HIDE-DUPS" IN EFFECT BUT OTHERWISE SHOW!
     m_fbart_hidden = aud_get_bool ("qtui", "infoarea_hide_fallback_art");
+    infobar_active = true;
 
     for (SongData & d : sd)
     {
@@ -256,6 +258,8 @@ EXPORT InfoBar::InfoBar (QWidget * parent) :
 
 EXPORT InfoBar::~InfoBar ()
 {
+    if (! m_parent)
+        infobar_active = false;
 }
 
 EXPORT void InfoBar::resizeEvent (QResizeEvent *)
@@ -266,12 +270,47 @@ EXPORT void InfoBar::resizeEvent (QResizeEvent *)
 
 EXPORT void InfoBar::paintEvent (QPaintEvent *)
 {
+    if (! infobar_active)
+        return;
+
     QPainter p (this);
 
-    int show_art = m_art_enabled
-            && (! m_fbart_hidden || ! aud_get_bool ("albumart", "_last_art_was_fallback"));
+    m_art_force_dups = true;
+
+    /* JWT:NOTE:  m_parent MEANS WE'RE THE INFO_BAR, *NOT* MINI-FAUXDACIOUS! */
+
+    /* JWT:THIS CHECK NEEDED ONLY IF ALBUM-ART PLGN ACTIVE && HIDE-DUPS ON && ALBUM-ART SAYS IT'S A DUP!: */
+    if (aud_get_bool ("albumart", "_isactive") && aud_get_bool ("albumart", "hide_dup_art_icon")
+            && aud_get_bool ("albumart", "_infoarea_hide_art"))
+    {
+        m_art_force_dups = false;
+        /* CHECK IF WE'RE MINI-FAUXDACIOUS, AND IF SO, WE ONLY HAVE TO FETCH THE DOCK-WIDGET 1ST TIME: */
+        if (! m_parent)
+        {
+            if (! m_dockwidget)  // 1ST TIME SINCE ACTIVATED - NEED IT'S DOCK WIDGET TO SEE IF FLOATING:
+            {
+                PluginHandle * mini_fauxd = aud_plugin_lookup_basename ("info-bar-plugin-qt");
+                if (mini_fauxd && aud_plugin_get_enabled (mini_fauxd))
+                {
+                    auto * item = audqt::DockItem::find_by_plugin (mini_fauxd);
+                    if (item)
+                        m_dockwidget = (QDockWidget *) item->host_data ();  // GOT IT!
+                    else
+                        m_dockwidget = nullptr;  // DIDN'T GET IT (NOT ALWAYS IMMEDATELY AVAILABLE)!
+                }
+            }
+            /* JWT:FORCE ENABLED ON UNDOCKED (FLOATING) MINI-FAUXDACIOUS AND ONLY HIDDEN B/C OF DUP. ART!: */
+            if (m_dockwidget && m_dockwidget->isFloating ())
+                m_art_force_dups = true;
+        }
+    }
+    bool show_art = (m_art_enabled && m_art_force_dups
+            && (! m_fbart_hidden || ! aud_get_bool ("albumart", "_last_art_was_fallback")));
     int viswidth = m_vis->isVisible () ? ps.VisWidth : 0;
     int offset = show_art ? ps.Height : ps.Spacing;
+
+    if (! infobar_active)
+        return;
 
     p.fillRect(0, 0, width () - viswidth, ps.Height, m_vis->gradient ());
 
@@ -380,7 +419,6 @@ EXPORT void InfoBar::update_album_art ()
     }
     else
         aud_set_bool ("albumart", "_last_art_was_fallback", false);
-        
 }
 
 EXPORT void InfoBar::next_song ()

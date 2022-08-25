@@ -62,6 +62,7 @@ typedef struct {
 
     bool show_art;
     bool stopped;
+    GtkWidget * widget;
 } UIInfoArea;
 
 class InfoAreaVis : public Visualizer
@@ -404,7 +405,8 @@ static void set_album_art ()
     }
 
     bool noAltArt = true;
-    if (aud_get_bool ("albumart", "_isactive"))
+    bool albumart_plugin_is_active = aud_get_bool ("albumart", "_isactive");
+    if (albumart_plugin_is_active)
     {
         /* JWT:AlbumArt PLUGIN ACTIVE, SEE IF WE HAVE "CHANNEL ICON" TO PUT IN INFO_BAR INSTEAD: */
         Tuple tuple = aud_drct_get_tuple ();
@@ -465,6 +467,37 @@ static void set_album_art ()
         {
             area->pb = AudguiPixbuf ();
             area->show_art = false;
+            return;
+        }
+    }
+    /* JWT:NOW CHECK FOR "m_art_force_dups" (SEE Qt SIDE): */
+    bool m_art_force_dups = true;  /* SET TO HIDE TO FORCE HIDING ALBUM-ART ICON. */
+    /* JWT:THIS CHECK NEEDED ONLY IF ALBUM-ART PLGN ACTIVE && HIDE-DUPS ON && ALBUM-ART SAYS IT'S A DUP!: */
+    if (albumart_plugin_is_active && aud_get_bool ("albumart", "hide_dup_art_icon")
+            && aud_get_bool ("albumart", "_infoarea_hide_art"))
+    {
+        m_art_force_dups = false;
+        if (area->widget)
+        {
+            GtkWidget * parent_window = gtk_widget_get_parent (area->widget);
+            if (parent_window)
+            {
+                GtkWidget * grandparent_window = gtk_widget_get_parent (parent_window);
+                if (grandparent_window)
+                {
+                    if (gtk_widget_is_toplevel (grandparent_window))
+                        m_art_force_dups = true;  // MINI-FAUXDACIOUS IS UNDOCKED.
+                }
+            }
+            else  // NO PARENT WINDOW (YET?! - MINI-FAUXDACIOUS JUST LAUNCHED):
+                m_art_force_dups = true;  // WE CAN'T TELL DOCK-STATUS, SO TREAT AS UNDOCKED.
+        }
+
+        if (! m_art_force_dups)
+        {
+            area->pb = AudguiPixbuf ();
+            area->show_art = false;
+            return;
         }
     }
 }
@@ -521,6 +554,7 @@ EXPORT void ui_infoarea_show_art (bool show)
     if (! area)
         return;
 
+    /* JWT:NOTE: TOGGLED BY MENU, BUT MUST AND W/OTHER SHOW/HIDE CONDITIONS (IN set_album_art)!: */
     area->show_art = show;
     set_album_art ();
     gtk_widget_queue_draw (area->main);
@@ -528,6 +562,21 @@ EXPORT void ui_infoarea_show_art (bool show)
 
 EXPORT void ui_infoarea_toggle_art ()
 {
+    if (! area)
+        return;
+
+    area->show_art = aud_get_bool ("gtkui", "infoarea_show_art");
+    set_album_art ();
+    gtk_widget_queue_draw (area->main);
+}
+
+/* JWT:CATCH CHANGES IN DOCKED-STATUS: */
+EXPORT void ui_infoarea_chg_dock_status (PluginHandle * plugin, void *)
+{
+    if (! strstr (aud_plugin_get_basename (plugin), "info-bar-plugin-gtk"))
+        return;  // CATCHES ANY PLUGIN'S DOCK-STATUS CHANGE, IGNORE ALL BUT THIS ONE!
+
+    ui_infoarea_toggle_art ();
     if (! area)
         return;
 
@@ -579,6 +628,7 @@ static void destroy_cb (GtkWidget * widget)
 
     ui_infoarea_show_vis (false);
 
+    hook_dissociate ("plugin dock status changed", (HookFunction) ui_infoarea_chg_dock_status, nullptr);
     hook_dissociate ("gtkui toggle infoarea_art", (HookFunction) ui_infoarea_toggle_art, nullptr);
     hook_dissociate ("playback stop", (HookFunction) ui_infoarea_playback_stop);
     hook_dissociate ("playback ready", (HookFunction) ui_infoarea_playback_start);
@@ -597,6 +647,7 @@ EXPORT GtkWidget * ui_infoarea_new ()
     compute_sizes ();
 
     area = new UIInfoArea ();
+    area->widget = nullptr;
     area->box = gtk_hbox_new (false, 0);
 
     area->main = gtk_drawing_area_new ();
@@ -609,6 +660,7 @@ EXPORT GtkWidget * ui_infoarea_new ()
     hook_associate ("playback ready", (HookFunction) ui_infoarea_playback_start, nullptr);
     hook_associate ("playback stop", (HookFunction) ui_infoarea_playback_stop, nullptr);
     hook_associate ("gtkui toggle infoarea_art", (HookFunction) ui_infoarea_toggle_art, nullptr);
+    hook_associate ("plugin dock status changed", (HookFunction) ui_infoarea_chg_dock_status, nullptr);
 
     g_signal_connect (area->box, "destroy", (GCallback) destroy_cb, nullptr);
 
@@ -624,6 +676,7 @@ EXPORT GtkWidget * ui_infoarea_new ()
     GtkWidget * frame = gtk_frame_new (nullptr);
     gtk_frame_set_shadow_type ((GtkFrame *) frame, GTK_SHADOW_IN);
     gtk_container_add ((GtkContainer *) frame, area->box);
+    area->widget = frame;
 
     return frame;
 }
