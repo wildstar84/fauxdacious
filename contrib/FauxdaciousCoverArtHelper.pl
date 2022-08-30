@@ -455,7 +455,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 	foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
 		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/$album_uesc\|/;
-		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
+		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E/) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME/TITLE THOUGH!
@@ -463,18 +463,26 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 	}
 
 	#STEP 2:  IF WE HAVE AN ART LINK FROM TAGS (IN $ARGV[5]), USE THAT:
-	if (defined $ARGV[5]) {
-		if ($ARGV[5] =~ /^NOWEB$/i) { #ONLY CHECK CACHE, DON'T SEARCH WEB!
+	if (defined $ARGV[5] && $ARGV[5] =~ /\S/o) {
+		if ($ARGV[5] !~ m#^https?\:\/\/#) { #("NOWEB") - ONLY CHECK CACHE, DON'T SEARCH WEB!
+			print STDERR "i:ART HELPER: SKIPPING (URL ALBUM/NOWEB).\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);
 		}
 		#OTHERWISE, ASSUME WE HAVE A COVER-ART URL FROM TAG-DATA, SO GRAB IT INSTEAD OF SEARCHING!
-		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {
+		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {  #FIRST CHECK FOR notagart="image-url", QUIT ON MATCH.
+			if ($ARGV[5] =~ /^\Q${skipit}\E$/) {
+				print STDERR "i:ART HELPER: SKIPPING ART LOOKUP FOR THIS TAG-URL ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+				&albumart_done();  #QUIT - USER DOES NOT WISH TO USE METATAG ART *OR SEARCH WEB* FOR *THIS* ART URL!
+				exit(0);
+			}
+		}
+		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {  #NEXT CHECK FOR notagart="album/title", SKIP & SEARCH WEB INSTEAD ON MATCH.
 			$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 			$skipit =~ s/^\_\|/$album_uesc\|/;
 			if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
-				print STDERR "i:ART HELPER: SKIPPING ART TAG ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-				goto WEBSEARCH;  #QUIT - USER DOES NOT WISH TO USE METATAG ART FOR *THIS* ALBUM NAME/TITLE THOUGH!
+				print STDERR "i:ART HELPER: NOT USING ART TAG-URL FOR ($skipit) AS CONFIGURED...\n"  if ($DEBUG);
+				goto WEBSEARCH;  #USER DOES NOT WISH TO USE METATAG ART FOR *THIS* ALBUM NAME/TITLE, BUT SEARCH WEB!
 			}
 		}
 		print STDERR "i:FETCHING ($ARGV[5]) FOUND IN STREAM!\n"  if ($DEBUG);
