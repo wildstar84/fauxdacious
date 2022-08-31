@@ -462,30 +462,36 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 		}
 	}
 
-	#STEP 2:  IF WE HAVE AN ART LINK FROM TAGS (IN $ARGV[5]), USE THAT:
+	my $art2fid = "albumart/${albart_FN}";
+	#STEP 2:  IF NOT IN CACHE, BUT WE HAVE AN ART LINK FROM TAGS (IN $ARGV[5]), USE THAT:
 	if (defined $ARGV[5] && $ARGV[5] =~ /\S/o) {
-		if ($ARGV[5] !~ m#^https?\:\/\/#) { #("NOWEB") - ONLY CHECK CACHE, DON'T SEARCH WEB!
+		if ($ARGV[5] =~ m#^file\:\/\/#) {  #FILE (FAUXD. ENTRY), SAVE IT TO THIS FILE INSTEAD OF CACHE:
+		    ($art2fid = $ARGV[5]) =~ s#^file\:\/\/##;
+		    $art2fid =~ s/\.[^\.]*$//;   #STRIP OFF MEDIA EXTENSION!
+print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEBUG);
+		} elsif ($ARGV[5] !~ m#^https?\:\/\/#) { #("NOWEB") - DONE: CHECKED CACHE, BUT DON'T SEARCH WEB!
 			print STDERR "i:ART HELPER: SKIPPING (URL ALBUM/NOWEB).\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);
-		}
-		#OTHERWISE, ASSUME WE HAVE A COVER-ART URL FROM TAG-DATA, SO GRAB IT INSTEAD OF SEARCHING!
-		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {  #FIRST CHECK FOR notagart="image-url", QUIT ON MATCH.
-			if ($ARGV[5] =~ /^\Q${skipit}\E$/) {
-				print STDERR "i:ART HELPER: SKIPPING ART LOOKUP FOR THIS TAG-URL ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-				&albumart_done();  #QUIT - USER DOES NOT WISH TO USE METATAG ART *OR SEARCH WEB* FOR *THIS* ART URL!
-				exit(0);
+		} else {
+			#OTHERWISE, ASSUME WE HAVE A COVER-ART URL FROM TAG-DATA, SO GRAB IT INSTEAD OF SEARCHING!
+			foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {  #FIRST CHECK FOR notagart="image-url", QUIT ON MATCH.
+				if ($ARGV[5] =~ /^\Q${skipit}\E$/) {
+					print STDERR "i:ART HELPER: SKIPPING ART LOOKUP FOR THIS TAG-URL ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+					&albumart_done();  #QUIT - USER DOES NOT WISH TO USE METATAG ART OR SEARCH WEB FOR *THIS* ART URL!
+					exit(0);
+				}
 			}
+			print STDERR "i:FETCHING ($ARGV[5]) FOUND IN STREAM!\n"  if ($DEBUG);
 		}
 		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {  #NEXT CHECK FOR notagart="album/title", SKIP & SEARCH WEB INSTEAD ON MATCH.
 			$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 			$skipit =~ s/^\_\|/$album_uesc\|/;
 			if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
 				print STDERR "i:ART HELPER: NOT USING ART TAG-URL FOR ($skipit) AS CONFIGURED...\n"  if ($DEBUG);
-				goto WEBSEARCH;  #USER DOES NOT WISH TO USE METATAG ART FOR *THIS* ALBUM NAME/TITLE, BUT SEARCH WEB!
+				goto WEBSEARCH;  #USER DOES NOT WISH TO USE STATION-SUPPLIED ART URL FOR *THIS* ALBUM NAME/TITLE, BUT SEARCH WEB!
 			}
 		}
-		print STDERR "i:FETCHING ($ARGV[5]) FOUND IN STREAM!\n"  if ($DEBUG);
 		unless (-d "${configPath}/albumart") {
 			mkdir ("${configPath}/albumart",0755) || die "f:Could not create directory (${configPath}/albumart) ($!)!\n";;
 		}
@@ -526,7 +532,7 @@ WEBSEARCH:
 					print STDERR "i:found (".$lf->source().") IMAGE ($image_url)?\n"  if ($DEBUG);
 					$tried = $lf->tried();
 					&albumart_done($tried);
-					&writeArtImage($image_url, "albumart/${albart_FN}", '_tmp_albumart')
+					&writeArtImage($image_url, $art2fid, '_tmp_albumart')
 							if ($image_url && $image_url !~ /(?:default|place\-?holder|nocover)/i); #EXCLUDE DUMMY-IMAGES.
 				} else {
 					$tried = $lf->tried();
@@ -613,7 +619,7 @@ RELEASETYPE:
 		#LOOK UP ART LINKS FOR EACH MATCHING MUSICBRAINZ ID IN ORDER OF DESCENDING PRIORITY, STOPPING IF ONE FOUND:
 		foreach $mbzid (sort { $mbHash{$b} <=> $mbHash{$a} } keys %mbHash) {
 			$art_url = &lookup_art_on_mb_release_by_mbid("https://musicbrainz.org/release/$mbzid");
-			&writeArtImage($art_url, "albumart/${albart_FN}", '_tmp_albumart')  if ($art_url);
+			&writeArtImage($art_url, $art2fid, '_tmp_albumart')  if ($art_url);
 		}
 		print STDERR "-----ART:AT END OF FOR-LOOP($release), CONTINUE OR PUNT...\n"  if ($DEBUG > 1);
 	}
@@ -688,10 +694,15 @@ sub writeArtImage {   # DOWNLOADS AND SAVES THE FOUND COVER-ART IMAGE AND EXITS:
 
 	return  unless ($art_url =~ /\S/);
 
+	if ($bummer) {
+		$filename = $configPath . '/' . $filename  unless ($filename =~ m#^(?:\w\:)?[\/\\]#o);
+	} else {
+		$filename = $configPath . '/' . $filename  unless ($filename =~ m#^\/#o);
+	}
 	my $image_ext = ($art_url =~ /\.(\w+)$/) ? $1 : 'jpg';
 	my $art_image = '';
 	print STDERR "-5: ext=$image_ext= art_url=$art_url= configpath=$configPath=\n"  if ($DEBUG);
-	print STDERR "-5b: attempt to download art image (${configPath}/${filename}.$image_ext)!\n"  if ($DEBUG);
+	print STDERR "-5b: attempt to download art image (${filename}.$image_ext)!\n"  if ($DEBUG);
 	my $response = $ua->get($art_url);
 	if ($response->is_success) {
 		$art_image = $response->decoded_content;
@@ -700,8 +711,8 @@ sub writeArtImage {   # DOWNLOADS AND SAVES THE FOUND COVER-ART IMAGE AND EXITS:
 		print STDERR "! ($art_url)\n";
 		$art_image = '';
 	}
-	if ($configPath && $art_image && open IMGOUT, ">${configPath}/${filename}.$image_ext") {
-		print STDERR "-6: will write art image to (${configPath}/${filename}.$image_ext)\n"  if ($DEBUG);
+	if ($configPath && $art_image && open IMGOUT, ">${filename}.$image_ext") {
+		print STDERR "-6: will write art image to (${filename}.$image_ext)\n"  if ($DEBUG);
 		binmode IMGOUT;
 		print IMGOUT $art_image;
 		close IMGOUT;
