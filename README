@@ -19,17 +19,17 @@ Install the following Dependencies:
 sudo apt-get install git automake build-essential libasound2-dev \
 libavformat-dev libbinio-dev libbs2b-dev libcddb2-dev libcdio-cdda-dev \
 libcue-dev libcurl4-gnutls-dev libdbus-glib-1-dev libfaad-dev libflac-dev \
-libfluidsynth-dev libgtk2.0-dev libguess-dev \
-libjack-jackd2-dev liblircclient-dev libmms-dev libmodplug-dev libmp3lame-dev \
-libmpg123-dev libneon27-gnutls-dev libnotify-dev libpulse-dev \
-libsamplerate0-dev libsdl2-dev libsidplayfp-dev libsndfile1-dev libsoxr-dev \
-libvorbis-dev libwavpack-dev libxml2-dev libswscale-dev
+libfluidsynth-dev libgtk2.0-dev libjack-jackd2-dev liblircclient-dev \
+libmms-dev libmodplug-dev libmp3lame-dev libmpg123-dev libneon27-gnutls-dev \
+libnotify-dev libpulse-dev libsamplerate0-dev libsdl2-dev libsidplayfp-dev \
+libsndfile1-dev libsoxr-dev libvorbis-dev libwavpack-dev libxml2-dev \
+libswscale-dev
 
 If building the Qt version, you'll also need at least the following (which 
 should also bring in their dependencies):
 
-qtbase5-dev, qt5-qmake, libglu-dev, libvulkan-dev, libxext-dev, 
-libqt5opengl5-dev, and libqt5x11extras5-dev.
+sudo apt-get install qtbase5-dev qt5-qmake libglu-dev libvulkan-dev \
+libxext-dev libqt5opengl5-dev libqt5x11extras5-dev
 
 Please report any others it reports as missing when building, so I can make 
 sure they're included here too!
@@ -39,12 +39,12 @@ Download and install from Github:
 	cd /tmp
 	mkdir fauxdacious
 	mkdir fauxdacious-plugins
-	git clone --single-branch git://github.com/wildstar84/fauxdacious.git fauxdacious
-	git clone --single-branch git://github.com/wildstar84/fauxdacious-plugins.git fauxdacious-plugins
+	git clone --single-branch https://github.com/wildstar84/fauxdacious.git fauxdacious
+	git clone --single-branch https://github.com/wildstar84/fauxdacious-plugins.git fauxdacious-plugins
 
 Build Fauxdacious:
 
-	cd fauxdacious
+	cd /tmp/fauxdacious
 	./autogen.sh
 	./configure --prefix=/usr/local [--enable-qt] --with-buildstamp=Fauxdacious
 	make
@@ -54,7 +54,7 @@ Build Fauxdacious:
 
 Build Fauxdacious Plugins:
 
-	cd ../fauxdacious-plugins
+	cd /tmp/fauxdacious-plugins
 	./autogen.sh
 	./configure --prefix=/usr/local [--enable-qt]
 	make
@@ -63,7 +63,9 @@ Build Fauxdacious Plugins:
 	sudo update-desktop-database
 	sudo update-icon-caches /usr/share/icons/hicolor
 
-Install the Perl helper scripts (non-M$-Windows versions):
+Install the (optional but highly reccomended) Perl helper scripts 
+(non-M$-Windows versions - The Windows EasyInstaller takes care of all this 
+for M$-Windows users):
 
 	sudo cp fauxdacious/contrib/Fauxdacious*.pl /usr/local/bin/
 	sudo chmod 755 Fauxdacious*.pl
@@ -74,8 +76,8 @@ Install the Perl helper scripts (non-M$-Windows versions):
 Optional (copy your existing Audacious profile to Fauxdacious):  
 
 	cd ~/.config; mkdir fauxdacious; cp -R audacious/. fauxdacious
-	# This copies your previous default Audacious instance profile to the new
-	# (Fauxdacious) location.
+	# This copies your previous default Audacious instance profile(s) to the
+	# new (Fauxdacious) location.
 
 Now run fauxdacious:
 

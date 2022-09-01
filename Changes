@@ -1,5 +1,17 @@
 Version 4.2-beta1:
 
+* Album-art plugins - Add "Try to save by song file-name first?" option:  
+This works like the same option that already exists in the Lyrics plugins, 
+which (for local song files) causes web-fetched art image to be cached in the 
+same directory and file-name as the song file itself exists in, but with any 
+extension (ie. .mp3, etc., if any) to be replaced with the image type's 
+extension.  Normally, cover-art images are placed in the 
+.config/fauxdacious[-instancename]/albumart/ directory named after the album/
+artist name.  This is useful for tying the image directly to the particular 
+song file, which is where Fauxdacious looks first (if no embedded image tag).  
+NOTE:  This option has no effect on cover-art downloaded by URL entries (ie. 
+streaming stations, podcasts, videos, etc.)
+
 * Album-art plugins - Ignore the "Hide info bar art icon unless separate album 
 cover fetched" option when the Mini-Fauxdacious plugin is running and is not 
 docked (floating).  The purpose of this option was to prevent displaying the 
