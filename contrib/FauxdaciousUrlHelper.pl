@@ -10,10 +10,14 @@
 ###use StreamFinder::Apple;
 ###use StreamFinder::Bitchute;
 ###use StreamFinder::Blogger;
+###use StreamFinder::BrandNewTube;
 ###use StreamFinder::Brighteon;
 ###use StreamFinder::Castbox;
 ###use StreamFinder::Google;
 ###use StreamFinder::IHeartRadio;
+###use StreamFinder::Odysee;
+###use StreamFinder::Podbean;
+###use StreamFinder::PodcastAddict;
 ###use StreamFinder::RadioNet;
 ###use StreamFinder::Rumble;
 ###use StreamFinder::SermonAudio;

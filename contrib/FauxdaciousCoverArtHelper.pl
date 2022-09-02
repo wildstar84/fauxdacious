@@ -495,8 +495,11 @@ print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEB
 		unless (-d "${configPath}/albumart") {
 			mkdir ("${configPath}/albumart",0755) || die "f:Could not create directory (${configPath}/albumart) ($!)!\n";;
 		}
-		&albumart_done();
-		&writeArtImage($ARGV[5], "albumart/${albart_FN}", '_tmp_albumart')  if ($ARGV[5] =~ /^http/);
+		if ($ARGV[5] =~ /^http/) {
+			&albumart_done();
+			&writeArtImage($ARGV[5], "albumart/${albart_FN}", '_tmp_albumart');  #EXITS IF SUCCESSFUL!
+			unlink("${configPath}/_albumart_done.tmp");  #NOPE, IF WE GOT HERE: ALBUMART *NOT* DONE, SEARCH WEB!
+		}
     }
 
 WEBSEARCH:
