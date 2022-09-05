@@ -114,9 +114,8 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
             ext_matches.append (plugin);
     }
 
-    /* NOTE:Must not return Vorbis plugin without probing first, since not all .ogg entries are Vorbis! */
-    if ((ext_matches.len () == 1 && ! strstr(aud_plugin_get_name (ext_matches[0]), "Ogg Vorbis Decoder"))
-            || (ext_matches.len () > 1 && ! strncmp (filename, "stdin://", 8)))
+    /* JWT:NOTE:MUST NOT RETURN VORBIS PLUGIN WITHOUT PROBING FIRST, SINCE NOT ALL .ogg ENTRIES ARE VORBIS! */
+    if ((ext_matches.len () == 1 && ! strstr(aud_plugin_get_name (ext_matches[0]), "Ogg Vorbis Decoder")))
     {
         AUDINFO ("Matched %s by extension.\n", aud_plugin_get_name (ext_matches[0]));
         if (! strncmp (filename, "stdin://", 8) && ! open_input_file (filename, "r", nullptr, file, error))
@@ -128,15 +127,17 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
     AUDINFO ("Matched %d plugins by extension.\n", ext_matches.len ());
 
     /* JWT:SPECIAL CHECK FOR YOUTUBE STREAMS: CHECK URL FOR EMBEDDED MIME-TYPE (SINCE BY-CONTENT SOMETIMES FAILS): */
-    const char * urlmime = strstr(filename, "&mime=video%2F");
+    const char * urlmime = strstr(filename, "&mime=");
     if (urlmime)
     {
-        urlmime += 14;
+        urlmime += 6;
+        if (urlmime && (! strncmp (urlmime, "video%2F", 8) || ! strncmp (urlmime, "audio%2F", 8)))
+            urlmime += 8;
+
         const char * end = urlmime;
         while (end[0] && end[0] != '&')
-        {
             ++end;
-        }
+
         ext = str_printf ("%.*s", (int)(end - urlmime), urlmime);
         for (PluginHandle * plugin : list)
         {
@@ -186,22 +187,15 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
             {
                 AUDINFO ("Matched %s by MIME type %s.\n",
                         aud_plugin_get_name (plugin), (const char *) mime);
-                if (! mime_is_oggish)  // NOT AN OGG MIMETYPE, SO WE'RE GOOD.
-                    return plugin;  // SO WE'LL USE FIRST MATCHING PLUGIN.
-                else if (strstr (aud_plugin_get_name (plugin), "FLAC Decoder")) // TRYING FLAC DECODER FOR OGG:
+                if (! mime_is_oggish)  // NOT AN OGG MIMETYPE, SO WE'RE GOOD...
+                    return plugin;     // ...SO WE'LL USE FIRST MATCHING PLUGIN.
+                else if (strstr (aud_plugin_get_name (plugin), "FLAC Decoder")  // MUST PROBE FLAC THEN VORBIS FOR OGG*:
+                        || strstr (aud_plugin_get_name (plugin), "Ogg Vorbis Decoder"))
                 {
-                    /* JWT:MUST PROBE FLAC HERE B/C FLAC'S "our_file()" CAN FAIL SOME VALID OGG-WRAPPED FLAC! */
-                    char buf[33];
-                    if (! file.fseek (0, VFS_SEEK_SET) && file.fread (buf, 1, sizeof buf) == sizeof buf
-                            && ! strncasecmp (buf+29, "FLAC", 4))
-                        return plugin;  // WILL USE FLAC PLUGIN.
-                }
-                else if (strstr (aud_plugin_get_name (plugin), "Ogg Vorbis Decoder")) // TRYING VORBIS DECODER FOR OGG:
-                {
-                    /* JWT:WE NOW TEST VORBIS IN IT'S "our_file" FN AS IT SHOULD ACCEPT ANY VORBIS DATA. */
+                    /* JWT:TEST FLAC & VORBIS VIA "our_file()" FN AS THEY CAN ACCEPT EMBEDDED STREAMS OF OTHER TYPES. */
                     auto ip = (InputPlugin *) aud_plugin_get_header (plugin);
                     if (ip && ip->is_our_file (filename, file))
-                        return plugin;  // WILL USE VORBIS PLUGIN.
+                        return plugin;  // WILL USE FLAC FOR EMBEDDED OGG* OR VORBIS PLUGIN FOR VALID OGG-VORBIS.
                 }
             }
         }
