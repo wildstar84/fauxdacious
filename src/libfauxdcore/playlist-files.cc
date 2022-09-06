@@ -37,31 +37,49 @@
 EXPORT bool aud_filename_is_playlist (const char * filename, bool from_playlist)
 {
     bool userurl2playlist = false;
-
     int url_helper_allow = aud_get_int ("audacious", "url_helper_allow");
     bool url_skiphelper = (! url_helper_allow || (from_playlist && url_helper_allow < 2)
             || aud_get_bool ("audacious", "_url_helper_denythistime"));
+
     if (! url_skiphelper && (! strncmp (filename, "https://", 7) || ! strncmp (filename, "http://", 7)))  // A HELPABLE? URL:
     {
         String url_helper = aud_get_str ("audacious", "url_helper");
-        if (url_helper[0])  // JWT:WE HAVE A PERL HELPER, LESSEE IF IT RECOGNIZES & CONVERTS IT (ie. tunein.com, youtube, etc):
+        if (url_helper && url_helper[0])  // JWT:WE HAVE A PERL HELPER, LESSEE IF IT RECOGNIZES & CONVERTS IT (ie. tunein.com, youtube, etc):
         {
-            StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
-            remove ((const char *) temp_playlist_filename);
-            StringBuf filenameBuf = strstr (filename, "&")
-                ? index_to_str_list (str_list_to_index (filename, "&"), "\\&") 
-                : str_copy (filename);  // JWT:MUST ESCAPE AMPRESANDS ELSE system TRUNCATES URL AT FIRST AMPRESAND!
+            bool is_playlist_by_ext = false;
+            StringBuf ext = uri_get_extension (filename);
+            if (ext)
+            {
+                for (PluginHandle * plugin : aud_plugin_list (PluginType::Playlist))
+                {
+                    if (! aud_plugin_get_enabled (plugin) || ! playlist_plugin_has_ext (plugin, ext))
+                        continue;
+
+                    AUDINFO ("Trying playlist plugin %s.\n", aud_plugin_get_name (plugin));
+                    is_playlist_by_ext = true;  // URL MATCHES A PLAYLIST PLUGIN BY EXTENSION, DON'T CALL HELPER!
+                    break;
+                }
+            }
+            if (! is_playlist_by_ext)
+            {
+                /* JWT:CALL THE URL-HELPER SCRIPT FOR THIS URL: */
+                StringBuf temp_playlist_filename = filename_build ({aud_get_path (AudPath::UserDir), "tempurl.pls"});
+                remove ((const char *) temp_playlist_filename);
+                StringBuf filenameBuf = strstr (filename, "&")
+                    ? index_to_str_list (str_list_to_index (filename, "&"), "\\&")
+                    : str_copy (filename);  // JWT:MUST ESCAPE AMPRESANDS ELSE system TRUNCATES URL AT FIRST AMPRESAND!
 
 #ifdef _WIN32
-            int res = WinExec ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf,
-                    " ", aud_get_path (AudPath::UserDir)}), SW_HIDE);
-            if (res > 31 && access((const char *) temp_playlist_filename, F_OK ) != -1 )
-                userurl2playlist = true;
+                int res = WinExec ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf,
+                        " ", aud_get_path (AudPath::UserDir)}), SW_HIDE);
+                if (res > 31 && access((const char *) temp_playlist_filename, F_OK ) != -1 )
+                    userurl2playlist = true;
 #else
-            int res = system ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf, " ", aud_get_path (AudPath::UserDir)}));    
-            if (res >= 0 && access((const char *) temp_playlist_filename, F_OK ) != -1 )
-                userurl2playlist = true;
+                int res = system ((const char *) str_concat ({url_helper, " ", (const char *) filenameBuf, " ", aud_get_path (AudPath::UserDir)}));
+                if (res >= 0 && access((const char *) temp_playlist_filename, F_OK ) != -1 )
+                    userurl2playlist = true;
 #endif
+            }
         }
     }
 
