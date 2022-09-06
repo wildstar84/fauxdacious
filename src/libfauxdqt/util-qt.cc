@@ -105,7 +105,7 @@ namespace audqt {
      const QString & text_to_copy)
     {
         auto menu = new QMenu (parent);
-        auto action = new QAction (audqt::get_icon ("edit-copy"), N_("Copy"), menu);
+        auto action = new QAction (audqt::get_icon ("edit-copy"), _("Copy"), menu);
 
         QObject::connect (action, & QAction::triggered, action, [text_to_copy] () {
             auto data = new QMimeData;
