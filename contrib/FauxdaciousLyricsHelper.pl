@@ -13,6 +13,7 @@
 ###use LyricFinder::_Class;
 ###use LyricFinder::ApiLyricsOvh;
 ###use LyricFinder::AZLyrics;
+###use LyricFinder::Cache;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Letras;
 ###use LyricFinder::Musixmatch;
@@ -135,8 +136,10 @@ if ($#ARGV >= 1) {
 
 	#SKIP ANY SONGS THE USER DOESN'T WANT LYRICS FETCHED FOR:
 	foreach my $skipit (@SKIPTHESE) {
+		$skipit =~ s/\|\_$/\|$ARGV[1]/;  #WILDCARDS:
+		$skipit =~ s/^\_\|/$ARGV[0]\|/;
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
-		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E$/i) {
+		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E/i) {
 			print STDERR "i:LYRICS HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			exit (0)  if ($^O =~ /MSWin/);
 			exit (4);  #QUIT
