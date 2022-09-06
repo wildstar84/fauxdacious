@@ -430,7 +430,10 @@ static const PreferencesWidget playlist_page_widgets[] = {
     WidgetCheck (N_("Keep playlist metadata (like cuesheets do)"),
         WidgetBool (0, "keep_playlist_metadata")),
     WidgetCheck (N_("Don't allow streams to change metadata"),
-        WidgetBool (0, "no_dynamic_stream_metadata"))
+        WidgetBool (0, "no_dynamic_stream_metadata")),
+    WidgetSpin (N_("Limit playlist URLs to"),
+        WidgetInt (0, "playlist_url_limit"),
+        {0, 99, 1, N_("entries (0=no limit)")})
 };
 
 static const PreferencesWidget song_info_page_widgets[] = {

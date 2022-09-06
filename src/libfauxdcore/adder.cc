@@ -227,7 +227,15 @@ static void add_generic (PlaylistAddItem && item, PlaylistFilterFunc filter,
 static void add_playlist (const char * filename, PlaylistFilterFunc filter,
  void * user, AddResult * result, bool save_title)
 {
-    AUDINFO ("Adding playlist: %s\n", filename);
+    int item_limit = 0;
+    /* JWT:USER CAN LIMIT # ENTRIES ADDED FROM URL (WEB-BASED) PLAYLISTS, AS THESE OFTEN CONTAIN
+       DOZENS OF DUPLICATE ENTRIES OF THE SAME STREAMING STATION, OFTEN VARYING ONLY IN THE PORT#.
+       DEFAULT IS ZERO (NO LIMIT).
+    */
+    if (! strncmp (filename, "https://", 7) || ! strncmp (filename, "http://", 7))
+        item_limit = aud_get_int ("audacious", "playlist_url_limit");
+
+    AUDINFO ("Adding playlist: %s; URL limit: %d\n", filename, item_limit);
     status_update (filename, result->items.len ());
 
     String title;
@@ -251,8 +259,14 @@ static void add_playlist (const char * filename, PlaylistFilterFunc filter,
         result->title = title ? title : String (uri_get_display_base (filename));
     }
 
+    int item_count = 0;
     for (auto & item : items)
+    {
         add_generic (std::move (item), filter, user, result, false, true);
+        item_count++;
+        if (item_limit > 0 && item_count >= item_limit)  // JWT:LIMIT # ENTRIES ADDED FROM PLAYLIST (IF URL):
+            break;
+    }
 }
 
 static void add_cuesheets (Index<String> & files, PlaylistFilterFunc filter,
