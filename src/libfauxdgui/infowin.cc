@@ -55,7 +55,9 @@ static const char * codec_labels[CODEC_ITEMS] = {
 };
 
 static struct {
-    GtkWidget * location;
+    GtkTextView * location;
+    GtkWidget * location_scrolled;
+    GtkTextBuffer * textbuffer;
     GtkWidget * title;
     GtkWidget * artist;
     GtkWidget * album;
@@ -331,9 +333,9 @@ static void add_entry (GtkWidget * grid, const char * title, GtkWidget * entry,
     GtkWidget * label = small_label_new (title);
 
     gtk_table_attach ((GtkTable *) grid, label, x, x + span, y, y + 1,
-     GTK_FILL, GTK_FILL, 0, 0);
+     (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_FILL, 0, 0);
     gtk_table_attach ((GtkTable *) grid, entry, x, x + span, y + 1, y + 2,
-     GTK_FILL, GTK_FILL, 0, 0);
+     (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_FILL, 0, 0);
 
     g_signal_connect (entry, "changed", (GCallback) entry_changed, nullptr);
 }
@@ -408,6 +410,7 @@ static GtkWidget * coverart_file_entry_new (GtkFileChooserAction action, const c
 static void create_infowin ()
 {
     int dpi = audgui_get_dpi ();
+    int xysize = (int)(2.5 * dpi);
 
     infowin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_container_set_border_width ((GtkContainer *) infowin, 6);
@@ -421,21 +424,35 @@ static void create_infowin ()
     gtk_container_add ((GtkContainer *) infowin, main_grid);
 
     widgets.image = audgui_scaled_image_new (nullptr);
-    gtk_table_attach_defaults ((GtkTable *) main_grid, widgets.image, 0, 1, 0, 1);
-
-    widgets.location = gtk_label_new ("");
-    gtk_widget_set_size_request (widgets.location, 2 * dpi, -1);
-    gtk_label_set_line_wrap ((GtkLabel *) widgets.location, true);
-    gtk_label_set_line_wrap_mode ((GtkLabel *) widgets.location, PANGO_WRAP_WORD_CHAR);
-    gtk_label_set_selectable ((GtkLabel *) widgets.location, true);
-    gtk_table_attach ((GtkTable *) main_grid, widgets.location, 0, 1, 1, 2,
+    gtk_widget_set_size_request (widgets.image, xysize, xysize);
+    gtk_table_attach ((GtkTable *) main_grid, widgets.image, 0, 1, 0, 1,
      GTK_FILL, GTK_FILL, 0, 0);
+
+    widgets.location_scrolled = gtk_scrolled_window_new (nullptr, nullptr);
+    gtk_scrolled_window_set_shadow_type ((GtkScrolledWindow *) widgets.location_scrolled, GTK_SHADOW_IN);
+    gtk_scrolled_window_set_policy ((GtkScrolledWindow *) widgets.location_scrolled,
+     GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+    widgets.location = (GtkTextView *) gtk_text_view_new ();
+    gtk_text_view_set_editable (widgets.location, false);
+    gtk_text_view_set_cursor_visible (widgets.location, true);
+    gtk_text_view_set_left_margin (widgets.location, 4);
+    gtk_text_view_set_right_margin (widgets.location, 4);
+    gtk_text_view_set_wrap_mode (widgets.location, GTK_WRAP_CHAR);
+    widgets.textbuffer = gtk_text_view_get_buffer (widgets.location);
+
+    gtk_container_add ((GtkContainer *) widgets.location_scrolled, (GtkWidget *) widgets.location);
+    GtkWidget * scrolled_vbox = gtk_vbox_new (false, 6);
+    gtk_box_pack_start ((GtkBox *) scrolled_vbox, widgets.location_scrolled, true, true, 0);
+    gtk_widget_show_all (scrolled_vbox);
+    gtk_table_attach ((GtkTable *) main_grid, scrolled_vbox, 0, 1, 1, 2,
+     GTK_FILL, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), 0, 0);
 
     GtkWidget * codec_grid = gtk_table_new (0, 0, false);
     gtk_table_set_row_spacings ((GtkTable *) codec_grid, 2);
     gtk_table_set_col_spacings ((GtkTable *) codec_grid, 12);
     gtk_table_attach ((GtkTable *) main_grid, codec_grid, 0, 1, 2, 3,
-     GTK_FILL, GTK_FILL, 0, 0);
+     GTK_FILL, GTK_FILL, 0, 8);
 
     for (int row = 0; row < CODEC_ITEMS; row ++)
     {
@@ -452,7 +469,7 @@ static void create_infowin ()
     gtk_table_set_row_spacings ((GtkTable *) grid, 2);
     gtk_table_set_col_spacings ((GtkTable *) grid, 6);
     gtk_table_attach ((GtkTable *) main_grid, grid, 1, 2, 0, 3,
-     GTK_FILL, GTK_FILL, 0, 0);
+     (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_FILL, 0, 0);
 
     widgets.title = gtk_entry_new ();
     gtk_widget_set_size_request (widgets.title, 3 * dpi, -1);
@@ -493,7 +510,7 @@ static void create_infowin ()
 
     gtk_widget_set_no_show_all (widgets.autofill, true);
     gtk_widget_show (widgets.autofill);
-    gtk_box_pack_start ((GtkBox *) bottom_hbox, widgets.autofill, false, false, 0);
+    gtk_box_pack_start ((GtkBox *) bottom_hbox, widgets.autofill, true, true, 0);
 
     widgets.ministatus = small_label_new (nullptr);
     gtk_widget_set_no_show_all (widgets.ministatus, true);
@@ -547,7 +564,7 @@ static void infowin_show (int list, int entry, const String & filename, const St
     set_entry_str_from_field (gtk_bin_get_child ((GtkBin *) widgets.genre),
      tuple, Tuple::Genre, writable, clear, changed);
 
-    gtk_label_set_text ((GtkLabel *) widgets.location, uri_to_display (filename));
+    gtk_text_buffer_set_text (widgets.textbuffer, uri_to_display (filename), -1);
 
     set_entry_int_from_field (widgets.year, tuple, Tuple::Year, writable, clear, changed);
     set_entry_int_from_field (widgets.track, tuple, Tuple::Track, writable, clear, changed);
