@@ -457,7 +457,7 @@ static void set_album_art ()
     }
 
     if (filename && ! strncmp (filename, "file://", 7)  // JWT:SOMETIMES NULL ON GTK-STARTUP, SO ALWAYS TEST!
-            && aud_get_bool ("albumart", "seek_default_cover_file"))
+            && aud_get_bool ("albumart", "seek_directory_channel_art"))
     {
         /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY CHANNEL ART ICON FILE: */
         String dir_channel_icon = aud_get_str ("albumart", "directory_channel_art");
