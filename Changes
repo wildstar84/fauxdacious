@@ -1,5 +1,38 @@
 Version 4.2-beta1:
 
+* Added new Song Info options:  "Directory Channel-icon file[.ext]" and 
+"Use Directory Channel icon file (see above)" checkbox to allow 
+specifying an image file-name, which, if it appears in the directory of a 
+local song-entry file, will be used as the second ("channel") icon, similar 
+to the station / video or podcast channel icon imported when playing them, if 
+the Album-art plugin is active.  If not, and the song-entry does not have a 
+cover-art image associated with it, this will instead be used as a "fallback" 
+image for that entry.  The file-name specified may either be a simple name, 
+such as "channel", in which Fauxdacious will check for either "channel.png", 
+"channel.jp[e]g", or "channel.gif".  If specified with an extension, ie. 
+"channel.png", then only that image file will be checked for.  The same file-
+name must be used in all directories one wishes to have a channel icon, though 
+the extensions may vary (unless specified), and of course they can be different 
+images.  This differs from the other Album cover art file options, as it is 
+not loaded/used until after any web-searches by the Album-art plugins.
+
+* Added the Settings submenu option to the main menu for easier (2-click) 
+access, along with some additional menu icons.
+
+* Song-Info Edit window - Merge Audacious window-layout improvements allowing 
+user to resize window where the input text fields expand with the window while 
+keeping the image the same size.  Also allowing user to select the text of the 
+song entry path (on the middle left side of the window)  We also added these 
+features to the GTK version and increased the cover-art image size from 2 to 
+2.5 inches for easier viewing.
+
+* Fixed failure to play some URLs that contain playlists and have a valid 
+playlist extension (ie. .pls, .m3u, etc.) by NOT calling the URL-helper script 
+if this is so.  Also added an option to the [Settings.Playlist] tab to limit 
+the number of entries added by such URL-based (web-based) playlists, many of 
+which are just multiple entries for the same streaming station but with just 
+different port numbers (streamtheworld.com has a lot of these).
+
 * Album-art plugins - Add "Try to save by song file-name first?" option:  
 This works like the same option that already exists in the Lyrics plugins, 
 which (for local song files) causes web-fetched art image to be cached in the 

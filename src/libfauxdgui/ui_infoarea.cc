@@ -18,6 +18,7 @@
  */
 
 #include <math.h>
+#include <sys/stat.h>
 #include <string.h>
 
 #include <gtk/gtk.h>
@@ -29,6 +30,7 @@
 #include <libfauxdcore/probe.h>
 #include <libfauxdcore/plugins.h>
 #include <libfauxdgui/libfauxdgui-gtk.h>
+#include <libfauxdcore/audstrings.h>
 
 #include "ui_infoarea.h"
 
@@ -405,8 +407,12 @@ static void set_album_art ()
     }
 
     bool noAltArt = true;
-    bool albumart_plugin_is_active = aud_get_bool ("albumart", "_isactive");
-    if (albumart_plugin_is_active)
+    bool have_dir_icon_art = false;
+    bool albumart_plugin_isactive = aud_get_bool ("albumart", "_isactive");
+    AudguiPixbuf dir_icon_art;
+    const char * filename = aud_drct_get_filename ();  // JWT:FIXME: THIS THANG CAN COME UP NULL ON GTK-STARTUP!!!
+
+    if (albumart_plugin_isactive)
     {
         /* JWT:AlbumArt PLUGIN ACTIVE, SEE IF WE HAVE "CHANNEL ICON" TO PUT IN INFO_BAR INSTEAD: */
         Tuple tuple = aud_drct_get_tuple ();
@@ -427,7 +433,6 @@ static void set_album_art ()
             }
             else  /* NO CHANNEL ICON IN COMMENT (OVERWRITTEN BY STREAM METATAGS?), SO CHECK tmp_tag_data: */
             {     /* (THIS ONLY APPLIES TO STREAMING VIDEOS/PODCASTS, WHICH ALWAYS PUT IT THERE) */
-                const char * filename = aud_drct_get_filename ();
                 if (filename && aud_read_tag_from_tagfile (filename, "tmp_tag_data", tuple))
                 {
                     String tfld = tuple.get_str (Tuple::Comment);
@@ -450,9 +455,50 @@ static void set_album_art ()
             }
         }
     }
-    aud_set_bool ("albumart", "_have_channel_art", ! noAltArt); // TELL AlbumArt PLUGIN.
+
+    if (filename && ! strncmp (filename, "file://", 7)  // JWT:SOMETIMES NULL ON GTK-STARTUP, SO ALWAYS TEST!
+            && aud_get_bool ("albumart", "seek_default_cover_file"))
+    {
+        /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY CHANNEL ART ICON FILE: */
+        String dir_channel_icon = aud_get_str ("albumart", "directory_channel_art");
+        if (dir_channel_icon && dir_channel_icon[0])
+        {
+            struct stat statbuf;
+            StringBuf icon_path = str_concat ({filename_get_parent (uri_to_filename (filename)), "/"});
+            StringBuf icon_fid = str_concat ({icon_path, dir_channel_icon});
+            const char * filename;
+            const char * ext;
+            int isub_p;
+            uri_parse (icon_fid, & filename, & ext, nullptr, & isub_p);
+            if (! ext || ! ext[0])
+            {
+                Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
+                for (auto & ext : extlist)
+                {
+                    dir_channel_icon = String (str_concat ({icon_fid, ".", (const char *) ext}));
+                    struct stat statbuf;
+                    if (stat ((const char *) dir_channel_icon, &statbuf) < 0)  // ART IMAGE FILE DOESN'T EXIST:
+                        dir_channel_icon = String ("");
+                    else
+                        break;
+                }
+            }
+            else
+                dir_channel_icon = String (icon_fid);
+
+            if (dir_channel_icon && dir_channel_icon[0] && stat ((const char *) dir_channel_icon, & statbuf) == 0)
+            {
+                dir_icon_art = audgui_pixbuf_request ((const char *) dir_channel_icon);
+                if (dir_icon_art)
+                    have_dir_icon_art = true;
+            }
+        }
+    }
+    aud_set_bool ("albumart", "_have_channel_art", ! (noAltArt && ! have_dir_icon_art)); // TELL AlbumArt PLUGIN.
     if (noAltArt)
-        area->pb = audgui_pixbuf_request_current ();
+        area->pb = (have_dir_icon_art && albumart_plugin_isactive) ? dir_icon_art.ref ()
+                : audgui_pixbuf_request_current ();
+
     if (area->pb)
     {
         audgui_pixbuf_scale_within (area->pb, ICON_SIZE);
@@ -460,20 +506,29 @@ static void set_album_art ()
     }
     else
     {
-        area->pb = audgui_pixbuf_fallback ();
-        aud_set_bool ("albumart", "_last_art_was_fallback", true);
-        /* JWT:USER DOESN'T WANT TO SEE THE FALLBACK IMAGE! */
-        if (aud_get_bool ("gtkui", "infoarea_hide_fallback_art"))
+        if (have_dir_icon_art && ! albumart_plugin_isactive)
         {
-            area->pb = AudguiPixbuf ();
-            area->show_art = false;
-            return;
+            area->pb = dir_icon_art.ref ();
+            if (area->pb)
+                audgui_pixbuf_scale_within (area->pb, ICON_SIZE);
+        }
+        if (! area->pb)
+        {
+            area->pb = audgui_pixbuf_fallback ();
+            aud_set_bool ("albumart", "_last_art_was_fallback", true);
+            /* JWT:USER DOESN'T WANT TO SEE THE FALLBACK IMAGE! */
+            if (aud_get_bool ("gtkui", "infoarea_hide_fallback_art"))
+            {
+                area->pb = AudguiPixbuf ();
+                area->show_art = false;
+                return;
+            }
         }
     }
     /* JWT:NOW CHECK FOR "m_art_force_dups" (SEE Qt SIDE): */
     bool m_art_force_dups = true;  /* SET TO HIDE TO FORCE HIDING ALBUM-ART ICON. */
     /* JWT:THIS CHECK NEEDED ONLY IF ALBUM-ART PLGN ACTIVE && HIDE-DUPS ON && ALBUM-ART SAYS IT'S A DUP!: */
-    if (albumart_plugin_is_active && aud_get_bool ("albumart", "hide_dup_art_icon")
+    if (albumart_plugin_isactive && aud_get_bool ("albumart", "hide_dup_art_icon")
             && aud_get_bool ("albumart", "_infoarea_hide_art"))
     {
         m_art_force_dups = false;
