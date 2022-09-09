@@ -79,6 +79,16 @@ EXPORT QPixmap art_request_current (unsigned int w, unsigned int h, bool want_hi
 EXPORT QPixmap art_request_fallback (unsigned int w, unsigned int h)
 {
     unsigned size = to_native_dpi (48);
+
+    /* JWT:ALLOW USER TO SPECIFY A DIFFERENT FALLBACK IMAGE: */
+    String artdefault = aud_get_str(nullptr, "default_cover_file");
+    if (artdefault && artdefault[0])
+    {
+        QPixmap user_fallback = art_request ((const char *) artdefault, w, h);
+        if (! user_fallback.isNull ())
+            return user_fallback;
+    }
+
     return QPixmap (get_icon ("audio-x-generic").pixmap (aud::max (w, size), aud::max (h, size)));
 }
 

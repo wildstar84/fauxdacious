@@ -29,22 +29,6 @@
 
 static AudguiPixbuf current_pixbuf;
 
-EXPORT AudguiPixbuf audgui_pixbuf_fallback ()
-{
-    static AudguiPixbuf fallback;
-
-    if (! fallback)
-    {
-        GtkIconTheme * icon_theme = gtk_icon_theme_get_default ();
-        int icon_size = audgui_to_native_dpi (48);
-
-        fallback.capture (gtk_icon_theme_load_icon (icon_theme,
-         "audio-x-generic", icon_size, (GtkIconLookupFlags) 0, nullptr));
-    }
-
-    return fallback.ref ();
-}
-
 void audgui_pixbuf_uncache ()
 {
     current_pixbuf.clear ();
@@ -83,6 +67,31 @@ EXPORT AudguiPixbuf audgui_pixbuf_request (const char * filename, bool * queued)
 
     auto data = art.data ();
     return data ? audgui_pixbuf_from_data (data->begin (), data->len ()) : AudguiPixbuf ();
+}
+
+EXPORT AudguiPixbuf audgui_pixbuf_fallback ()
+{
+    static AudguiPixbuf fallback;
+
+    /* JWT:ALLOW USER TO SPECIFY A DIFFERENT FALLBACK IMAGE: */
+    String artdefault = aud_get_str(nullptr, "default_cover_file");
+    if (artdefault && artdefault[0])
+    {
+        AudguiPixbuf user_fallback = audgui_pixbuf_request ((const char *) artdefault);
+        if (user_fallback)
+            return user_fallback.ref ();
+    }
+
+    if (! fallback)
+    {
+        GtkIconTheme * icon_theme = gtk_icon_theme_get_default ();
+        int icon_size = audgui_to_native_dpi (48);
+
+        fallback.capture (gtk_icon_theme_load_icon (icon_theme,
+         "audio-x-generic", icon_size, (GtkIconLookupFlags) 0, nullptr));
+    }
+
+    return fallback.ref ();
 }
 
 EXPORT AudguiPixbuf audgui_pixbuf_request_current (bool * queued)

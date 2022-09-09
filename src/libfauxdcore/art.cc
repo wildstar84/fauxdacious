@@ -411,13 +411,6 @@ EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)
 
     if (format & AUD_ART_DATA)
     {
-        /* JWT:DO WE HAVE A "DEFAULT" COVER ART FILE? */
-        if (item->data.len () <= 0 && ! item->art_file)
-        {
-            String artdefault = aud_get_str(nullptr, "default_cover_file");
-            if (artdefault && artdefault[0])
-                item->art_file = String (filename_to_uri ((const char *) artdefault));
-        }
         /* load data from external image file */
         if (item->data.len () <= 0 && item->art_file)
         {
