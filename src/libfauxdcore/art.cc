@@ -262,8 +262,8 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
     if (! foundArt && item->data.len () <= 0 && ! item->art_file)  // 4TH, CHECK BASE URL-NAMED FILE (IF WEB URL):
     {
         StringBuf scheme = uri_get_scheme (filename);
-        if (strcmp (scheme, "file") && strcmp (scheme, "stdin")
-                && strcmp (scheme, "cdda") && strcmp (scheme, "dvd"))
+        if (strcmp_safe (scheme, "file") && strcmp_safe (scheme, "stdin")
+                && strcmp_safe (scheme, "cdda") && strcmp_safe (scheme, "dvd"))
         {
             /* JWT:URL & NO OTHER ART FOUND, SO LOOK FOR IMAGE MATCHING STREAMING URL (IE: www.streamingradio.com.jpg): */
             const char * slash = strstr (filename, "//");
