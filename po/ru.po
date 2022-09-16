@@ -44,7 +44,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: https://redmine.audacious-media-player.org/\n"
-"POT-Creation-Date: 2018-08-15 12:14-0500\n"
+"POT-Creation-Date: 2022-09-16 14:59-0500\n"
 "PO-Revision-Date: 2018-07-29 18:16+0000\n"
 "Last-Translator: dartraiden\n"
 "Language-Team: Russian (http://www.transifex.com/audacious/audacious/"
@@ -53,122 +53,131 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: src/fauxdacious/main.cc:78
+#: src/fauxdacious/main.cc:87
+msgid "Add Playlist: each use creates new pl. (-a | --add-list[=\"pl name\"])"
+msgstr ""
+
+#: src/fauxdacious/main.cc:88
 #, fuzzy
 msgid "Clear Playlist"
 msgstr "Новый список воспроизведения"
 
-#: src/fauxdacious/main.cc:79
+#: src/fauxdacious/main.cc:89
 msgid "DELETE all playlists!"
 msgstr ""
 
-#: src/fauxdacious/main.cc:80
+#: src/fauxdacious/main.cc:90
 msgid "Add files to the playlist"
 msgstr "Добавить файлы в список воспроизведения"
 
-#: src/fauxdacious/main.cc:81
+#: src/fauxdacious/main.cc:91
 msgid "Add files to a temporary playlist"
 msgstr "Добавить файлы во временный список воспроизведения"
 
-#: src/fauxdacious/main.cc:82
+#: src/fauxdacious/main.cc:92
 msgid "Skip to next song"
 msgstr "Перейти к следующей песне"
 
-#: src/fauxdacious/main.cc:83
+#: src/fauxdacious/main.cc:93
 msgid "Fudge Additional Gain Adjustment"
 msgstr ""
 
-#: src/fauxdacious/main.cc:84
+#: src/fauxdacious/main.cc:95
+#, fuzzy
+msgid "Run in GTK mode (default)"
+msgstr "Запуск в режиме Qt"
+
+#: src/fauxdacious/main.cc:97
 msgid "Show command-line help"
 msgstr "Показать помощь по командной строке"
 
-#: src/fauxdacious/main.cc:85
+#: src/fauxdacious/main.cc:98
 msgid "Start without a graphical interface"
 msgstr "Запуск без графического интерфейса"
 
-#: src/fauxdacious/main.cc:86
+#: src/fauxdacious/main.cc:99
 msgid "Display the jump-to-song window"
 msgstr "Показать окно переключения песен"
 
-#: src/fauxdacious/main.cc:87
+#: src/fauxdacious/main.cc:100
 msgid "Display the main window"
 msgstr "Показать главное окно"
 
-#: src/fauxdacious/main.cc:88
-msgid "New Instance:  number, name, or unnamed (ie: -# | --new=name | -n)"
+#: src/fauxdacious/main.cc:101
+msgid "New Instance: number, name, or unnamed (-# | --new=name | -n)"
 msgstr ""
 
-#: src/fauxdacious/main.cc:89
+#: src/fauxdacious/main.cc:102
 msgid "Output to stdout (extension)"
 msgstr ""
 
-#: src/fauxdacious/main.cc:90
+#: src/fauxdacious/main.cc:103
 msgid "Start playback"
 msgstr "Начать воспроизведение"
 
-#: src/fauxdacious/main.cc:91 src/libfauxdgui/prefs-window.cc:317
-#: src/libfauxdqt/prefs-window-qt.cc:350
+#: src/fauxdacious/main.cc:104 src/libfauxdgui/prefs-window.cc:343
+#: src/libfauxdqt/prefs-window-qt.cc:424
 #, fuzzy
 msgid "Pause mutes instead of pausing"
 msgstr "Пауза вместо немедленного продолжения"
 
-#: src/fauxdacious/main.cc:92
+#: src/fauxdacious/main.cc:105
 msgid "Quit on playback stop"
 msgstr "Выйти по окончании воспроизведения"
 
-#: src/fauxdacious/main.cc:94
+#: src/fauxdacious/main.cc:107
 msgid "Run in Qt mode"
 msgstr "Запуск в режиме Qt"
 
-#: src/fauxdacious/main.cc:96
+#: src/fauxdacious/main.cc:109
 msgid "Skip to previous song"
 msgstr "Перейти к предыдущей песне"
 
-#: src/fauxdacious/main.cc:97
+#: src/fauxdacious/main.cc:110
 #, fuzzy
 msgid "Start Recording"
 msgstr "Год записи"
 
-#: src/fauxdacious/main.cc:98
+#: src/fauxdacious/main.cc:111
 msgid "Stop playback"
 msgstr "Остановить воспроизведение"
 
-#: src/fauxdacious/main.cc:99
+#: src/fauxdacious/main.cc:112
 msgid "Pause if playing, play otherwise"
 msgstr "Приостановить при проигрывании, иначе ― воспроизводить"
 
-#: src/fauxdacious/main.cc:100
+#: src/fauxdacious/main.cc:113
 msgid "Pause playback"
 msgstr "Приостановить воспроизведение"
 
-#: src/fauxdacious/main.cc:101
+#: src/fauxdacious/main.cc:114
 msgid "Show version"
 msgstr "Показать версию"
 
-#: src/fauxdacious/main.cc:102
+#: src/fauxdacious/main.cc:115
 msgid "Print debugging messages (may be used twice)"
 msgstr "Выводить отладочные сообщения (может использоваться дважды)"
 
-#: src/fauxdacious/main.cc:103
+#: src/fauxdacious/main.cc:116
 #, fuzzy
 msgid "Force Equalizer Off"
 msgstr "Эквалайзер"
 
-#: src/fauxdacious/main.cc:228
+#: src/fauxdacious/main.cc:246
 #, c-format
 msgid "Unknown option: %s\n"
 msgstr "Неизвестная опция: %s\n"
 
-#: src/fauxdacious/main.cc:261
+#: src/fauxdacious/main.cc:281
 #, c-format
 msgid "Unknown option: -%c\n"
 msgstr "Неизвестная опция: -%c\n"
 
-#: src/fauxdacious/main.cc:289
+#: src/fauxdacious/main.cc:315
 #, fuzzy
 msgid ""
 "Usage: fauxdacious [OPTION] ... [FILE] ...\n"
@@ -177,13 +186,13 @@ msgstr ""
 "Использование: audacious [Опция] ... [Файл] ...\n"
 "\n"
 
-#: src/fauxdacious/main.cc:290
+#: src/fauxdacious/main.cc:316
 msgid ""
 "FILE can be: local-file, url, -|--|-.ext (stdin).\n"
 "\n"
 msgstr ""
 
-#: src/fauxdacious/main.cc:550 src/libfauxdqt/audqt.cc:63
+#: src/fauxdacious/main.cc:721
 #, fuzzy
 msgid "Fauxdacious"
 msgstr "Audacious"
@@ -197,16 +206,16 @@ msgstr[1] "Найдено %d файла"
 msgstr[2] "Найдено %d файлов"
 msgstr[3] "Найдено %d файлов"
 
-#: src/libfauxdcore/adder.cc:169 src/libfauxdcore/adder.cc:179
+#: src/libfauxdcore/adder.cc:169
 msgid "file://"
 msgstr ""
 
 #: src/libfauxdcore/adder.cc:170 src/libfauxdcore/adder.cc:180
-#: src/libfauxdcore/probe.cc:218
+#: src/libfauxdcore/probe.cc:240
 msgid "stdin://"
 msgstr ""
 
-#: src/libfauxdcore/adder.cc:314 src/libfauxdcore/adder.cc:388
+#: src/libfauxdcore/adder.cc:341 src/libfauxdcore/adder.cc:433
 #, c-format
 msgid ""
 "Error reading %s:\n"
@@ -215,11 +224,11 @@ msgstr ""
 "Ошибка чтения %s:\n"
 "%s"
 
-#: src/libfauxdcore/adder.cc:446
+#: src/libfauxdcore/adder.cc:499
 msgid "No files found."
 msgstr "Файлы не найдены."
 
-#: src/libfauxdcore/audstrings.cc:659 src/libfauxdcore/tuple.cc:520
+#: src/libfauxdcore/audstrings.cc:659 src/libfauxdcore/tuple.cc:553
 msgid "Standard input"
 msgstr "Стандартный ввод"
 
@@ -233,20 +242,31 @@ msgstr "Аудио CD, дорожка %s"
 msgid "DVD, title %s"
 msgstr ""
 
-#: src/libfauxdcore/audstrings.cc:667 src/libfauxdcore/tuple.cc:496
+#: src/libfauxdcore/audstrings.cc:667 src/libfauxdcore/tuple.cc:529
 msgid "(character encoding error)"
 msgstr "(ошибка кодировки)"
 
-#: src/libfauxdcore/audstrings.cc:1190
+#: src/libfauxdcore/audstrings.cc:1200
 #, c-format
 msgid "%.*s"
 msgstr ""
 
-#: src/libfauxdcore/output.cc:216 src/libfauxdcore/output.cc:269
+#: src/libfauxdcore/drct.cc:104
+msgid ""
+"Stream recording must be configured in Audio Settings before it can be used."
+msgstr ""
+"Прежде, чем использовать запись потока, её нужно настроить в разделе "
+"\"Звук\"."
+
+#: src/libfauxdcore/output.cc:226
 msgid "Error opening output stream"
 msgstr "Ошибка открытия потока вывода"
 
-#: src/libfauxdcore/playback.cc:373
+#: src/libfauxdcore/output.cc:278
+msgid "Error recording output stream"
+msgstr "Ошибка: запись в поток вывода невозможна"
+
+#: src/libfauxdcore/playback.cc:375
 #, c-format
 msgid ""
 "Error playing %s:\n"
@@ -255,7 +275,7 @@ msgstr ""
 "Ошибка воспроизведения %s:\n"
 "%s"
 
-#: src/libfauxdcore/playback.cc:505
+#: src/libfauxdcore/playback.cc:507
 msgid "Invalid audio format"
 msgstr "Недопустимый звуковой формат"
 
@@ -267,23 +287,24 @@ msgstr "Новый список воспроизведения"
 msgid "Now Playing"
 msgstr "Сейчас воспроизводится"
 
-#: src/libfauxdcore/playlist.cc:1688
+#: src/libfauxdcore/playlist.cc:1764
 msgid ""
 "The playlist cannot be sorted because metadata scanning is still in progress "
 "(or has been disabled)."
 msgstr ""
 
-#: src/libfauxdcore/playlist-files.cc:57 src/libfauxdcore/playlist-files.cc:84
+#: src/libfauxdcore/playlist-files.cc:96 src/libfauxdcore/playlist-files.cc:124
 msgid "pls"
 msgstr ""
 
-#: src/libfauxdcore/playlist-files.cc:105
+#: src/libfauxdcore/playlist-files.cc:145
 msgid "tempurl.pls"
 msgstr ""
 
-#: src/libfauxdcore/playlist-files.cc:111
-#: src/libfauxdcore/playlist-files.cc:124 src/libfauxdgui/infowin.cc:494
-#: src/libfauxdqt/infowin-qt.cc:220
+#: src/libfauxdcore/playlist-files.cc:151
+#: src/libfauxdcore/playlist-files.cc:164
+#: src/libfauxdcore/playlist-files.cc:242 src/libfauxdgui/infowin.cc:626
+#: src/libfauxdqt/infowin-qt.cc:208
 #, c-format
 msgid ""
 "Error opening %s:\n"
@@ -292,46 +313,52 @@ msgstr ""
 "Ошибка открытия %s:\n"
 "%s"
 
-#: src/libfauxdcore/playlist-files.cc:139
+#: src/libfauxdcore/playlist-files.cc:179 src/libfauxdqt/eq-preset-qt.cc:336
+#: src/libfauxdqt/info-widget.cc:271
 #, c-format
 msgid "Error loading %s."
 msgstr "Ошибка загрузки %s."
 
-#: src/libfauxdcore/playlist-files.cc:141
+#: src/libfauxdcore/playlist-files.cc:181
 #, c-format
 msgid "Cannot load %s: unsupported file name extension."
 msgstr "Невозможно загрузить %s: расширение файла не поддерживается."
 
-#: src/libfauxdcore/playlist-files.cc:207
+#: src/libfauxdcore/playlist-files.cc:250 src/libfauxdqt/eq-preset-qt.cc:541
+#, fuzzy, c-format
+msgid "Error saving %s."
+msgstr "Ошибка загрузки %s."
+
+#: src/libfauxdcore/playlist-files.cc:255
 #, c-format
 msgid "Cannot save %s: unsupported file name extension."
 msgstr "Невозможно сохранить %s: расширение файла не поддерживается."
 
-#: src/libfauxdcore/probe.cc:59
+#: src/libfauxdcore/probe.cc:60
 msgid "Error loading plugin"
 msgstr "Ошибка загрузки модуля"
 
-#: src/libfauxdcore/probe.cc:205
+#: src/libfauxdcore/probe.cc:227
 msgid "Seek error"
 msgstr "Ошибка перемотки"
 
-#: src/libfauxdcore/probe.cc:242
+#: src/libfauxdcore/probe.cc:264
 msgid "File format not recognized"
 msgstr "Неопознанный формат файла"
 
-#: src/libfauxdcore/probe.cc:486
+#: src/libfauxdcore/probe.cc:604
 msgid "Error reading metadata"
 msgstr "Ошибка чтения метаданных"
 
-#: src/libfauxdcore/tuple.cc:550
+#: src/libfauxdcore/tuple.cc:583
 msgid "Mono"
 msgstr "Моно"
 
-#: src/libfauxdcore/tuple.cc:552
+#: src/libfauxdcore/tuple.cc:585
 msgid "Stereo"
 msgstr "Стерео"
 
-#: src/libfauxdcore/tuple.cc:554
+#: src/libfauxdcore/tuple.cc:587
 #, c-format
 msgid "%d channel"
 msgid_plural "%d channels"
@@ -340,25 +367,25 @@ msgstr[1] "%d канала"
 msgstr[2] "%d каналов"
 msgstr[3] "%d каналов"
 
-#: src/libfauxdcore/tuple.cc:847
+#: src/libfauxdcore/tuple.cc:1133
 msgid "Audio CD"
 msgstr "Аудио CD"
 
-#: src/libfauxdcore/tuple.cc:855
+#: src/libfauxdcore/tuple.cc:1141
 msgid "DVD"
 msgstr ""
 
-#: src/libfauxdcore/tuple.cc:937
+#: src/libfauxdcore/tuple.cc:1223
 #, c-format
 msgid "Track %d"
 msgstr "Дорожка %d"
 
-#: src/libfauxdcore/tuple.cc:946
+#: src/libfauxdcore/tuple.cc:1232
 #, fuzzy, c-format
 msgid "Title %d"
 msgstr "Название"
 
-#: src/libfauxdcore/tuple.cc:951
+#: src/libfauxdcore/tuple.cc:1237
 msgid "(unknown title)"
 msgstr "(неизвестное название)"
 
@@ -375,15 +402,15 @@ msgstr "Недопустимое имя файла"
 msgid "Invalid access mode"
 msgstr "Недопустимый режим доступа"
 
-#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:36
+#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:37
 msgid "Credits"
 msgstr "Авторы"
 
-#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:36
+#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:37
 msgid "License"
 msgstr "Лицензия"
 
-#: src/libfauxdgui/about.cc:72 src/libfauxdqt/about-qt.cc:64
+#: src/libfauxdgui/about.cc:72 src/libfauxdqt/about-qt.cc:65
 #, fuzzy
 msgid "About Fauxdacious"
 msgstr "Об Audacious"
@@ -391,199 +418,186 @@ msgstr "Об Audacious"
 #: src/libfauxdgui/confirm.cc:36 src/libfauxdgui/jump-to-time.cc:48
 #: src/libfauxdgui/playlists.cc:93 src/libfauxdgui/playlists.cc:190
 #: src/libfauxdgui/plugin-prefs.cc:160 src/libfauxdgui/url-opener.cc:101
-#: src/libfauxdqt/playlist-management.cc:43
-#: src/libfauxdqt/playlist-management.cc:78 src/libfauxdqt/prefs-plugin.cc:131
-#: src/libfauxdqt/url-opener-qt.cc:79
+#: src/libfauxdqt/playlist-management.cc:40
+#: src/libfauxdqt/playlist-management.cc:59 src/libfauxdqt/prefs-plugin.cc:135
+#: src/libfauxdqt/url-opener-qt.cc:80
 msgid "_Cancel"
 msgstr "_Отмена"
 
-#: src/libfauxdgui/confirm.cc:51 src/libfauxdqt/playlist-management.cc:76
+#: src/libfauxdgui/confirm.cc:51
 msgid "_Don’t ask again"
 msgstr "_Не спрашивать снова"
 
-#: src/libfauxdgui/confirm.cc:73 src/libfauxdqt/playlist-management.cc:82
+#: src/libfauxdgui/confirm.cc:73
 #, c-format
 msgid "Do you want to permanently remove “%s”?"
 msgstr "Вы хотите удалить “%s” без возможности восстановления?"
 
-#: src/libfauxdgui/confirm.cc:77 src/libfauxdqt/playlist-management.cc:77
+#: src/libfauxdgui/confirm.cc:77 src/libfauxdqt/playlist-management.cc:58
 msgid "_Remove"
 msgstr "_Удалить"
 
-#: src/libfauxdgui/confirm.cc:80 src/libfauxdqt/playlist-management.cc:81
+#: src/libfauxdgui/confirm.cc:80 src/libfauxdqt/playlist-management.cc:62
 msgid "Remove Playlist"
 msgstr "Удалить список воспроизведения"
 
-#: src/libfauxdgui/confirm.cc:101 src/libfauxdqt/playlist-management.cc:40
+#: src/libfauxdgui/confirm.cc:101 src/libfauxdqt/playlist-management.cc:38
 msgid "What would you like to call this playlist?"
 msgstr "Как вы хотите назвать этот список воспроизведения?"
 
-#: src/libfauxdgui/confirm.cc:102 src/libfauxdqt/playlist-management.cc:42
+#: src/libfauxdgui/confirm.cc:102 src/libfauxdqt/playlist-management.cc:39
 msgid "_Rename"
 msgstr "_Переименовать"
 
-#: src/libfauxdgui/confirm.cc:103 src/libfauxdqt/playlist-management.cc:65
+#: src/libfauxdgui/confirm.cc:103 src/libfauxdqt/playlist-management.cc:37
 msgid "Rename Playlist"
 msgstr "Переименовать список воспроизведения"
 
-#: src/libfauxdgui/confirm.cc:126
-msgid ""
-"Failed to start recording.  Check that the FileWriter plugin is installed "
-"and is NOT selected as the primary output plugin."
-msgstr ""
-
-#: src/libfauxdgui/confirm.cc:139
-msgid ""
-"Do you want to start recording?\n"
-"\n"
-"Recording saves (transcodes) a copy of the currently playing song or stream "
-"to your computer.  To change settings such as the output folder or encoding "
-"quality, go to Audio Settings in the Output menu."
-msgstr ""
-
-#: src/libfauxdgui/confirm.cc:144
-msgid "_Record"
-msgstr ""
-
-#: src/libfauxdgui/confirm.cc:145
-#, fuzzy
-msgid "Record"
-msgstr "Запись потока:"
-
-#: src/libfauxdgui/eq-preset.cc:228 src/libfauxdgui/eq-preset.cc:235
+#: src/libfauxdgui/eq-preset.cc:278 src/libfauxdgui/eq-preset.cc:283
 msgid "Preset File ..."
 msgstr "Файл предустановок ..."
 
-#: src/libfauxdgui/eq-preset.cc:229 src/libfauxdgui/eq-preset.cc:236
+#: src/libfauxdgui/eq-preset.cc:279 src/libfauxdgui/eq-preset.cc:284
 msgid "EQF File ..."
 msgstr "Файл предустановок эквалайзера ..."
 
-#: src/libfauxdgui/eq-preset.cc:231
-msgid "Winamp Presets ..."
-msgstr "Предустановки Winamp ..."
-
-#: src/libfauxdgui/eq-preset.cc:240 src/libfauxdqt/fileopener.cc:70
+#: src/libfauxdgui/eq-preset.cc:288 src/libfauxdqt/eq-preset-qt.cc:571
+#: src/libfauxdqt/fileopener.cc:72
 msgid "Import"
 msgstr "Импорт"
 
-#: src/libfauxdgui/eq-preset.cc:241 src/libfauxdqt/fileopener.cc:71
+#: src/libfauxdgui/eq-preset.cc:289 src/libfauxdqt/eq-preset-qt.cc:574
+#: src/libfauxdqt/fileopener.cc:73
 msgid "Export"
 msgstr "Экспорт"
 
-#: src/libfauxdgui/eq-preset.cc:256
-msgid "Equalizer Presets"
+#: src/libfauxdgui/eq-preset.cc:304 src/libfauxdqt/eq-preset-qt.cc:551
+#, fuzzy
+msgid "Equalizer Presets - Fauxdacious"
 msgstr "Предустановки эквалайзера"
 
-#: src/libfauxdgui/eq-preset.cc:278
+#: src/libfauxdgui/eq-preset.cc:326 src/libfauxdqt/eq-preset-qt.cc:555
 msgid "Save Preset"
 msgstr "Сохранить  предустановки"
 
-#: src/libfauxdgui/eq-preset.cc:293
+#: src/libfauxdgui/eq-preset.cc:341 src/libfauxdqt/eq-preset-qt.cc:564
 msgid "Use entry's local directory for preset files, if file."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:308
-msgid "Save as Directory-wide Preset, if file & above box checked."
+#: src/libfauxdgui/eq-preset.cc:356 src/libfauxdqt/eq-preset-qt.cc:565
+msgid "Save as Directory-wide Preset, IF file & above box checked."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:322
-msgid "Exclude arg. lists from urls to create preset filename."
+#: src/libfauxdgui/eq-preset.cc:370 src/libfauxdqt/eq-preset-qt.cc:566
+msgid "Use only base site name for URLs."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:335
+#: src/libfauxdgui/eq-preset.cc:381 src/libfauxdqt/eq-preset-qt.cc:567
+msgid "Exclude arg. lists from URLs to create preset filename."
+msgstr ""
+
+#: src/libfauxdgui/eq-preset.cc:394 src/libfauxdqt/eq-preset-qt.cc:568
 msgid "Save Effects (plugins) with presets."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:356
+#: src/libfauxdgui/eq-preset.cc:415 src/libfauxdqt/eq-preset-qt.cc:584
 msgid "Delete Selected"
 msgstr "Удалить выбранное"
 
-#: src/libfauxdgui/eq-preset.cc:361 src/libfauxdgui/equalizer.cc:188
-#: src/libfauxdgui/file-opener.cc:128 src/libfauxdgui/infowin.cc:397
-#: src/libfauxdgui/jump-to-track.cc:309 src/libfauxdgui/plugin-prefs.cc:166
-#: src/libfauxdgui/prefs-window.cc:926 src/libfauxdgui/queue-manager.cc:194
-#: src/libfauxdgui/util.cc:298 src/libfauxdqt/audqt.cc:189
-#: src/libfauxdqt/infowin-qt.cc:149 src/libfauxdqt/log-inspector.cc:227
-#: src/libfauxdqt/prefs-plugin.cc:141 src/libfauxdqt/prefs-window-qt.cc:660
-#: src/libfauxdqt/queue-manager-qt.cc:163
+#: src/libfauxdgui/eq-preset.cc:420 src/libfauxdgui/file-opener.cc:128
+#: src/libfauxdgui/infowin.cc:518 src/libfauxdgui/jump-to-track.cc:309
+#: src/libfauxdgui/plugin-prefs.cc:166 src/libfauxdgui/prefs-window.cc:982
+#: src/libfauxdgui/queue-manager.cc:194 src/libfauxdgui/util.cc:298
+#: src/libfauxdqt/audqt.cc:369 src/libfauxdqt/infowin-qt.cc:99
+#: src/libfauxdqt/log-inspector.cc:228 src/libfauxdqt/prefs-plugin.cc:145
+#: src/libfauxdqt/prefs-window-qt.cc:766 src/libfauxdqt/song-window-qt.cc:372
 msgid "_Close"
 msgstr "_Закрыть"
 
-#: src/libfauxdgui/eq-preset.cc:365
+#: src/libfauxdgui/eq-preset.cc:424 src/libfauxdqt/eq-preset-qt.cc:588
 msgid "Revert Changes"
 msgstr "Откатить изменения"
 
-#: src/libfauxdgui/equalizer.cc:64 src/libfauxdqt/equalizer-qt.cc:114
-msgid "_Enable"
-msgstr "_Включить"
-
-#: src/libfauxdgui/equalizer.cc:74
-msgid "_Auto"
+#: src/libfauxdgui/equalizer.cc:48 src/libfauxdgui/equalizer.cc:185
+msgid "_PreSETs!"
 msgstr ""
 
-#: src/libfauxdgui/equalizer.cc:155 src/libfauxdqt/equalizer-qt.cc:116
-msgid "31 Hz"
-msgstr "31 Гц"
-
-#: src/libfauxdgui/equalizer.cc:155 src/libfauxdqt/equalizer-qt.cc:116
-msgid "63 Hz"
-msgstr "63 Гц"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "125 Hz"
-msgstr "125 Гц"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "250 Hz"
-msgstr "250 Гц"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "500 Hz"
-msgstr "500 Гц"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "1 kHz"
-msgstr "1 кГц"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "2 kHz"
-msgstr "2 кГц"
-
-#: src/libfauxdgui/equalizer.cc:157 src/libfauxdqt/equalizer-qt.cc:118
-msgid "4 kHz"
-msgstr "4 кГц"
-
-#: src/libfauxdgui/equalizer.cc:157 src/libfauxdqt/equalizer-qt.cc:118
-msgid "8 kHz"
-msgstr "8 кГц"
-
-#: src/libfauxdgui/equalizer.cc:157 src/libfauxdqt/equalizer-qt.cc:118
-msgid "16 kHz"
-msgstr "16 кГц"
-
-#: src/libfauxdgui/equalizer.cc:160 src/libfauxdqt/equalizer-qt.cc:142
-msgid "Equalizer"
-msgstr "Эквалайзер"
-
-#: src/libfauxdgui/equalizer.cc:176 src/libfauxdgui/equalizer.cc:178
+#: src/libfauxdgui/equalizer.cc:54 src/libfauxdgui/equalizer.cc:187
 #, fuzzy
 msgid "_Presets"
 msgstr "Предустановки ..."
 
-#: src/libfauxdgui/equalizer.cc:183
+#: src/libfauxdgui/equalizer.cc:72 src/libfauxdqt/equalizer-qt.cc:122
+msgid "_Enable"
+msgstr "_Включить"
+
+#: src/libfauxdgui/equalizer.cc:82
+msgid "_Auto"
+msgstr ""
+
+#: src/libfauxdgui/equalizer.cc:164 src/libfauxdqt/equalizer-qt.cc:124
+msgid "31 Hz"
+msgstr "31 Гц"
+
+#: src/libfauxdgui/equalizer.cc:164 src/libfauxdqt/equalizer-qt.cc:124
+msgid "63 Hz"
+msgstr "63 Гц"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "125 Hz"
+msgstr "125 Гц"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "250 Hz"
+msgstr "250 Гц"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "500 Hz"
+msgstr "500 Гц"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "1 kHz"
+msgstr "1 кГц"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "2 kHz"
+msgstr "2 кГц"
+
+#: src/libfauxdgui/equalizer.cc:166 src/libfauxdqt/equalizer-qt.cc:126
+msgid "4 kHz"
+msgstr "4 кГц"
+
+#: src/libfauxdgui/equalizer.cc:166 src/libfauxdqt/equalizer-qt.cc:126
+msgid "8 kHz"
+msgstr "8 кГц"
+
+#: src/libfauxdgui/equalizer.cc:166 src/libfauxdqt/equalizer-qt.cc:126
+msgid "16 kHz"
+msgstr "16 кГц"
+
+#: src/libfauxdgui/equalizer.cc:169 src/libfauxdqt/equalizer-qt.cc:251
+msgid "Equalizer"
+msgstr "Эквалайзер"
+
+#: src/libfauxdgui/equalizer.cc:192
 msgid "_Flat"
 msgstr ""
 
-#: src/libfauxdgui/equalizer.cc:195 src/libfauxdqt/equalizer-qt.cc:123
+#: src/libfauxdgui/equalizer.cc:197
+msgid "_Hide"
+msgstr ""
+
+#: src/libfauxdgui/equalizer.cc:204 src/libfauxdqt/equalizer-qt.cc:131
 msgid "Preamp"
 msgstr "Предусиление"
 
-#: src/libfauxdgui/file-opener.cc:78 src/libfauxdqt/fileopener.cc:57
-msgid "Open Files"
-msgstr "Открыть файлы"
+#: src/libfauxdgui/file-opener.cc:78 src/libfauxdqt/fileopener.cc:59
+#, fuzzy
+msgid "Open Files - Fauxdacious"
+msgstr "Audacious"
 
 #: src/libfauxdgui/file-opener.cc:79 src/libfauxdgui/url-opener.cc:64
-#: src/libfauxdqt/url-opener-qt.cc:48
+#: src/libfauxdqt/url-opener-qt.cc:49
 msgid "_Open"
 msgstr "_Открыть"
 
@@ -591,12 +605,13 @@ msgstr "_Открыть"
 msgid "Close _dialog on open"
 msgstr "Закрыть _диалог при открытии"
 
-#: src/libfauxdgui/file-opener.cc:86 src/libfauxdqt/fileopener.cc:59
-msgid "Add Files"
-msgstr "Добавить файлы"
+#: src/libfauxdgui/file-opener.cc:86 src/libfauxdqt/fileopener.cc:61
+#, fuzzy
+msgid "Add Files - Fauxdacious"
+msgstr "Об Audacious"
 
 #: src/libfauxdgui/file-opener.cc:87 src/libfauxdgui/url-opener.cc:70
-#: src/libfauxdqt/url-opener-qt.cc:54
+#: src/libfauxdqt/url-opener-qt.cc:55
 msgid "_Add"
 msgstr "_Добавить"
 
@@ -604,264 +619,312 @@ msgstr "_Добавить"
 msgid "Close _dialog on add"
 msgstr "Закрыть _диалог при добавлении"
 
-#: src/libfauxdgui/infopopup.cc:192 src/libfauxdgui/infowin.cc:351
-#: src/libfauxdgui/prefs-window.cc:113 src/libfauxdqt/infopopup-qt.cc:89
-#: src/libfauxdqt/info-widget.cc:43 src/libfauxdqt/prefs-window-qt.cc:158
+#: src/libfauxdgui/infopopup.cc:187 src/libfauxdgui/infowin.cc:472
+#: src/libfauxdgui/prefs-window.cc:113 src/libfauxdqt/infopopup-qt.cc:93
+#: src/libfauxdqt/info-widget.cc:53 src/libfauxdqt/prefs-window-qt.cc:169
 msgid "Title"
 msgstr "Название"
 
-#: src/libfauxdgui/infopopup.cc:193 src/libfauxdgui/infowin.cc:354
-#: src/libfauxdgui/prefs-window.cc:110 src/libfauxdqt/infopopup-qt.cc:91
-#: src/libfauxdqt/info-widget.cc:41 src/libfauxdqt/prefs-window-qt.cc:155
+#: src/libfauxdgui/infopopup.cc:188 src/libfauxdgui/infowin.cc:475
+#: src/libfauxdgui/prefs-window.cc:110 src/libfauxdqt/infopopup-qt.cc:95
+#: src/libfauxdqt/info-widget.cc:51 src/libfauxdqt/prefs-window-qt.cc:166
 msgid "Artist"
 msgstr "Исполнитель"
 
-#: src/libfauxdgui/infopopup.cc:194 src/libfauxdgui/infowin.cc:357
-#: src/libfauxdgui/prefs-window.cc:111 src/libfauxdgui/prefs-window.cc:157
-#: src/libfauxdqt/infopopup-qt.cc:93 src/libfauxdqt/info-widget.cc:42
-#: src/libfauxdqt/prefs-window-qt.cc:156 src/libfauxdqt/prefs-window-qt.cc:202
+#: src/libfauxdgui/infopopup.cc:189 src/libfauxdgui/infowin.cc:478
+#: src/libfauxdgui/prefs-window.cc:111 src/libfauxdgui/prefs-window.cc:169
+#: src/libfauxdqt/infopopup-qt.cc:97 src/libfauxdqt/info-widget.cc:52
+#: src/libfauxdqt/prefs-window-qt.cc:167 src/libfauxdqt/prefs-window-qt.cc:225
 msgid "Album"
 msgstr "Альбом"
 
-#: src/libfauxdgui/infopopup.cc:195 src/libfauxdgui/infowin.cc:367
-#: src/libfauxdgui/prefs-window.cc:115 src/libfauxdqt/infopopup-qt.cc:95
-#: src/libfauxdqt/info-widget.cc:45 src/libfauxdqt/prefs-window-qt.cc:160
+#: src/libfauxdgui/infopopup.cc:190 src/libfauxdgui/infowin.cc:489
+#: src/libfauxdgui/prefs-window.cc:115 src/libfauxdqt/infopopup-qt.cc:99
+#: src/libfauxdqt/info-widget.cc:55 src/libfauxdqt/prefs-window-qt.cc:171
 msgid "Genre"
 msgstr "Жанр"
 
-#: src/libfauxdgui/infopopup.cc:196 src/libfauxdgui/infowin.cc:370
-#: src/libfauxdgui/prefs-window.cc:119 src/libfauxdqt/infopopup-qt.cc:97
-#: src/libfauxdqt/prefs-window-qt.cc:164
+#: src/libfauxdgui/infopopup.cc:191 src/libfauxdgui/infowin.cc:492
+#: src/libfauxdgui/prefs-window.cc:119 src/libfauxdqt/infopopup-qt.cc:101
+#: src/libfauxdqt/prefs-window-qt.cc:175
 msgid "Year"
 msgstr "Год"
 
-#: src/libfauxdgui/infopopup.cc:197 src/libfauxdgui/prefs-window.cc:156
-#: src/libfauxdqt/infopopup-qt.cc:99 src/libfauxdqt/prefs-window-qt.cc:201
+#: src/libfauxdgui/infopopup.cc:192 src/libfauxdgui/prefs-window.cc:168
+#: src/libfauxdqt/infopopup-qt.cc:103 src/libfauxdqt/prefs-window-qt.cc:224
 msgid "Track"
 msgstr "Дорожка"
 
-#: src/libfauxdgui/infopopup.cc:198 src/libfauxdqt/infopopup-qt.cc:101
-#: src/libfauxdqt/info-widget.cc:55
+#: src/libfauxdgui/infopopup.cc:193 src/libfauxdqt/infopopup-qt.cc:105
+#: src/libfauxdqt/info-widget.cc:65
 msgid "Length"
 msgstr "Продолжительность"
 
-#: src/libfauxdgui/infowin.cc:50
+#: src/libfauxdgui/infowin.cc:52
 msgid "Format:"
 msgstr "Формат:"
 
-#: src/libfauxdgui/infowin.cc:51
+#: src/libfauxdgui/infowin.cc:53
 msgid "Quality:"
 msgstr "Качество:"
 
-#: src/libfauxdgui/infowin.cc:52
+#: src/libfauxdgui/infowin.cc:54
 msgid "Bitrate:"
 msgstr "Битрейт:"
 
-#: src/libfauxdgui/infowin.cc:85
+#: src/libfauxdgui/infowin.cc:90
 msgid "Acid Jazz"
 msgstr "Acid Jazz"
 
-#: src/libfauxdgui/infowin.cc:86
+#: src/libfauxdgui/infowin.cc:91
 msgid "Acid Rock"
 msgstr "Acid Rock"
 
-#: src/libfauxdgui/infowin.cc:87
+#: src/libfauxdgui/infowin.cc:92
 msgid "Ambient"
 msgstr "Ambient"
 
-#: src/libfauxdgui/infowin.cc:88
+#: src/libfauxdgui/infowin.cc:93
 msgid "Bebop"
 msgstr "Bebop"
 
-#: src/libfauxdgui/infowin.cc:89
+#: src/libfauxdgui/infowin.cc:94
 msgid "Bluegrass"
 msgstr "Bluegrass"
 
-#: src/libfauxdgui/infowin.cc:90
+#: src/libfauxdgui/infowin.cc:95
 msgid "Blues"
 msgstr "Blues"
 
-#: src/libfauxdgui/infowin.cc:91
+#: src/libfauxdgui/infowin.cc:96
 msgid "Chamber Music"
 msgstr "Chamber Music"
 
-#: src/libfauxdgui/infowin.cc:92
+#: src/libfauxdgui/infowin.cc:97
 msgid "Classical"
 msgstr "Classical"
 
-#: src/libfauxdgui/infowin.cc:93
+#: src/libfauxdgui/infowin.cc:98
 msgid "Country"
 msgstr "Country"
 
-#: src/libfauxdgui/infowin.cc:94
+#: src/libfauxdgui/infowin.cc:99
 msgid "Death Metal"
 msgstr "Death Metal"
 
-#: src/libfauxdgui/infowin.cc:95
+#: src/libfauxdgui/infowin.cc:100
 msgid "Disco"
 msgstr "Disco"
 
-#: src/libfauxdgui/infowin.cc:96
+#: src/libfauxdgui/infowin.cc:101
 msgid "Easy Listening"
 msgstr "Easy Listening"
 
-#: src/libfauxdgui/infowin.cc:97
+#: src/libfauxdgui/infowin.cc:102
 msgid "Folk"
 msgstr "Folk"
 
-#: src/libfauxdgui/infowin.cc:98
+#: src/libfauxdgui/infowin.cc:103
 msgid "Funk"
 msgstr "Funk"
 
-#: src/libfauxdgui/infowin.cc:99
+#: src/libfauxdgui/infowin.cc:104
 msgid "Gangsta Rap"
 msgstr "Gangsta Rap"
 
-#: src/libfauxdgui/infowin.cc:100
+#: src/libfauxdgui/infowin.cc:105
 msgid "Gospel"
 msgstr "Gospel"
 
-#: src/libfauxdgui/infowin.cc:101
+#: src/libfauxdgui/infowin.cc:106
 msgid "Grunge"
 msgstr "Grunge"
 
-#: src/libfauxdgui/infowin.cc:102
+#: src/libfauxdgui/infowin.cc:107
 msgid "Hard Rock"
 msgstr "Hard Rock"
 
-#: src/libfauxdgui/infowin.cc:103
+#: src/libfauxdgui/infowin.cc:108
 msgid "Heavy Metal"
 msgstr "Heavy Metal"
 
-#: src/libfauxdgui/infowin.cc:104
+#: src/libfauxdgui/infowin.cc:109
 msgid "Hip-hop"
 msgstr "Hip-hop"
 
-#: src/libfauxdgui/infowin.cc:105
+#: src/libfauxdgui/infowin.cc:110
 msgid "House"
 msgstr "House"
 
-#: src/libfauxdgui/infowin.cc:106
+#: src/libfauxdgui/infowin.cc:111
 msgid "Jazz"
 msgstr "Jazz"
 
-#: src/libfauxdgui/infowin.cc:107
+#: src/libfauxdgui/infowin.cc:112
 msgid "Jungle"
 msgstr "Jungle"
 
-#: src/libfauxdgui/infowin.cc:108
+#: src/libfauxdgui/infowin.cc:113
 msgid "Metal"
 msgstr "Metal"
 
-#: src/libfauxdgui/infowin.cc:109
+#: src/libfauxdgui/infowin.cc:114
 msgid "New Age"
 msgstr "New Age"
 
-#: src/libfauxdgui/infowin.cc:110
+#: src/libfauxdgui/infowin.cc:115
 msgid "New Wave"
 msgstr "New Wave"
 
-#: src/libfauxdgui/infowin.cc:111
+#: src/libfauxdgui/infowin.cc:116
 msgid "Noise"
 msgstr "Noise"
 
-#: src/libfauxdgui/infowin.cc:112
+#: src/libfauxdgui/infowin.cc:117
 msgid "Pop"
 msgstr "Pop"
 
-#: src/libfauxdgui/infowin.cc:113
+#: src/libfauxdgui/infowin.cc:118
 msgid "Punk Rock"
 msgstr "Punk Rock"
 
-#: src/libfauxdgui/infowin.cc:114
+#: src/libfauxdgui/infowin.cc:119
 msgid "Rap"
 msgstr "Rap"
 
-#: src/libfauxdgui/infowin.cc:115
+#: src/libfauxdgui/infowin.cc:120
 msgid "Reggae"
 msgstr "Reggae"
 
-#: src/libfauxdgui/infowin.cc:116
+#: src/libfauxdgui/infowin.cc:121
 msgid "Rock"
 msgstr "Rock"
 
-#: src/libfauxdgui/infowin.cc:117
+#: src/libfauxdgui/infowin.cc:122
 msgid "Rock and Roll"
 msgstr "Rock and Roll"
 
-#: src/libfauxdgui/infowin.cc:118
+#: src/libfauxdgui/infowin.cc:123
 msgid "Rhythm and Blues"
 msgstr "Rhythm and Blues"
 
-#: src/libfauxdgui/infowin.cc:119
+#: src/libfauxdgui/infowin.cc:124
 msgid "Ska"
 msgstr "Ska"
 
-#: src/libfauxdgui/infowin.cc:120
+#: src/libfauxdgui/infowin.cc:125
 msgid "Soul"
 msgstr "Soul"
 
-#: src/libfauxdgui/infowin.cc:121
+#: src/libfauxdgui/infowin.cc:126
 msgid "Swing"
 msgstr "Swing"
 
-#: src/libfauxdgui/infowin.cc:122
+#: src/libfauxdgui/infowin.cc:127
 msgid "Techno"
 msgstr "Techno"
 
-#: src/libfauxdgui/infowin.cc:123
+#: src/libfauxdgui/infowin.cc:128
 msgid "Trip-hop"
 msgstr "Trip-hop"
 
-#: src/libfauxdgui/infowin.cc:216
+#: src/libfauxdgui/infowin.cc:249
 msgid "Save successful"
 msgstr "Успешно сохранено"
 
-#: src/libfauxdgui/infowin.cc:220
+#: src/libfauxdgui/infowin.cc:253
 msgid "Save error"
 msgstr "Ошибка сохранения"
 
-#: src/libfauxdgui/infowin.cc:306 src/libfauxdgui/prefs-window.cc:86
-#: src/libfauxdgui/prefs-window.cc:95 src/libfauxdqt/infowin-qt.cc:123
-#: src/libfauxdqt/prefs-window-qt.cc:140 src/libfauxdqt/prefs-window-qt.cc:149
-msgid "Song Info"
-msgstr "Информация о песне"
+#: src/libfauxdgui/infowin.cc:373 src/libfauxdqt/info-widget.cc:207
+msgid "Select Cover Art File - Fauxdacious"
+msgstr ""
 
-#: src/libfauxdgui/infowin.cc:360 src/libfauxdqt/info-widget.cc:47
+#: src/libfauxdgui/infowin.cc:374 src/libfauxdgui/preset-browser.cc:83
+#: src/libfauxdgui/util.cc:172 src/libfauxdqt/fileopener.cc:93
+msgid "Cancel"
+msgstr "Отмена"
+
+#: src/libfauxdgui/infowin.cc:375 src/libfauxdgui/util.cc:172
+#: src/libfauxdqt/fileopener.cc:68 src/libfauxdqt/fileopener.cc:69
+msgid "Open"
+msgstr "Открыть"
+
+#: src/libfauxdgui/infowin.cc:378
+msgid "Coverart image files"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:379
+msgid "*.jpg"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:380
+msgid "*.png"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:381
+msgid "*.jpeg"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:382
+msgid "*.gif"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:401
+#, fuzzy
+msgid "File"
+msgstr "Добавить файлы"
+
+#: src/libfauxdgui/infowin.cc:413 src/libfauxdqt/infowin-qt.cc:76
+#, fuzzy
+msgid "Song Info - Fauxdacious"
+msgstr "Об Audacious"
+
+#: src/libfauxdgui/infowin.cc:481 src/libfauxdqt/info-widget.cc:57
 msgid "Album Artist"
 msgstr "Исполнитель альбома"
 
-#: src/libfauxdgui/infowin.cc:363 src/libfauxdgui/prefs-window.cc:120
-#: src/libfauxdqt/info-widget.cc:46 src/libfauxdqt/prefs-window-qt.cc:165
+#: src/libfauxdgui/infowin.cc:484
+#, fuzzy
+msgid "Coverart File"
+msgstr "Выберите файл"
+
+#: src/libfauxdgui/infowin.cc:485 src/libfauxdgui/prefs-window.cc:120
+#: src/libfauxdqt/info-widget.cc:56 src/libfauxdqt/prefs-window-qt.cc:176
 msgid "Comment"
 msgstr "Комментарий"
 
-#: src/libfauxdgui/infowin.cc:373 src/libfauxdqt/info-widget.cc:44
+#: src/libfauxdgui/infowin.cc:495 src/libfauxdqt/info-widget.cc:54
 msgid "Track Number"
 msgstr "Номер дорожки"
 
-#: src/libfauxdgui/infowin.cc:380
-msgid "Clea_r fields when moving to next song"
-msgstr "_Очищать поля при переходе к следующей композиции"
+#: src/libfauxdgui/infowin.cc:501
+msgid "_Auto-fill empty fields"
+msgstr ""
 
-#: src/libfauxdgui/infowin.cc:394 src/libfauxdqt/infowin-qt.cc:148
+#: src/libfauxdgui/infowin.cc:515 src/libfauxdqt/infowin-qt.cc:98
 msgid "_Save"
 msgstr "_Сохранить"
 
-#: src/libfauxdgui/infowin.cc:400
+#: src/libfauxdgui/infowin.cc:521
+msgid "_Previous"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:524
 msgid "_Next"
 msgstr "С_ледующая"
 
-#: src/libfauxdgui/infowin.cc:447
+#: src/libfauxdgui/infowin.cc:574
 #, c-format
 msgid "%d kb/s"
 msgstr "%d кб/с"
 
-#: src/libfauxdgui/infowin.cc:452
+#: src/libfauxdgui/infowin.cc:579
 msgid "N/A"
 msgstr "нет данных"
 
 #: src/libfauxdgui/jump-to-time.cc:47 src/libfauxdgui/jump-to-track.cc:314
+#: src/libfauxdqt/song-window-qt.cc:370
 msgid "_Jump"
 msgstr "_Перейти"
 
@@ -874,19 +937,20 @@ msgid "Enter time (minutes:seconds):"
 msgstr "Введите время (минуты:секунды):"
 
 #: src/libfauxdgui/jump-to-track.cc:95 src/libfauxdgui/jump-to-track.cc:103
-#: src/libfauxdgui/jump-to-track.cc:305
+#: src/libfauxdgui/jump-to-track.cc:305 src/libfauxdqt/song-window-qt.cc:293
+#: src/libfauxdqt/song-window-qt.cc:369
 msgid "_Queue"
 msgstr "Поставить в _очередь"
 
-#: src/libfauxdgui/jump-to-track.cc:101
+#: src/libfauxdgui/jump-to-track.cc:101 src/libfauxdqt/song-window-qt.cc:293
 msgid "Un_queue"
 msgstr "Удалить из _очереди"
 
-#: src/libfauxdgui/jump-to-track.cc:240
+#: src/libfauxdgui/jump-to-track.cc:240 src/libfauxdqt/song-window-qt.cc:306
 msgid "Jump to Song"
 msgstr "Перейти к композиции"
 
-#: src/libfauxdgui/jump-to-track.cc:265
+#: src/libfauxdgui/jump-to-track.cc:265 src/libfauxdqt/song-window-qt.cc:323
 msgid "Filter: "
 msgstr "Фильтр: "
 
@@ -894,7 +958,7 @@ msgstr "Фильтр: "
 msgid "_Filter:"
 msgstr "_Фильтр:"
 
-#: src/libfauxdgui/jump-to-track.cc:298
+#: src/libfauxdgui/jump-to-track.cc:298 src/libfauxdqt/song-window-qt.cc:364
 msgid "C_lose on jump"
 msgstr "За_крыть после перехода"
 
@@ -920,7 +984,7 @@ msgstr "Введите расширение файла или выберите �
 msgid "Select Format by Extension"
 msgstr "Выберите формат расширения"
 
-#: src/libfauxdgui/playlists.cc:168 src/libfauxdqt/fileopener.cc:62
+#: src/libfauxdgui/playlists.cc:168
 msgid "Export Playlist"
 msgstr "Экспортировать список воспроизведения"
 
@@ -928,7 +992,7 @@ msgstr "Экспортировать список воспроизведения
 msgid "_Export"
 msgstr "_Экспортировать"
 
-#: src/libfauxdgui/playlists.cc:175 src/libfauxdqt/fileopener.cc:61
+#: src/libfauxdgui/playlists.cc:175
 msgid "Import Playlist"
 msgstr "Импортировать список воспроизведения"
 
@@ -940,69 +1004,74 @@ msgstr "_Импортировать"
 msgid "_Plugins ..."
 msgstr "_Модули ..."
 
-#: src/libfauxdgui/plugin-prefs.cc:109 src/libfauxdqt/prefs-plugin.cc:56
+#: src/libfauxdgui/plugin-prefs.cc:109 src/libfauxdqt/prefs-plugin.cc:60
 #, c-format
 msgid "About %s"
 msgstr "О %s"
 
-#: src/libfauxdgui/plugin-prefs.cc:155 src/libfauxdqt/prefs-plugin.cc:119
+#: src/libfauxdgui/plugin-prefs.cc:155 src/libfauxdqt/prefs-plugin.cc:123
 #, c-format
 msgid "%s Settings"
 msgstr "Настройки %s"
 
-#: src/libfauxdgui/plugin-prefs.cc:159 src/libfauxdqt/prefs-plugin.cc:130
+#: src/libfauxdgui/plugin-prefs.cc:159 src/libfauxdqt/prefs-plugin.cc:134
 msgid "_Set"
 msgstr "_Установить"
 
-#: src/libfauxdgui/plugin-view.cc:235 src/libfauxdgui/prefs-window.cc:738
-#: src/libfauxdgui/prefs-window.cc:778 src/libfauxdqt/prefs-window-qt.cc:621
-#: src/libfauxdqt/prefs-window-qt.cc:624
+#: src/libfauxdgui/plugin-view.cc:235 src/libfauxdgui/prefs-window.cc:796
+#: src/libfauxdgui/prefs-window.cc:836 src/libfauxdqt/prefs-window-qt.cc:724
+#: src/libfauxdqt/prefs-window-qt.cc:727
 msgid "_Settings"
 msgstr "_Настройки"
 
-#: src/libfauxdgui/plugin-view.cc:242 src/libfauxdgui/prefs-window.cc:752
-#: src/libfauxdgui/prefs-window.cc:790 src/libfauxdqt/prefs-window-qt.cc:622
-#: src/libfauxdqt/prefs-window-qt.cc:625
+#: src/libfauxdgui/plugin-view.cc:242 src/libfauxdgui/prefs-window.cc:810
+#: src/libfauxdgui/prefs-window.cc:848 src/libfauxdqt/prefs-window-qt.cc:725
+#: src/libfauxdqt/prefs-window-qt.cc:728
 msgid "_About"
 msgstr "_Описание"
 
-#: src/libfauxdgui/prefs-widget.cc:277
+#: src/libfauxdgui/prefs-widget.cc:277 src/libfauxdqt/prefs-widget-qt.cc:228
 msgid "Choose File"
 msgstr "Выберите файл"
 
-#: src/libfauxdgui/prefs-widget.cc:281
+#: src/libfauxdgui/prefs-widget.cc:281 src/libfauxdqt/prefs-widget-qt.cc:232
 msgid "Choose Folder"
 msgstr "Выберите каталог"
 
 #: src/libfauxdgui/prefs-window.cc:82 src/libfauxdgui/prefs-window.cc:91
-#: src/libfauxdqt/prefs-window-qt.cc:136 src/libfauxdqt/prefs-window-qt.cc:145
+#: src/libfauxdqt/prefs-window-qt.cc:147 src/libfauxdqt/prefs-window-qt.cc:156
 msgid "Appearance"
 msgstr "Внешний вид"
 
 #: src/libfauxdgui/prefs-window.cc:83 src/libfauxdgui/prefs-window.cc:92
-#: src/libfauxdqt/prefs-window-qt.cc:137 src/libfauxdqt/prefs-window-qt.cc:146
+#: src/libfauxdqt/prefs-window-qt.cc:148 src/libfauxdqt/prefs-window-qt.cc:157
 msgid "Audio"
 msgstr "Звук"
 
 #: src/libfauxdgui/prefs-window.cc:84 src/libfauxdgui/prefs-window.cc:93
-#: src/libfauxdqt/prefs-window-qt.cc:138 src/libfauxdqt/prefs-window-qt.cc:147
+#: src/libfauxdqt/prefs-window-qt.cc:149 src/libfauxdqt/prefs-window-qt.cc:158
 msgid "Network"
 msgstr "Сеть"
 
 #: src/libfauxdgui/prefs-window.cc:85 src/libfauxdgui/prefs-window.cc:94
 #: src/libfauxdgui/prefs-window.cc:105
 #: src/libfauxdqt/prefs-pluginlist-model.cc:41
-#: src/libfauxdqt/prefs-window-qt.cc:139 src/libfauxdqt/prefs-window-qt.cc:148
+#: src/libfauxdqt/prefs-window-qt.cc:150 src/libfauxdqt/prefs-window-qt.cc:159
 msgid "Playlist"
 msgstr "Список воспроизведения"
 
+#: src/libfauxdgui/prefs-window.cc:86 src/libfauxdgui/prefs-window.cc:95
+#: src/libfauxdqt/prefs-window-qt.cc:151 src/libfauxdqt/prefs-window-qt.cc:160
+msgid "Song Info"
+msgstr "Информация о песне"
+
 #: src/libfauxdgui/prefs-window.cc:87 src/libfauxdgui/prefs-window.cc:96
-#: src/libfauxdqt/prefs-window-qt.cc:141 src/libfauxdqt/prefs-window-qt.cc:150
+#: src/libfauxdqt/prefs-window-qt.cc:152 src/libfauxdqt/prefs-window-qt.cc:161
 msgid "Plugins"
 msgstr "Модули"
 
 #: src/libfauxdgui/prefs-window.cc:88 src/libfauxdgui/prefs-window.cc:97
-#: src/libfauxdqt/prefs-window-qt.cc:142 src/libfauxdqt/prefs-window-qt.cc:151
+#: src/libfauxdqt/prefs-window-qt.cc:153 src/libfauxdqt/prefs-window-qt.cc:162
 msgid "Advanced"
 msgstr "Продвинутый"
 
@@ -1031,493 +1100,607 @@ msgstr "Ввод"
 msgid "Transport"
 msgstr "Транспорт"
 
-#: src/libfauxdgui/prefs-window.cc:112 src/libfauxdqt/prefs-window-qt.cc:157
+#: src/libfauxdgui/prefs-window.cc:112 src/libfauxdqt/prefs-window-qt.cc:168
 msgid "Album artist"
 msgstr "Исполнитель альбома"
 
-#: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/prefs-window-qt.cc:159
+#: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/prefs-window-qt.cc:170
 msgid "Track number"
 msgstr "Номер дорожки"
 
-#: src/libfauxdgui/prefs-window.cc:116 src/libfauxdqt/prefs-window-qt.cc:161
+#: src/libfauxdgui/prefs-window.cc:116 src/libfauxdqt/prefs-window-qt.cc:172
 msgid "File name"
 msgstr "Имя файла"
 
-#: src/libfauxdgui/prefs-window.cc:117 src/libfauxdqt/prefs-window-qt.cc:162
+#: src/libfauxdgui/prefs-window.cc:117 src/libfauxdqt/prefs-window-qt.cc:173
 msgid "File path"
 msgstr "Расположение файла"
 
-#: src/libfauxdgui/prefs-window.cc:118 src/libfauxdqt/prefs-window-qt.cc:163
+#: src/libfauxdgui/prefs-window.cc:118 src/libfauxdqt/prefs-window-qt.cc:174
 msgid "Date"
 msgstr "Дата"
 
-#: src/libfauxdgui/prefs-window.cc:121 src/libfauxdqt/info-widget.cc:56
-#: src/libfauxdqt/prefs-window-qt.cc:166
+#: src/libfauxdgui/prefs-window.cc:121 src/libfauxdqt/info-widget.cc:66
+#: src/libfauxdqt/prefs-window-qt.cc:177
 msgid "Codec"
 msgstr "Кодек"
 
-#: src/libfauxdgui/prefs-window.cc:122 src/libfauxdqt/info-widget.cc:57
-#: src/libfauxdqt/prefs-window-qt.cc:167
+#: src/libfauxdgui/prefs-window.cc:122 src/libfauxdqt/info-widget.cc:67
+#: src/libfauxdqt/prefs-window-qt.cc:178
 msgid "Quality"
 msgstr "Качество"
 
-#: src/libfauxdgui/prefs-window.cc:126 src/libfauxdqt/prefs-window-qt.cc:171
+#: src/libfauxdgui/prefs-window.cc:126 src/libfauxdqt/prefs-window-qt.cc:182
 msgid "None"
 msgstr "Нет"
 
-#: src/libfauxdgui/prefs-window.cc:127 src/libfauxdqt/prefs-window-qt.cc:172
+#: src/libfauxdgui/prefs-window.cc:127 src/libfauxdqt/prefs-window-qt.cc:183
 msgid "Arabic"
 msgstr "Арабский"
 
-#: src/libfauxdgui/prefs-window.cc:128 src/libfauxdqt/prefs-window-qt.cc:173
+#: src/libfauxdgui/prefs-window.cc:128 src/libfauxdqt/prefs-window-qt.cc:184
 msgid "Baltic"
 msgstr "Балтийские языки"
 
-#: src/libfauxdgui/prefs-window.cc:129 src/libfauxdqt/prefs-window-qt.cc:174
+#: src/libfauxdgui/prefs-window.cc:129 src/libfauxdqt/prefs-window-qt.cc:185
 msgid "Chinese"
 msgstr "Китайский"
 
-#: src/libfauxdgui/prefs-window.cc:130 src/libfauxdqt/prefs-window-qt.cc:175
+#: src/libfauxdgui/prefs-window.cc:130 src/libfauxdqt/prefs-window-qt.cc:186
 msgid "Greek"
 msgstr "Греческий"
 
-#: src/libfauxdgui/prefs-window.cc:131 src/libfauxdqt/prefs-window-qt.cc:176
+#: src/libfauxdgui/prefs-window.cc:131 src/libfauxdqt/prefs-window-qt.cc:187
 msgid "Hebrew"
 msgstr "Иврит"
 
-#: src/libfauxdgui/prefs-window.cc:132 src/libfauxdqt/prefs-window-qt.cc:177
+#: src/libfauxdgui/prefs-window.cc:132 src/libfauxdqt/prefs-window-qt.cc:188
 msgid "Japanese"
 msgstr "Японский"
 
-#: src/libfauxdgui/prefs-window.cc:133 src/libfauxdqt/prefs-window-qt.cc:178
+#: src/libfauxdgui/prefs-window.cc:133 src/libfauxdqt/prefs-window-qt.cc:189
 msgid "Korean"
 msgstr "Корейский"
 
-#: src/libfauxdgui/prefs-window.cc:134 src/libfauxdqt/prefs-window-qt.cc:179
+#: src/libfauxdgui/prefs-window.cc:134 src/libfauxdqt/prefs-window-qt.cc:190
 msgid "Polish"
 msgstr "Польский"
 
-#: src/libfauxdgui/prefs-window.cc:135 src/libfauxdqt/prefs-window-qt.cc:180
+#: src/libfauxdgui/prefs-window.cc:135 src/libfauxdqt/prefs-window-qt.cc:191
 msgid "Russian"
 msgstr "Русский"
 
-#: src/libfauxdgui/prefs-window.cc:136 src/libfauxdqt/prefs-window-qt.cc:181
+#: src/libfauxdgui/prefs-window.cc:136 src/libfauxdqt/prefs-window-qt.cc:192
 msgid "Taiwanese"
 msgstr "Тайваньский"
 
-#: src/libfauxdgui/prefs-window.cc:137 src/libfauxdqt/prefs-window-qt.cc:182
+#: src/libfauxdgui/prefs-window.cc:137 src/libfauxdqt/prefs-window-qt.cc:193
 msgid "Turkish"
 msgstr "Турецкий"
 
-#: src/libfauxdgui/prefs-window.cc:141 src/libfauxdqt/prefs-window-qt.cc:186
+#: src/libfauxdgui/prefs-window.cc:141 src/libfauxdqt/prefs-window-qt.cc:197
 msgid "Automatic"
 msgstr "Автоматически"
 
-#: src/libfauxdgui/prefs-window.cc:145 src/libfauxdqt/prefs-window-qt.cc:190
+#: src/libfauxdgui/prefs-window.cc:145 src/libfauxdqt/prefs-window-qt.cc:201
 msgid "Floating point"
 msgstr "Плавающая точка"
 
-#: src/libfauxdgui/prefs-window.cc:149 src/libfauxdqt/prefs-window-qt.cc:194
+#: src/libfauxdgui/prefs-window.cc:149 src/libfauxdqt/prefs-window-qt.cc:205
 msgid "As decoded"
 msgstr "После раскодирования"
 
-#: src/libfauxdgui/prefs-window.cc:150 src/libfauxdqt/prefs-window-qt.cc:195
+#: src/libfauxdgui/prefs-window.cc:150 src/libfauxdqt/prefs-window-qt.cc:206
 msgid "After applying ReplayGain"
 msgstr "После выравнивания громкости"
 
-#: src/libfauxdgui/prefs-window.cc:151 src/libfauxdqt/prefs-window-qt.cc:196
+#: src/libfauxdgui/prefs-window.cc:151 src/libfauxdqt/prefs-window-qt.cc:207
 msgid "After applying effects"
 msgstr "После применения эффектов"
 
-#: src/libfauxdgui/prefs-window.cc:152 src/libfauxdqt/prefs-window-qt.cc:197
+#: src/libfauxdgui/prefs-window.cc:152 src/libfauxdqt/prefs-window-qt.cc:208
 msgid "After applying equalization"
 msgstr "После применения эквалайзера"
 
-#: src/libfauxdgui/prefs-window.cc:158 src/libfauxdqt/prefs-window-qt.cc:203
+#: src/libfauxdgui/prefs-window.cc:156 src/libfauxdqt/prefs-window-qt.cc:212
+msgid "Never"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:157 src/libfauxdqt/prefs-window-qt.cc:213
+msgid "URLs NOT in playlists"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:158 src/libfauxdqt/prefs-window-qt.cc:214
+msgid "Always"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:162 src/libfauxdqt/prefs-window-qt.cc:218
+msgid "<song file-name>.tag (if local)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:163 src/libfauxdqt/prefs-window-qt.cc:219
+msgid "Directory tagfile (if local)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:164 src/libfauxdqt/prefs-window-qt.cc:220
+msgid "Global tagfile"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:170 src/libfauxdqt/prefs-window-qt.cc:226
 msgid "Based on shuffle"
 msgstr "Основано на воспроизведении в произвольном порядке"
 
-#: src/libfauxdgui/prefs-window.cc:170 src/libfauxdqt/prefs-window-qt.cc:215
+#: src/libfauxdgui/prefs-window.cc:182 src/libfauxdqt/prefs-window-qt.cc:270
 msgid "Interface:"
 msgstr "Интерфейс:"
 
-#: src/libfauxdgui/prefs-window.cc:189 src/libfauxdqt/prefs-window-qt.cc:225
+#: src/libfauxdgui/prefs-window.cc:185 src/libfauxdqt/prefs-window-qt.cc:278
+msgid "Use Classic icons for this dialog's tabs (next time)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:203 src/libfauxdqt/prefs-window-qt.cc:290
 msgid "Output plugin:"
 msgstr "Модуль вывода:"
 
-#: src/libfauxdgui/prefs-window.cc:210 src/libfauxdqt/prefs-window-qt.cc:240
+#: src/libfauxdgui/prefs-window.cc:224 src/libfauxdqt/prefs-window-qt.cc:305
 msgid "Amplify all files:"
 msgstr "Усилить звук во всех файлах на:"
 
-#: src/libfauxdgui/prefs-window.cc:212 src/libfauxdgui/prefs-window.cc:215
-#: src/libfauxdqt/prefs-window-qt.cc:242 src/libfauxdqt/prefs-window-qt.cc:245
+#: src/libfauxdgui/prefs-window.cc:226 src/libfauxdgui/prefs-window.cc:229
+#: src/libfauxdqt/prefs-window-qt.cc:307 src/libfauxdqt/prefs-window-qt.cc:310
 msgid "dB"
 msgstr "дБ"
 
-#: src/libfauxdgui/prefs-window.cc:213 src/libfauxdqt/prefs-window-qt.cc:243
+#: src/libfauxdgui/prefs-window.cc:227 src/libfauxdqt/prefs-window-qt.cc:308
 msgid "Amplify untagged files:"
 msgstr "Усилить звук в файлах без меток на:"
 
-#: src/libfauxdgui/prefs-window.cc:219 src/libfauxdqt/prefs-window-qt.cc:249
+#: src/libfauxdgui/prefs-window.cc:233 src/libfauxdqt/prefs-window-qt.cc:314
 msgid "<b>Output Settings</b>"
 msgstr "<b>Настройки вывода</b>"
 
-#: src/libfauxdgui/prefs-window.cc:221 src/libfauxdqt/prefs-window-qt.cc:251
+#: src/libfauxdgui/prefs-window.cc:235 src/libfauxdqt/prefs-window-qt.cc:316
 msgid "Bit depth:"
 msgstr "Разрядность выходного потока:"
 
-#: src/libfauxdgui/prefs-window.cc:224 src/libfauxdgui/prefs-window.cc:269
-#: src/libfauxdqt/prefs-window-qt.cc:254 src/libfauxdqt/prefs-window-qt.cc:308
+#: src/libfauxdgui/prefs-window.cc:238 src/libfauxdgui/prefs-window.cc:283
+#: src/libfauxdqt/prefs-window-qt.cc:319 src/libfauxdqt/prefs-window-qt.cc:364
 msgid "Buffer size:"
 msgstr "Размер буфера:"
 
-#: src/libfauxdgui/prefs-window.cc:226 src/libfauxdqt/prefs-window-qt.cc:256
+#: src/libfauxdgui/prefs-window.cc:240 src/libfauxdqt/prefs-window-qt.cc:321
 msgid "ms"
 msgstr "мс"
 
-#: src/libfauxdgui/prefs-window.cc:227 src/libfauxdqt/prefs-window-qt.cc:257
+#: src/libfauxdgui/prefs-window.cc:241 src/libfauxdqt/prefs-window-qt.cc:322
 msgid "Soft clipping"
 msgstr "Мягкое отсечение"
 
-#: src/libfauxdgui/prefs-window.cc:229 src/libfauxdqt/prefs-window-qt.cc:259
+#: src/libfauxdgui/prefs-window.cc:243 src/libfauxdqt/prefs-window-qt.cc:324
 msgid "Use software volume control (not recommended)"
 msgstr "Использовать программную регулировку громкости (не рекомендуется)"
 
-#: src/libfauxdgui/prefs-window.cc:231 src/libfauxdqt/prefs-window-qt.cc:261
+#: src/libfauxdgui/prefs-window.cc:245 src/libfauxdqt/prefs-window-qt.cc:326
 msgid "<b>Recording Settings</b>"
 msgstr "<b>Настройки записи</b>"
 
-#: src/libfauxdgui/prefs-window.cc:235 src/libfauxdqt/prefs-window-qt.cc:265
+#: src/libfauxdgui/prefs-window.cc:249 src/libfauxdqt/prefs-window-qt.cc:330
 msgid "Record stream:"
 msgstr "Запись потока:"
 
-#: src/libfauxdgui/prefs-window.cc:238 src/libfauxdqt/prefs-window-qt.cc:268
+#: src/libfauxdgui/prefs-window.cc:252 src/libfauxdqt/prefs-window-qt.cc:333
 msgid "<b>ReplayGain</b>"
 msgstr "<b>Выравнивание громкости</b>"
 
-#: src/libfauxdgui/prefs-window.cc:239 src/libfauxdqt/prefs-window-qt.cc:269
+#: src/libfauxdgui/prefs-window.cc:253 src/libfauxdqt/prefs-window-qt.cc:334
 msgid "Enable ReplayGain"
 msgstr "Включить выравнивание громкости"
 
-#: src/libfauxdgui/prefs-window.cc:241 src/libfauxdqt/prefs-window-qt.cc:271
+#: src/libfauxdgui/prefs-window.cc:255 src/libfauxdqt/prefs-window-qt.cc:336
 msgid "Mode:"
 msgstr "Режим:"
 
-#: src/libfauxdgui/prefs-window.cc:245 src/libfauxdqt/prefs-window-qt.cc:275
+#: src/libfauxdgui/prefs-window.cc:259 src/libfauxdqt/prefs-window-qt.cc:340
 msgid "Prevent clipping (recommended)"
 msgstr "Предотвратить отсечение (рекомендуется)"
 
-#: src/libfauxdgui/prefs-window.cc:253 src/libfauxdqt/prefs-window-qt.cc:283
+#: src/libfauxdgui/prefs-window.cc:267 src/libfauxdqt/prefs-window-qt.cc:348
 msgid "Proxy hostname:"
 msgstr "Имя узла прокси-сервера:"
 
-#: src/libfauxdgui/prefs-window.cc:255 src/libfauxdqt/prefs-window-qt.cc:285
+#: src/libfauxdgui/prefs-window.cc:269 src/libfauxdqt/prefs-window-qt.cc:350
 msgid "Proxy port:"
 msgstr "Порт:"
 
-#: src/libfauxdgui/prefs-window.cc:260 src/libfauxdqt/prefs-window-qt.cc:290
+#: src/libfauxdgui/prefs-window.cc:274 src/libfauxdqt/prefs-window-qt.cc:355
 msgid "Proxy username:"
 msgstr "Имя пользователя:"
 
-#: src/libfauxdgui/prefs-window.cc:262 src/libfauxdqt/prefs-window-qt.cc:292
+#: src/libfauxdgui/prefs-window.cc:276 src/libfauxdqt/prefs-window-qt.cc:357
 msgid "Proxy password:"
 msgstr "Пароль:"
 
-#: src/libfauxdgui/prefs-window.cc:268 src/libfauxdqt/prefs-window-qt.cc:307
+#: src/libfauxdgui/prefs-window.cc:282 src/libfauxdqt/prefs-window-qt.cc:363
 msgid "<b>Network Settings</b>"
 msgstr "<b>Сетевые настройки</b>"
 
-#: src/libfauxdgui/prefs-window.cc:271 src/libfauxdqt/prefs-window-qt.cc:310
+#: src/libfauxdgui/prefs-window.cc:285 src/libfauxdqt/prefs-window-qt.cc:366
 msgid "KiB"
 msgstr "КиБ"
 
-#: src/libfauxdgui/prefs-window.cc:272 src/libfauxdqt/prefs-window-qt.cc:311
+#: src/libfauxdgui/prefs-window.cc:286 src/libfauxdqt/prefs-window-qt.cc:367
 msgid "<b>Proxy Configuration</b>"
 msgstr "<b>Настройка прокси-сервера</b>"
 
-#: src/libfauxdgui/prefs-window.cc:273 src/libfauxdqt/prefs-window-qt.cc:312
+#: src/libfauxdgui/prefs-window.cc:287 src/libfauxdqt/prefs-window-qt.cc:368
 msgid "Enable proxy usage"
 msgstr "Использовать прокси"
 
-#: src/libfauxdgui/prefs-window.cc:277 src/libfauxdqt/prefs-window-qt.cc:316
+#: src/libfauxdgui/prefs-window.cc:291 src/libfauxdqt/prefs-window-qt.cc:372
 msgid "Use authentication with proxy"
 msgstr "Использовать авторизацию с прокси"
 
-#: src/libfauxdgui/prefs-window.cc:281 src/libfauxdqt/prefs-window-qt.cc:320
-msgid "SOCKS proxy?"
+#: src/libfauxdgui/prefs-window.cc:295 src/libfauxdqt/prefs-window-qt.cc:376
+msgid "Use SOCKS proxy"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:283 src/libfauxdqt/prefs-window-qt.cc:298
+#: src/libfauxdgui/prefs-window.cc:297 src/libfauxdqt/prefs-window-qt.cc:378
 msgid "SOCKS v4a"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:287 src/libfauxdqt/prefs-window-qt.cc:301
+#: src/libfauxdgui/prefs-window.cc:301 src/libfauxdqt/prefs-window-qt.cc:382
 msgid "SOCKS v5"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:294 src/libfauxdqt/prefs-window-qt.cc:327
+#: src/libfauxdgui/prefs-window.cc:308 src/libfauxdqt/prefs-window-qt.cc:389
 msgid "Auto character encoding detector for:"
 msgstr "Автоматически определять кодировку для языка:"
 
-#: src/libfauxdgui/prefs-window.cc:297 src/libfauxdqt/prefs-window-qt.cc:330
+#: src/libfauxdgui/prefs-window.cc:311 src/libfauxdqt/prefs-window-qt.cc:392
 msgid "Fallback character encodings:"
 msgstr "Если не удалось определить, использовать кодировку:"
 
-#: src/libfauxdgui/prefs-window.cc:305 src/libfauxdqt/prefs-window-qt.cc:338
+#: src/libfauxdgui/prefs-window.cc:319 src/libfauxdqt/prefs-window-qt.cc:400
 msgid "<b>Behavior</b>"
 msgstr "<b>Поведение</b>"
 
-#: src/libfauxdgui/prefs-window.cc:306 src/libfauxdqt/prefs-window-qt.cc:339
+#: src/libfauxdgui/prefs-window.cc:320 src/libfauxdqt/prefs-window-qt.cc:401
 msgid "Resume playback on startup"
 msgstr "Продолжить воспроизведение при запуске"
 
-#: src/libfauxdgui/prefs-window.cc:308 src/libfauxdqt/prefs-window-qt.cc:341
-msgid "Pause instead of resuming immediately"
+#: src/libfauxdgui/prefs-window.cc:322 src/libfauxdqt/prefs-window-qt.cc:403
+#, fuzzy
+msgid "...but Pause instead of resuming immediately"
 msgstr "Пауза вместо немедленного продолжения"
 
-#: src/libfauxdgui/prefs-window.cc:311 src/libfauxdqt/prefs-window-qt.cc:344
+#: src/libfauxdgui/prefs-window.cc:325 src/libfauxdqt/prefs-window-qt.cc:406
 msgid "Advance when the current song is deleted"
 msgstr "Продвигаться дальше, если текущая композиция удалена"
 
-#: src/libfauxdgui/prefs-window.cc:313 src/libfauxdqt/prefs-window-qt.cc:346
-msgid "Clear the playlist when opening files"
+#: src/libfauxdgui/prefs-window.cc:327 src/libfauxdqt/prefs-window-qt.cc:408
+#, fuzzy
+msgid "Clear the playlist when Opening (not \"Adding\") files"
 msgstr "Очистить список воспроизведения при открытии файлов"
 
-#: src/libfauxdgui/prefs-window.cc:315 src/libfauxdqt/prefs-window-qt.cc:348
-msgid "Open files in a temporary playlist"
+#: src/libfauxdgui/prefs-window.cc:329 src/libfauxdqt/prefs-window-qt.cc:410
+#, fuzzy
+msgid "Open files in a temporary (\"Now Playing\") playlist"
 msgstr "Открывать файлы во временном списке воспроизведения"
 
-#: src/libfauxdgui/prefs-window.cc:319 src/libfauxdqt/prefs-window-qt.cc:352
+#: src/libfauxdgui/prefs-window.cc:331 src/libfauxdqt/prefs-window-qt.cc:412
 msgid "<b>Song Display</b>"
 msgstr "<b>Отображение композиций</b>"
 
-#: src/libfauxdgui/prefs-window.cc:320 src/libfauxdqt/prefs-window-qt.cc:353
+#: src/libfauxdgui/prefs-window.cc:332 src/libfauxdqt/prefs-window-qt.cc:413
 msgid "Show song numbers"
 msgstr "Показывать номер композиции"
 
-#: src/libfauxdgui/prefs-window.cc:322 src/libfauxdqt/prefs-window-qt.cc:355
+#: src/libfauxdgui/prefs-window.cc:334 src/libfauxdqt/prefs-window-qt.cc:415
 msgid "Show leading zeroes (02:00 vs. 2:00)"
 msgstr "Показывать нули в начале (02:00 вместо 2:00)"
 
-#: src/libfauxdgui/prefs-window.cc:324 src/libfauxdqt/prefs-window-qt.cc:357
+#: src/libfauxdgui/prefs-window.cc:336 src/libfauxdqt/prefs-window-qt.cc:417
 msgid "Show hours separately (1:30:00 vs. 90:00)"
 msgstr "Показывать часы отдельно (1:30:00 вместо 90:00)"
 
-#: src/libfauxdgui/prefs-window.cc:327 src/libfauxdqt/prefs-window-qt.cc:360
+#: src/libfauxdgui/prefs-window.cc:339 src/libfauxdqt/prefs-window-qt.cc:420
 msgid "<b>Export</b>"
 msgstr "<b>Экспорт</b>"
 
-#: src/libfauxdgui/prefs-window.cc:328 src/libfauxdqt/prefs-window-qt.cc:361
+#: src/libfauxdgui/prefs-window.cc:340 src/libfauxdqt/prefs-window-qt.cc:421
 msgid "Use relative paths when possible"
 msgstr "Используйте относительные пути, если это возможно"
 
-#: src/libfauxdgui/prefs-window.cc:333 src/libfauxdqt/prefs-window-qt.cc:366
+#: src/libfauxdgui/prefs-window.cc:342 src/libfauxdgui/prefs-window.cc:390
+#: src/libfauxdgui/prefs-window.cc:423 src/libfauxdqt/prefs-window-qt.cc:423
+#: src/libfauxdqt/prefs-window-qt.cc:468 src/libfauxdqt/prefs-window-qt.cc:501
+#, fuzzy
+msgid "<b>Fauxdacious Extras</b>"
+msgstr "Настройки Audacious"
+
+#: src/libfauxdgui/prefs-window.cc:345 src/libfauxdqt/prefs-window-qt.cc:426
+msgid "Split Artist - Title in streams"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:347 src/libfauxdqt/prefs-window-qt.cc:428
+msgid "Advance to next selected entry in list"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:349 src/libfauxdqt/prefs-window-qt.cc:430
+msgid "Keep playlist metadata (like cuesheets do)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:351 src/libfauxdqt/prefs-window-qt.cc:432
+msgid "Don't allow streams to change metadata"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:353 src/libfauxdqt/prefs-window-qt.cc:434
+msgid "Limit playlist URLs to"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:355 src/libfauxdqt/prefs-window-qt.cc:436
+msgid "entries (0=no limit)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:359 src/libfauxdqt/prefs-window-qt.cc:440
 msgid "<b>Album Art</b>"
 msgstr "<b>Обложка альбома</b>"
 
-#: src/libfauxdgui/prefs-window.cc:334 src/libfauxdqt/prefs-window-qt.cc:367
+#: src/libfauxdgui/prefs-window.cc:360 src/libfauxdqt/prefs-window-qt.cc:441
 msgid "Search for images matching these words (comma-separated):"
 msgstr "Искать изображения, содержащие эти слова (разделять запятыми):"
 
-#: src/libfauxdgui/prefs-window.cc:336 src/libfauxdqt/prefs-window-qt.cc:369
+#: src/libfauxdgui/prefs-window.cc:362 src/libfauxdqt/prefs-window-qt.cc:443
 msgid "Exclude images matching these words (comma-separated):"
 msgstr "Исключать изображения, содержащие эти слова (разделять запятыми):"
 
-#: src/libfauxdgui/prefs-window.cc:338 src/libfauxdqt/prefs-window-qt.cc:371
-msgid "Default cover image file?:"
+#: src/libfauxdgui/prefs-window.cc:364 src/libfauxdqt/prefs-window-qt.cc:445
+msgid "Directory Channel-icon image (filename[.ext] only)?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:340 src/libfauxdqt/prefs-window-qt.cc:373
+#: src/libfauxdgui/prefs-window.cc:366 src/libfauxdqt/prefs-window-qt.cc:447
+msgid "Fallback cover image file? (full path required):"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:368 src/libfauxdqt/prefs-window-qt.cc:449
+msgid "Use Directory Channel-icon image file (see above)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:370 src/libfauxdqt/prefs-window-qt.cc:451
 msgid "Search for images matching song file name"
 msgstr "Искать изображения, совпадающие с композицией по имени файла"
 
-#: src/libfauxdgui/prefs-window.cc:342 src/libfauxdqt/prefs-window-qt.cc:375
+#: src/libfauxdgui/prefs-window.cc:372 src/libfauxdqt/prefs-window-qt.cc:453
+#, fuzzy
+msgid "Search for images matching Album tag (file name overrides)"
+msgstr "Искать изображения, совпадающие с композицией по имени файла"
+
+#: src/libfauxdgui/prefs-window.cc:374 src/libfauxdqt/prefs-window-qt.cc:455
 msgid "Search recursively"
 msgstr "Рекурсивный поиск"
 
-#: src/libfauxdgui/prefs-window.cc:344 src/libfauxdqt/prefs-window-qt.cc:377
+#: src/libfauxdgui/prefs-window.cc:376 src/libfauxdqt/prefs-window-qt.cc:457
 msgid "Search depth:"
 msgstr "Глубина поиска:"
 
-#: src/libfauxdgui/prefs-window.cc:348 src/libfauxdqt/prefs-window-qt.cc:381
+#: src/libfauxdgui/prefs-window.cc:380 src/libfauxdqt/prefs-window-qt.cc:461
 msgid "<b>Popup Information</b>"
 msgstr "<b>Всплывающее информационное окно</b>"
 
-#: src/libfauxdgui/prefs-window.cc:349 src/libfauxdqt/prefs-window-qt.cc:382
+#: src/libfauxdgui/prefs-window.cc:381 src/libfauxdqt/prefs-window-qt.cc:462
 msgid "Show popup information"
 msgstr "Показывать всплывающее информационное окно"
 
-#: src/libfauxdgui/prefs-window.cc:351 src/libfauxdqt/prefs-window-qt.cc:384
+#: src/libfauxdgui/prefs-window.cc:383 src/libfauxdqt/prefs-window-qt.cc:464
 msgid "Popup delay (tenths of a second):"
 msgstr "Задержка всплывания (десятые доли секунды):"
 
-#: src/libfauxdgui/prefs-window.cc:355 src/libfauxdqt/prefs-window-qt.cc:388
+#: src/libfauxdgui/prefs-window.cc:387
 msgid "Show time scale for current song"
 msgstr "Показывать шкалу времени для текущей композиции"
 
-#: src/libfauxdgui/prefs-window.cc:361 src/libfauxdqt/prefs-window-qt.cc:394
+#: src/libfauxdgui/prefs-window.cc:391 src/libfauxdqt/prefs-window-qt.cc:469
+msgid "Save unsavable metadata to file"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:394 src/libfauxdqt/prefs-window-qt.cc:472
+#, fuzzy
+msgid "Save tags to:"
+msgstr "Сохранить в историю"
+
+#: src/libfauxdgui/prefs-window.cc:400 src/libfauxdqt/prefs-window-qt.cc:478
 msgid "<b>Compatibility</b>"
 msgstr "<b>Совместимость</b>"
 
-#: src/libfauxdgui/prefs-window.cc:362 src/libfauxdqt/prefs-window-qt.cc:395
+#: src/libfauxdgui/prefs-window.cc:401 src/libfauxdqt/prefs-window-qt.cc:479
 msgid "Interpret \\ (backward slash) as a folder delimiter"
 msgstr "Считать \\ (обратную косую черту) разделителем имён каталогов"
 
-#: src/libfauxdgui/prefs-window.cc:365 src/libfauxdqt/prefs-window-qt.cc:398
+#: src/libfauxdgui/prefs-window.cc:404 src/libfauxdqt/prefs-window-qt.cc:482
 msgid "<b>Playlist</b>"
 msgstr "<b>Список воспроизведения</b>"
 
-#: src/libfauxdgui/prefs-window.cc:366 src/libfauxdqt/prefs-window-qt.cc:399
+#: src/libfauxdgui/prefs-window.cc:405 src/libfauxdqt/prefs-window-qt.cc:483
 msgid "Add folders recursively"
 msgstr "Добавлять каталоги рекурсивно"
 
-#: src/libfauxdgui/prefs-window.cc:368 src/libfauxdqt/prefs-window-qt.cc:401
+#: src/libfauxdgui/prefs-window.cc:407 src/libfauxdqt/prefs-window-qt.cc:485
 msgid "Add folders nested within playlist files"
 msgstr "Добавлять каталоги, содержащиеся в списках воспроизведения"
 
-#: src/libfauxdgui/prefs-window.cc:370 src/libfauxdqt/prefs-window-qt.cc:403
+#: src/libfauxdgui/prefs-window.cc:409 src/libfauxdqt/prefs-window-qt.cc:487
 msgid "<b>Metadata</b>"
 msgstr "<b>Метаданные</b>"
 
-#: src/libfauxdgui/prefs-window.cc:371 src/libfauxdqt/prefs-window-qt.cc:404
+#: src/libfauxdgui/prefs-window.cc:410 src/libfauxdqt/prefs-window-qt.cc:488
 msgid "Guess missing metadata from file path"
 msgstr "Определять отсутствующие метаданные по пути файла"
 
-#: src/libfauxdgui/prefs-window.cc:373 src/libfauxdqt/prefs-window-qt.cc:406
+#: src/libfauxdgui/prefs-window.cc:412 src/libfauxdqt/prefs-window-qt.cc:490
 msgid "Do not load metadata for songs until played"
 msgstr "Не загружать метаданные композиций до воспроизведения"
 
-#: src/libfauxdgui/prefs-window.cc:375 src/libfauxdqt/prefs-window-qt.cc:408
+#: src/libfauxdgui/prefs-window.cc:414 src/libfauxdqt/prefs-window-qt.cc:492
 msgid "Probe content of files with no recognized file name extension"
 msgstr "Воспроизводить файлы с неизвестными расширениями"
 
-#: src/libfauxdgui/prefs-window.cc:393 src/libfauxdqt/prefs-window-qt.cc:426
+#: src/libfauxdgui/prefs-window.cc:416 src/libfauxdqt/prefs-window-qt.cc:494
+msgid "<b>Miscellaneous</b>"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:417 src/libfauxdqt/prefs-window-qt.cc:495
+msgid "Step forward/backward by:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:419 src/libfauxdqt/prefs-window-qt.cc:497
+msgid "seconds"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:420 src/libfauxdqt/prefs-window-qt.cc:498
+msgid "Adjust volume by:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:422 src/libfauxdqt/prefs-window-qt.cc:500
+msgid "percent"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:424 src/libfauxdqt/prefs-window-qt.cc:502
+msgid "Allow URL-helper:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:427 src/libfauxdqt/prefs-window-qt.cc:505
+msgid "URL-helper program?:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:429 src/libfauxdqt/prefs-window-qt.cc:507
+msgid "Cover Art-helper program?:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:431 src/libfauxdqt/prefs-window-qt.cc:509
+msgid "Lyrics plugins helper program?:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:433 src/libfauxdqt/prefs-window-qt.cc:511
+msgid "Quirky window-managers (ie. AfterStep)?"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:451 src/libfauxdqt/prefs-window-qt.cc:529
 msgid "TITLE"
 msgstr "НАЗВАНИЕ"
 
-#: src/libfauxdgui/prefs-window.cc:394 src/libfauxdqt/prefs-window-qt.cc:427
+#: src/libfauxdgui/prefs-window.cc:452 src/libfauxdqt/prefs-window-qt.cc:530
 msgid "TITLE - ARTIST"
 msgstr "НАЗВАНИЕ - ИСПОЛНИТЕЛЬ"
 
-#: src/libfauxdgui/prefs-window.cc:395 src/libfauxdqt/prefs-window-qt.cc:428
+#: src/libfauxdgui/prefs-window.cc:453 src/libfauxdqt/prefs-window-qt.cc:531
 msgid "TITLE - ARTIST - ALBUM"
 msgstr "НАЗВАНИЕ - ИСПОЛНИТЕЛЬ - АЛЬБОМ"
 
-#: src/libfauxdgui/prefs-window.cc:396 src/libfauxdqt/prefs-window-qt.cc:429
+#: src/libfauxdgui/prefs-window.cc:454 src/libfauxdqt/prefs-window-qt.cc:532
 msgid "ARTIST - TITLE"
 msgstr "ИСПОЛНИТЕЛЬ - НАЗВАНИЕ"
 
-#: src/libfauxdgui/prefs-window.cc:397 src/libfauxdqt/prefs-window-qt.cc:430
+#: src/libfauxdgui/prefs-window.cc:455 src/libfauxdqt/prefs-window-qt.cc:533
 msgid "ARTIST - ALBUM - TITLE"
 msgstr "ИСПОЛНИТЕЛЬ - АЛЬБОМ - НАЗВАНИЕ"
 
-#: src/libfauxdgui/prefs-window.cc:398 src/libfauxdqt/prefs-window-qt.cc:431
+#: src/libfauxdgui/prefs-window.cc:456 src/libfauxdqt/prefs-window-qt.cc:534
 msgid "ARTIST - ALBUM - TRACK. TITLE"
 msgstr "ИСПОЛНИТЕЛЬ - АЛЬБОМ - ДОРОЖКА. НАЗВАНИЕ"
 
-#: src/libfauxdgui/prefs-window.cc:399 src/libfauxdqt/prefs-window-qt.cc:432
+#: src/libfauxdgui/prefs-window.cc:457 src/libfauxdqt/prefs-window-qt.cc:535
 msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
 msgstr "ИСПОЛНИТЕЛЬ [ АЛЬБОМ ] - ДОРОЖКА. НАЗВАНИЕ"
 
-#: src/libfauxdgui/prefs-window.cc:400 src/libfauxdqt/prefs-window-qt.cc:433
+#: src/libfauxdgui/prefs-window.cc:458 src/libfauxdqt/prefs-window-qt.cc:536
 msgid "ALBUM - TITLE"
 msgstr "АЛЬБОМ - НАЗВАНИЕ"
 
-#: src/libfauxdgui/prefs-window.cc:494
+#: src/libfauxdgui/prefs-window.cc:552
 msgid "Category"
 msgstr "Категория"
 
-#: src/libfauxdgui/prefs-window.cc:583 src/libfauxdqt/prefs-window-qt.cc:451
+#: src/libfauxdgui/prefs-window.cc:641 src/libfauxdqt/prefs-window-qt.cc:554
 msgid "Custom"
 msgstr "Другой формат"
 
-#: src/libfauxdgui/prefs-window.cc:601 src/libfauxdqt/prefs-window-qt.cc:443
+#: src/libfauxdgui/prefs-window.cc:659 src/libfauxdqt/prefs-window-qt.cc:546
 msgid "Title format:"
 msgstr "Формат названия:"
 
-#: src/libfauxdgui/prefs-window.cc:605 src/libfauxdqt/prefs-window-qt.cc:454
+#: src/libfauxdgui/prefs-window.cc:663 src/libfauxdqt/prefs-window-qt.cc:557
 msgid "Custom string:"
 msgstr "Задать формат:"
 
-#: src/libfauxdgui/prefs-window.cc:804 src/libfauxdqt/prefs-window-qt.cc:763
+#: src/libfauxdgui/prefs-window.cc:862 src/libfauxdqt/prefs-window-qt.cc:870
 #, fuzzy, c-format
-msgid "Record audio stream using %s"
+msgid "Enable audio stream recording with %s"
 msgstr "Включить запись звукового потока с помощью %s"
 
-#: src/libfauxdgui/prefs-window.cc:815 src/libfauxdqt/prefs-window-qt.cc:776
+#: src/libfauxdgui/prefs-window.cc:871 src/libfauxdqt/prefs-window-qt.cc:881
 msgid "No audio recording plugin available"
 msgstr "Нет доступных модулей для записи звука"
 
-#: src/libfauxdgui/prefs-window.cc:875 src/libfauxdqt/prefs-window-qt.cc:633
+#: src/libfauxdgui/prefs-window.cc:931 src/libfauxdqt/prefs-window-qt.cc:736
 #, fuzzy
-msgid "Fauxdacious Settings"
-msgstr "Настройки Audacious"
+msgid "Settings - Fauxdacious"
+msgstr "Об Audacious"
 
-#: src/libfauxdgui/preset-browser.cc:79 src/libfauxdgui/util.cc:172
-msgid "Cancel"
-msgstr "Отмена"
-
-#: src/libfauxdgui/preset-browser.cc:80
+#: src/libfauxdgui/preset-browser.cc:84 src/libfauxdqt/eq-preset-qt.cc:353
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/libfauxdgui/preset-browser.cc:80
+#: src/libfauxdgui/preset-browser.cc:84 src/libfauxdqt/eq-preset-qt.cc:307
+#: src/libfauxdqt/info-widget.cc:211
 msgid "Load"
 msgstr "Загрузить"
 
-#: src/libfauxdgui/preset-browser.cc:83
+#: src/libfauxdgui/preset-browser.cc:87
 #, fuzzy
 msgid "Preset/Eq Files"
 msgstr "Файл предустановок ..."
 
-#: src/libfauxdgui/preset-browser.cc:84
+#: src/libfauxdgui/preset-browser.cc:88
 #, fuzzy
 msgid "*.preset"
 msgstr "<название>.preset"
 
-#: src/libfauxdgui/preset-browser.cc:85
+#: src/libfauxdgui/preset-browser.cc:89
 msgid "*.eqf"
 msgstr ""
 
-#: src/libfauxdgui/preset-browser.cc:86
+#: src/libfauxdgui/preset-browser.cc:90
 msgid "*.q1"
 msgstr ""
 
-#: src/libfauxdgui/preset-browser.cc:117
-msgid "Load Preset File"
+#: src/libfauxdgui/preset-browser.cc:126 src/libfauxdqt/eq-preset-qt.cc:303
+#, fuzzy
+msgid "Load Preset File - Fauxdacious"
 msgstr "Загрузить файл предустановок"
 
-#: src/libfauxdgui/preset-browser.cc:135
-msgid "Load EQF File"
+#: src/libfauxdgui/preset-browser.cc:141
+#, fuzzy
+msgid "Load EQF File - Fauxdacious"
 msgstr "Загрузить файл предустановок эквалайзера"
 
-#: src/libfauxdgui/preset-browser.cc:187 src/libfauxdgui/preset-browser.cc:225
-#: src/libfauxdgui/preset-browser.cc:255 src/libfauxdgui/preset-browser.cc:270
-#: src/libfauxdgui/preset-browser.cc:276
-msgid "Save Preset File"
+#: src/libfauxdgui/preset-browser.cc:183 src/libfauxdgui/preset-browser.cc:207
+#: src/libfauxdgui/preset-browser.cc:242 src/libfauxdgui/preset-browser.cc:275
+#: src/libfauxdgui/preset-browser.cc:306 src/libfauxdgui/preset-browser.cc:322
+#: src/libfauxdgui/preset-browser.cc:332
+#, fuzzy
+msgid "Save Preset File - Fauxdacious"
 msgstr "Сохранить файл предустановок"
 
-#: src/libfauxdgui/preset-browser.cc:276
-msgid "<name>.preset"
-msgstr "<название>.preset"
-
-#: src/libfauxdgui/preset-browser.cc:295
-msgid "Save EQF File"
+#: src/libfauxdgui/preset-browser.cc:352
+#, fuzzy
+msgid "Save EQF File - Fauxdacious"
 msgstr "Сохранить файл предустановок эквалайзера"
 
-#: src/libfauxdgui/preset-browser.cc:295
-msgid "<name>.eqf"
-msgstr "<название>.eqf"
-
-#: src/libfauxdgui/preset-browser.cc:310
-msgid "Import Winamp Presets"
-msgstr "Импортировать предустановки Winamp"
-
-#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:159
+#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:227
 msgid "Queue Manager"
 msgstr "Управление очередью"
 
-#: src/libfauxdgui/queue-manager.cc:193 src/libfauxdqt/queue-manager-qt.cc:162
+#: src/libfauxdgui/queue-manager.cc:193 src/libfauxdqt/queue-manager-qt.cc:179
 msgid "_Unqueue"
 msgstr "_Убрать из очереди"
 
@@ -1525,7 +1708,7 @@ msgstr "_Убрать из очереди"
 msgid "Working ..."
 msgstr "Работаю ..."
 
-#: src/libfauxdgui/status.cc:85 src/libfauxdqt/log-inspector.cc:209
+#: src/libfauxdgui/status.cc:85 src/libfauxdqt/log-inspector.cc:210
 msgid "Error"
 msgstr "Ошибка"
 
@@ -1533,30 +1716,27 @@ msgstr "Ошибка"
 msgid "Information"
 msgstr "Информация"
 
-#: src/libfauxdgui/url-opener.cc:55 src/libfauxdqt/url-opener-qt.cc:39
+#: src/libfauxdgui/url-opener.cc:55 src/libfauxdqt/url-opener-qt.cc:40
 msgid "_Save to history"
 msgstr "Сохранить в историю"
 
-#: src/libfauxdgui/url-opener.cc:63 src/libfauxdqt/url-opener-qt.cc:47
-msgid "Open URL"
-msgstr "Открыть веб-ссылку"
+#: src/libfauxdgui/url-opener.cc:63 src/libfauxdqt/url-opener-qt.cc:48
+#, fuzzy
+msgid "Open URL - Fauxdacious"
+msgstr "Audacious"
 
-#: src/libfauxdgui/url-opener.cc:69 src/libfauxdqt/url-opener-qt.cc:53
-msgid "Add URL"
-msgstr "Добавить веб-ссылку"
+#: src/libfauxdgui/url-opener.cc:69 src/libfauxdqt/url-opener-qt.cc:54
+#, fuzzy
+msgid "Add URL - Fauxdacious"
+msgstr "Audacious"
 
-#: src/libfauxdgui/url-opener.cc:92 src/libfauxdqt/url-opener-qt.cc:68
+#: src/libfauxdgui/url-opener.cc:92 src/libfauxdqt/url-opener-qt.cc:69
 msgid "C_lear history"
 msgstr "О_чистить историю"
 
-#: src/libfauxdgui/url-opener.cc:104 src/libfauxdqt/url-opener-qt.cc:62
+#: src/libfauxdgui/url-opener.cc:104 src/libfauxdqt/url-opener-qt.cc:63
 msgid "Enter URL:"
 msgstr "Введите веб-ссылку:"
-
-#: src/libfauxdgui/util.cc:172 src/libfauxdqt/fileopener.cc:66
-#: src/libfauxdqt/fileopener.cc:67
-msgid "Open"
-msgstr "Открыть"
 
 #: src/libfauxdgui/util.cc:284
 msgid ""
@@ -1566,102 +1746,247 @@ msgstr ""
 "\n"
 "(Подробные сообщения были скрыты.)"
 
-#: src/libfauxdqt/fileopener.cc:58
-msgid "Open Folder"
-msgstr "Открыть каталог"
+#: src/libfauxdqt/audqt.cc:146
+#, fuzzy
+msgid "Fauxdacious_Qt"
+msgstr "Audacious"
+
+#: src/libfauxdqt/eq-preset-qt.cc:275
+msgid "Preset files (*.preset *.eqf *.q1)"
+msgstr ""
+
+#: src/libfauxdqt/eq-preset-qt.cc:348
+msgid "Save Preset File"
+msgstr "Сохранить файл предустановок"
+
+#: src/libfauxdqt/eq-preset-qt.cc:592
+#, fuzzy
+msgid "Close"
+msgstr "_Закрыть"
+
+#: src/libfauxdqt/equalizer-qt.cc:145
+msgid "Hide"
+msgstr ""
+
+#: src/libfauxdqt/equalizer-qt.cc:146 src/libfauxdqt/prefs-window-qt.cc:252
+msgid "Flat"
+msgstr ""
+
+#: src/libfauxdqt/equalizer-qt.cc:152 src/libfauxdqt/equalizer-qt.cc:240
+msgid "PreSETs!"
+msgstr ""
+
+#: src/libfauxdqt/equalizer-qt.cc:157 src/libfauxdqt/equalizer-qt.cc:245
+#, fuzzy
+msgid "Presets"
+msgstr "Предустановки ..."
+
+#: src/libfauxdqt/equalizer-qt.cc:159
+#, fuzzy
+msgid "Auto"
+msgstr "Автоматически"
+
+#: src/libfauxdqt/file-entry.cc:41
+msgid "Browse"
+msgstr ""
 
 #: src/libfauxdqt/fileopener.cc:60
-msgid "Add Folder"
-msgstr "Добавить каталог"
+#, fuzzy
+msgid "Open Folder - Fauxdacious"
+msgstr "Об Audacious"
 
-#: src/libfauxdqt/fileopener.cc:68 src/libfauxdqt/fileopener.cc:69
+#: src/libfauxdqt/fileopener.cc:62
+#, fuzzy
+msgid "Add Folder - Fauxdacious"
+msgstr "Об Audacious"
+
+#: src/libfauxdqt/fileopener.cc:63
+#, fuzzy
+msgid "Import Playlist - Fauxdacious"
+msgstr "Импортировать список воспроизведения"
+
+#: src/libfauxdqt/fileopener.cc:64
+#, fuzzy
+msgid "Export Playlist - Fauxdacious"
+msgstr "Экспортировать список воспроизведения"
+
+#: src/libfauxdqt/fileopener.cc:70 src/libfauxdqt/fileopener.cc:71
 msgid "Add"
 msgstr "Добавить"
 
-#: src/libfauxdqt/info-widget.cc:40
+#: src/libfauxdqt/font-entry.cc:37
+msgid "Set Font"
+msgstr ""
+
+#: src/libfauxdqt/info-widget.cc:50
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: src/libfauxdqt/info-widget.cc:48
+#: src/libfauxdqt/info-widget.cc:58
 msgid "Composer"
 msgstr "Композитор"
 
-#: src/libfauxdqt/info-widget.cc:49
+#: src/libfauxdqt/info-widget.cc:59
 msgid "Performer"
 msgstr "Исполнитель"
 
-#: src/libfauxdqt/info-widget.cc:50
+#: src/libfauxdqt/info-widget.cc:60
 msgid "Recording Year"
 msgstr "Год записи"
 
-#: src/libfauxdqt/info-widget.cc:51
+#: src/libfauxdqt/info-widget.cc:61
 msgid "Recording Date"
 msgstr "Дата записи"
 
-#: src/libfauxdqt/info-widget.cc:54
+#: src/libfauxdqt/info-widget.cc:64
 msgid "Technical"
 msgstr "Технические"
 
-#: src/libfauxdqt/info-widget.cc:58
+#: src/libfauxdqt/info-widget.cc:68
 msgid "Bitrate"
 msgstr "Битрейт"
 
-#: src/libfauxdqt/log-inspector.cc:137
+#: src/libfauxdqt/info-widget.cc:69
+#, fuzzy
+msgid "Channels"
+msgstr "%d канал"
+
+#: src/libfauxdqt/info-widget.cc:70
+msgid "MusicBrainz ID"
+msgstr ""
+
+#: src/libfauxdqt/info-widget.cc:206
+msgid "Image files (*.gif *.jpg *.jpeg *.png)"
+msgstr ""
+
+#: src/libfauxdqt/infowin-qt.cc:95
+msgid "Art Lookup"
+msgstr ""
+
+#: src/libfauxdqt/log-inspector.cc:138
 msgid "Level"
 msgstr "Уровень"
 
-#: src/libfauxdqt/log-inspector.cc:138
+#: src/libfauxdqt/log-inspector.cc:139
 msgid "Function"
 msgstr "Функция"
 
-#: src/libfauxdqt/log-inspector.cc:139
+#: src/libfauxdqt/log-inspector.cc:140
 msgid "Message"
 msgstr "Сообщение"
 
-#: src/libfauxdqt/log-inspector.cc:195
-msgid "Log Inspector"
+#: src/libfauxdqt/log-inspector.cc:196
+#, fuzzy
+msgid "Log Inspector - Fauxdacious"
 msgstr "Инспектор журнала"
 
-#: src/libfauxdqt/log-inspector.cc:206
+#: src/libfauxdqt/log-inspector.cc:207
 msgid "Debug"
 msgstr "Отладка"
 
-#: src/libfauxdqt/log-inspector.cc:207
+#: src/libfauxdqt/log-inspector.cc:208
 msgid "Info"
 msgstr "Информация"
 
-#: src/libfauxdqt/log-inspector.cc:208
+#: src/libfauxdqt/log-inspector.cc:209
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: src/libfauxdqt/log-inspector.cc:219
+#: src/libfauxdqt/log-inspector.cc:220
 msgid "Cl_ear"
 msgstr "Чи_сто"
 
-#: src/libfauxdqt/log-inspector.cc:232
+#: src/libfauxdqt/log-inspector.cc:233
 msgid "Log Level:"
 msgstr "Уровень журналирования:"
+
+#: src/libfauxdqt/playlist-management.cc:57
+#, fuzzy
+msgid "_Do not ask again"
+msgstr "_Не спрашивать снова"
+
+#: src/libfauxdqt/playlist-management.cc:63
+#, fuzzy, c-format
+msgid "Do you want to permanently remove %s?"
+msgstr "Вы хотите удалить “%s” без возможности восстановления?"
 
 #: src/libfauxdqt/plugin-menu-qt.cc:53
 msgid "Services"
 msgstr "Службы"
 
-#: src/libfauxdqt/util-qt.cc:77
+#: src/libfauxdqt/prefs-window-qt.cc:237 src/libfauxdqt/prefs-window-qt.cc:250
+#: src/libfauxdqt/prefs-window-qt.cc:264
+msgid "Native"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:238
+msgid "Dark"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:253
+msgid "Flat (dark)"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:265
+msgid "Native unless alt theme or icons"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:266
+msgid "Qt"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:273
+msgid "Theme:"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:275
+msgid "Icon theme:"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:280
+msgid "File Dialog Windows:"
+msgstr ""
+
+#: src/libfauxdqt/util-qt.cc:108
 msgid "Copy"
 msgstr "Копировать"
 
+#, fuzzy
+#~ msgid "Record"
+#~ msgstr "Запись потока:"
+
+#~ msgid "Winamp Presets ..."
+#~ msgstr "Предустановки Winamp ..."
+
+#~ msgid "Open Files"
+#~ msgstr "Открыть файлы"
+
+#~ msgid "Clea_r fields when moving to next song"
+#~ msgstr "_Очищать поля при переходе к следующей композиции"
+
+#~ msgid "<name>.preset"
+#~ msgstr "<название>.preset"
+
+#~ msgid "<name>.eqf"
+#~ msgstr "<название>.eqf"
+
+#~ msgid "Import Winamp Presets"
+#~ msgstr "Импортировать предустановки Winamp"
+
+#~ msgid "Open URL"
+#~ msgstr "Открыть веб-ссылку"
+
+#~ msgid "Add URL"
+#~ msgstr "Добавить веб-ссылку"
+
+#~ msgid "Open Folder"
+#~ msgstr "Открыть каталог"
+
+#~ msgid "Add Folder"
+#~ msgstr "Добавить каталог"
+
 #~ msgid "Select instance to run/control"
 #~ msgstr "Выбрать экземпляр для запуска/управления"
-
-#~ msgid ""
-#~ "Stream recording must be configured in Audio Settings before it can be "
-#~ "used."
-#~ msgstr ""
-#~ "Прежде, чем использовать запись потока, её нужно настроить в разделе "
-#~ "\"Звук\"."
-
-#~ msgid "Error recording output stream"
-#~ msgstr "Ошибка: запись в поток вывода невозможна"
 
 #~ msgid "Reset to Zero"
 #~ msgstr "Сбросить на ноль"

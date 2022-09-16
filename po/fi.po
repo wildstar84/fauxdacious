@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: https://redmine.audacious-media-player.org/\n"
-"POT-Creation-Date: 2018-08-15 12:14-0500\n"
+"POT-Creation-Date: 2022-09-16 14:59-0500\n"
 "PO-Revision-Date: 2018-07-21 10:48+0000\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/audacious/audacious/"
@@ -26,118 +26,127 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/fauxdacious/main.cc:78
+#: src/fauxdacious/main.cc:87
+msgid "Add Playlist: each use creates new pl. (-a | --add-list[=\"pl name\"])"
+msgstr ""
+
+#: src/fauxdacious/main.cc:88
 #, fuzzy
 msgid "Clear Playlist"
 msgstr "Uusi soittolista"
 
-#: src/fauxdacious/main.cc:79
+#: src/fauxdacious/main.cc:89
 msgid "DELETE all playlists!"
 msgstr ""
 
-#: src/fauxdacious/main.cc:80
+#: src/fauxdacious/main.cc:90
 msgid "Add files to the playlist"
 msgstr "Lisää tiedostoja soittolistaan"
 
-#: src/fauxdacious/main.cc:81
+#: src/fauxdacious/main.cc:91
 msgid "Add files to a temporary playlist"
 msgstr "Lisää tiedostoja väliaikaiselle soittolistalle"
 
-#: src/fauxdacious/main.cc:82
+#: src/fauxdacious/main.cc:92
 msgid "Skip to next song"
 msgstr "Siirry seuraavaan kappaleeseen"
 
-#: src/fauxdacious/main.cc:83
+#: src/fauxdacious/main.cc:93
 msgid "Fudge Additional Gain Adjustment"
 msgstr ""
 
-#: src/fauxdacious/main.cc:84
+#: src/fauxdacious/main.cc:95
+#, fuzzy
+msgid "Run in GTK mode (default)"
+msgstr "Suorita Qt-tilassa"
+
+#: src/fauxdacious/main.cc:97
 msgid "Show command-line help"
 msgstr "Näytä komentorivin ohje"
 
-#: src/fauxdacious/main.cc:85
+#: src/fauxdacious/main.cc:98
 msgid "Start without a graphical interface"
 msgstr "Käynnistä ilman graafista käyttöliittymää"
 
-#: src/fauxdacious/main.cc:86
+#: src/fauxdacious/main.cc:99
 msgid "Display the jump-to-song window"
 msgstr "Näytä \"siirry kappaleeseen\"-ikkuna"
 
-#: src/fauxdacious/main.cc:87
+#: src/fauxdacious/main.cc:100
 msgid "Display the main window"
 msgstr "Näytä pääikkuna"
 
-#: src/fauxdacious/main.cc:88
-msgid "New Instance:  number, name, or unnamed (ie: -# | --new=name | -n)"
+#: src/fauxdacious/main.cc:101
+msgid "New Instance: number, name, or unnamed (-# | --new=name | -n)"
 msgstr ""
 
-#: src/fauxdacious/main.cc:89
+#: src/fauxdacious/main.cc:102
 msgid "Output to stdout (extension)"
 msgstr ""
 
-#: src/fauxdacious/main.cc:90
+#: src/fauxdacious/main.cc:103
 msgid "Start playback"
 msgstr "Aloita toisto"
 
-#: src/fauxdacious/main.cc:91 src/libfauxdgui/prefs-window.cc:317
-#: src/libfauxdqt/prefs-window-qt.cc:350
+#: src/fauxdacious/main.cc:104 src/libfauxdgui/prefs-window.cc:343
+#: src/libfauxdqt/prefs-window-qt.cc:424
 #, fuzzy
 msgid "Pause mutes instead of pausing"
 msgstr "Keskeytä välittömän palauttamisen sijaan"
 
-#: src/fauxdacious/main.cc:92
+#: src/fauxdacious/main.cc:105
 msgid "Quit on playback stop"
 msgstr "Sulje kun toisto pysäytetään"
 
-#: src/fauxdacious/main.cc:94
+#: src/fauxdacious/main.cc:107
 msgid "Run in Qt mode"
 msgstr "Suorita Qt-tilassa"
 
-#: src/fauxdacious/main.cc:96
+#: src/fauxdacious/main.cc:109
 msgid "Skip to previous song"
 msgstr "Siirry edelliseen kappaleeseen"
 
-#: src/fauxdacious/main.cc:97
+#: src/fauxdacious/main.cc:110
 #, fuzzy
 msgid "Start Recording"
 msgstr "Nauhoitusvuosi"
 
-#: src/fauxdacious/main.cc:98
+#: src/fauxdacious/main.cc:111
 msgid "Stop playback"
 msgstr "Pysäytä toisto"
 
-#: src/fauxdacious/main.cc:99
+#: src/fauxdacious/main.cc:112
 msgid "Pause if playing, play otherwise"
 msgstr "Keskeytä jos kappale soi, muutoin jatka soittamista"
 
-#: src/fauxdacious/main.cc:100
+#: src/fauxdacious/main.cc:113
 msgid "Pause playback"
 msgstr "Keskeytä toisto"
 
-#: src/fauxdacious/main.cc:101
+#: src/fauxdacious/main.cc:114
 msgid "Show version"
 msgstr "Näytä versio"
 
-#: src/fauxdacious/main.cc:102
+#: src/fauxdacious/main.cc:115
 msgid "Print debugging messages (may be used twice)"
 msgstr "Tulosta vianjäljitysviestit (mahdollista käyttää kahdesti)"
 
-#: src/fauxdacious/main.cc:103
+#: src/fauxdacious/main.cc:116
 #, fuzzy
 msgid "Force Equalizer Off"
 msgstr "Taajuuskorjain"
 
-#: src/fauxdacious/main.cc:228
+#: src/fauxdacious/main.cc:246
 #, c-format
 msgid "Unknown option: %s\n"
 msgstr "Tuntematon valinta: %s\n"
 
-#: src/fauxdacious/main.cc:261
+#: src/fauxdacious/main.cc:281
 #, c-format
 msgid "Unknown option: -%c\n"
 msgstr "Tuntematon valinta: -%c\n"
 
-#: src/fauxdacious/main.cc:289
+#: src/fauxdacious/main.cc:315
 #, fuzzy
 msgid ""
 "Usage: fauxdacious [OPTION] ... [FILE] ...\n"
@@ -146,13 +155,13 @@ msgstr ""
 "Käyttö: audacious [VALINTA] ... [TIEDOSTO] ...\n"
 "\n"
 
-#: src/fauxdacious/main.cc:290
+#: src/fauxdacious/main.cc:316
 msgid ""
 "FILE can be: local-file, url, -|--|-.ext (stdin).\n"
 "\n"
 msgstr ""
 
-#: src/fauxdacious/main.cc:550 src/libfauxdqt/audqt.cc:63
+#: src/fauxdacious/main.cc:721
 #, fuzzy
 msgid "Fauxdacious"
 msgstr "Audacious"
@@ -164,16 +173,16 @@ msgid_plural "%d files found"
 msgstr[0] "%d tiedosto löytyi"
 msgstr[1] "%d tiedostoa löytyi"
 
-#: src/libfauxdcore/adder.cc:169 src/libfauxdcore/adder.cc:179
+#: src/libfauxdcore/adder.cc:169
 msgid "file://"
 msgstr ""
 
 #: src/libfauxdcore/adder.cc:170 src/libfauxdcore/adder.cc:180
-#: src/libfauxdcore/probe.cc:218
+#: src/libfauxdcore/probe.cc:240
 msgid "stdin://"
 msgstr ""
 
-#: src/libfauxdcore/adder.cc:314 src/libfauxdcore/adder.cc:388
+#: src/libfauxdcore/adder.cc:341 src/libfauxdcore/adder.cc:433
 #, c-format
 msgid ""
 "Error reading %s:\n"
@@ -182,11 +191,11 @@ msgstr ""
 "Virhe luettaessa %s:\n"
 "%s"
 
-#: src/libfauxdcore/adder.cc:446
+#: src/libfauxdcore/adder.cc:499
 msgid "No files found."
 msgstr "Tiedostoja ei löytynyt."
 
-#: src/libfauxdcore/audstrings.cc:659 src/libfauxdcore/tuple.cc:520
+#: src/libfauxdcore/audstrings.cc:659 src/libfauxdcore/tuple.cc:553
 msgid "Standard input"
 msgstr ""
 
@@ -200,20 +209,30 @@ msgstr "Ääni-CD, kappale %s"
 msgid "DVD, title %s"
 msgstr ""
 
-#: src/libfauxdcore/audstrings.cc:667 src/libfauxdcore/tuple.cc:496
+#: src/libfauxdcore/audstrings.cc:667 src/libfauxdcore/tuple.cc:529
 msgid "(character encoding error)"
 msgstr "(merkistökoodausvirhe)"
 
-#: src/libfauxdcore/audstrings.cc:1190
+#: src/libfauxdcore/audstrings.cc:1200
 #, c-format
 msgid "%.*s"
 msgstr ""
 
-#: src/libfauxdcore/output.cc:216 src/libfauxdcore/output.cc:269
+#: src/libfauxdcore/drct.cc:104
+msgid ""
+"Stream recording must be configured in Audio Settings before it can be used."
+msgstr ""
+
+#: src/libfauxdcore/output.cc:226
 msgid "Error opening output stream"
 msgstr ""
 
-#: src/libfauxdcore/playback.cc:373
+#: src/libfauxdcore/output.cc:278
+#, fuzzy
+msgid "Error recording output stream"
+msgstr "Virhe metatietoja luettaessa"
+
+#: src/libfauxdcore/playback.cc:375
 #, c-format
 msgid ""
 "Error playing %s:\n"
@@ -222,7 +241,7 @@ msgstr ""
 "Virhe toistaessa %s:\n"
 "%s"
 
-#: src/libfauxdcore/playback.cc:505
+#: src/libfauxdcore/playback.cc:507
 msgid "Invalid audio format"
 msgstr "Virheellinen äänimuoto"
 
@@ -234,23 +253,24 @@ msgstr "Uusi soittolista"
 msgid "Now Playing"
 msgstr "Soi nyt"
 
-#: src/libfauxdcore/playlist.cc:1688
+#: src/libfauxdcore/playlist.cc:1764
 msgid ""
 "The playlist cannot be sorted because metadata scanning is still in progress "
 "(or has been disabled)."
 msgstr ""
 
-#: src/libfauxdcore/playlist-files.cc:57 src/libfauxdcore/playlist-files.cc:84
+#: src/libfauxdcore/playlist-files.cc:96 src/libfauxdcore/playlist-files.cc:124
 msgid "pls"
 msgstr ""
 
-#: src/libfauxdcore/playlist-files.cc:105
+#: src/libfauxdcore/playlist-files.cc:145
 msgid "tempurl.pls"
 msgstr ""
 
-#: src/libfauxdcore/playlist-files.cc:111
-#: src/libfauxdcore/playlist-files.cc:124 src/libfauxdgui/infowin.cc:494
-#: src/libfauxdqt/infowin-qt.cc:220
+#: src/libfauxdcore/playlist-files.cc:151
+#: src/libfauxdcore/playlist-files.cc:164
+#: src/libfauxdcore/playlist-files.cc:242 src/libfauxdgui/infowin.cc:626
+#: src/libfauxdqt/infowin-qt.cc:208
 #, c-format
 msgid ""
 "Error opening %s:\n"
@@ -259,71 +279,77 @@ msgstr ""
 "Virhe avattaessa %s:\n"
 "%s"
 
-#: src/libfauxdcore/playlist-files.cc:139
+#: src/libfauxdcore/playlist-files.cc:179 src/libfauxdqt/eq-preset-qt.cc:336
+#: src/libfauxdqt/info-widget.cc:271
 #, c-format
 msgid "Error loading %s."
 msgstr "Virhe ladatessa %s."
 
-#: src/libfauxdcore/playlist-files.cc:141
+#: src/libfauxdcore/playlist-files.cc:181
 #, c-format
 msgid "Cannot load %s: unsupported file name extension."
 msgstr "Kohdetta %s ei voi ladata: tiedostopääte ei ole tuettu."
 
-#: src/libfauxdcore/playlist-files.cc:207
+#: src/libfauxdcore/playlist-files.cc:250 src/libfauxdqt/eq-preset-qt.cc:541
+#, fuzzy, c-format
+msgid "Error saving %s."
+msgstr "Virhe ladatessa %s."
+
+#: src/libfauxdcore/playlist-files.cc:255
 #, c-format
 msgid "Cannot save %s: unsupported file name extension."
 msgstr "Kohdetta %s ei voi tallentaa: tiedostopääte ei ole tuettu."
 
-#: src/libfauxdcore/probe.cc:59
+#: src/libfauxdcore/probe.cc:60
 msgid "Error loading plugin"
 msgstr "Virhe liitännäistä ladattaessa"
 
-#: src/libfauxdcore/probe.cc:205
+#: src/libfauxdcore/probe.cc:227
 msgid "Seek error"
 msgstr "Siirtymisvirhe"
 
-#: src/libfauxdcore/probe.cc:242
+#: src/libfauxdcore/probe.cc:264
 msgid "File format not recognized"
 msgstr "Tiedostomuotoa ei tunnistettu"
 
-#: src/libfauxdcore/probe.cc:486
+#: src/libfauxdcore/probe.cc:604
 msgid "Error reading metadata"
 msgstr "Virhe metatietoja luettaessa"
 
-#: src/libfauxdcore/tuple.cc:550
+#: src/libfauxdcore/tuple.cc:583
 msgid "Mono"
 msgstr "Mono"
 
-#: src/libfauxdcore/tuple.cc:552
+#: src/libfauxdcore/tuple.cc:585
 msgid "Stereo"
 msgstr "Stereo"
 
-#: src/libfauxdcore/tuple.cc:554
+#: src/libfauxdcore/tuple.cc:587
 #, c-format
 msgid "%d channel"
 msgid_plural "%d channels"
 msgstr[0] "%d kanava"
 msgstr[1] "%d kanavaa"
 
-#: src/libfauxdcore/tuple.cc:847
+#: src/libfauxdcore/tuple.cc:1133
 msgid "Audio CD"
 msgstr "Ääni-CD"
 
-#: src/libfauxdcore/tuple.cc:855
+#: src/libfauxdcore/tuple.cc:1141
 msgid "DVD"
 msgstr ""
 
-#: src/libfauxdcore/tuple.cc:937
+#: src/libfauxdcore/tuple.cc:1223
 #, c-format
 msgid "Track %d"
 msgstr "Kappale %d"
 
-#: src/libfauxdcore/tuple.cc:946
+#: src/libfauxdcore/tuple.cc:1232
 #, fuzzy, c-format
 msgid "Title %d"
 msgstr "Nimi"
 
-#: src/libfauxdcore/tuple.cc:951
+#: src/libfauxdcore/tuple.cc:1237
 msgid "(unknown title)"
 msgstr "(tuntematon nimi)"
 
@@ -340,15 +366,15 @@ msgstr "Virheellinen tiedostonimi"
 msgid "Invalid access mode"
 msgstr ""
 
-#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:36
+#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:37
 msgid "Credits"
 msgstr "Tekijät"
 
-#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:36
+#: src/libfauxdgui/about.cc:36 src/libfauxdqt/about-qt.cc:37
 msgid "License"
 msgstr "Lisenssi"
 
-#: src/libfauxdgui/about.cc:72 src/libfauxdqt/about-qt.cc:64
+#: src/libfauxdgui/about.cc:72 src/libfauxdqt/about-qt.cc:65
 #, fuzzy
 msgid "About Fauxdacious"
 msgstr "Tietoja Audaciouksesta"
@@ -356,199 +382,186 @@ msgstr "Tietoja Audaciouksesta"
 #: src/libfauxdgui/confirm.cc:36 src/libfauxdgui/jump-to-time.cc:48
 #: src/libfauxdgui/playlists.cc:93 src/libfauxdgui/playlists.cc:190
 #: src/libfauxdgui/plugin-prefs.cc:160 src/libfauxdgui/url-opener.cc:101
-#: src/libfauxdqt/playlist-management.cc:43
-#: src/libfauxdqt/playlist-management.cc:78 src/libfauxdqt/prefs-plugin.cc:131
-#: src/libfauxdqt/url-opener-qt.cc:79
+#: src/libfauxdqt/playlist-management.cc:40
+#: src/libfauxdqt/playlist-management.cc:59 src/libfauxdqt/prefs-plugin.cc:135
+#: src/libfauxdqt/url-opener-qt.cc:80
 msgid "_Cancel"
 msgstr "_Peru"
 
-#: src/libfauxdgui/confirm.cc:51 src/libfauxdqt/playlist-management.cc:76
+#: src/libfauxdgui/confirm.cc:51
 msgid "_Don’t ask again"
 msgstr "_Älä kysy uudelleen"
 
-#: src/libfauxdgui/confirm.cc:73 src/libfauxdqt/playlist-management.cc:82
+#: src/libfauxdgui/confirm.cc:73
 #, c-format
 msgid "Do you want to permanently remove “%s”?"
 msgstr "Haluastko poistaa kohteen “%s” pysyvästi?"
 
-#: src/libfauxdgui/confirm.cc:77 src/libfauxdqt/playlist-management.cc:77
+#: src/libfauxdgui/confirm.cc:77 src/libfauxdqt/playlist-management.cc:58
 msgid "_Remove"
 msgstr "_Poista"
 
-#: src/libfauxdgui/confirm.cc:80 src/libfauxdqt/playlist-management.cc:81
+#: src/libfauxdgui/confirm.cc:80 src/libfauxdqt/playlist-management.cc:62
 msgid "Remove Playlist"
 msgstr "Poista soittolista"
 
-#: src/libfauxdgui/confirm.cc:101 src/libfauxdqt/playlist-management.cc:40
+#: src/libfauxdgui/confirm.cc:101 src/libfauxdqt/playlist-management.cc:38
 msgid "What would you like to call this playlist?"
 msgstr "Minkä nimen haluat antaa tälle soittolistalle?"
 
-#: src/libfauxdgui/confirm.cc:102 src/libfauxdqt/playlist-management.cc:42
+#: src/libfauxdgui/confirm.cc:102 src/libfauxdqt/playlist-management.cc:39
 msgid "_Rename"
 msgstr "_Nimeä uudelleen"
 
-#: src/libfauxdgui/confirm.cc:103 src/libfauxdqt/playlist-management.cc:65
+#: src/libfauxdgui/confirm.cc:103 src/libfauxdqt/playlist-management.cc:37
 msgid "Rename Playlist"
 msgstr "Nimeä soittolista uudelleen"
 
-#: src/libfauxdgui/confirm.cc:126
-msgid ""
-"Failed to start recording.  Check that the FileWriter plugin is installed "
-"and is NOT selected as the primary output plugin."
-msgstr ""
-
-#: src/libfauxdgui/confirm.cc:139
-msgid ""
-"Do you want to start recording?\n"
-"\n"
-"Recording saves (transcodes) a copy of the currently playing song or stream "
-"to your computer.  To change settings such as the output folder or encoding "
-"quality, go to Audio Settings in the Output menu."
-msgstr ""
-
-#: src/libfauxdgui/confirm.cc:144
-msgid "_Record"
-msgstr ""
-
-#: src/libfauxdgui/confirm.cc:145
-#, fuzzy
-msgid "Record"
-msgstr "Nauhoitusvuosi"
-
-#: src/libfauxdgui/eq-preset.cc:228 src/libfauxdgui/eq-preset.cc:235
+#: src/libfauxdgui/eq-preset.cc:278 src/libfauxdgui/eq-preset.cc:283
 msgid "Preset File ..."
 msgstr "Esiasetustiedosto..."
 
-#: src/libfauxdgui/eq-preset.cc:229 src/libfauxdgui/eq-preset.cc:236
+#: src/libfauxdgui/eq-preset.cc:279 src/libfauxdgui/eq-preset.cc:284
 msgid "EQF File ..."
 msgstr "EQF-tiedosto..."
 
-#: src/libfauxdgui/eq-preset.cc:231
-msgid "Winamp Presets ..."
-msgstr "Winamp-esiasetukset..."
-
-#: src/libfauxdgui/eq-preset.cc:240 src/libfauxdqt/fileopener.cc:70
+#: src/libfauxdgui/eq-preset.cc:288 src/libfauxdqt/eq-preset-qt.cc:571
+#: src/libfauxdqt/fileopener.cc:72
 msgid "Import"
 msgstr "Tuo"
 
-#: src/libfauxdgui/eq-preset.cc:241 src/libfauxdqt/fileopener.cc:71
+#: src/libfauxdgui/eq-preset.cc:289 src/libfauxdqt/eq-preset-qt.cc:574
+#: src/libfauxdqt/fileopener.cc:73
 msgid "Export"
 msgstr "Vie"
 
-#: src/libfauxdgui/eq-preset.cc:256
-msgid "Equalizer Presets"
+#: src/libfauxdgui/eq-preset.cc:304 src/libfauxdqt/eq-preset-qt.cc:551
+#, fuzzy
+msgid "Equalizer Presets - Fauxdacious"
 msgstr "Taajuuskorjaimen esiasetukset"
 
-#: src/libfauxdgui/eq-preset.cc:278
+#: src/libfauxdgui/eq-preset.cc:326 src/libfauxdqt/eq-preset-qt.cc:555
 msgid "Save Preset"
 msgstr "Tallenna esiasetukset"
 
-#: src/libfauxdgui/eq-preset.cc:293
+#: src/libfauxdgui/eq-preset.cc:341 src/libfauxdqt/eq-preset-qt.cc:564
 msgid "Use entry's local directory for preset files, if file."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:308
-msgid "Save as Directory-wide Preset, if file & above box checked."
+#: src/libfauxdgui/eq-preset.cc:356 src/libfauxdqt/eq-preset-qt.cc:565
+msgid "Save as Directory-wide Preset, IF file & above box checked."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:322
-msgid "Exclude arg. lists from urls to create preset filename."
+#: src/libfauxdgui/eq-preset.cc:370 src/libfauxdqt/eq-preset-qt.cc:566
+msgid "Use only base site name for URLs."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:335
+#: src/libfauxdgui/eq-preset.cc:381 src/libfauxdqt/eq-preset-qt.cc:567
+msgid "Exclude arg. lists from URLs to create preset filename."
+msgstr ""
+
+#: src/libfauxdgui/eq-preset.cc:394 src/libfauxdqt/eq-preset-qt.cc:568
 msgid "Save Effects (plugins) with presets."
 msgstr ""
 
-#: src/libfauxdgui/eq-preset.cc:356
+#: src/libfauxdgui/eq-preset.cc:415 src/libfauxdqt/eq-preset-qt.cc:584
 msgid "Delete Selected"
 msgstr "Poista valitut"
 
-#: src/libfauxdgui/eq-preset.cc:361 src/libfauxdgui/equalizer.cc:188
-#: src/libfauxdgui/file-opener.cc:128 src/libfauxdgui/infowin.cc:397
-#: src/libfauxdgui/jump-to-track.cc:309 src/libfauxdgui/plugin-prefs.cc:166
-#: src/libfauxdgui/prefs-window.cc:926 src/libfauxdgui/queue-manager.cc:194
-#: src/libfauxdgui/util.cc:298 src/libfauxdqt/audqt.cc:189
-#: src/libfauxdqt/infowin-qt.cc:149 src/libfauxdqt/log-inspector.cc:227
-#: src/libfauxdqt/prefs-plugin.cc:141 src/libfauxdqt/prefs-window-qt.cc:660
-#: src/libfauxdqt/queue-manager-qt.cc:163
+#: src/libfauxdgui/eq-preset.cc:420 src/libfauxdgui/file-opener.cc:128
+#: src/libfauxdgui/infowin.cc:518 src/libfauxdgui/jump-to-track.cc:309
+#: src/libfauxdgui/plugin-prefs.cc:166 src/libfauxdgui/prefs-window.cc:982
+#: src/libfauxdgui/queue-manager.cc:194 src/libfauxdgui/util.cc:298
+#: src/libfauxdqt/audqt.cc:369 src/libfauxdqt/infowin-qt.cc:99
+#: src/libfauxdqt/log-inspector.cc:228 src/libfauxdqt/prefs-plugin.cc:145
+#: src/libfauxdqt/prefs-window-qt.cc:766 src/libfauxdqt/song-window-qt.cc:372
 msgid "_Close"
 msgstr "_Sulje"
 
-#: src/libfauxdgui/eq-preset.cc:365
+#: src/libfauxdgui/eq-preset.cc:424 src/libfauxdqt/eq-preset-qt.cc:588
 msgid "Revert Changes"
 msgstr "Kumoa muutokset"
 
-#: src/libfauxdgui/equalizer.cc:64 src/libfauxdqt/equalizer-qt.cc:114
-msgid "_Enable"
-msgstr "_Käytä"
-
-#: src/libfauxdgui/equalizer.cc:74
-msgid "_Auto"
+#: src/libfauxdgui/equalizer.cc:48 src/libfauxdgui/equalizer.cc:185
+msgid "_PreSETs!"
 msgstr ""
 
-#: src/libfauxdgui/equalizer.cc:155 src/libfauxdqt/equalizer-qt.cc:116
-msgid "31 Hz"
-msgstr "31 Hz"
-
-#: src/libfauxdgui/equalizer.cc:155 src/libfauxdqt/equalizer-qt.cc:116
-msgid "63 Hz"
-msgstr "63 Hz"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "125 Hz"
-msgstr "125 Hz"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "250 Hz"
-msgstr "250 Hz"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "500 Hz"
-msgstr "500 Hz"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "1 kHz"
-msgstr "1 kHz"
-
-#: src/libfauxdgui/equalizer.cc:156 src/libfauxdqt/equalizer-qt.cc:117
-msgid "2 kHz"
-msgstr "2 kHz"
-
-#: src/libfauxdgui/equalizer.cc:157 src/libfauxdqt/equalizer-qt.cc:118
-msgid "4 kHz"
-msgstr "4 kHz"
-
-#: src/libfauxdgui/equalizer.cc:157 src/libfauxdqt/equalizer-qt.cc:118
-msgid "8 kHz"
-msgstr "8 kHz"
-
-#: src/libfauxdgui/equalizer.cc:157 src/libfauxdqt/equalizer-qt.cc:118
-msgid "16 kHz"
-msgstr "16 kHz"
-
-#: src/libfauxdgui/equalizer.cc:160 src/libfauxdqt/equalizer-qt.cc:142
-msgid "Equalizer"
-msgstr "Taajuuskorjain"
-
-#: src/libfauxdgui/equalizer.cc:176 src/libfauxdgui/equalizer.cc:178
+#: src/libfauxdgui/equalizer.cc:54 src/libfauxdgui/equalizer.cc:187
 #, fuzzy
 msgid "_Presets"
 msgstr "Esiasetukset..."
 
-#: src/libfauxdgui/equalizer.cc:183
+#: src/libfauxdgui/equalizer.cc:72 src/libfauxdqt/equalizer-qt.cc:122
+msgid "_Enable"
+msgstr "_Käytä"
+
+#: src/libfauxdgui/equalizer.cc:82
+msgid "_Auto"
+msgstr ""
+
+#: src/libfauxdgui/equalizer.cc:164 src/libfauxdqt/equalizer-qt.cc:124
+msgid "31 Hz"
+msgstr "31 Hz"
+
+#: src/libfauxdgui/equalizer.cc:164 src/libfauxdqt/equalizer-qt.cc:124
+msgid "63 Hz"
+msgstr "63 Hz"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "125 Hz"
+msgstr "125 Hz"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "250 Hz"
+msgstr "250 Hz"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "500 Hz"
+msgstr "500 Hz"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "1 kHz"
+msgstr "1 kHz"
+
+#: src/libfauxdgui/equalizer.cc:165 src/libfauxdqt/equalizer-qt.cc:125
+msgid "2 kHz"
+msgstr "2 kHz"
+
+#: src/libfauxdgui/equalizer.cc:166 src/libfauxdqt/equalizer-qt.cc:126
+msgid "4 kHz"
+msgstr "4 kHz"
+
+#: src/libfauxdgui/equalizer.cc:166 src/libfauxdqt/equalizer-qt.cc:126
+msgid "8 kHz"
+msgstr "8 kHz"
+
+#: src/libfauxdgui/equalizer.cc:166 src/libfauxdqt/equalizer-qt.cc:126
+msgid "16 kHz"
+msgstr "16 kHz"
+
+#: src/libfauxdgui/equalizer.cc:169 src/libfauxdqt/equalizer-qt.cc:251
+msgid "Equalizer"
+msgstr "Taajuuskorjain"
+
+#: src/libfauxdgui/equalizer.cc:192
 msgid "_Flat"
 msgstr ""
 
-#: src/libfauxdgui/equalizer.cc:195 src/libfauxdqt/equalizer-qt.cc:123
+#: src/libfauxdgui/equalizer.cc:197
+msgid "_Hide"
+msgstr ""
+
+#: src/libfauxdgui/equalizer.cc:204 src/libfauxdqt/equalizer-qt.cc:131
 msgid "Preamp"
 msgstr "Esivahvistus"
 
-#: src/libfauxdgui/file-opener.cc:78 src/libfauxdqt/fileopener.cc:57
-msgid "Open Files"
-msgstr "Avaa tiedostoja"
+#: src/libfauxdgui/file-opener.cc:78 src/libfauxdqt/fileopener.cc:59
+#, fuzzy
+msgid "Open Files - Fauxdacious"
+msgstr "Audacious"
 
 #: src/libfauxdgui/file-opener.cc:79 src/libfauxdgui/url-opener.cc:64
-#: src/libfauxdqt/url-opener-qt.cc:48
+#: src/libfauxdqt/url-opener-qt.cc:49
 msgid "_Open"
 msgstr "_Avaa"
 
@@ -556,12 +569,13 @@ msgstr "_Avaa"
 msgid "Close _dialog on open"
 msgstr "S_ulje ikkuna avatessa"
 
-#: src/libfauxdgui/file-opener.cc:86 src/libfauxdqt/fileopener.cc:59
-msgid "Add Files"
-msgstr "Lisää tiedostoja"
+#: src/libfauxdgui/file-opener.cc:86 src/libfauxdqt/fileopener.cc:61
+#, fuzzy
+msgid "Add Files - Fauxdacious"
+msgstr "Tietoja Audaciouksesta"
 
 #: src/libfauxdgui/file-opener.cc:87 src/libfauxdgui/url-opener.cc:70
-#: src/libfauxdqt/url-opener-qt.cc:54
+#: src/libfauxdqt/url-opener-qt.cc:55
 msgid "_Add"
 msgstr "_Lisää"
 
@@ -569,264 +583,312 @@ msgstr "_Lisää"
 msgid "Close _dialog on add"
 msgstr "Sul_je ikkuna lisättäessä"
 
-#: src/libfauxdgui/infopopup.cc:192 src/libfauxdgui/infowin.cc:351
-#: src/libfauxdgui/prefs-window.cc:113 src/libfauxdqt/infopopup-qt.cc:89
-#: src/libfauxdqt/info-widget.cc:43 src/libfauxdqt/prefs-window-qt.cc:158
+#: src/libfauxdgui/infopopup.cc:187 src/libfauxdgui/infowin.cc:472
+#: src/libfauxdgui/prefs-window.cc:113 src/libfauxdqt/infopopup-qt.cc:93
+#: src/libfauxdqt/info-widget.cc:53 src/libfauxdqt/prefs-window-qt.cc:169
 msgid "Title"
 msgstr "Nimi"
 
-#: src/libfauxdgui/infopopup.cc:193 src/libfauxdgui/infowin.cc:354
-#: src/libfauxdgui/prefs-window.cc:110 src/libfauxdqt/infopopup-qt.cc:91
-#: src/libfauxdqt/info-widget.cc:41 src/libfauxdqt/prefs-window-qt.cc:155
+#: src/libfauxdgui/infopopup.cc:188 src/libfauxdgui/infowin.cc:475
+#: src/libfauxdgui/prefs-window.cc:110 src/libfauxdqt/infopopup-qt.cc:95
+#: src/libfauxdqt/info-widget.cc:51 src/libfauxdqt/prefs-window-qt.cc:166
 msgid "Artist"
 msgstr "Esittäjä"
 
-#: src/libfauxdgui/infopopup.cc:194 src/libfauxdgui/infowin.cc:357
-#: src/libfauxdgui/prefs-window.cc:111 src/libfauxdgui/prefs-window.cc:157
-#: src/libfauxdqt/infopopup-qt.cc:93 src/libfauxdqt/info-widget.cc:42
-#: src/libfauxdqt/prefs-window-qt.cc:156 src/libfauxdqt/prefs-window-qt.cc:202
+#: src/libfauxdgui/infopopup.cc:189 src/libfauxdgui/infowin.cc:478
+#: src/libfauxdgui/prefs-window.cc:111 src/libfauxdgui/prefs-window.cc:169
+#: src/libfauxdqt/infopopup-qt.cc:97 src/libfauxdqt/info-widget.cc:52
+#: src/libfauxdqt/prefs-window-qt.cc:167 src/libfauxdqt/prefs-window-qt.cc:225
 msgid "Album"
 msgstr "Albumi"
 
-#: src/libfauxdgui/infopopup.cc:195 src/libfauxdgui/infowin.cc:367
-#: src/libfauxdgui/prefs-window.cc:115 src/libfauxdqt/infopopup-qt.cc:95
-#: src/libfauxdqt/info-widget.cc:45 src/libfauxdqt/prefs-window-qt.cc:160
+#: src/libfauxdgui/infopopup.cc:190 src/libfauxdgui/infowin.cc:489
+#: src/libfauxdgui/prefs-window.cc:115 src/libfauxdqt/infopopup-qt.cc:99
+#: src/libfauxdqt/info-widget.cc:55 src/libfauxdqt/prefs-window-qt.cc:171
 msgid "Genre"
 msgstr "Tyylilaji"
 
-#: src/libfauxdgui/infopopup.cc:196 src/libfauxdgui/infowin.cc:370
-#: src/libfauxdgui/prefs-window.cc:119 src/libfauxdqt/infopopup-qt.cc:97
-#: src/libfauxdqt/prefs-window-qt.cc:164
+#: src/libfauxdgui/infopopup.cc:191 src/libfauxdgui/infowin.cc:492
+#: src/libfauxdgui/prefs-window.cc:119 src/libfauxdqt/infopopup-qt.cc:101
+#: src/libfauxdqt/prefs-window-qt.cc:175
 msgid "Year"
 msgstr "Vuosi"
 
-#: src/libfauxdgui/infopopup.cc:197 src/libfauxdgui/prefs-window.cc:156
-#: src/libfauxdqt/infopopup-qt.cc:99 src/libfauxdqt/prefs-window-qt.cc:201
+#: src/libfauxdgui/infopopup.cc:192 src/libfauxdgui/prefs-window.cc:168
+#: src/libfauxdqt/infopopup-qt.cc:103 src/libfauxdqt/prefs-window-qt.cc:224
 msgid "Track"
 msgstr "Kappale"
 
-#: src/libfauxdgui/infopopup.cc:198 src/libfauxdqt/infopopup-qt.cc:101
-#: src/libfauxdqt/info-widget.cc:55
+#: src/libfauxdgui/infopopup.cc:193 src/libfauxdqt/infopopup-qt.cc:105
+#: src/libfauxdqt/info-widget.cc:65
 msgid "Length"
 msgstr "Kesto"
 
-#: src/libfauxdgui/infowin.cc:50
+#: src/libfauxdgui/infowin.cc:52
 msgid "Format:"
 msgstr "Muoto:"
 
-#: src/libfauxdgui/infowin.cc:51
+#: src/libfauxdgui/infowin.cc:53
 msgid "Quality:"
 msgstr "Laatu:"
 
-#: src/libfauxdgui/infowin.cc:52
+#: src/libfauxdgui/infowin.cc:54
 msgid "Bitrate:"
 msgstr "Bittinopeus:"
 
-#: src/libfauxdgui/infowin.cc:85
+#: src/libfauxdgui/infowin.cc:90
 msgid "Acid Jazz"
 msgstr "Acid jazz"
 
-#: src/libfauxdgui/infowin.cc:86
+#: src/libfauxdgui/infowin.cc:91
 msgid "Acid Rock"
 msgstr "Acid rock"
 
-#: src/libfauxdgui/infowin.cc:87
+#: src/libfauxdgui/infowin.cc:92
 msgid "Ambient"
 msgstr "Ambient"
 
-#: src/libfauxdgui/infowin.cc:88
+#: src/libfauxdgui/infowin.cc:93
 msgid "Bebop"
 msgstr "Bebop"
 
-#: src/libfauxdgui/infowin.cc:89
+#: src/libfauxdgui/infowin.cc:94
 msgid "Bluegrass"
 msgstr "Bluegrass"
 
-#: src/libfauxdgui/infowin.cc:90
+#: src/libfauxdgui/infowin.cc:95
 msgid "Blues"
 msgstr "Blues"
 
-#: src/libfauxdgui/infowin.cc:91
+#: src/libfauxdgui/infowin.cc:96
 msgid "Chamber Music"
 msgstr "Kamarimusiikki"
 
-#: src/libfauxdgui/infowin.cc:92
+#: src/libfauxdgui/infowin.cc:97
 msgid "Classical"
 msgstr "Klassinen"
 
-#: src/libfauxdgui/infowin.cc:93
+#: src/libfauxdgui/infowin.cc:98
 msgid "Country"
 msgstr "Kantri"
 
-#: src/libfauxdgui/infowin.cc:94
+#: src/libfauxdgui/infowin.cc:99
 msgid "Death Metal"
 msgstr "Death metal"
 
-#: src/libfauxdgui/infowin.cc:95
+#: src/libfauxdgui/infowin.cc:100
 msgid "Disco"
 msgstr "Disko"
 
-#: src/libfauxdgui/infowin.cc:96
+#: src/libfauxdgui/infowin.cc:101
 msgid "Easy Listening"
 msgstr "Kevyt kuunneltava"
 
-#: src/libfauxdgui/infowin.cc:97
+#: src/libfauxdgui/infowin.cc:102
 msgid "Folk"
 msgstr "Folk"
 
-#: src/libfauxdgui/infowin.cc:98
+#: src/libfauxdgui/infowin.cc:103
 msgid "Funk"
 msgstr "Funk"
 
-#: src/libfauxdgui/infowin.cc:99
+#: src/libfauxdgui/infowin.cc:104
 msgid "Gangsta Rap"
 msgstr "Gangsta-rap"
 
-#: src/libfauxdgui/infowin.cc:100
+#: src/libfauxdgui/infowin.cc:105
 msgid "Gospel"
 msgstr "Gospel"
 
-#: src/libfauxdgui/infowin.cc:101
+#: src/libfauxdgui/infowin.cc:106
 msgid "Grunge"
 msgstr "Grunge"
 
-#: src/libfauxdgui/infowin.cc:102
+#: src/libfauxdgui/infowin.cc:107
 msgid "Hard Rock"
 msgstr "Hard rock"
 
-#: src/libfauxdgui/infowin.cc:103
+#: src/libfauxdgui/infowin.cc:108
 msgid "Heavy Metal"
 msgstr "Heavy metal"
 
-#: src/libfauxdgui/infowin.cc:104
+#: src/libfauxdgui/infowin.cc:109
 msgid "Hip-hop"
 msgstr "Hip-hop"
 
-#: src/libfauxdgui/infowin.cc:105
+#: src/libfauxdgui/infowin.cc:110
 msgid "House"
 msgstr "House"
 
-#: src/libfauxdgui/infowin.cc:106
+#: src/libfauxdgui/infowin.cc:111
 msgid "Jazz"
 msgstr "Jazz"
 
-#: src/libfauxdgui/infowin.cc:107
+#: src/libfauxdgui/infowin.cc:112
 msgid "Jungle"
 msgstr "Jungle"
 
-#: src/libfauxdgui/infowin.cc:108
+#: src/libfauxdgui/infowin.cc:113
 msgid "Metal"
 msgstr "Metalli"
 
-#: src/libfauxdgui/infowin.cc:109
+#: src/libfauxdgui/infowin.cc:114
 msgid "New Age"
 msgstr "New age"
 
-#: src/libfauxdgui/infowin.cc:110
+#: src/libfauxdgui/infowin.cc:115
 msgid "New Wave"
 msgstr "New wave"
 
-#: src/libfauxdgui/infowin.cc:111
+#: src/libfauxdgui/infowin.cc:116
 msgid "Noise"
 msgstr "Noise"
 
-#: src/libfauxdgui/infowin.cc:112
+#: src/libfauxdgui/infowin.cc:117
 msgid "Pop"
 msgstr "Pop"
 
-#: src/libfauxdgui/infowin.cc:113
+#: src/libfauxdgui/infowin.cc:118
 msgid "Punk Rock"
 msgstr "Punk rock"
 
-#: src/libfauxdgui/infowin.cc:114
+#: src/libfauxdgui/infowin.cc:119
 msgid "Rap"
 msgstr "Rap"
 
-#: src/libfauxdgui/infowin.cc:115
+#: src/libfauxdgui/infowin.cc:120
 msgid "Reggae"
 msgstr "Reggae"
 
-#: src/libfauxdgui/infowin.cc:116
+#: src/libfauxdgui/infowin.cc:121
 msgid "Rock"
 msgstr "Rock"
 
-#: src/libfauxdgui/infowin.cc:117
+#: src/libfauxdgui/infowin.cc:122
 msgid "Rock and Roll"
 msgstr "Rock 'n' roll"
 
-#: src/libfauxdgui/infowin.cc:118
+#: src/libfauxdgui/infowin.cc:123
 msgid "Rhythm and Blues"
 msgstr "R'n'B"
 
-#: src/libfauxdgui/infowin.cc:119
+#: src/libfauxdgui/infowin.cc:124
 msgid "Ska"
 msgstr "Ska"
 
-#: src/libfauxdgui/infowin.cc:120
+#: src/libfauxdgui/infowin.cc:125
 msgid "Soul"
 msgstr "Soul"
 
-#: src/libfauxdgui/infowin.cc:121
+#: src/libfauxdgui/infowin.cc:126
 msgid "Swing"
 msgstr "Swing"
 
-#: src/libfauxdgui/infowin.cc:122
+#: src/libfauxdgui/infowin.cc:127
 msgid "Techno"
 msgstr "Tekno"
 
-#: src/libfauxdgui/infowin.cc:123
+#: src/libfauxdgui/infowin.cc:128
 msgid "Trip-hop"
 msgstr "Trip-hop"
 
-#: src/libfauxdgui/infowin.cc:216
+#: src/libfauxdgui/infowin.cc:249
 msgid "Save successful"
 msgstr "Tallennus onnistui"
 
-#: src/libfauxdgui/infowin.cc:220
+#: src/libfauxdgui/infowin.cc:253
 msgid "Save error"
 msgstr "Virhe tallennettaessa"
 
-#: src/libfauxdgui/infowin.cc:306 src/libfauxdgui/prefs-window.cc:86
-#: src/libfauxdgui/prefs-window.cc:95 src/libfauxdqt/infowin-qt.cc:123
-#: src/libfauxdqt/prefs-window-qt.cc:140 src/libfauxdqt/prefs-window-qt.cc:149
-msgid "Song Info"
-msgstr "Kappaleen tiedot"
+#: src/libfauxdgui/infowin.cc:373 src/libfauxdqt/info-widget.cc:207
+msgid "Select Cover Art File - Fauxdacious"
+msgstr ""
 
-#: src/libfauxdgui/infowin.cc:360 src/libfauxdqt/info-widget.cc:47
+#: src/libfauxdgui/infowin.cc:374 src/libfauxdgui/preset-browser.cc:83
+#: src/libfauxdgui/util.cc:172 src/libfauxdqt/fileopener.cc:93
+msgid "Cancel"
+msgstr "Peru"
+
+#: src/libfauxdgui/infowin.cc:375 src/libfauxdgui/util.cc:172
+#: src/libfauxdqt/fileopener.cc:68 src/libfauxdqt/fileopener.cc:69
+msgid "Open"
+msgstr "Avaa"
+
+#: src/libfauxdgui/infowin.cc:378
+msgid "Coverart image files"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:379
+msgid "*.jpg"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:380
+msgid "*.png"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:381
+msgid "*.jpeg"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:382
+msgid "*.gif"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:401
+#, fuzzy
+msgid "File"
+msgstr "Lisää tiedostoja"
+
+#: src/libfauxdgui/infowin.cc:413 src/libfauxdqt/infowin-qt.cc:76
+#, fuzzy
+msgid "Song Info - Fauxdacious"
+msgstr "Tietoja Audaciouksesta"
+
+#: src/libfauxdgui/infowin.cc:481 src/libfauxdqt/info-widget.cc:57
 msgid "Album Artist"
 msgstr "Albumi / esittäjä"
 
-#: src/libfauxdgui/infowin.cc:363 src/libfauxdgui/prefs-window.cc:120
-#: src/libfauxdqt/info-widget.cc:46 src/libfauxdqt/prefs-window-qt.cc:165
+#: src/libfauxdgui/infowin.cc:484
+#, fuzzy
+msgid "Coverart File"
+msgstr "Valitse tiedosto"
+
+#: src/libfauxdgui/infowin.cc:485 src/libfauxdgui/prefs-window.cc:120
+#: src/libfauxdqt/info-widget.cc:56 src/libfauxdqt/prefs-window-qt.cc:176
 msgid "Comment"
 msgstr "Kommentti"
 
-#: src/libfauxdgui/infowin.cc:373 src/libfauxdqt/info-widget.cc:44
+#: src/libfauxdgui/infowin.cc:495 src/libfauxdqt/info-widget.cc:54
 msgid "Track Number"
 msgstr "Kappaleen numero"
 
-#: src/libfauxdgui/infowin.cc:380
-msgid "Clea_r fields when moving to next song"
-msgstr "T_yhjennä kentät seuraavaan kappaleeseen siirryttäessä"
+#: src/libfauxdgui/infowin.cc:501
+msgid "_Auto-fill empty fields"
+msgstr ""
 
-#: src/libfauxdgui/infowin.cc:394 src/libfauxdqt/infowin-qt.cc:148
+#: src/libfauxdgui/infowin.cc:515 src/libfauxdqt/infowin-qt.cc:98
 msgid "_Save"
 msgstr "_Tallenna"
 
-#: src/libfauxdgui/infowin.cc:400
+#: src/libfauxdgui/infowin.cc:521
+msgid "_Previous"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:524
 msgid "_Next"
 msgstr "_Seuraava"
 
-#: src/libfauxdgui/infowin.cc:447
+#: src/libfauxdgui/infowin.cc:574
 #, c-format
 msgid "%d kb/s"
 msgstr "%d kb/s"
 
-#: src/libfauxdgui/infowin.cc:452
+#: src/libfauxdgui/infowin.cc:579
 msgid "N/A"
 msgstr "-"
 
 #: src/libfauxdgui/jump-to-time.cc:47 src/libfauxdgui/jump-to-track.cc:314
+#: src/libfauxdqt/song-window-qt.cc:370
 msgid "_Jump"
 msgstr "Sii_rry"
 
@@ -839,19 +901,20 @@ msgid "Enter time (minutes:seconds):"
 msgstr "Syötä aika (minuutit:sekunnit):"
 
 #: src/libfauxdgui/jump-to-track.cc:95 src/libfauxdgui/jump-to-track.cc:103
-#: src/libfauxdgui/jump-to-track.cc:305
+#: src/libfauxdgui/jump-to-track.cc:305 src/libfauxdqt/song-window-qt.cc:293
+#: src/libfauxdqt/song-window-qt.cc:369
 msgid "_Queue"
 msgstr "_Lisää jonoon"
 
-#: src/libfauxdgui/jump-to-track.cc:101
+#: src/libfauxdgui/jump-to-track.cc:101 src/libfauxdqt/song-window-qt.cc:293
 msgid "Un_queue"
 msgstr "_Poista jonosta"
 
-#: src/libfauxdgui/jump-to-track.cc:240
+#: src/libfauxdgui/jump-to-track.cc:240 src/libfauxdqt/song-window-qt.cc:306
 msgid "Jump to Song"
 msgstr "Hyppää kappaleeseen"
 
-#: src/libfauxdgui/jump-to-track.cc:265
+#: src/libfauxdgui/jump-to-track.cc:265 src/libfauxdqt/song-window-qt.cc:323
 msgid "Filter: "
 msgstr "Suodatin: "
 
@@ -859,7 +922,7 @@ msgstr "Suodatin: "
 msgid "_Filter:"
 msgstr "_Suodatin:"
 
-#: src/libfauxdgui/jump-to-track.cc:298
+#: src/libfauxdgui/jump-to-track.cc:298 src/libfauxdqt/song-window-qt.cc:364
 msgid "C_lose on jump"
 msgstr "S_ulje siirryttäessä"
 
@@ -885,7 +948,7 @@ msgstr "Valitse tiedostonimen pääte tai valitse muoto pudotusvalikosta."
 msgid "Select Format by Extension"
 msgstr "Valitse muoto tiedostopäätteen avulla"
 
-#: src/libfauxdgui/playlists.cc:168 src/libfauxdqt/fileopener.cc:62
+#: src/libfauxdgui/playlists.cc:168
 msgid "Export Playlist"
 msgstr "Vie soittolista"
 
@@ -893,7 +956,7 @@ msgstr "Vie soittolista"
 msgid "_Export"
 msgstr "_Vie"
 
-#: src/libfauxdgui/playlists.cc:175 src/libfauxdqt/fileopener.cc:61
+#: src/libfauxdgui/playlists.cc:175
 msgid "Import Playlist"
 msgstr "Tuo soittolista"
 
@@ -905,69 +968,74 @@ msgstr "_Tuo"
 msgid "_Plugins ..."
 msgstr "_Liitännäiset..."
 
-#: src/libfauxdgui/plugin-prefs.cc:109 src/libfauxdqt/prefs-plugin.cc:56
+#: src/libfauxdgui/plugin-prefs.cc:109 src/libfauxdqt/prefs-plugin.cc:60
 #, c-format
 msgid "About %s"
 msgstr "Tietoja - %s"
 
-#: src/libfauxdgui/plugin-prefs.cc:155 src/libfauxdqt/prefs-plugin.cc:119
+#: src/libfauxdgui/plugin-prefs.cc:155 src/libfauxdqt/prefs-plugin.cc:123
 #, c-format
 msgid "%s Settings"
 msgstr "%s - asetukset"
 
-#: src/libfauxdgui/plugin-prefs.cc:159 src/libfauxdqt/prefs-plugin.cc:130
+#: src/libfauxdgui/plugin-prefs.cc:159 src/libfauxdqt/prefs-plugin.cc:134
 msgid "_Set"
 msgstr "_Aseta"
 
-#: src/libfauxdgui/plugin-view.cc:235 src/libfauxdgui/prefs-window.cc:738
-#: src/libfauxdgui/prefs-window.cc:778 src/libfauxdqt/prefs-window-qt.cc:621
-#: src/libfauxdqt/prefs-window-qt.cc:624
+#: src/libfauxdgui/plugin-view.cc:235 src/libfauxdgui/prefs-window.cc:796
+#: src/libfauxdgui/prefs-window.cc:836 src/libfauxdqt/prefs-window-qt.cc:724
+#: src/libfauxdqt/prefs-window-qt.cc:727
 msgid "_Settings"
 msgstr "_Asetukset"
 
-#: src/libfauxdgui/plugin-view.cc:242 src/libfauxdgui/prefs-window.cc:752
-#: src/libfauxdgui/prefs-window.cc:790 src/libfauxdqt/prefs-window-qt.cc:622
-#: src/libfauxdqt/prefs-window-qt.cc:625
+#: src/libfauxdgui/plugin-view.cc:242 src/libfauxdgui/prefs-window.cc:810
+#: src/libfauxdgui/prefs-window.cc:848 src/libfauxdqt/prefs-window-qt.cc:725
+#: src/libfauxdqt/prefs-window-qt.cc:728
 msgid "_About"
 msgstr "_Tietoja"
 
-#: src/libfauxdgui/prefs-widget.cc:277
+#: src/libfauxdgui/prefs-widget.cc:277 src/libfauxdqt/prefs-widget-qt.cc:228
 msgid "Choose File"
 msgstr "Valitse tiedosto"
 
-#: src/libfauxdgui/prefs-widget.cc:281
+#: src/libfauxdgui/prefs-widget.cc:281 src/libfauxdqt/prefs-widget-qt.cc:232
 msgid "Choose Folder"
 msgstr "Valitse kansio"
 
 #: src/libfauxdgui/prefs-window.cc:82 src/libfauxdgui/prefs-window.cc:91
-#: src/libfauxdqt/prefs-window-qt.cc:136 src/libfauxdqt/prefs-window-qt.cc:145
+#: src/libfauxdqt/prefs-window-qt.cc:147 src/libfauxdqt/prefs-window-qt.cc:156
 msgid "Appearance"
 msgstr "Ulkoasu"
 
 #: src/libfauxdgui/prefs-window.cc:83 src/libfauxdgui/prefs-window.cc:92
-#: src/libfauxdqt/prefs-window-qt.cc:137 src/libfauxdqt/prefs-window-qt.cc:146
+#: src/libfauxdqt/prefs-window-qt.cc:148 src/libfauxdqt/prefs-window-qt.cc:157
 msgid "Audio"
 msgstr "Ääni"
 
 #: src/libfauxdgui/prefs-window.cc:84 src/libfauxdgui/prefs-window.cc:93
-#: src/libfauxdqt/prefs-window-qt.cc:138 src/libfauxdqt/prefs-window-qt.cc:147
+#: src/libfauxdqt/prefs-window-qt.cc:149 src/libfauxdqt/prefs-window-qt.cc:158
 msgid "Network"
 msgstr "Verkko"
 
 #: src/libfauxdgui/prefs-window.cc:85 src/libfauxdgui/prefs-window.cc:94
 #: src/libfauxdgui/prefs-window.cc:105
 #: src/libfauxdqt/prefs-pluginlist-model.cc:41
-#: src/libfauxdqt/prefs-window-qt.cc:139 src/libfauxdqt/prefs-window-qt.cc:148
+#: src/libfauxdqt/prefs-window-qt.cc:150 src/libfauxdqt/prefs-window-qt.cc:159
 msgid "Playlist"
 msgstr "Soittolista"
 
+#: src/libfauxdgui/prefs-window.cc:86 src/libfauxdgui/prefs-window.cc:95
+#: src/libfauxdqt/prefs-window-qt.cc:151 src/libfauxdqt/prefs-window-qt.cc:160
+msgid "Song Info"
+msgstr "Kappaleen tiedot"
+
 #: src/libfauxdgui/prefs-window.cc:87 src/libfauxdgui/prefs-window.cc:96
-#: src/libfauxdqt/prefs-window-qt.cc:141 src/libfauxdqt/prefs-window-qt.cc:150
+#: src/libfauxdqt/prefs-window-qt.cc:152 src/libfauxdqt/prefs-window-qt.cc:161
 msgid "Plugins"
 msgstr "Liitännäiset"
 
 #: src/libfauxdgui/prefs-window.cc:88 src/libfauxdgui/prefs-window.cc:97
-#: src/libfauxdqt/prefs-window-qt.cc:142 src/libfauxdqt/prefs-window-qt.cc:151
+#: src/libfauxdqt/prefs-window-qt.cc:153 src/libfauxdqt/prefs-window-qt.cc:162
 msgid "Advanced"
 msgstr ""
 
@@ -996,493 +1064,606 @@ msgstr "Äänilähteet"
 msgid "Transport"
 msgstr "Siirtokanavat"
 
-#: src/libfauxdgui/prefs-window.cc:112 src/libfauxdqt/prefs-window-qt.cc:157
+#: src/libfauxdgui/prefs-window.cc:112 src/libfauxdqt/prefs-window-qt.cc:168
 msgid "Album artist"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/prefs-window-qt.cc:159
+#: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/prefs-window-qt.cc:170
 msgid "Track number"
 msgstr "Kappalenumero"
 
-#: src/libfauxdgui/prefs-window.cc:116 src/libfauxdqt/prefs-window-qt.cc:161
+#: src/libfauxdgui/prefs-window.cc:116 src/libfauxdqt/prefs-window-qt.cc:172
 msgid "File name"
 msgstr "Tiedostonimi"
 
-#: src/libfauxdgui/prefs-window.cc:117 src/libfauxdqt/prefs-window-qt.cc:162
+#: src/libfauxdgui/prefs-window.cc:117 src/libfauxdqt/prefs-window-qt.cc:173
 msgid "File path"
 msgstr "Tiedoston polku"
 
-#: src/libfauxdgui/prefs-window.cc:118 src/libfauxdqt/prefs-window-qt.cc:163
+#: src/libfauxdgui/prefs-window.cc:118 src/libfauxdqt/prefs-window-qt.cc:174
 msgid "Date"
 msgstr "Päiväys"
 
-#: src/libfauxdgui/prefs-window.cc:121 src/libfauxdqt/info-widget.cc:56
-#: src/libfauxdqt/prefs-window-qt.cc:166
+#: src/libfauxdgui/prefs-window.cc:121 src/libfauxdqt/info-widget.cc:66
+#: src/libfauxdqt/prefs-window-qt.cc:177
 msgid "Codec"
 msgstr "Koodekki"
 
-#: src/libfauxdgui/prefs-window.cc:122 src/libfauxdqt/info-widget.cc:57
-#: src/libfauxdqt/prefs-window-qt.cc:167
+#: src/libfauxdgui/prefs-window.cc:122 src/libfauxdqt/info-widget.cc:67
+#: src/libfauxdqt/prefs-window-qt.cc:178
 msgid "Quality"
 msgstr "Laatu"
 
-#: src/libfauxdgui/prefs-window.cc:126 src/libfauxdqt/prefs-window-qt.cc:171
+#: src/libfauxdgui/prefs-window.cc:126 src/libfauxdqt/prefs-window-qt.cc:182
 msgid "None"
 msgstr "Ei mikään"
 
-#: src/libfauxdgui/prefs-window.cc:127 src/libfauxdqt/prefs-window-qt.cc:172
+#: src/libfauxdgui/prefs-window.cc:127 src/libfauxdqt/prefs-window-qt.cc:183
 msgid "Arabic"
 msgstr "Arabia"
 
-#: src/libfauxdgui/prefs-window.cc:128 src/libfauxdqt/prefs-window-qt.cc:173
+#: src/libfauxdgui/prefs-window.cc:128 src/libfauxdqt/prefs-window-qt.cc:184
 msgid "Baltic"
 msgstr "Balttia"
 
-#: src/libfauxdgui/prefs-window.cc:129 src/libfauxdqt/prefs-window-qt.cc:174
+#: src/libfauxdgui/prefs-window.cc:129 src/libfauxdqt/prefs-window-qt.cc:185
 msgid "Chinese"
 msgstr "Kiina"
 
-#: src/libfauxdgui/prefs-window.cc:130 src/libfauxdqt/prefs-window-qt.cc:175
+#: src/libfauxdgui/prefs-window.cc:130 src/libfauxdqt/prefs-window-qt.cc:186
 msgid "Greek"
 msgstr "Kreikka"
 
-#: src/libfauxdgui/prefs-window.cc:131 src/libfauxdqt/prefs-window-qt.cc:176
+#: src/libfauxdgui/prefs-window.cc:131 src/libfauxdqt/prefs-window-qt.cc:187
 msgid "Hebrew"
 msgstr "Heprea"
 
-#: src/libfauxdgui/prefs-window.cc:132 src/libfauxdqt/prefs-window-qt.cc:177
+#: src/libfauxdgui/prefs-window.cc:132 src/libfauxdqt/prefs-window-qt.cc:188
 msgid "Japanese"
 msgstr "Japani"
 
-#: src/libfauxdgui/prefs-window.cc:133 src/libfauxdqt/prefs-window-qt.cc:178
+#: src/libfauxdgui/prefs-window.cc:133 src/libfauxdqt/prefs-window-qt.cc:189
 msgid "Korean"
 msgstr "Korea"
 
-#: src/libfauxdgui/prefs-window.cc:134 src/libfauxdqt/prefs-window-qt.cc:179
+#: src/libfauxdgui/prefs-window.cc:134 src/libfauxdqt/prefs-window-qt.cc:190
 msgid "Polish"
 msgstr "Puola"
 
-#: src/libfauxdgui/prefs-window.cc:135 src/libfauxdqt/prefs-window-qt.cc:180
+#: src/libfauxdgui/prefs-window.cc:135 src/libfauxdqt/prefs-window-qt.cc:191
 msgid "Russian"
 msgstr "Venäjä"
 
-#: src/libfauxdgui/prefs-window.cc:136 src/libfauxdqt/prefs-window-qt.cc:181
+#: src/libfauxdgui/prefs-window.cc:136 src/libfauxdqt/prefs-window-qt.cc:192
 msgid "Taiwanese"
 msgstr "Taiwan"
 
-#: src/libfauxdgui/prefs-window.cc:137 src/libfauxdqt/prefs-window-qt.cc:182
+#: src/libfauxdgui/prefs-window.cc:137 src/libfauxdqt/prefs-window-qt.cc:193
 msgid "Turkish"
 msgstr "Turkki"
 
-#: src/libfauxdgui/prefs-window.cc:141 src/libfauxdqt/prefs-window-qt.cc:186
+#: src/libfauxdgui/prefs-window.cc:141 src/libfauxdqt/prefs-window-qt.cc:197
 msgid "Automatic"
 msgstr "Automaattinen"
 
-#: src/libfauxdgui/prefs-window.cc:145 src/libfauxdqt/prefs-window-qt.cc:190
+#: src/libfauxdgui/prefs-window.cc:145 src/libfauxdqt/prefs-window-qt.cc:201
 msgid "Floating point"
 msgstr "Liukuluku"
 
-#: src/libfauxdgui/prefs-window.cc:149 src/libfauxdqt/prefs-window-qt.cc:194
+#: src/libfauxdgui/prefs-window.cc:149 src/libfauxdqt/prefs-window-qt.cc:205
 msgid "As decoded"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:150 src/libfauxdqt/prefs-window-qt.cc:195
+#: src/libfauxdgui/prefs-window.cc:150 src/libfauxdqt/prefs-window-qt.cc:206
 msgid "After applying ReplayGain"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:151 src/libfauxdqt/prefs-window-qt.cc:196
+#: src/libfauxdgui/prefs-window.cc:151 src/libfauxdqt/prefs-window-qt.cc:207
 msgid "After applying effects"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:152 src/libfauxdqt/prefs-window-qt.cc:197
+#: src/libfauxdgui/prefs-window.cc:152 src/libfauxdqt/prefs-window-qt.cc:208
 msgid "After applying equalization"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:158 src/libfauxdqt/prefs-window-qt.cc:203
+#: src/libfauxdgui/prefs-window.cc:156 src/libfauxdqt/prefs-window-qt.cc:212
+msgid "Never"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:157 src/libfauxdqt/prefs-window-qt.cc:213
+msgid "URLs NOT in playlists"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:158 src/libfauxdqt/prefs-window-qt.cc:214
+msgid "Always"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:162 src/libfauxdqt/prefs-window-qt.cc:218
+msgid "<song file-name>.tag (if local)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:163 src/libfauxdqt/prefs-window-qt.cc:219
+msgid "Directory tagfile (if local)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:164 src/libfauxdqt/prefs-window-qt.cc:220
+msgid "Global tagfile"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:170 src/libfauxdqt/prefs-window-qt.cc:226
 msgid "Based on shuffle"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:170 src/libfauxdqt/prefs-window-qt.cc:215
+#: src/libfauxdgui/prefs-window.cc:182 src/libfauxdqt/prefs-window-qt.cc:270
 msgid "Interface:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:189 src/libfauxdqt/prefs-window-qt.cc:225
+#: src/libfauxdgui/prefs-window.cc:185 src/libfauxdqt/prefs-window-qt.cc:278
+msgid "Use Classic icons for this dialog's tabs (next time)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:203 src/libfauxdqt/prefs-window-qt.cc:290
 msgid "Output plugin:"
 msgstr "Ulostulon lisäosa:"
 
-#: src/libfauxdgui/prefs-window.cc:210 src/libfauxdqt/prefs-window-qt.cc:240
+#: src/libfauxdgui/prefs-window.cc:224 src/libfauxdqt/prefs-window-qt.cc:305
 msgid "Amplify all files:"
 msgstr "Vahvista kaikki tiedostot:"
 
-#: src/libfauxdgui/prefs-window.cc:212 src/libfauxdgui/prefs-window.cc:215
-#: src/libfauxdqt/prefs-window-qt.cc:242 src/libfauxdqt/prefs-window-qt.cc:245
+#: src/libfauxdgui/prefs-window.cc:226 src/libfauxdgui/prefs-window.cc:229
+#: src/libfauxdqt/prefs-window-qt.cc:307 src/libfauxdqt/prefs-window-qt.cc:310
 msgid "dB"
 msgstr "dB"
 
-#: src/libfauxdgui/prefs-window.cc:213 src/libfauxdqt/prefs-window-qt.cc:243
+#: src/libfauxdgui/prefs-window.cc:227 src/libfauxdqt/prefs-window-qt.cc:308
 msgid "Amplify untagged files:"
 msgstr "Vahvista luokittelemattomat tiedostot:"
 
-#: src/libfauxdgui/prefs-window.cc:219 src/libfauxdqt/prefs-window-qt.cc:249
+#: src/libfauxdgui/prefs-window.cc:233 src/libfauxdqt/prefs-window-qt.cc:314
 msgid "<b>Output Settings</b>"
 msgstr "<b>Ulostulon asetukset</b>"
 
-#: src/libfauxdgui/prefs-window.cc:221 src/libfauxdqt/prefs-window-qt.cc:251
+#: src/libfauxdgui/prefs-window.cc:235 src/libfauxdqt/prefs-window-qt.cc:316
 msgid "Bit depth:"
 msgstr "Bittisyvyys:"
 
-#: src/libfauxdgui/prefs-window.cc:224 src/libfauxdgui/prefs-window.cc:269
-#: src/libfauxdqt/prefs-window-qt.cc:254 src/libfauxdqt/prefs-window-qt.cc:308
+#: src/libfauxdgui/prefs-window.cc:238 src/libfauxdgui/prefs-window.cc:283
+#: src/libfauxdqt/prefs-window-qt.cc:319 src/libfauxdqt/prefs-window-qt.cc:364
 msgid "Buffer size:"
 msgstr "Puskurin koko:"
 
-#: src/libfauxdgui/prefs-window.cc:226 src/libfauxdqt/prefs-window-qt.cc:256
+#: src/libfauxdgui/prefs-window.cc:240 src/libfauxdqt/prefs-window-qt.cc:321
 msgid "ms"
 msgstr "ms"
 
-#: src/libfauxdgui/prefs-window.cc:227 src/libfauxdqt/prefs-window-qt.cc:257
+#: src/libfauxdgui/prefs-window.cc:241 src/libfauxdqt/prefs-window-qt.cc:322
 msgid "Soft clipping"
 msgstr "Pehmeä leikkaantuminen"
 
-#: src/libfauxdgui/prefs-window.cc:229 src/libfauxdqt/prefs-window-qt.cc:259
+#: src/libfauxdgui/prefs-window.cc:243 src/libfauxdqt/prefs-window-qt.cc:324
 msgid "Use software volume control (not recommended)"
 msgstr "Käytä ohjelmallista äänensäätöä (ei suositeltu)"
 
-#: src/libfauxdgui/prefs-window.cc:231 src/libfauxdqt/prefs-window-qt.cc:261
+#: src/libfauxdgui/prefs-window.cc:245 src/libfauxdqt/prefs-window-qt.cc:326
 msgid "<b>Recording Settings</b>"
 msgstr "<b>Nauhoitusasetukset</b>"
 
-#: src/libfauxdgui/prefs-window.cc:235 src/libfauxdqt/prefs-window-qt.cc:265
+#: src/libfauxdgui/prefs-window.cc:249 src/libfauxdqt/prefs-window-qt.cc:330
 msgid "Record stream:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:238 src/libfauxdqt/prefs-window-qt.cc:268
+#: src/libfauxdgui/prefs-window.cc:252 src/libfauxdqt/prefs-window-qt.cc:333
 msgid "<b>ReplayGain</b>"
 msgstr "<b>ReplayGain</b>"
 
-#: src/libfauxdgui/prefs-window.cc:239 src/libfauxdqt/prefs-window-qt.cc:269
+#: src/libfauxdgui/prefs-window.cc:253 src/libfauxdqt/prefs-window-qt.cc:334
 msgid "Enable ReplayGain"
 msgstr "Käytä ReplayGainia"
 
-#: src/libfauxdgui/prefs-window.cc:241 src/libfauxdqt/prefs-window-qt.cc:271
+#: src/libfauxdgui/prefs-window.cc:255 src/libfauxdqt/prefs-window-qt.cc:336
 msgid "Mode:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:245 src/libfauxdqt/prefs-window-qt.cc:275
+#: src/libfauxdgui/prefs-window.cc:259 src/libfauxdqt/prefs-window-qt.cc:340
 msgid "Prevent clipping (recommended)"
 msgstr "Estä leikkaantuminen (suositeltu)"
 
-#: src/libfauxdgui/prefs-window.cc:253 src/libfauxdqt/prefs-window-qt.cc:283
+#: src/libfauxdgui/prefs-window.cc:267 src/libfauxdqt/prefs-window-qt.cc:348
 msgid "Proxy hostname:"
 msgstr "Välityspalvelimen osoite:"
 
-#: src/libfauxdgui/prefs-window.cc:255 src/libfauxdqt/prefs-window-qt.cc:285
+#: src/libfauxdgui/prefs-window.cc:269 src/libfauxdqt/prefs-window-qt.cc:350
 msgid "Proxy port:"
 msgstr "Välityspalvelimen portti:"
 
-#: src/libfauxdgui/prefs-window.cc:260 src/libfauxdqt/prefs-window-qt.cc:290
+#: src/libfauxdgui/prefs-window.cc:274 src/libfauxdqt/prefs-window-qt.cc:355
 msgid "Proxy username:"
 msgstr "Välityspalvelimen käyttäjätunnus:"
 
-#: src/libfauxdgui/prefs-window.cc:262 src/libfauxdqt/prefs-window-qt.cc:292
+#: src/libfauxdgui/prefs-window.cc:276 src/libfauxdqt/prefs-window-qt.cc:357
 msgid "Proxy password:"
 msgstr "Välityspalvelimen salasana:"
 
-#: src/libfauxdgui/prefs-window.cc:268 src/libfauxdqt/prefs-window-qt.cc:307
+#: src/libfauxdgui/prefs-window.cc:282 src/libfauxdqt/prefs-window-qt.cc:363
 msgid "<b>Network Settings</b>"
 msgstr "<b>Verkkoasetukset</b>"
 
-#: src/libfauxdgui/prefs-window.cc:271 src/libfauxdqt/prefs-window-qt.cc:310
+#: src/libfauxdgui/prefs-window.cc:285 src/libfauxdqt/prefs-window-qt.cc:366
 msgid "KiB"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:272 src/libfauxdqt/prefs-window-qt.cc:311
+#: src/libfauxdgui/prefs-window.cc:286 src/libfauxdqt/prefs-window-qt.cc:367
 msgid "<b>Proxy Configuration</b>"
 msgstr "<b>Välityspalvelimen asetukset</b>"
 
-#: src/libfauxdgui/prefs-window.cc:273 src/libfauxdqt/prefs-window-qt.cc:312
+#: src/libfauxdgui/prefs-window.cc:287 src/libfauxdqt/prefs-window-qt.cc:368
 msgid "Enable proxy usage"
 msgstr "Käytä välityspalvelinta"
 
-#: src/libfauxdgui/prefs-window.cc:277 src/libfauxdqt/prefs-window-qt.cc:316
+#: src/libfauxdgui/prefs-window.cc:291 src/libfauxdqt/prefs-window-qt.cc:372
 msgid "Use authentication with proxy"
 msgstr "Käytä tunnistautumista välityspalvelimen kanssa"
 
-#: src/libfauxdgui/prefs-window.cc:281 src/libfauxdqt/prefs-window-qt.cc:320
-msgid "SOCKS proxy?"
+#: src/libfauxdgui/prefs-window.cc:295 src/libfauxdqt/prefs-window-qt.cc:376
+msgid "Use SOCKS proxy"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:283 src/libfauxdqt/prefs-window-qt.cc:298
+#: src/libfauxdgui/prefs-window.cc:297 src/libfauxdqt/prefs-window-qt.cc:378
 msgid "SOCKS v4a"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:287 src/libfauxdqt/prefs-window-qt.cc:301
+#: src/libfauxdgui/prefs-window.cc:301 src/libfauxdqt/prefs-window-qt.cc:382
 msgid "SOCKS v5"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:294 src/libfauxdqt/prefs-window-qt.cc:327
+#: src/libfauxdgui/prefs-window.cc:308 src/libfauxdqt/prefs-window-qt.cc:389
 msgid "Auto character encoding detector for:"
 msgstr "Automaattinen merkistökoodauksen tunnistus:"
 
-#: src/libfauxdgui/prefs-window.cc:297 src/libfauxdqt/prefs-window-qt.cc:330
+#: src/libfauxdgui/prefs-window.cc:311 src/libfauxdqt/prefs-window-qt.cc:392
 msgid "Fallback character encodings:"
 msgstr "Toissijaiset merkistökoodaukset:"
 
-#: src/libfauxdgui/prefs-window.cc:305 src/libfauxdqt/prefs-window-qt.cc:338
+#: src/libfauxdgui/prefs-window.cc:319 src/libfauxdqt/prefs-window-qt.cc:400
 msgid "<b>Behavior</b>"
 msgstr "<b>Käytös</b>"
 
-#: src/libfauxdgui/prefs-window.cc:306 src/libfauxdqt/prefs-window-qt.cc:339
+#: src/libfauxdgui/prefs-window.cc:320 src/libfauxdqt/prefs-window-qt.cc:401
 msgid "Resume playback on startup"
 msgstr "Palauta toisto käynnistäessä"
 
-#: src/libfauxdgui/prefs-window.cc:308 src/libfauxdqt/prefs-window-qt.cc:341
-msgid "Pause instead of resuming immediately"
+#: src/libfauxdgui/prefs-window.cc:322 src/libfauxdqt/prefs-window-qt.cc:403
+#, fuzzy
+msgid "...but Pause instead of resuming immediately"
 msgstr "Keskeytä välittömän palauttamisen sijaan"
 
-#: src/libfauxdgui/prefs-window.cc:311 src/libfauxdqt/prefs-window-qt.cc:344
+#: src/libfauxdgui/prefs-window.cc:325 src/libfauxdqt/prefs-window-qt.cc:406
 msgid "Advance when the current song is deleted"
 msgstr "Jatka, kun nykyinen kappale on poistettu"
 
-#: src/libfauxdgui/prefs-window.cc:313 src/libfauxdqt/prefs-window-qt.cc:346
-msgid "Clear the playlist when opening files"
+#: src/libfauxdgui/prefs-window.cc:327 src/libfauxdqt/prefs-window-qt.cc:408
+#, fuzzy
+msgid "Clear the playlist when Opening (not \"Adding\") files"
 msgstr "Tyhjennä soittolista avattaessa tiedostoja"
 
-#: src/libfauxdgui/prefs-window.cc:315 src/libfauxdqt/prefs-window-qt.cc:348
-msgid "Open files in a temporary playlist"
+#: src/libfauxdgui/prefs-window.cc:329 src/libfauxdqt/prefs-window-qt.cc:410
+#, fuzzy
+msgid "Open files in a temporary (\"Now Playing\") playlist"
 msgstr "Avaa tiedostot väliaikaisessa soittolistassa"
 
-#: src/libfauxdgui/prefs-window.cc:319 src/libfauxdqt/prefs-window-qt.cc:352
+#: src/libfauxdgui/prefs-window.cc:331 src/libfauxdqt/prefs-window-qt.cc:412
 msgid "<b>Song Display</b>"
 msgstr "<b>Kappaleen näyttö</b>"
 
-#: src/libfauxdgui/prefs-window.cc:320 src/libfauxdqt/prefs-window-qt.cc:353
+#: src/libfauxdgui/prefs-window.cc:332 src/libfauxdqt/prefs-window-qt.cc:413
 msgid "Show song numbers"
 msgstr "Näytä kappalenumerot"
 
-#: src/libfauxdgui/prefs-window.cc:322 src/libfauxdqt/prefs-window-qt.cc:355
+#: src/libfauxdgui/prefs-window.cc:334 src/libfauxdqt/prefs-window-qt.cc:415
 msgid "Show leading zeroes (02:00 vs. 2:00)"
 msgstr "Näytä etunollat (02:00 vrt. 2:00)"
 
-#: src/libfauxdgui/prefs-window.cc:324 src/libfauxdqt/prefs-window-qt.cc:357
+#: src/libfauxdgui/prefs-window.cc:336 src/libfauxdqt/prefs-window-qt.cc:417
 msgid "Show hours separately (1:30:00 vs. 90:00)"
 msgstr "Näytä tunnit erillisenä (1:30:00 vrt. 90:00)"
 
-#: src/libfauxdgui/prefs-window.cc:327 src/libfauxdqt/prefs-window-qt.cc:360
+#: src/libfauxdgui/prefs-window.cc:339 src/libfauxdqt/prefs-window-qt.cc:420
 msgid "<b>Export</b>"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:328 src/libfauxdqt/prefs-window-qt.cc:361
+#: src/libfauxdgui/prefs-window.cc:340 src/libfauxdqt/prefs-window-qt.cc:421
 msgid "Use relative paths when possible"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:333 src/libfauxdqt/prefs-window-qt.cc:366
+#: src/libfauxdgui/prefs-window.cc:342 src/libfauxdgui/prefs-window.cc:390
+#: src/libfauxdgui/prefs-window.cc:423 src/libfauxdqt/prefs-window-qt.cc:423
+#: src/libfauxdqt/prefs-window-qt.cc:468 src/libfauxdqt/prefs-window-qt.cc:501
+#, fuzzy
+msgid "<b>Fauxdacious Extras</b>"
+msgstr "Audaciouksen asetukset"
+
+#: src/libfauxdgui/prefs-window.cc:345 src/libfauxdqt/prefs-window-qt.cc:426
+msgid "Split Artist - Title in streams"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:347 src/libfauxdqt/prefs-window-qt.cc:428
+msgid "Advance to next selected entry in list"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:349 src/libfauxdqt/prefs-window-qt.cc:430
+msgid "Keep playlist metadata (like cuesheets do)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:351 src/libfauxdqt/prefs-window-qt.cc:432
+msgid "Don't allow streams to change metadata"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:353 src/libfauxdqt/prefs-window-qt.cc:434
+msgid "Limit playlist URLs to"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:355 src/libfauxdqt/prefs-window-qt.cc:436
+msgid "entries (0=no limit)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:359 src/libfauxdqt/prefs-window-qt.cc:440
 msgid "<b>Album Art</b>"
 msgstr "<b>Albumikansi</b>"
 
-#: src/libfauxdgui/prefs-window.cc:334 src/libfauxdqt/prefs-window-qt.cc:367
+#: src/libfauxdgui/prefs-window.cc:360 src/libfauxdqt/prefs-window-qt.cc:441
 msgid "Search for images matching these words (comma-separated):"
 msgstr "Etsi kuvia joissa esiintyy sanat (erota pilkulla):"
 
-#: src/libfauxdgui/prefs-window.cc:336 src/libfauxdqt/prefs-window-qt.cc:369
+#: src/libfauxdgui/prefs-window.cc:362 src/libfauxdqt/prefs-window-qt.cc:443
 msgid "Exclude images matching these words (comma-separated):"
 msgstr "Hylkää kuvat joissa esiintyy sanat (erota pilkulla):"
 
-#: src/libfauxdgui/prefs-window.cc:338 src/libfauxdqt/prefs-window-qt.cc:371
-msgid "Default cover image file?:"
+#: src/libfauxdgui/prefs-window.cc:364 src/libfauxdqt/prefs-window-qt.cc:445
+msgid "Directory Channel-icon image (filename[.ext] only)?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:340 src/libfauxdqt/prefs-window-qt.cc:373
+#: src/libfauxdgui/prefs-window.cc:366 src/libfauxdqt/prefs-window-qt.cc:447
+msgid "Fallback cover image file? (full path required):"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:368 src/libfauxdqt/prefs-window-qt.cc:449
+msgid "Use Directory Channel-icon image file (see above)"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:370 src/libfauxdqt/prefs-window-qt.cc:451
 msgid "Search for images matching song file name"
 msgstr "Etsi kuvia jotka täsmäävät kappaleen tiedostonimeen"
 
-#: src/libfauxdgui/prefs-window.cc:342 src/libfauxdqt/prefs-window-qt.cc:375
+#: src/libfauxdgui/prefs-window.cc:372 src/libfauxdqt/prefs-window-qt.cc:453
+#, fuzzy
+msgid "Search for images matching Album tag (file name overrides)"
+msgstr "Etsi kuvia jotka täsmäävät kappaleen tiedostonimeen"
+
+#: src/libfauxdgui/prefs-window.cc:374 src/libfauxdqt/prefs-window-qt.cc:455
 msgid "Search recursively"
 msgstr "Etsi rekursiivisesti"
 
-#: src/libfauxdgui/prefs-window.cc:344 src/libfauxdqt/prefs-window-qt.cc:377
+#: src/libfauxdgui/prefs-window.cc:376 src/libfauxdqt/prefs-window-qt.cc:457
 msgid "Search depth:"
 msgstr "Etsintäsyvyys:"
 
-#: src/libfauxdgui/prefs-window.cc:348 src/libfauxdqt/prefs-window-qt.cc:381
+#: src/libfauxdgui/prefs-window.cc:380 src/libfauxdqt/prefs-window-qt.cc:461
 msgid "<b>Popup Information</b>"
 msgstr "<b>Ponnahdusikkuna</b>"
 
-#: src/libfauxdgui/prefs-window.cc:349 src/libfauxdqt/prefs-window-qt.cc:382
+#: src/libfauxdgui/prefs-window.cc:381 src/libfauxdqt/prefs-window-qt.cc:462
 msgid "Show popup information"
 msgstr "Näytä ponnahdusikkuna"
 
-#: src/libfauxdgui/prefs-window.cc:351 src/libfauxdqt/prefs-window-qt.cc:384
+#: src/libfauxdgui/prefs-window.cc:383 src/libfauxdqt/prefs-window-qt.cc:464
 msgid "Popup delay (tenths of a second):"
 msgstr "Ponnahdusikkunan viive (kymmenesosasekunti):"
 
-#: src/libfauxdgui/prefs-window.cc:355 src/libfauxdqt/prefs-window-qt.cc:388
+#: src/libfauxdgui/prefs-window.cc:387
 msgid "Show time scale for current song"
 msgstr "Näytä soivan kappaleen aikapalkki"
 
-#: src/libfauxdgui/prefs-window.cc:361 src/libfauxdqt/prefs-window-qt.cc:394
+#: src/libfauxdgui/prefs-window.cc:391 src/libfauxdqt/prefs-window-qt.cc:469
+msgid "Save unsavable metadata to file"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:394 src/libfauxdqt/prefs-window-qt.cc:472
+msgid "Save tags to:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:400 src/libfauxdqt/prefs-window-qt.cc:478
 msgid "<b>Compatibility</b>"
 msgstr "<b>Yhteensopivuus</b>"
 
-#: src/libfauxdgui/prefs-window.cc:362 src/libfauxdqt/prefs-window-qt.cc:395
+#: src/libfauxdgui/prefs-window.cc:401 src/libfauxdqt/prefs-window-qt.cc:479
 msgid "Interpret \\ (backward slash) as a folder delimiter"
 msgstr "Tulkitse \\ (kenoviiva) kansioerottimeksi"
 
-#: src/libfauxdgui/prefs-window.cc:365 src/libfauxdqt/prefs-window-qt.cc:398
+#: src/libfauxdgui/prefs-window.cc:404 src/libfauxdqt/prefs-window-qt.cc:482
 msgid "<b>Playlist</b>"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:366 src/libfauxdqt/prefs-window-qt.cc:399
+#: src/libfauxdgui/prefs-window.cc:405 src/libfauxdqt/prefs-window-qt.cc:483
 msgid "Add folders recursively"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:368 src/libfauxdqt/prefs-window-qt.cc:401
+#: src/libfauxdgui/prefs-window.cc:407 src/libfauxdqt/prefs-window-qt.cc:485
 msgid "Add folders nested within playlist files"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:370 src/libfauxdqt/prefs-window-qt.cc:403
+#: src/libfauxdgui/prefs-window.cc:409 src/libfauxdqt/prefs-window-qt.cc:487
 msgid "<b>Metadata</b>"
 msgstr "<b>Metatiedot</b>"
 
-#: src/libfauxdgui/prefs-window.cc:371 src/libfauxdqt/prefs-window-qt.cc:404
+#: src/libfauxdgui/prefs-window.cc:410 src/libfauxdqt/prefs-window-qt.cc:488
 msgid "Guess missing metadata from file path"
 msgstr "Arvaa puuttuva metadata tiedostopolun perusteella"
 
-#: src/libfauxdgui/prefs-window.cc:373 src/libfauxdqt/prefs-window-qt.cc:406
+#: src/libfauxdgui/prefs-window.cc:412 src/libfauxdqt/prefs-window-qt.cc:490
 msgid "Do not load metadata for songs until played"
 msgstr "Älä lataa metatietoja kun kappaletta soitetaan"
 
-#: src/libfauxdgui/prefs-window.cc:375 src/libfauxdqt/prefs-window-qt.cc:408
+#: src/libfauxdgui/prefs-window.cc:414 src/libfauxdqt/prefs-window-qt.cc:492
 msgid "Probe content of files with no recognized file name extension"
 msgstr "Tutki tuntemattomien tiedostopäätteiden omaavien tiedostojen sisältö"
 
-#: src/libfauxdgui/prefs-window.cc:393 src/libfauxdqt/prefs-window-qt.cc:426
+#: src/libfauxdgui/prefs-window.cc:416 src/libfauxdqt/prefs-window-qt.cc:494
+msgid "<b>Miscellaneous</b>"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:417 src/libfauxdqt/prefs-window-qt.cc:495
+msgid "Step forward/backward by:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:419 src/libfauxdqt/prefs-window-qt.cc:497
+msgid "seconds"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:420 src/libfauxdqt/prefs-window-qt.cc:498
+msgid "Adjust volume by:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:422 src/libfauxdqt/prefs-window-qt.cc:500
+msgid "percent"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:424 src/libfauxdqt/prefs-window-qt.cc:502
+msgid "Allow URL-helper:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:427 src/libfauxdqt/prefs-window-qt.cc:505
+msgid "URL-helper program?:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:429 src/libfauxdqt/prefs-window-qt.cc:507
+msgid "Cover Art-helper program?:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:431 src/libfauxdqt/prefs-window-qt.cc:509
+msgid "Lyrics plugins helper program?:"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:433 src/libfauxdqt/prefs-window-qt.cc:511
+msgid "Quirky window-managers (ie. AfterStep)?"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:451 src/libfauxdqt/prefs-window-qt.cc:529
 msgid "TITLE"
 msgstr "NIMI"
 
-#: src/libfauxdgui/prefs-window.cc:394 src/libfauxdqt/prefs-window-qt.cc:427
+#: src/libfauxdgui/prefs-window.cc:452 src/libfauxdqt/prefs-window-qt.cc:530
 msgid "TITLE - ARTIST"
 msgstr "NIMI - ESITTÄJÄ"
 
-#: src/libfauxdgui/prefs-window.cc:395 src/libfauxdqt/prefs-window-qt.cc:428
+#: src/libfauxdgui/prefs-window.cc:453 src/libfauxdqt/prefs-window-qt.cc:531
 msgid "TITLE - ARTIST - ALBUM"
 msgstr "NIMI - ESITTÄJÄ - ALBUMI"
 
-#: src/libfauxdgui/prefs-window.cc:396 src/libfauxdqt/prefs-window-qt.cc:429
+#: src/libfauxdgui/prefs-window.cc:454 src/libfauxdqt/prefs-window-qt.cc:532
 msgid "ARTIST - TITLE"
 msgstr "ESITTÄJÄ - NIMI"
 
-#: src/libfauxdgui/prefs-window.cc:397 src/libfauxdqt/prefs-window-qt.cc:430
+#: src/libfauxdgui/prefs-window.cc:455 src/libfauxdqt/prefs-window-qt.cc:533
 msgid "ARTIST - ALBUM - TITLE"
 msgstr "ESITTÄJÄ - ALBUMI - NIMI"
 
-#: src/libfauxdgui/prefs-window.cc:398 src/libfauxdqt/prefs-window-qt.cc:431
+#: src/libfauxdgui/prefs-window.cc:456 src/libfauxdqt/prefs-window-qt.cc:534
 msgid "ARTIST - ALBUM - TRACK. TITLE"
 msgstr "ESITTÄJÄ - ALBUMI - KAPPALENUMERO. NIMI"
 
-#: src/libfauxdgui/prefs-window.cc:399 src/libfauxdqt/prefs-window-qt.cc:432
+#: src/libfauxdgui/prefs-window.cc:457 src/libfauxdqt/prefs-window-qt.cc:535
 msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
 msgstr "ARTISTI [ ALBUMI ] - KAPPALENUMERO. NIMI"
 
-#: src/libfauxdgui/prefs-window.cc:400 src/libfauxdqt/prefs-window-qt.cc:433
+#: src/libfauxdgui/prefs-window.cc:458 src/libfauxdqt/prefs-window-qt.cc:536
 msgid "ALBUM - TITLE"
 msgstr "ALBUMI - NIMI"
 
-#: src/libfauxdgui/prefs-window.cc:494
+#: src/libfauxdgui/prefs-window.cc:552
 msgid "Category"
 msgstr "Luokka"
 
-#: src/libfauxdgui/prefs-window.cc:583 src/libfauxdqt/prefs-window-qt.cc:451
+#: src/libfauxdgui/prefs-window.cc:641 src/libfauxdqt/prefs-window-qt.cc:554
 msgid "Custom"
 msgstr "Mukautettu..."
 
-#: src/libfauxdgui/prefs-window.cc:601 src/libfauxdqt/prefs-window-qt.cc:443
+#: src/libfauxdgui/prefs-window.cc:659 src/libfauxdqt/prefs-window-qt.cc:546
 msgid "Title format:"
 msgstr "Nimikkeen muoto:"
 
-#: src/libfauxdgui/prefs-window.cc:605 src/libfauxdqt/prefs-window-qt.cc:454
+#: src/libfauxdgui/prefs-window.cc:663 src/libfauxdqt/prefs-window-qt.cc:557
 msgid "Custom string:"
 msgstr "Muu merkkijono:"
 
-#: src/libfauxdgui/prefs-window.cc:804 src/libfauxdqt/prefs-window-qt.cc:763
+#: src/libfauxdgui/prefs-window.cc:862 src/libfauxdqt/prefs-window-qt.cc:870
 #, c-format
-msgid "Record audio stream using %s"
+msgid "Enable audio stream recording with %s"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:815 src/libfauxdqt/prefs-window-qt.cc:776
+#: src/libfauxdgui/prefs-window.cc:871 src/libfauxdqt/prefs-window-qt.cc:881
 msgid "No audio recording plugin available"
 msgstr "Liitännäistä äänen nauhoittamista varten ei ole saatavilla"
 
-#: src/libfauxdgui/prefs-window.cc:875 src/libfauxdqt/prefs-window-qt.cc:633
+#: src/libfauxdgui/prefs-window.cc:931 src/libfauxdqt/prefs-window-qt.cc:736
 #, fuzzy
-msgid "Fauxdacious Settings"
-msgstr "Audaciouksen asetukset"
+msgid "Settings - Fauxdacious"
+msgstr "Tietoja Audaciouksesta"
 
-#: src/libfauxdgui/preset-browser.cc:79 src/libfauxdgui/util.cc:172
-msgid "Cancel"
-msgstr "Peru"
-
-#: src/libfauxdgui/preset-browser.cc:80
+#: src/libfauxdgui/preset-browser.cc:84 src/libfauxdqt/eq-preset-qt.cc:353
 msgid "Save"
 msgstr "Tallenna"
 
-#: src/libfauxdgui/preset-browser.cc:80
+#: src/libfauxdgui/preset-browser.cc:84 src/libfauxdqt/eq-preset-qt.cc:307
+#: src/libfauxdqt/info-widget.cc:211
 msgid "Load"
 msgstr "Lataa"
 
-#: src/libfauxdgui/preset-browser.cc:83
+#: src/libfauxdgui/preset-browser.cc:87
 #, fuzzy
 msgid "Preset/Eq Files"
 msgstr "Esiasetustiedosto..."
 
-#: src/libfauxdgui/preset-browser.cc:84
+#: src/libfauxdgui/preset-browser.cc:88
 #, fuzzy
 msgid "*.preset"
 msgstr "<name>.preset"
 
-#: src/libfauxdgui/preset-browser.cc:85
+#: src/libfauxdgui/preset-browser.cc:89
 msgid "*.eqf"
 msgstr ""
 
-#: src/libfauxdgui/preset-browser.cc:86
+#: src/libfauxdgui/preset-browser.cc:90
 msgid "*.q1"
 msgstr ""
 
-#: src/libfauxdgui/preset-browser.cc:117
-msgid "Load Preset File"
+#: src/libfauxdgui/preset-browser.cc:126 src/libfauxdqt/eq-preset-qt.cc:303
+#, fuzzy
+msgid "Load Preset File - Fauxdacious"
 msgstr "Lataa esiasetustiedosto"
 
-#: src/libfauxdgui/preset-browser.cc:135
-msgid "Load EQF File"
+#: src/libfauxdgui/preset-browser.cc:141
+#, fuzzy
+msgid "Load EQF File - Fauxdacious"
 msgstr "Lataa EQF-tiedosto"
 
-#: src/libfauxdgui/preset-browser.cc:187 src/libfauxdgui/preset-browser.cc:225
-#: src/libfauxdgui/preset-browser.cc:255 src/libfauxdgui/preset-browser.cc:270
-#: src/libfauxdgui/preset-browser.cc:276
-msgid "Save Preset File"
+#: src/libfauxdgui/preset-browser.cc:183 src/libfauxdgui/preset-browser.cc:207
+#: src/libfauxdgui/preset-browser.cc:242 src/libfauxdgui/preset-browser.cc:275
+#: src/libfauxdgui/preset-browser.cc:306 src/libfauxdgui/preset-browser.cc:322
+#: src/libfauxdgui/preset-browser.cc:332
+#, fuzzy
+msgid "Save Preset File - Fauxdacious"
 msgstr "Tallenna esiasetustiedosto"
 
-#: src/libfauxdgui/preset-browser.cc:276
-msgid "<name>.preset"
-msgstr "<name>.preset"
-
-#: src/libfauxdgui/preset-browser.cc:295
-msgid "Save EQF File"
+#: src/libfauxdgui/preset-browser.cc:352
+#, fuzzy
+msgid "Save EQF File - Fauxdacious"
 msgstr "Tallenna EQF-tiedosto"
 
-#: src/libfauxdgui/preset-browser.cc:295
-msgid "<name>.eqf"
-msgstr "<name>.eqf"
-
-#: src/libfauxdgui/preset-browser.cc:310
-msgid "Import Winamp Presets"
-msgstr "Tuo Winamp-esiasetukset"
-
-#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:159
+#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:227
 msgid "Queue Manager"
 msgstr "Jonomanageri"
 
-#: src/libfauxdgui/queue-manager.cc:193 src/libfauxdqt/queue-manager-qt.cc:162
+#: src/libfauxdgui/queue-manager.cc:193 src/libfauxdqt/queue-manager-qt.cc:179
 msgid "_Unqueue"
 msgstr "_Poista jonosta"
 
@@ -1490,7 +1671,7 @@ msgstr "_Poista jonosta"
 msgid "Working ..."
 msgstr "Työskennellään..."
 
-#: src/libfauxdgui/status.cc:85 src/libfauxdqt/log-inspector.cc:209
+#: src/libfauxdgui/status.cc:85 src/libfauxdqt/log-inspector.cc:210
 msgid "Error"
 msgstr "Virhe"
 
@@ -1498,30 +1679,27 @@ msgstr "Virhe"
 msgid "Information"
 msgstr ""
 
-#: src/libfauxdgui/url-opener.cc:55 src/libfauxdqt/url-opener-qt.cc:39
+#: src/libfauxdgui/url-opener.cc:55 src/libfauxdqt/url-opener-qt.cc:40
 msgid "_Save to history"
 msgstr ""
 
-#: src/libfauxdgui/url-opener.cc:63 src/libfauxdqt/url-opener-qt.cc:47
-msgid "Open URL"
-msgstr "Avaa verkko-osoite"
+#: src/libfauxdgui/url-opener.cc:63 src/libfauxdqt/url-opener-qt.cc:48
+#, fuzzy
+msgid "Open URL - Fauxdacious"
+msgstr "Audacious"
 
-#: src/libfauxdgui/url-opener.cc:69 src/libfauxdqt/url-opener-qt.cc:53
-msgid "Add URL"
-msgstr "Lisää verkko-osoite"
+#: src/libfauxdgui/url-opener.cc:69 src/libfauxdqt/url-opener-qt.cc:54
+#, fuzzy
+msgid "Add URL - Fauxdacious"
+msgstr "Audacious"
 
-#: src/libfauxdgui/url-opener.cc:92 src/libfauxdqt/url-opener-qt.cc:68
+#: src/libfauxdgui/url-opener.cc:92 src/libfauxdqt/url-opener-qt.cc:69
 msgid "C_lear history"
 msgstr ""
 
-#: src/libfauxdgui/url-opener.cc:104 src/libfauxdqt/url-opener-qt.cc:62
+#: src/libfauxdgui/url-opener.cc:104 src/libfauxdqt/url-opener-qt.cc:63
 msgid "Enter URL:"
 msgstr "Anna verkko-osoite:"
-
-#: src/libfauxdgui/util.cc:172 src/libfauxdqt/fileopener.cc:66
-#: src/libfauxdqt/fileopener.cc:67
-msgid "Open"
-msgstr "Avaa"
 
 #: src/libfauxdgui/util.cc:284
 msgid ""
@@ -1531,89 +1709,244 @@ msgstr ""
 "\n"
 "(Seuraavat viestit ovat piilotettu.)"
 
-#: src/libfauxdqt/fileopener.cc:58
-msgid "Open Folder"
-msgstr "Avaa kansio"
+#: src/libfauxdqt/audqt.cc:146
+#, fuzzy
+msgid "Fauxdacious_Qt"
+msgstr "Audacious"
+
+#: src/libfauxdqt/eq-preset-qt.cc:275
+msgid "Preset files (*.preset *.eqf *.q1)"
+msgstr ""
+
+#: src/libfauxdqt/eq-preset-qt.cc:348
+msgid "Save Preset File"
+msgstr "Tallenna esiasetustiedosto"
+
+#: src/libfauxdqt/eq-preset-qt.cc:592
+#, fuzzy
+msgid "Close"
+msgstr "_Sulje"
+
+#: src/libfauxdqt/equalizer-qt.cc:145
+msgid "Hide"
+msgstr ""
+
+#: src/libfauxdqt/equalizer-qt.cc:146 src/libfauxdqt/prefs-window-qt.cc:252
+msgid "Flat"
+msgstr ""
+
+#: src/libfauxdqt/equalizer-qt.cc:152 src/libfauxdqt/equalizer-qt.cc:240
+msgid "PreSETs!"
+msgstr ""
+
+#: src/libfauxdqt/equalizer-qt.cc:157 src/libfauxdqt/equalizer-qt.cc:245
+#, fuzzy
+msgid "Presets"
+msgstr "Esiasetukset..."
+
+#: src/libfauxdqt/equalizer-qt.cc:159
+#, fuzzy
+msgid "Auto"
+msgstr "Automaattinen"
+
+#: src/libfauxdqt/file-entry.cc:41
+msgid "Browse"
+msgstr ""
 
 #: src/libfauxdqt/fileopener.cc:60
-msgid "Add Folder"
-msgstr "Lisää kansio"
+#, fuzzy
+msgid "Open Folder - Fauxdacious"
+msgstr "Tietoja Audaciouksesta"
 
-#: src/libfauxdqt/fileopener.cc:68 src/libfauxdqt/fileopener.cc:69
+#: src/libfauxdqt/fileopener.cc:62
+#, fuzzy
+msgid "Add Folder - Fauxdacious"
+msgstr "Tietoja Audaciouksesta"
+
+#: src/libfauxdqt/fileopener.cc:63
+#, fuzzy
+msgid "Import Playlist - Fauxdacious"
+msgstr "Tuo soittolista"
+
+#: src/libfauxdqt/fileopener.cc:64
+#, fuzzy
+msgid "Export Playlist - Fauxdacious"
+msgstr "Vie soittolista"
+
+#: src/libfauxdqt/fileopener.cc:70 src/libfauxdqt/fileopener.cc:71
 msgid "Add"
 msgstr "Lisää"
 
-#: src/libfauxdqt/info-widget.cc:40
+#: src/libfauxdqt/font-entry.cc:37
+msgid "Set Font"
+msgstr ""
+
+#: src/libfauxdqt/info-widget.cc:50
 msgid "Metadata"
 msgstr "Metatiedot"
 
-#: src/libfauxdqt/info-widget.cc:48
+#: src/libfauxdqt/info-widget.cc:58
 msgid "Composer"
 msgstr "Säveltäjä"
 
-#: src/libfauxdqt/info-widget.cc:49
+#: src/libfauxdqt/info-widget.cc:59
 msgid "Performer"
 msgstr "Esittäjä"
 
-#: src/libfauxdqt/info-widget.cc:50
+#: src/libfauxdqt/info-widget.cc:60
 msgid "Recording Year"
 msgstr "Nauhoitusvuosi"
 
-#: src/libfauxdqt/info-widget.cc:51
+#: src/libfauxdqt/info-widget.cc:61
 msgid "Recording Date"
 msgstr "Nauhoituspäivä"
 
-#: src/libfauxdqt/info-widget.cc:54
+#: src/libfauxdqt/info-widget.cc:64
 msgid "Technical"
 msgstr ""
 
-#: src/libfauxdqt/info-widget.cc:58
+#: src/libfauxdqt/info-widget.cc:68
 msgid "Bitrate"
 msgstr "Bittinopeus"
 
-#: src/libfauxdqt/log-inspector.cc:137
-msgid "Level"
+#: src/libfauxdqt/info-widget.cc:69
+#, fuzzy
+msgid "Channels"
+msgstr "%d kanava"
+
+#: src/libfauxdqt/info-widget.cc:70
+msgid "MusicBrainz ID"
+msgstr ""
+
+#: src/libfauxdqt/info-widget.cc:206
+msgid "Image files (*.gif *.jpg *.jpeg *.png)"
+msgstr ""
+
+#: src/libfauxdqt/infowin-qt.cc:95
+msgid "Art Lookup"
 msgstr ""
 
 #: src/libfauxdqt/log-inspector.cc:138
-msgid "Function"
+msgid "Level"
 msgstr ""
 
 #: src/libfauxdqt/log-inspector.cc:139
+msgid "Function"
+msgstr ""
+
+#: src/libfauxdqt/log-inspector.cc:140
 msgid "Message"
 msgstr "Viesti"
 
-#: src/libfauxdqt/log-inspector.cc:195
-msgid "Log Inspector"
-msgstr ""
+#: src/libfauxdqt/log-inspector.cc:196
+#, fuzzy
+msgid "Log Inspector - Fauxdacious"
+msgstr "Tietoja Audaciouksesta"
 
-#: src/libfauxdqt/log-inspector.cc:206
+#: src/libfauxdqt/log-inspector.cc:207
 msgid "Debug"
 msgstr "Vianetsintä"
 
-#: src/libfauxdqt/log-inspector.cc:207
+#: src/libfauxdqt/log-inspector.cc:208
 msgid "Info"
 msgstr "Tiedot"
 
-#: src/libfauxdqt/log-inspector.cc:208
+#: src/libfauxdqt/log-inspector.cc:209
 msgid "Warning"
 msgstr "Varoitus"
 
-#: src/libfauxdqt/log-inspector.cc:219
+#: src/libfauxdqt/log-inspector.cc:220
 msgid "Cl_ear"
 msgstr "T_yhjennä"
 
-#: src/libfauxdqt/log-inspector.cc:232
+#: src/libfauxdqt/log-inspector.cc:233
 msgid "Log Level:"
 msgstr "Lokitaso:"
+
+#: src/libfauxdqt/playlist-management.cc:57
+#, fuzzy
+msgid "_Do not ask again"
+msgstr "_Älä kysy uudelleen"
+
+#: src/libfauxdqt/playlist-management.cc:63
+#, fuzzy, c-format
+msgid "Do you want to permanently remove %s?"
+msgstr "Haluastko poistaa kohteen “%s” pysyvästi?"
 
 #: src/libfauxdqt/plugin-menu-qt.cc:53
 msgid "Services"
 msgstr "Palvelut"
 
-#: src/libfauxdqt/util-qt.cc:77
+#: src/libfauxdqt/prefs-window-qt.cc:237 src/libfauxdqt/prefs-window-qt.cc:250
+#: src/libfauxdqt/prefs-window-qt.cc:264
+msgid "Native"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:238
+msgid "Dark"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:253
+msgid "Flat (dark)"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:265
+msgid "Native unless alt theme or icons"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:266
+msgid "Qt"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:273
+msgid "Theme:"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:275
+msgid "Icon theme:"
+msgstr ""
+
+#: src/libfauxdqt/prefs-window-qt.cc:280
+msgid "File Dialog Windows:"
+msgstr ""
+
+#: src/libfauxdqt/util-qt.cc:108
 msgid "Copy"
 msgstr "Kopioi"
+
+#, fuzzy
+#~ msgid "Record"
+#~ msgstr "Nauhoitusvuosi"
+
+#~ msgid "Winamp Presets ..."
+#~ msgstr "Winamp-esiasetukset..."
+
+#~ msgid "Open Files"
+#~ msgstr "Avaa tiedostoja"
+
+#~ msgid "Clea_r fields when moving to next song"
+#~ msgstr "T_yhjennä kentät seuraavaan kappaleeseen siirryttäessä"
+
+#~ msgid "<name>.preset"
+#~ msgstr "<name>.preset"
+
+#~ msgid "<name>.eqf"
+#~ msgstr "<name>.eqf"
+
+#~ msgid "Import Winamp Presets"
+#~ msgstr "Tuo Winamp-esiasetukset"
+
+#~ msgid "Open URL"
+#~ msgstr "Avaa verkko-osoite"
+
+#~ msgid "Add URL"
+#~ msgstr "Lisää verkko-osoite"
+
+#~ msgid "Open Folder"
+#~ msgstr "Avaa kansio"
+
+#~ msgid "Add Folder"
+#~ msgstr "Lisää kansio"
 
 #~ msgid "Reset to Zero"
 #~ msgstr "Palauta nollaksi"

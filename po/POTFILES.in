@@ -2,6 +2,7 @@
 src/fauxdacious/main.cc
 src/libfauxdcore/adder.cc
 src/libfauxdcore/audstrings.cc
+src/libfauxdcore/drct.cc
 src/libfauxdcore/output.cc
 src/libfauxdcore/playback.cc
 src/libfauxdcore/playlist.cc
@@ -33,8 +34,11 @@ src/libfauxdgui/url-opener.cc
 src/libfauxdgui/util.cc
 src/libfauxdqt/about-qt.cc
 src/libfauxdqt/audqt.cc
+src/libfauxdqt/eq-preset-qt.cc
 src/libfauxdqt/equalizer-qt.cc
+src/libfauxdqt/file-entry.cc
 src/libfauxdqt/fileopener.cc
+src/libfauxdqt/font-entry.cc
 src/libfauxdqt/infopopup-qt.cc
 src/libfauxdqt/info-widget.cc
 src/libfauxdqt/infowin-qt.cc
@@ -43,7 +47,9 @@ src/libfauxdqt/playlist-management.cc
 src/libfauxdqt/plugin-menu-qt.cc
 src/libfauxdqt/prefs-plugin.cc
 src/libfauxdqt/prefs-pluginlist-model.cc
+src/libfauxdqt/prefs-widget-qt.cc
 src/libfauxdqt/prefs-window-qt.cc
 src/libfauxdqt/queue-manager-qt.cc
+src/libfauxdqt/song-window-qt.cc
 src/libfauxdqt/url-opener-qt.cc
 src/libfauxdqt/util-qt.cc

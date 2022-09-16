@@ -1,0 +1,7 @@
+To update the transifex stuff (*.po, etc.), do the following:
+
+1)  make clean
+2)  ./update-potfiles.sh   #UPDATES POTFILES.in
+3)  make update-po         #UPDATES *.po (TO REFLECT CHANGES IN SOURCE-CODE)
+4)  rm -f *.po~            #REMOVE BACKUP FILES CREATED BY STEP 3.
+5)  make                   #CREATES THE *.mo FILES.
