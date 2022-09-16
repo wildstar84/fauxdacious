@@ -528,7 +528,7 @@ static void set_album_art ()
     /* JWT:NOW CHECK FOR "m_art_force_dups" (SEE Qt SIDE): */
     bool m_art_force_dups = true;  /* SET TO HIDE TO FORCE HIDING ALBUM-ART ICON. */
     /* JWT:THIS CHECK NEEDED ONLY IF ALBUM-ART PLGN ACTIVE && HIDE-DUPS ON && ALBUM-ART SAYS IT'S A DUP!: */
-    if (albumart_plugin_isactive && aud_get_bool ("albumart", "hide_dup_art_icon")
+    if (noAltArt && albumart_plugin_isactive && aud_get_bool ("albumart", "hide_dup_art_icon")
             && aud_get_bool ("albumart", "_infoarea_hide_art"))
     {
         m_art_force_dups = false;
