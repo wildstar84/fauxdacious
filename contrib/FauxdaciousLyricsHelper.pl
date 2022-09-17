@@ -13,7 +13,6 @@
 ###use LyricFinder::_Class;
 ###use LyricFinder::ApiLyricsOvh;
 ###use LyricFinder::AZLyrics;
-###use LyricFinder::Cache;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Letras;
 ###use LyricFinder::Musixmatch;
@@ -115,8 +114,8 @@ if ($#ARGV >= 1) {
 	}
 
 	for (my $a=0;$a<=$#ARGV;$a++) {  #STRIP QUOTES AROUND ARGUMENTS OFF (M$-Windows EXE)!:
-		$ARGV[$a] =~ s/^[\'\"]//;
-		$ARGV[$a] =~ s/[\'\"]$//;
+		$ARGV[$a] =~ s/^[\'\"]//o;
+		$ARGV[$a] =~ s/[\'\"]$//o;
 	}
 
 	unlink "$ARGV[2]/_tmp_lyrics.txt"  if ($ARGV[2] && -d $ARGV[2] && -f "$ARGV[2]/_tmp_lyrics.txt");
@@ -128,7 +127,7 @@ if ($#ARGV >= 1) {
 			print STDERR "-???- ALB=$ARGV[3]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 			if ("$ARGV[3]" =~ /^\Q${skipit}\E$/i) {
 				print STDERR "i:LYRICS HELPER: SKIPPING ALBUM ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-				exit (0)  if ($^O =~ /MSWin/);
+				exit (0)  if ($^O =~ /MSWin/o);
 				exit (4);  #QUIT
 			}
 		}
@@ -141,7 +140,7 @@ if ($#ARGV >= 1) {
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
 		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E/i) {
 			print STDERR "i:LYRICS HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
-			exit (0)  if ($^O =~ /MSWin/);
+			exit (0)  if ($^O =~ /MSWin/o);
 			exit (4);  #QUIT
 		}
 	}
