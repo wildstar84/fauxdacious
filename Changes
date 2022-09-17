@@ -1,4 +1,33 @@
-Version 4.2-beta1:
+Version 4.2-final:
+
+This version should be up to date with (and ahead of) Audacious's recent v4.2 
+(final) release plus all accepted Audacious GIT commits through at least   
+09/10/22.  This release features numerous minor changes all over.  We also 
+updated all the Transifex translations to make Fauxdacious easier to use for 
+non-English speakers.  
+
+The Album-art plugins saw alot of attention, along with streaming metadata 
+handling.  Several new playlist, menu and appearance options were added, along 
+with a new "-a" command-line option.  Qt saw new theme and icon options.  
+The Song Info Edit window in particular saw significant improvements.  
+
+The Mini-Fauxdacious / info-bar code received significant cleanups reducing the 
+potential for crashes, particularly on the Qt side.  Otherwise, just numerous 
+minor bug-fixes, tweaks, stability improvements, and minor Audacious changes 
+all over!  See the GIT commits for specific details.  We've had to release 
+more v4.1.x-final versions while awaiting Audacious to release v4.2, 
+as I prefer to avoid getting ahead of them in version numbers, even as we are 
+ahead of 'em in features! ;)
+
+M$-Windows users should see some improved functioning of the helper scripts.
+
+NOTE:  As always, "final" does NOT mean the final (last) release we'll do, but 
+rather the latest final (ie. finished) production release, as opposed to a 
+beta or development ("devel") release (and a fresh MS-Windows binary build)!  
+
+Change log:
+
+* Update Transifex language-translations!
 
 * Added new Song Info options:  "Directory Channel-icon file[.ext]" and 
 "Use Directory Channel icon file (see above)" checkbox to allow 

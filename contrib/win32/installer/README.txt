@@ -1,4 +1,4 @@
-Fauxdacious 4.1.3-final for Windows
+Fauxdacious 4.2-final for Windows
 
     https://github.com/wildstar84/fauxdacious-windows-easyinstaller
     https://wildstar84.wordpress.com/fauxdacious
@@ -6,7 +6,7 @@ Fauxdacious 4.1.3-final for Windows
 Fauxdacious is free and open source software.  By installing Fauxdacious, you agree
 to be bound by various licenses governing its use and redistribution.
 
-Build date: 05 February, 2022
+Build date: 16 September, 2022
 
 LICENSE
 
