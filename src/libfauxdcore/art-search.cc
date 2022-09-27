@@ -19,7 +19,9 @@
 
 #include "internal.h"
 
+#include <sys/stat.h>
 #include <string.h>
+#include <utime.h>
 
 #include <glib.h>  /* for g_dir_open, g_file_test */
 
@@ -27,6 +29,7 @@
 #include "index.h"
 #include "tuple.h"
 #include "runtime.h"
+#include "drct.h"
 
 struct SearchParams {
     String filename;
@@ -175,5 +178,98 @@ String art_search (const char * filename, Tuple & tuple)
     cut_path_element (local, elem - local);
 
     String image_local = fileinfo_recursive_get_image (local, & params, 0, tuple);
-    return image_local ? String (filename_to_uri (image_local)) : String ();
+    if (image_local)
+        return String (filename_to_uri (image_local));
+
+    /* JWT:NOW CHECK THE ALBUM-ART CACHE (IF USER WISHES): */
+    if (! aud_get_bool (nullptr, "search_albumart_cache"))
+        return String ();
+
+    String Title = tuple.get_str (Tuple::Title);
+    String Artist = tuple.get_str (Tuple::Artist);
+    String Album = tuple.get_str (Tuple::Album);
+    String audio_fn = tuple.get_str (Tuple::AudioFile);
+    if (! audio_fn || ! audio_fn[0])
+        audio_fn = aud_drct_get_filename ();
+
+    const char * album = (const char *) Album;
+
+    if (Title && Title[0])
+    {
+        bool split_titles = aud_get_bool (nullptr, "split_titles");
+        if (album && album[0])  // ALBUM FIELD NOT BLANK AND NOT A FILE/URL:
+        {
+            const char * album_uri = strstr (album, "://");  // FOR URI, WE'LL ASSUME LONGEST IS "stdin" (5 chars)
+            if (album_uri && (album_uri-album) < 6)  // ALBUM FIELD IS A URI (PBLY A PODCAST/VIDEO FROM STREAMFINDER!):
+                Album = String ("_");
+            else if (split_titles)
+            {
+                /* ALBUM MAY ALSO CONTAIN THE STREAM NAME (IE. "<ALBUM> - <STREAM NAME>"): STRIP THAT OFF: */
+                const char * throwaway = strstr (album, " - ");
+                int albumlen = throwaway ? throwaway - album : -1;
+                Album = String (str_copy (album, albumlen));
+            }
+        }
+        else
+            Album = String ("_");
+
+        if (! split_titles)
+        {
+            /* ARTIST MAY BE IN TITLE INSTEAD (IE. "<ARTIST> - <TITLE>"): IF SO, USE THAT FOR ARTIST: */
+            const char * title = (const char *) Title;
+            if (title)
+            {
+                const char * artistlen = strstr (title, " - ");
+                if (artistlen)
+                {
+                    Artist = String (str_copy (title, artistlen - title));
+                    const char * titleoffset = artistlen+3;
+                    if (titleoffset)
+                        Title = String (str_copy (artistlen+3, -1));
+                }
+            }
+        }
+
+        StringBuf albart_FN;
+        StringBuf album_buf = str_copy (Album);
+        str_replace_char (album_buf, ' ', '/');  // JWT:PROTECT SPACES, WHICH I STUPIDLY DIDN'T ENCODE IN ALBUMART!
+        if (Artist && Artist[0])
+        {
+            StringBuf artist_buf = str_copy (Artist);
+            str_replace_char (artist_buf, ' ', '/');
+            albart_FN = str_concat ({(const char *) str_encode_percent (album_buf), "__",
+                    (const char *) str_encode_percent (artist_buf)});
+        }
+        else if (Title && Title[0])
+        {
+            StringBuf title_buf = str_copy (Title);
+            str_replace_char (title_buf, ' ', '/');
+            albart_FN = str_concat ({(const char *) str_encode_percent (album_buf), "__",
+                    (const char *) str_encode_percent (title_buf)});
+        }
+        else
+        {
+            albart_FN = str_encode_percent (album_buf);
+        }
+        str_replace_char (albart_FN, '/', ' ');  // JWT:UNPROTECT SPACES!
+
+        String coverart_file;
+        Index<String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+        for (auto & ext : extlist)
+        {
+            coverart_file = String (str_concat ({aud_get_path (AudPath::UserDir),
+                    "/albumart/", (const char *) albart_FN, ".", (const char *) ext}));
+            const char * filenamechar = coverart_file;
+            struct stat statbuf;
+            if (stat (filenamechar, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
+            {
+                if (utime (filenamechar, nullptr) < 0)
+                    AUDWARN ("i:Failed to update art-file time (for easier user-lookup)!\n");
+
+                return String (filename_to_uri (filenamechar));
+            }
+        }
+    }
+
+    return String ();
 }

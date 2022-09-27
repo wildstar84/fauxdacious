@@ -1,3 +1,19 @@
+Version 4.2.1-beta1:
+
+* Add [Settings].[Song Info] "Search for images in album-art cache" to enable 
+pulling previously-cached (by the AlbumArt plugins) to be immediately loaded 
+without calling the helper for local song files.  The main side-effect 
+(besides speed) is that the cover-art image is immediately loaded without 
+calling the CoverArtHelper script (just as if the image was in a file matching 
+the song file-name itself, thus allowing for it to appear in the info-bar / 
+Mini-Fauxdacious plugins.
+
+While at it, we also added this code to the AlbumArt plugins to enable them 
+to also check the cache directly without having to call the helper script 
+(increases speed and efficiency).  NOTE:  When using the AlbumArt plugins, the 
+new option is ignored, as the AlbumArt plugins are *supposed* to always check 
+the AlbumArt cache first!
+
 Version 4.2-final:
 
 This version should be up to date with (and ahead of) Audacious's recent v4.2 
