@@ -85,7 +85,14 @@ static String fileinfo_recursive_get_image (const char * path,
         String album_artfile = String ("");
 
         if (aud_get_bool (nullptr, "use_album_tag_cover") && album_tag && album_tag[0])
+        {
             use_album_tag_cover = true;
+            StringBuf album_tag_buf = str_copy (album_tag);
+            str_replace_char (album_tag_buf, ' ', '~');  // JWT:PROTECT SPACES, WHICH I STUPIDLY DIDN'T ENCODE IN ALBUMART!
+            album_tag_buf = str_encode_percent (album_tag_buf);
+            str_replace_char (album_tag_buf, '~', ' ');  // JWT:UNPROTECT SPACES!
+            album_tag = String (album_tag_buf);
+        }
 
         if (use_file_cover || use_album_tag_cover)
         {
@@ -232,18 +239,18 @@ String art_search (const char * filename, Tuple & tuple)
 
         StringBuf albart_FN;
         StringBuf album_buf = str_copy (Album);
-        str_replace_char (album_buf, ' ', '/');  // JWT:PROTECT SPACES, WHICH I STUPIDLY DIDN'T ENCODE IN ALBUMART!
+        str_replace_char (album_buf, ' ', '~');  // JWT:PROTECT SPACES, WHICH I STUPIDLY DIDN'T ENCODE IN ALBUMART!
         if (Artist && Artist[0])
         {
             StringBuf artist_buf = str_copy (Artist);
-            str_replace_char (artist_buf, ' ', '/');
+            str_replace_char (artist_buf, ' ', '~');
             albart_FN = str_concat ({(const char *) str_encode_percent (album_buf), "__",
                     (const char *) str_encode_percent (artist_buf)});
         }
         else if (Title && Title[0])
         {
             StringBuf title_buf = str_copy (Title);
-            str_replace_char (title_buf, ' ', '/');
+            str_replace_char (title_buf, ' ', '~');
             albart_FN = str_concat ({(const char *) str_encode_percent (album_buf), "__",
                     (const char *) str_encode_percent (title_buf)});
         }
@@ -251,7 +258,7 @@ String art_search (const char * filename, Tuple & tuple)
         {
             albart_FN = str_encode_percent (album_buf);
         }
-        str_replace_char (albart_FN, '/', ' ');  // JWT:UNPROTECT SPACES!
+        str_replace_char (albart_FN, '~', ' ');  // JWT:UNPROTECT SPACES!
 
         String coverart_file;
         Index<String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
