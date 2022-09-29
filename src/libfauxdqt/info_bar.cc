@@ -179,7 +179,7 @@ void InfoVis::clear ()
 
 void InfoVis::changeEvent (QEvent * event)
 {
-    if (! infovis_active)
+    if (! infovis_active || ! event)
         return;
 
     if (event->type () == QEvent::PaletteChange)
@@ -228,13 +228,13 @@ EXPORT InfoBar::InfoBar (QWidget * parent) :
 {
     m_parent = parent;
     m_dockwidget = nullptr;
+    infobar_active = true;
     update_vis ();
     setFixedHeight (ps.Height);
 
     m_art_enabled = aud_get_bool ("qtui", "infoarea_show_art");
     m_art_force_dups = true;  // JWT:FORCE ART ON FLOATING MINI-FAUXD IF "HIDE-DUPS" IN EFFECT BUT OTHERWISE SHOW!
     m_fbart_hidden = aud_get_bool ("qtui", "infoarea_hide_fallback_art");
-    infobar_active = true;
 
     for (SongData & d : sd)
     {
@@ -266,6 +266,9 @@ EXPORT InfoBar::~InfoBar ()
 
 EXPORT void InfoBar::resizeEvent (QResizeEvent *)
 {
+    if (! infobar_active)
+        return;
+
     reellipsize_title ();
     m_vis->move (width () - ps.VisWidth, 0);
 }
@@ -354,6 +357,9 @@ EXPORT void InfoBar::paintEvent (QPaintEvent *)
 
 EXPORT void InfoBar::update_title ()
 {
+    if (! infobar_active)
+        return;
+
     Tuple tuple = aud_drct_get_tuple ();
 
     sd[Cur].title.setText (QString ());
@@ -366,6 +372,9 @@ EXPORT void InfoBar::update_title ()
 
 EXPORT void InfoBar::update_album_art ()
 {
+    if (! infobar_active)
+        return;
+
     bool noAltArt = true;
     bool have_dir_icon_art = false;
     bool albumart_plugin_isactive = aud_get_bool ("albumart", "_isactive");
@@ -493,7 +502,8 @@ EXPORT void InfoBar::do_fade ()
         done = false;
     }
 
-    update ();
+    if (infobar_active)
+        update ();
 
     if (done)
         fade_timer.stop ();
@@ -505,6 +515,10 @@ EXPORT void InfoBar::playback_ready_cb ()
         next_song ();
 
     m_stopped = false;
+
+    if (! infobar_active)
+        return;
+
     update_title ();
     update_album_art ();
 
@@ -516,6 +530,9 @@ EXPORT void InfoBar::playback_stop_cb ()
 {
     next_song ();
     m_stopped = true;
+
+    if (! infobar_active)
+        return;
 
     update ();
     fade_timer.start ();
@@ -530,6 +547,9 @@ EXPORT void InfoBar::reellipsize_title ()
 
 EXPORT void InfoBar::update_vis ()
 {
+    if (! infobar_active)
+        return;
+
     m_vis->set_parent (m_parent);
     reellipsize_title ();
 
@@ -542,12 +562,16 @@ EXPORT void InfoBar::update_art ()
     reellipsize_title ();
     m_art_enabled = aud_get_bool ("qtui", "infoarea_show_art");
     m_fbart_hidden = aud_get_bool ("qtui", "infoarea_hide_fallback_art");
+
+    if (! infobar_active)
+        return;
+
     update ();
 }
 
 void InfoBar::keyPressEvent (QKeyEvent * event)
 {
-    if (m_parent != nullptr)
+    if (m_parent != nullptr || ! event)
         return;
 
     auto CtrlShiftAlt = Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier;
@@ -649,7 +673,7 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
 
 void InfoBar::mouseDoubleClickEvent (QMouseEvent * e)
 {
-    if (m_parent == nullptr)
+    if (m_parent == nullptr || ! e)
         return;
 
     PluginHandle * infobarHandle = aud_plugin_lookup_basename ("info-bar-plugin-qt");

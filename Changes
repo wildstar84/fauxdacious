@@ -1,5 +1,18 @@
 Version 4.2.1-beta1:
 
+* Merge Audacious's skins-GTK "Search and Select" dialog into all interfaces, 
+and add a "Jump right to it" checkbox to cause the first entry found to play.  
+This option is needed if wishing to play the selected list, as double-clicking 
+on one of the selected entries always clears the selections!
+
+NOTE1:  "Jump right to it" does not apply if the "copy to new playlist" option 
+is also selected (one can simply select the play option in that playlist to 
+jump to it without clearing the selections in the original playlist).
+
+NOTE2:  This option works well in tandum with the Fauxdacious 
+[Settings].[Playlist]."[] Advance to next selected entry in list" option to 
+play the selected list once, then resume normal play!
+
 * Add [Settings].[Song Info] "Search for images in album-art cache" to enable 
 pulling previously-cached (by the AlbumArt plugins) to be immediately loaded 
 without calling the helper for local song files.  The main side-effect 

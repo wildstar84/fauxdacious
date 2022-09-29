@@ -192,6 +192,9 @@ void queue_manager_hide ();
 /* volumebutton.cc */
 QToolButton * volume_button_new (QWidget * parent = nullptr);
 
+/* search & select menu-option */
+void playlist_search_and_select ();
+
 } // namespace audqt
 
 #endif

@@ -97,4 +97,7 @@ Index<char> audgui_urilist_create_from_selected (int playlist);
 /* url-opener.c */
 void audgui_show_add_url_window (bool open);
 
+/* search & select menu-option */
+void playlist_search_and_select ();
+
 #endif /* LIBAUDGUI_H */

@@ -29,6 +29,7 @@ SRCS = about-qt.cc \
        prefs-pluginlist-model.cc \
        queue-manager-qt.cc \
        song-window-qt.cc \
+       search-select-qt.cc \
        url-opener-qt.cc \
        util-qt.cc \
        treeview.cc \
