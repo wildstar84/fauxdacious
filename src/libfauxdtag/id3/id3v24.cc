@@ -710,27 +710,36 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
     add_frameFromTupleStr (tuple, Tuple::Genre, ID3_GENRE, dict);
 
     String comment = tuple.get_str (Tuple::Comment);
+    bool wrote_art = false;
     if (comment && comment[0] && ! strncmp ((const char *) comment, "file://", 7))
     {
-        VFSFile file (comment, "r");  /* JWT:ASSUME COMMENT IS AN IMAGE FILE FROM SONG-INFO EDITS!: */
+        const char * comment_ptr = (const char *) comment;
+        const char * sep = strstr (comment_ptr, ";file://");
+        String main_imageuri = sep ? String (str_printf ("%.*s", (int)(sep - comment_ptr), comment_ptr))
+                : comment;
+        VFSFile file (main_imageuri, "r");  /* JWT:ASSUME COMMENT IS AN IMAGE FILE FROM SONG-INFO EDITS!: */
         if (file)
         {
             Index<char> data = file.read_all ();
             if (data.len () > 499)  /* JWT:SANITY-CHECK: ANY VALID ART IMAGE SHOULD BE BIGGER THAN THIS! */
             {
-                if (str_has_suffix_nocase ((const char *) comment, ".png"))
+                const char * main_imageuri_ptr = (const char *) main_imageuri;
+                if (str_has_suffix_nocase (main_imageuri_ptr, ".png"))
                     add_picture_frame (data.begin (), data.len (), dict, "image/png", 9);
-                else if (str_has_suffix_nocase ((const char *) comment, ".gif"))
+                else if (str_has_suffix_nocase (main_imageuri_ptr, ".gif"))
                     add_picture_frame (data.begin (), data.len (), dict, "image/gif", 9);
                 else  // DEFAULT TO JPEG, AS THIS SEEMS TO WORK FOR MOST STUFF ANYWAY!:
                     add_picture_frame (data.begin (), data.len (), dict, "image/jpeg", 10);
 
                 mustpreservelength = true;
+                wrote_art = true;
                 aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
+                if (sep)  // WE MAY HAVE A SECOND (CHANNEL) ART IMAGE, WRITE THAT TO COMMENT FIELD (";file:.."):
+                    add_comment_frame (sep, dict);  // EAT 1ST IMG. URI, BUT SAVE THE 2ND ONE (CHANNEL IMG).
             }
         }
     }
-    else
+    if (! wrote_art)
         add_comment_frame (comment, dict);
 
     String lyrics = tuple.get_str (Tuple::Lyrics);

@@ -331,6 +331,21 @@ static bool write_string_item (const Tuple & tuple, Tuple::Field field,
     return success;
 }
 
+/* JWT:ADDED FUNCTION TO WRITE A RAW (NON TUPLE-SUPPLIED VALUE) STRING: */
+static bool write_string_value (const char * value,
+ VFSFile & handle, const char * key, int * written_length, int * written_items)
+{
+    if (! value)
+        return true;
+
+    bool success = ape_write_item (handle, key, value, written_length);
+
+    if (success)
+        (* written_items) ++;
+
+    return success;
+}
+
 static bool write_integer_item (const Tuple & tuple, Tuple::Field field,
  VFSFile & handle, const char * key, int * written_length, int * written_items)
 {
@@ -446,16 +461,25 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
     bool wrote_art = false;
     if (comment && comment[0] && ! strncmp ((const char *) comment, "file://", 7))
     {
-        VFSFile file (comment, "r");  /* JWT:ASSUME COMMENT IS AN IMAGE FILE FROM SONG-INFO EDITS!: */
+        const char * comment_ptr = (const char *) comment;
+        const char * sep = strstr (comment_ptr, ";file://");
+        String main_imageuri = sep ? String (str_printf ("%.*s", (int)(sep - comment_ptr), comment_ptr))
+                : comment;
+        VFSFile file (main_imageuri, "r");  /* JWT:ASSUME COMMENT IS AN IMAGE FILE FROM SONG-INFO EDITS!: */
         if (file)
         {
             Index<char> data = file.read_all ();
             if (data.len () > 499)  /* JWT:SANITY-CHECK: ANY VALID ART IMAGE SHOULD BE BIGGER THAN THIS! */
             {
-                wrote_art = write_artimage_item (data, uri_get_extension (comment), handle, "Cover Art (Front)", & length, & items);
+                wrote_art = write_artimage_item (data, uri_get_extension ((const char *) main_imageuri), handle, "Cover Art (Front)", & length, & items);
                 if (wrote_art)
+                {
                     items ++;
-                aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
+                    if (sep)  // WE MAY HAVE A SECOND (CHANNEL) ART IMAGE, WRITE THAT TO COMMENT FIELD (";file:.."):
+                        write_string_value (sep, handle, "Comment", & length, & items);
+
+                    aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
+                }
             }
         }
     }
