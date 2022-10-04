@@ -96,7 +96,7 @@ if ($bummer && $configPath && $DEBUG) {  #WARNING:MAY HANG WHEN MULTITHREADED, B
     open $log_fh, ">${configPath}/FauxdaciousCoverArtHelper_log.txt";
     *STDERR = $log_fh;
 }
-print STDERR "-CoverArtHelper(".join('|',@ARGV)."=\n"  if ($DEBUG);
+print STDERR "\n-CoverArtHelper(".join('|',@ARGV)."=\n"  if ($DEBUG);
 
 if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE REMOVING ALL OLD COVERART IMAGE FILES:
 	if (open TAGDATA, "<${configPath}/tmp_tag_data") {
@@ -388,13 +388,13 @@ PLAN_B:   #PLAN "B":  NOT ON Dvdcover.com, SO LET'S TRY Archive.org (Dvdcover ea
 
 	&writeArtImage($art_url, $ARGV[1])  if ($art_url);   #GOT AN IMAGE LINK TO (HOPEFULLY THE RIGHT) COVER-ART IMAGE:
 }
-elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE, OR MUSICBRAINZ:
+elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, LYRICSFINDER, OR MUSICBRAINZ:
 {
+	### NOTE:  FAUXDACIOUS NOW CHECKS CACHE, SO IF WE'RE HERE, WE HAVE TO SEARCH THE WEB!:
 	if ($configPath && -d $configPath) {
 		unlink("${configPath}/_tmp_lyrics_from_albumart.txt")  if (-e "${configPath}/_tmp_lyrics_from_albumart.txt");
 		unlink("${configPath}/_albumart_done.tmp")  if (-e "${configPath}/_albumart_done.tmp");
 	}
-	#STEP 1:  TRY TO FETCH ALBUM COVER FROM CACHE:
 	(my $album = $ARGV[1]) =~ s/\%20$//;  #WHACK OFF TRAILING SPACE.
 	my $artist = defined($ARGV[3]) ? $ARGV[3] : '_';
 	my $title = defined($ARGV[4]) ? $ARGV[4] : '_';
@@ -410,25 +410,13 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 	$albart_FN =~ s/\%20$//;      #WHACK OFF TRAILING SPACE.
 	$albart_FN =~ s/\%20/ /g;     #UNESCAPE OTHER SPACES.
 	$albart_FN =~ s#\s*\/\s*#\_#; #ELIMINATE SLASHES (FILE NAME IS *NOT* A PATH!
-	{
-		my $found = 0;
-		foreach my $ext (qw(jpg png gif jpeg)) {
-			if (!$found && -e "${configPath}/albumart/${albart_FN}.$ext") {
-				copy ("${configPath}/albumart/${albart_FN}.$ext", "${configPath}/_tmp_albumart.$ext");
-				utime(undef, undef, "${configPath}/albumart/${albart_FN}.$ext");
-				print STDERR "i:ART HELPER: FOUND (${configPath}/albumart/${albart_FN}.$ext) ALREADY ON DISK, EXITING.\n"  if ($DEBUG);
-				$found = 1;
-			} else {
-				unlink ("${configPath}/_tmp_albumart.$ext")  if ($configPath && -e "${configPath}/_tmp_albumart.$ext");
-			}
-		}
-		if ($found) {
-			&albumart_done();
-			exit (0);
+	if ($configPath) {
+		foreach my $ext (qw(jpg png gif jpeg)) {  #REMOVE ANY EXISTING TEMP. ART-IMAGE FILES:
+				unlink ("${configPath}/_tmp_albumart.$ext")  if (-e "${configPath}/_tmp_albumart.$ext");
 		}
 	}
-	my %SKIPTHESE = ();
 
+	my %SKIPTHESE = ();
 	if ($configPath) {
 		## USER-CONFIGURED SITE-SKIP LIST:
 		if (open IN, "<${configPath}/FauxdaciousCoverArtHelper.ini") {
@@ -462,15 +450,16 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM CACHE,
 		}
 	}
 
+	#STEP 1:  WE HAVE AN "IN-STREAM" ART LINK FROM TAGS (IN $ARGV[5]), TRY THAT:
+
 	my $art2fid = "albumart/${albart_FN}";
-	#STEP 2:  IF NOT IN CACHE, BUT WE HAVE AN ART LINK FROM TAGS (IN $ARGV[5]), USE THAT:
 	if (defined $ARGV[5] && $ARGV[5] =~ /\S/o) {
 		if ($ARGV[5] =~ m#^file\:\/\/#) {  #FILE (FAUXD. ENTRY), SAVE IT TO THIS FILE INSTEAD OF CACHE:
 		    ($art2fid = $ARGV[5]) =~ s#^file\:\/\/##;
 		    $art2fid =~ s/\.[^\.]*$//;   #STRIP OFF MEDIA EXTENSION!
 print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEBUG);
 		} elsif ($ARGV[5] !~ m#^https?\:\/\/#) { #("NOWEB") - DONE: CHECKED CACHE, BUT DON'T SEARCH WEB!
-			print STDERR "i:ART HELPER: SKIPPING (URL ALBUM/NOWEB).\n"  if ($DEBUG);
+			print STDERR "d:ART HELPER: SKIPPING (URL ALBUM/NOWEB - SHOULD BE CAUGHT IN FAUXD NOW?($ARGV[5])!)\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);
 		} else {
@@ -504,16 +493,16 @@ print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEB
 
 WEBSEARCH:
 	print STDERR "---ART HELPER WILL SEARCH THE WEB...\n"  if ($DEBUG);
-	#($ARGV[5] IS NOT "NOWEB"): USER WANTS TO SEARCH WEB FOR ALBUM COVER (WASN'T IN CACHE OR TAGS)!:
 	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 	my $tried = '';
 	unless (-d "${configPath}/albumart") {
 		mkdir ("${configPath}/albumart",0755) || die "f:Could not create directory (${configPath}/albumart) ($!)!\n";;
 	}
 
-	#STEP 3:  TRY LYRICFINDER'S SITES THAT CAN RETURN COVER-ART LINKS FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
+	#STEP 2:  TRY LYRICFINDER'S SITES THAT CAN RETURN COVER-ART LINKS FIRST, AS IT IS FAST (SIMPLEST LOOKUP)!:
 	#(REQUIRES BOTH AN ARTIST AND A TITLE, NOT JUST ARTIST+ALBUM):
-	if ($artist && $artist ne '_' && $title) {
+
+	if ($artist ne '_' && $title ne '_') {
 		#FIRST TRY LYRICFINDER (WHICH CAN ALSO QUICKLY FETCH ALBUM ART (+LYRICS), WHICH MAY ALSO BE NEEDED):
 		my $haveLyricFinder = 0;
 		eval "use LyricFinder; \$haveLyricFinder = \$LyricFinder::VERSION; 1";
@@ -547,11 +536,13 @@ WEBSEARCH:
 	}
 	&albumart_done($tried);
 
-	#STEP 4:  SEARCH MUSICBRAINZ - BY ALBUM, THEN TITLE (SLOWER BUT MORE COMPREHENSIVE):
+	#STEP 3:  SEARCH MUSICBRAINZ - BY ALBUM, THEN TITLE (SLOWER BUT MORE COMPREHENSIVE):
+
+	#LYRICFINDER DID NOT RETURN A COVER IMAGE, SO SEARCH MUSICBRAINZ (FIRST TRY ARTIST/ALBUM, THEN ARTIST/TITLE):
 	#USER NOTE:  IF YOU MOSTLY JUST LISTEN TO STREAMING STATIONS (THAT USUALLY JUST SET THE ALBUM FIELD
 	#TO THE STATION NAME), YOU MIGHT WANT TO REVERSE THIS LIST (IE. $title, /* then */ $album)
 	#FOR EFFICIENCY'S SAKE!!
-	#LYRICFINDER DID NOT RETURN A COVER IMAGE, SO SEARCH MUSICBRAINZ (FIRST TRY ARTIST/ALBUM, THEN ARTIST/TITLE):
+
 RELEASETYPE:
 	foreach my $release ($album, $title) {
 		next  if ($release eq '_');
