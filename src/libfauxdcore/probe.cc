@@ -295,42 +295,42 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
     const char * instr;
     instr = g_key_file_get_string (rcfile, song_filename, "Title", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Title, String (instr));
+        tuple.set_str (Tuple::Title, String (str_decode_percent (instr)));
     else
         tuple.unset (Tuple::Title);
     instr = g_key_file_get_string (rcfile, song_filename, "Artist", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Artist, instr);
+        tuple.set_str (Tuple::Artist, str_decode_percent (instr));
     else
         tuple.unset (Tuple::Artist);
     instr = g_key_file_get_string (rcfile, song_filename, "Album", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Album, instr);
+        tuple.set_str (Tuple::Album, str_decode_percent (instr));
     else
         tuple.unset (Tuple::Album);
     instr = g_key_file_get_string (rcfile, song_filename, "AlbumArtist", nullptr);
     if (instr)
-        tuple.set_str (Tuple::AlbumArtist, instr);
+        tuple.set_str (Tuple::AlbumArtist, str_decode_percent (instr));
     else
         tuple.unset (Tuple::AlbumArtist);
     instr = g_key_file_get_string (rcfile, song_filename, "Comment", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Comment, instr);
+        tuple.set_str (Tuple::Comment, str_decode_percent (instr));
     else
         tuple.unset (Tuple::Comment);
     instr = g_key_file_get_string (rcfile, song_filename, "Composer", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Composer, instr);
+        tuple.set_str (Tuple::Composer, str_decode_percent (instr));
     else
         tuple.unset (Tuple::Composer);
     instr = g_key_file_get_string (rcfile, song_filename, "Performer", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Performer, instr);
+        tuple.set_str (Tuple::Performer, str_decode_percent (instr));
     else
         tuple.unset (Tuple::Performer);
     instr = g_key_file_get_string (rcfile, song_filename, "Genre", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Genre, instr);
+        tuple.set_str (Tuple::Genre, str_decode_percent (instr));
     else
         tuple.unset (Tuple::Genre);
     instr = g_key_file_get_string (rcfile, song_filename, "Year", nullptr);
@@ -347,7 +347,7 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
     if (instrc)
     {
         str_replace_char (instrc, 0x02, '\n');  // JWT:UNDO URLHELPER'S WORKAROUND FOR ILLEGAL MULTILINE "LYRICS" IN TAG FILES!
-        tuple.set_str (Tuple::Lyrics, instrc);
+        tuple.set_str (Tuple::Lyrics, str_decode_percent (instrc));
         g_free (instrc);
     }
     else

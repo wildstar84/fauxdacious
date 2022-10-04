@@ -87,6 +87,7 @@ BEGIN
 }
 use strict;
 use StreamFinder;
+use URI::Escape;
 
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
 #FORMAT:  '//www.problemserver.com' [, ...]
@@ -140,6 +141,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
 
 		$title = $client->getTitle();
+		$title =~ s/(?:\xe2?\x80\x99|\x{2019})/\'/g;  #*TRY* FIX SOME FUNKY SINGLE-QUOTES IN TITLE.
 		my $art_url = $client->getIconURL();
 		my $desc = $client->getTitle('desc');
 
@@ -201,7 +203,6 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			}
 		}
 		$comment =~ s/\0/ /gs;          #NO NULLS ALLOWED!
-		$comment =~ s/[\x80-\xff]//gs;  #MUST ALSO STRIP OUT ALL NON-ASCII CHARACTERS!
 	} else {
 		$newPlaylistURL = $ARGV[0];
 	}
@@ -219,13 +220,26 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			my $cmd = "curl -o /tmp/$fn \"$newPlaylistURL\"";
 			`$cmd`;
 		}
-		if (-f "/tmp/$fn") {
+		if (-f "/tmp/$fn") {   #TRY TO EXTRACT METADATA FROM THE DOWNLOADED FILE:
 			$newPlaylistURL = "file:///tmp/$fn";
-			my $getTitle = `ffprobe -loglevel error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 /tmp/$fn`;
-			if ($getTitle =~ /\w/) {
-				chomp $getTitle;
-				$title = $getTitle;
+			my @tagdata = `ffprobe -loglevel error -show_entries format_tags -of default=noprint_wrappers=1 /tmp/$fn`;
+			my $haveAlbum = 0;
+			for (my $i=0;$i<=$#tagdata;$i++) {
+				chomp $tagdata[$i];
+				$tagdata[$i] =~ s/^TAG\:(\w)/\U$1\E/;
+				my ($key, $val) = split(/\=/o, $tagdata[$i], 2);
+				if ($key eq 'Title') {
+					$title = $val;
+				} elsif ($key eq 'Album') {
+					$val .= ' - ' . $ARGV[0]  unless ($val =~ /^https?\:/);
+					$comment .= $key . '=' . $val . "\n";
+					$haveAlbum = 1;
+				} elsif ($key =~ /^(?:Artist|Album|Genre|AlbumArtist|Comment|Year|Date)$/o) {
+					$comment .= $tagdata[$i] . "\n";
+				}
 			}
+			$comment =~ s/Date\=(\d\d\d\d[\r\n])/Year\=$1/s  unless ($comment =~ /\bYear\=/s);
+			$comment .= "Album=$ARGV[0]\n"  unless ($haveAlbum);
 		} else {
 			exit (0);
 		}
@@ -267,6 +281,11 @@ sub writeTagData {
 	my $comment = shift || '';
 	my $downloadit = shift || 0;
 	my @tagdata = ();
+
+	#Fauxd's g_key_file_get_string() CAN'T HANDLE HIGH-ASCII CHARS (ACCENTS, ETC.),
+	#SO ESCAPE 'EM HERE, THEN UNESCAPE 'EM THERE!:
+	$title = uri_escape($title, "\x80-\xff");
+	$comment = uri_escape($comment, "\x80-\xff");
 	# WE WRITE VIDEOS/PODCASTS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!
 	# THE LIST IN THE REGEX BELOW ARE THE ONES TO *NOT* DELETE ART IMAGES FOR (ie. STREAMING STATIONS)!:
