@@ -125,6 +125,9 @@ void InfoWindow::fillInfo (int playlist, int entry, const char * filename, const
     if (! updating_enabled)
         bbox->button (QDialogButtonBox::Save)->setDisabled (true);
     m_infowidget.fillInfo (playlist, entry, filename, tuple, decoder, updating_enabled);
+    /* JWT:IF RECORDING && USER_TAG_DATA, ALLOW [Save] WITHOUT ANY CHANGES: */
+    if (updating_enabled && aud_get_bool (nullptr, "record") && aud_get_bool (nullptr, "user_tag_data"))
+        bbox->button (QDialogButtonBox::Save)->setDisabled (false);
 }
 
 void InfoWindow::displayImage (const char * filename)

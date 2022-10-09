@@ -582,7 +582,10 @@ static void infowin_show (int list, int entry, const String & filename, const St
 
     infowin_display_image (entryfn);
 
-    gtk_widget_set_sensitive (widgets.apply, changed);
+    /* JWT:IF RECORDING && USER_TAG_DATA, ALLOW [Save] WITHOUT ANY CHANGES: */
+    bool allowsave = changed || (writable && aud_get_bool (nullptr, "record")
+            && aud_get_bool (nullptr, "user_tag_data"));
+    gtk_widget_set_sensitive (widgets.apply, allowsave);
     gtk_widget_grab_focus (widgets.title);
 
     if (! audgui_reshow_unique_window (AUDGUI_INFO_WINDOW))
