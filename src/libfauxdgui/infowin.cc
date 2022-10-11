@@ -228,7 +228,7 @@ static void infowin_update_tuple ()
     set_field_int_from_entry (current_tuple, Tuple::Year, widgets.year);
     set_field_int_from_entry (current_tuple, Tuple::Track, widgets.track);
 
-    /* JWT:IF RECORDING ON, SAVE THE TAG DATA EDITS TO THE FILE BEING RECORDED! */
+    /* JWT:IF RECORDING ON, USE THE FILE BEING RECORDED TO (BUT WILL FAIL OVER TO USER TAG-FILE)! */
     if (aud_get_bool (nullptr, "record"))
     {
         String recording_file = aud_get_str ("filewriter", "_record_fid");
@@ -241,7 +241,7 @@ static void infowin_update_tuple ()
             success = aud_file_write_tuple (recording_file, decoder, current_tuple);
         }
     }
-    if (! success)
+    else
         success = aud_file_write_tuple (current_file, current_decoder, current_tuple);
 
     if (success)
@@ -614,10 +614,14 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
     if (decoder && tuple.valid () && ! aud_custom_infowin (filename, decoder))
     {
         /* cuesheet entries cannot be updated - JWT:THEY CAN NOW IN FAUXDACIOUS (EXCEPT CUESHEET CAN OVERRIDE)! */
-        bool can_write = aud_file_can_write_tuple (filename, decoder);
-        /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
-        if (! can_write && aud_get_bool (nullptr, "user_tag_data"))
-            can_write = true;
+        bool can_write;
+
+        if (aud_get_bool (nullptr, "user_tag_data"))
+            can_write = true;  /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
+        else if (aud_get_bool (nullptr, "record"))
+            can_write = false; /* JWT:DON'T LET 'EM SAVE IF RECORDING AND NOT USING TAG-FILES! */
+        else
+            can_write = aud_file_can_write_tuple (filename, decoder);
 
         tuple.delete_fallbacks ();
         infowin_show (playlist, entry, filename, entryfn, tuple, decoder, can_write);
@@ -627,7 +631,7 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
 
     if (error)
         aud_ui_show_error (str_printf (_("Error opening %s:\n%s"),
-         (const char *) filename, (const char *) error));
+                (const char *) filename, (const char *) error));
 }
 
 EXPORT void audgui_infowin_show_current ()

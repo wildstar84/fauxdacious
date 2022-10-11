@@ -196,10 +196,14 @@ EXPORT void infowin_show (int playlist, int entry)
     if (decoder && tuple.valid () && ! aud_custom_infowin (filename, decoder))
     {
         /* cuesheet entries cannot be updated - JWT:THEY CAN NOW IN FAUXDACIOUS (EXCEPT CUESHEET CAN OVERRIDE)! */
-        bool can_write = aud_file_can_write_tuple (filename, decoder);
+        bool can_write;
 
-        if (! can_write && aud_get_bool (nullptr, "user_tag_data"))
+        if (aud_get_bool (nullptr, "user_tag_data"))
             can_write = true;  /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
+        else if (aud_get_bool (nullptr, "record"))
+            can_write = false; /* JWT:DON'T LET 'EM SAVE IF RECORDING AND NOT USING TAG-FILES! */
+        else
+            can_write = aud_file_can_write_tuple (filename, decoder);
 
         tuple.delete_fallbacks ();
         show_infowin (playlist, entry, filename, tuple, decoder, can_write);
@@ -209,7 +213,7 @@ EXPORT void infowin_show (int playlist, int entry)
 
     if (error)
         aud_ui_show_error (str_printf (_("Error opening %s:\n%s"),
-         (const char *) filename, (const char *) error));
+                (const char *) filename, (const char *) error));
 }
 
 EXPORT void infowin_show_current ()

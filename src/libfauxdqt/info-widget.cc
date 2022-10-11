@@ -308,6 +308,7 @@ bool InfoModel::updateFile () const
     if (! m_dirty)
         return true;
 
+    /* JWT:IF RECORDING ON, USE THE FILE BEING RECORDED TO (BUT WILL FAIL OVER TO USER TAG-FILE)! */
     if (aud_get_bool (nullptr, "record"))
     {
         String recording_file = aud_get_str ("filewriter", "_record_fid");
@@ -321,7 +322,7 @@ bool InfoModel::updateFile () const
             success = aud_file_write_tuple (recording_file, out_plugin, m_tuple);
         }
     }
-    if (! success)
+    else
         success = aud_file_write_tuple (m_filename, m_plugin, m_tuple);
 
     return success;
