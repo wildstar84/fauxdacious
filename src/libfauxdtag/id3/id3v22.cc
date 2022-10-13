@@ -45,6 +45,7 @@ enum
     ID3_GENRE,
     ID3_COMMENT,
     ID3_ENCODER,
+    ID3_PUBLISHER,
     ID3_TXX,
     ID3_RVA,
     ID3_PIC,
@@ -66,6 +67,7 @@ static const char * id3_frames[ID3_TAGS_NO] = {
     "TCO",
     "COM",
     "TSS",
+    "TPB",
     "TXX",
     "RVA",
     "PIC",
@@ -107,7 +109,7 @@ static bool validate_header (ID3v22Header * header)
 
     header->size = unsyncsafe32 (FROM_BE32 (header->size));
 
-    AUDDBG ("Found ID3v22 header:\n");
+    AUDDBG ("Found ID3v2.2 header:\n");
     AUDDBG (" magic = %.3s\n", header->magic);
     AUDDBG (" version = %d\n", (int) header->version);
     AUDDBG (" revision = %d\n", (int) header->revision);
@@ -271,6 +273,9 @@ bool ID3v22TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
             break;
           case ID3_GENRE:
             id3_decode_genre (tuple, & frame[0], frame.len ());
+            break;
+          case ID3_PUBLISHER:
+            id3_associate_string (tuple, Tuple::Publisher, & frame[0], frame.len ());
             break;
           case ID3_COMMENT:
             id3_decode_comment (tuple, & frame[0], frame.len ());

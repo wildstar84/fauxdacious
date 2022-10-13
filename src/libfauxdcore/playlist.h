@@ -67,6 +67,8 @@ enum SortType {
     Length,
     Comment,
     Bitrate,
+    Publisher,
+    CatalogNum,
     n_sort_types
 };
 

@@ -1,7 +1,7 @@
 /*
  * info-widget.h
- * Copyright 2006-2018 René Bertin, Thomas Lange, John Lindgren,
- *                     William Pitcock, Tomasz Moń, and Eugene Zagidullin
+ * Copyright 2006-2022 René Bertin, Thomas Lange, John Lindgren,
+ *                     Ariadne Conill, Tomasz Moń, and Eugene Zagidullin
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -19,8 +19,8 @@
  */
 
 #include "info-widget.h"
-#include "libfauxdqt.h"
 #include "libfauxdqt-internal.h"
+#include "libfauxdqt.h"
 
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -48,17 +48,20 @@ struct TupleFieldMap {
 
 static const TupleFieldMap tuple_field_map[] = {
     {N_("Metadata"), Tuple::Invalid, false},
+    {N_("Title"), Tuple::Title, true},
     {N_("Artist"), Tuple::Artist, true},
     {N_("Album"), Tuple::Album, true},
-    {N_("Title"), Tuple::Title, true},
+    {N_("Album Artist"), Tuple::AlbumArtist, true},
     {N_("Track Number"), Tuple::Track, true},
     {N_("Genre"), Tuple::Genre, true},
     {N_("Comment"), Tuple::Comment, true},
-    {N_("Album Artist"), Tuple::AlbumArtist, true},
+    {N_("Description"), Tuple::Description, true},
     {N_("Composer"), Tuple::Composer, true},
     {N_("Performer"), Tuple::Performer, true},
     {N_("Recording Year"), Tuple::Year, true},
     {N_("Recording Date"), Tuple::Date, true},
+    {N_("Publisher"), Tuple::Publisher, true},
+    {N_("Catalog Number"), Tuple::CatalogNum, true},
 
     {nullptr, Tuple::Invalid, false},
     {N_("Technical"), Tuple::Invalid, false},
@@ -171,9 +174,7 @@ EXPORT InfoWidget::InfoWidget (QWidget * parent) :
     });
 }
 
-EXPORT InfoWidget::~InfoWidget ()
-{
-}
+EXPORT InfoWidget::~InfoWidget () {}
 
 EXPORT void InfoWidget::fillInfo (int playlist, int entry, const char * filename, const Tuple & tuple,
  PluginHandle * decoder, bool updating_enabled)

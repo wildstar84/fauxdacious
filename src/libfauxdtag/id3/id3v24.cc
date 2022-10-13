@@ -1,6 +1,6 @@
 /*
  * id3v24.c
- * Copyright 2009-2014 Paula Stanciu, Tony Vroon, John Lindgren,
+ * Copyright 2009-2022 Paula Stanciu, Tony Vroon, John Lindgren,
  *                     Mikael Magnusson, and Michał Lipski
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,7 @@ enum
     ID3_COMMENT,
     ID3_ENCODER,
     ID3_RECORDING_TIME,
+    ID3_PUBLISHER,
     ID3_TXXX,
     ID3_RVA2,
     ID3_APIC,
@@ -74,6 +75,7 @@ static const char * id3_frames[ID3_TAGS_NO] = {
     "COMM",
     "TSSE",
     "TDRC",
+    "TPUB",
     "TXXX",
     "RVA2",
     "APIC",
@@ -164,7 +166,7 @@ static bool validate_header (ID3v24Header * header, bool is_footer)
     if (header->size > MAX_TAG_SIZE)
         return false;
 
-    AUDDBG ("Found ID3v24 %s:\n", is_footer ? "footer" : "header");
+    AUDDBG ("Found ID3v2.4 %s:\n", is_footer ? "footer" : "header");
     AUDDBG (" magic = %.3s\n", header->magic);
     AUDDBG (" version = %d\n", (int) header->version);
     AUDDBG (" revision = %d\n", (int) header->revision);
@@ -645,6 +647,9 @@ bool ID3v24TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
           case ID3_RECORDING_TIME:
             id3_associate_int (tuple, Tuple::Year, & frame[0], frame.len ());
             break;
+          case ID3_PUBLISHER:
+            id3_associate_string (tuple, Tuple::Publisher, & frame[0], frame.len ());
+            break;
           case ID3_GENRE:
             id3_decode_genre (tuple, & frame[0], frame.len ());
             break;
@@ -704,6 +709,7 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
     add_frameFromTupleStr (tuple, Tuple::Album, ID3_ALBUM, dict);
     add_frameFromTupleStr (tuple, Tuple::AlbumArtist, ID3_ALBUM_ARTIST, dict);
     add_frameFromTupleStr (tuple, Tuple::Composer, ID3_COMPOSER, dict);
+    add_frameFromTupleStr (tuple, Tuple::Publisher, ID3_PUBLISHER, dict);
     add_frameFromTupleStr (tuple, Tuple::Copyright, ID3_COPYRIGHT, dict);
     add_frameFromTupleInt (tuple, Tuple::Year, ID3_YEAR, dict);
     add_frameFromTupleInt (tuple, Tuple::Track, ID3_TRACKNR, dict);

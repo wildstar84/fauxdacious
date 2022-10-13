@@ -49,7 +49,7 @@ enum {
 };
 
 static const char * codec_labels[CODEC_ITEMS] = {
-    N_("Format:"),
+    N_("Codec:"),
     N_("Quality:"),
     N_("Bitrate:")
 };
@@ -66,6 +66,11 @@ static struct {
     GtkWidget * year;
     GtkWidget * track;
     GtkWidget * genre;
+    GtkWidget * description;
+    GtkWidget * publisher;
+    GtkWidget * catalognum;
+    GtkWidget * composer;
+    GtkWidget * performer;
     GtkWidget * image;
     GtkWidget * codec[3];
     GtkWidget * apply;
@@ -218,13 +223,19 @@ static void infowin_update_tuple ()
 {
     bool success = false;
 
+    /* JWT:INCLUDE ALL SAVABLE FIELDS HERE!: */
     set_field_str_from_entry (current_tuple, Tuple::Title, widgets.title);
     set_field_str_from_entry (current_tuple, Tuple::Artist, widgets.artist);
     set_field_str_from_entry (current_tuple, Tuple::Album, widgets.album);
     set_field_str_from_entry (current_tuple, Tuple::AlbumArtist, widgets.album_artist);
     set_field_str_from_entry (current_tuple, Tuple::Comment, widgets.comment);
+    set_field_str_from_entry (current_tuple, Tuple::Description, widgets.description);
     set_field_str_from_entry (current_tuple, Tuple::Genre,
             gtk_bin_get_child ((GtkBin *) widgets.genre));
+    set_field_str_from_entry (current_tuple, Tuple::Publisher, widgets.publisher);
+    set_field_str_from_entry (current_tuple, Tuple::Composer, widgets.composer);
+    set_field_str_from_entry (current_tuple, Tuple::Performer, widgets.performer);
+    set_field_str_from_entry (current_tuple, Tuple::CatalogNum, widgets.catalognum);
     set_field_int_from_entry (current_tuple, Tuple::Year, widgets.year);
     set_field_int_from_entry (current_tuple, Tuple::Track, widgets.track);
 
@@ -494,6 +505,22 @@ static void create_infowin ()
     widgets.track = gtk_entry_new ();
     add_entry (grid, _("Track Number"), widgets.track, 1, 12, 1);
 
+    widgets.description = gtk_entry_new ();
+    add_entry (grid, _("Description (flac, ogg)"), widgets.description, 0, 14, 2);
+
+    widgets.publisher = gtk_entry_new ();
+    add_entry (grid, _("Publisher"), widgets.publisher, 0, 16, 1);
+
+    widgets.catalognum = gtk_entry_new ();
+    add_entry (grid, _("Catalog Number (ape, flac, ogg)"), widgets.catalognum, 1, 16, 1);
+
+    widgets.composer = gtk_entry_new ();
+    add_entry (grid, _("Composer (ape, mp3)"), widgets.composer, 0, 18, 1);
+
+    widgets.performer = gtk_entry_new ();
+    add_entry (grid, _("Performer (ape, flac, ogg)"), widgets.performer, 1, 18, 1);
+//    gtk_widget_set_sensitive (widgets.performer, false);
+
     GtkWidget * bottom_hbox = gtk_hbox_new (false, 6);
     gtk_table_attach ((GtkTable *) main_grid, bottom_hbox, 0, 2, 3, 4,
      GTK_FILL, GTK_FILL, 0, 0);
@@ -557,6 +584,11 @@ static void infowin_show (int list, int entry, const String & filename, const St
     set_entry_str_from_field (widgets.album, tuple, Tuple::Album, writable, clear, changed);
     set_entry_str_from_field (widgets.album_artist, tuple, Tuple::AlbumArtist, writable, clear, changed);
     set_entry_str_from_field (widgets.comment, tuple, Tuple::Comment, writable, clear, changed);
+    set_entry_str_from_field (widgets.description, tuple, Tuple::Description, writable, clear, changed);
+    set_entry_str_from_field (widgets.publisher, tuple, Tuple::Publisher, writable, clear, changed);
+    set_entry_str_from_field (widgets.catalognum, tuple, Tuple::CatalogNum, writable, clear, changed);
+    set_entry_str_from_field (widgets.composer, tuple, Tuple::Composer, writable, clear, changed);
+    set_entry_str_from_field (widgets.performer, tuple, Tuple::Performer, writable, clear, changed);
     set_entry_str_from_field (gtk_bin_get_child ((GtkBin *) widgets.genre),
      tuple, Tuple::Genre, writable, clear, changed);
 
@@ -636,7 +668,6 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
 
 EXPORT void audgui_infowin_show_current ()
 {
-AUDERR("--audgui_infowin_show_current called...\n");
     int playlist = aud_playlist_get_playing ();
     int position;
 
@@ -645,7 +676,6 @@ AUDERR("--audgui_infowin_show_current called...\n");
 
     position = aud_playlist_get_position (playlist);
 
-AUDERR("--POSITION=%d=\n", position);
     if (position == -1)
         return;
 

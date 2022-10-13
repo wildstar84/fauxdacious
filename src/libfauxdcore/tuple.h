@@ -101,6 +101,8 @@ public:
         MusicBrainzID,         /* MusicBrainz identifier */
         Lyrics,                /* JWT:Lyrics from id3 tags. */
         Channels,              /* Track channels count */
+        Publisher,  /* Publisher (label) */
+        CatalogNum, /* Catalog number */
 
         n_fields
     };
