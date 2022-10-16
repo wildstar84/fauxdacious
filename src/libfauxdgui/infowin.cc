@@ -518,7 +518,7 @@ static void create_infowin ()
     add_entry (grid, _("Composer (ape, mp3)"), widgets.composer, 0, 18, 1);
 
     widgets.performer = gtk_entry_new ();
-    add_entry (grid, _("Performer (ape, flac, ogg)"), widgets.performer, 1, 18, 1);
+    add_entry (grid, _("Performer (flac, ogg)"), widgets.performer, 1, 18, 1);
 //    gtk_widget_set_sensitive (widgets.performer, false);
 
     GtkWidget * bottom_hbox = gtk_hbox_new (false, 6);
