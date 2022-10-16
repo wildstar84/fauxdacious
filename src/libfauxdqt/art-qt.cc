@@ -35,8 +35,38 @@ EXPORT QImage art_request (const char * filename, bool * queued)
     AudArtPtr art = aud_art_request (filename, AUD_ART_DATA, queued);
 
     auto data = art.data ();
-    return data ? QImage::fromData ((const uchar *) data->begin (), data->len ()) : QImage ();
+//x    return data ? QImage::fromData ((const uchar *) data->begin (), data->len ()) : QImage ();
+    if (data)
+    {
+        Tuple tuple;
+        QImage qimg = QImage::fromData ((const uchar *) data->begin (), data->len ());
+        if (qimg.isNull () && aud_get_bool (nullptr, "user_tag_data")
+                && aud_read_tag_from_tagfile (filename, "tmp_tag_data", tuple))
+        {
+            /* JWT:INCOMING STREAM PIXBUF INVALID, TRY (KEEP) tmp_tag_data.Comment FIELD FOR ORIGINAL
+               IMAGE, AS THIS USUALLY ONLY HAPPENS IN PODCASTS:
+            */
+            String comment = tuple.get_str (Tuple::Comment);
+            if (comment && comment[0])
+            {
+                const char * comment_ptr = (const char *) comment;
+                const char * sep = strstr (comment_ptr, ";file://");
+                String main_imageuri = sep ? String (str_printf ("%.*s", (int)(sep - comment_ptr), comment_ptr))
+                        : comment;
+                art = aud_art_request ((const char *) main_imageuri, AUD_ART_DATA, queued);
+                data = art.data ();
+                if (data)
+                    aud_set_bool (nullptr, "_skip_web_art_search", true);
+
+                return data ? QImage::fromData ((const uchar *) data->begin (), data->len ()) : QImage ();
+            }
+            return QImage ();
+        }
+        return qimg;
+    }
+    return QImage ();
 }
+
 EXPORT QPixmap art_scale (const QImage & image, unsigned int w, unsigned int h, bool want_hidpi)
 {
     // return original image if requested size is zero,

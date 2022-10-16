@@ -290,8 +290,13 @@ sub writeTagData {
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!
 	# THE LIST IN THE REGEX BELOW ARE THE ONES TO *NOT* DELETE ART IMAGES FOR (ie. STREAMING STATIONS)!:
 	my $tagfid = (!$downloadit && $client && $client->getType()
-			=~ /^(?:IHeartRadio|RadioNet|Radionomy|Reciva|Tunein)$/)
+			=~ /^(?:IHeartRadio|RadioNet|Tunein)$/)
 			? 'user_tag_data' : 'tmp_tag_data';
+	#WORKAROUND FOR IHEART & TUNEIN PODCASTS:
+	if ($tagfid =~ /^user/) {
+		my $mediasource = $client->getType();
+		$tagfid = 'tmp_tag_data'  if ($ARGV[0] =~ m#\/podcasts?\/#);
+	}
 	if (open TAGDATA, "<${configPath}/$tagfid") {
 		my $omit = 0;
 		while (<TAGDATA>) {

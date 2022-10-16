@@ -180,6 +180,11 @@ static int check_tag_file (const String & filename, AudArtItem * item, const cha
                         if (item->data.len () > 0)
                         {
                             item->art_file = art_file;
+                            /* JWT:(ALBUMART PLUGINS): DON'T SEARCH WEB SINCE WE HAVE ART IMAGE ALREADY -
+                               THIS ADDED B/C PODCASTS MAY SEND US A BAD IMAGE THAT BLANKS OUR GOOD ONE!
+                            */
+                            if (! strcmp (tagfile, "tmp_tag_data"))
+	                            aud_set_bool (nullptr, "_skip_web_art_search", true);
                             return precedence;
                         }
                     }
@@ -240,6 +245,7 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
             forcetagcheck = true;  // FOR STREAMS, FORCE FULL TAG-FILE CHECK IF WE PROHIBIT STREAMS TO SET WHEN PLAYING!
     }
 
+    aud_set_bool (nullptr, "_skip_web_art_search", false);
     if (! item->art_file && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG-FILES IF USER WANTS TO USE THEM:
     {
         /* NORMALLY ONLY CHECK TAG-FILES "OVERRIDE"|"ONLY" IF HAVE EXISTING ART FILE, UNLESS FULL CHECK FORCED! */
