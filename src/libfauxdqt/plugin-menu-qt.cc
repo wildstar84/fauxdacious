@@ -52,17 +52,16 @@ void menu_rebuild (AudMenuID id)
     else
         menus[id] = new QMenu (_("Services"));
 
+    for (auto & item : default_menu_items)
+        menus[id]->addAction (menu_action (item, PACKAGE, menus[id]));
+
+    menus[id]->addAction (menu_action (MenuSep (), PACKAGE, menus[id]));
+
     for (auto & item : items[id])
     {
         item.action.capture (menu_action (item.item, nullptr));
         menus[id]->addAction (item.action.get ());
     }
-
-    if (! menus[id]->isEmpty ())
-        menus[id]->addAction (menu_action (MenuSep (), PACKAGE, menus[id]));
-
-    for (auto & item : default_menu_items)
-        menus[id]->addAction (menu_action (item, PACKAGE, menus[id]));
 }
 
 EXPORT QMenu * menu_get_by_id (AudMenuID id)
