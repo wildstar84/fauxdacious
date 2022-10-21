@@ -420,6 +420,33 @@ EXPORT void InfoBar::update_album_art ()
                             }
                         }
                     }
+                    /* FOR tmp_tag_data (1-OFF) STREAMS W/O CHANNEL-ART, CHECK FOR (CHANNEL) ARTIST'S ICON FILE: */
+                    if (noAltArt && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
+                    {
+                        String artist_tag = tuple.get_str (Tuple::Artist);
+                        if (artist_tag && artist_tag[0])
+                        {
+                            Index<String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+                            for (auto & ext : extlist)
+                            {
+                                String channelfn = String (str_concat ({aud_get_path (AudPath::UserDir),
+                                        "/albumart/", (const char *) artist_tag, ".", (const char *) ext}));
+                                const char * filenamechar = channelfn;
+                                struct stat statbuf;
+                                if (stat (filenamechar, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
+                                {
+                                    String coverart_uri = String (filename_to_uri (filenamechar));
+                                    sd[Cur].art = audqt::art_request ((const char *) coverart_uri,
+                                            ps.IconSize, ps.IconSize);
+                                    if (! sd[Cur].art.isNull ())
+                                    {
+                                        noAltArt = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

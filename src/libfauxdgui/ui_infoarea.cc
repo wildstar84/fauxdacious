@@ -406,7 +406,8 @@ static void set_album_art ()
         return;
     }
 
-    bool noAltArt = true;
+    bool noAltArt = true;   /* JWT:TRUE IF NO CHANNEL-ART FOUND. */
+    bool NOAltArt = false;  /* JWT:FORCE HIDE-DUP TEST IF TRUE, NEEDED FOR PODCASTS,ETC W/O CHANNEL-ART! */
     bool have_dir_icon_art = false;
     bool albumart_plugin_isactive = aud_get_bool ("albumart", "_isactive");
     AudguiPixbuf dir_icon_art;
@@ -451,6 +452,34 @@ static void set_album_art ()
                             }
                         }
                     }
+                    /* FOR tmp_tag_data (1-OFF) STREAMS W/O CHANNEL-ART, CHECK FOR (CHANNEL) ARTIST'S ICON FILE: */
+                    if (noAltArt && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
+                    {
+                        String artist_tag = tuple.get_str (Tuple::Artist);
+                        if (artist_tag && artist_tag[0])
+                        {
+                            Index<String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+                            for (auto & ext : extlist)
+                            {
+                                String channelfn = String (str_concat ({aud_get_path (AudPath::UserDir),
+                                        "/albumart/", (const char *) artist_tag, ".", (const char *) ext}));
+                                const char * filenamechar = channelfn;
+                                struct stat statbuf;
+                                if (stat (filenamechar, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
+                                {
+                                    String coverart_uri = String (filename_to_uri (filenamechar));
+                                    area->pb = audgui_pixbuf_request ((const char *) coverart_uri);
+                                    if (area->pb)  /* FOUND ART IN CACHE, RETURN. */
+                                    {
+                                        noAltArt = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (noAltArt)
+                        NOAltArt = true;
                 }
             }
         }
@@ -526,10 +555,12 @@ static void set_album_art ()
         }
     }
     /* JWT:NOW CHECK FOR "m_art_force_dups" (SEE Qt SIDE): */
-    bool m_art_force_dups = true;  /* SET TO HIDE TO FORCE HIDING ALBUM-ART ICON. */
+    bool m_art_force_dups = true;  /* SET TO HIDE TO FORCE HIDING ALBUM-ART ICON, CLEAR TO ALLOW SHOWING. */
+    int hidelevel = have_dir_icon_art ? 1 : 0;
     /* JWT:THIS CHECK NEEDED ONLY IF ALBUM-ART PLGN ACTIVE && HIDE-DUPS ON && ALBUM-ART SAYS IT'S A DUP!: */
-    if (noAltArt && albumart_plugin_isactive && aud_get_bool ("albumart", "hide_dup_art_icon")
-            && aud_get_bool ("albumart", "_infoarea_hide_art"))
+    if ((NOAltArt || (noAltArt && aud_get_int ("albumart", "_infoarea_hide_art_gtk") > hidelevel))
+            && albumart_plugin_isactive
+            && aud_get_bool ("albumart", "hide_dup_art_icon"))
     {
         m_art_force_dups = false;
         if (area->widget)
@@ -625,6 +656,20 @@ EXPORT void ui_infoarea_toggle_art ()
     gtk_widget_queue_draw (area->main);
 }
 
+/* JWT:CALLED BY HOOK IN AlbumArt PLUGINS: */
+EXPORT void ui_infoarea_hooked ()
+{
+    if (! area)
+        return;
+
+    area->show_art = aud_get_bool ("gtkui", "infoarea_show_art");
+    if (area->show_art)
+        area->show_art = (aud_get_int ("albumart", "_infoarea_hide_art_gtk") > 0) ? false : true;
+
+    set_album_art ();
+    gtk_widget_queue_draw (area->main);
+}
+
 /* JWT:CATCH CHANGES IN DOCKED-STATUS: */
 EXPORT void ui_infoarea_chg_dock_status (PluginHandle * plugin, void *)
 {
@@ -684,7 +729,7 @@ static void destroy_cb (GtkWidget * widget)
     ui_infoarea_show_vis (false);
 
     hook_dissociate ("plugin dock status changed", (HookFunction) ui_infoarea_chg_dock_status, nullptr);
-    hook_dissociate ("gtkui toggle infoarea_art", (HookFunction) ui_infoarea_toggle_art, nullptr);
+    hook_dissociate ("gtkui toggle infoarea_art", (HookFunction) ui_infoarea_hooked, nullptr);
     hook_dissociate ("playback stop", (HookFunction) ui_infoarea_playback_stop);
     hook_dissociate ("playback ready", (HookFunction) ui_infoarea_playback_start);
     hook_dissociate ("tuple change", (HookFunction) ui_infoarea_set_title);
@@ -714,7 +759,7 @@ EXPORT GtkWidget * ui_infoarea_new ()
     hook_associate ("tuple change", (HookFunction) ui_infoarea_set_title, nullptr);
     hook_associate ("playback ready", (HookFunction) ui_infoarea_playback_start, nullptr);
     hook_associate ("playback stop", (HookFunction) ui_infoarea_playback_stop, nullptr);
-    hook_associate ("gtkui toggle infoarea_art", (HookFunction) ui_infoarea_toggle_art, nullptr);
+    hook_associate ("gtkui toggle infoarea_art", (HookFunction) ui_infoarea_hooked, nullptr);
     hook_associate ("plugin dock status changed", (HookFunction) ui_infoarea_chg_dock_status, nullptr);
 
     g_signal_connect (area->box, "destroy", (GCallback) destroy_cb, nullptr);

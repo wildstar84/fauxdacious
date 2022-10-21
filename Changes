@@ -1,5 +1,20 @@
 Version 4.2.1-beta1:
 
+* Add file-matching option by Artist for One-off streams (ie. videos and 
+podcasts) to specify a channel-icon for those from frequently-accessed channel 
+creators known to not have one (Rumble has become known for this issue).  
+While at it, discovered and fixed a complex issue with "Duplicate-art hiding" 
+on the GTK side involving podcasts, etc. where sometimes album-images would 
+also show when no channel icon was available, or vice-versa (I continue to try 
+my best to keep the GTK side fully supported, even though I don't use it much 
+anymore).  The GTK side also seems alot more stable, just not quite as pretty!
+
+* Add several new metadata fields Audacious recently added, but also make 'em 
+each work properly with all codecs which support them and editable via the 
+Song-Edit screen.  Fields are:  Publisher, Performer, Composer, and Catalog#.  
+The GTK Song-Edit screen has room so the headers now show which codecs support 
+fields (savability) which have limited codec support (Not room in the Qt vsn).
+
 * Merge Audacious's skins-GTK "Search and Select" dialog into all interfaces, 
 and add a "Jump right to it" checkbox to cause the first entry found to play.  
 This option is needed if wishing to play the selected list, as double-clicking 
