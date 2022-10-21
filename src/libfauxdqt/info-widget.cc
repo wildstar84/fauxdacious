@@ -242,7 +242,10 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
             if (position == -1)
                 return;
 
-            auto prev_comment = m_model->data (this->createModelIndex (6, 1), Qt::DisplayRole).toString ();
+            /* JWT:PROGRAMMER NOTE:  THE 1ST (ZERO-BASED Y) INDEX# (JUST BELOW & 19 LINES BELOW *MUST* BE
+               ADJUSTED WHENEVER THE EDIT-BOX ROWS ARE ADDED TO, REMOVED, OR RE-ORDERED!:
+            */
+            auto prev_comment = m_model->data (this->createModelIndex (7, 1), Qt::DisplayRole).toString ();
             if (! prev_comment.isEmpty ())
             {
                 int album_img_index = prev_comment.indexOf (";file:");
@@ -261,7 +264,7 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
                 prev_comment = coverart_fid;
 
             /* JWT:PUT THE IMAGE FILE INTO THE Comment FIELD & UPDATE FIELD AND IMAGE DISPLAYED: */
-            m_model->setData (this->createModelIndex (6, 1), prev_comment.toUtf8 ().constData (), Qt::EditRole);
+            m_model->setData (this->createModelIndex (7, 1), prev_comment.toUtf8 ().constData (), Qt::EditRole);
             hook_call ("image change", aud::to_ptr (coverart_fid.constData ()));
             dialog->deleteLater ();
 
