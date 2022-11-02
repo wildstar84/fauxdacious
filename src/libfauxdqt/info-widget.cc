@@ -46,6 +46,7 @@ struct TupleFieldMap {
     bool editable;
 };
 
+/* JWT:SEE PROGRAMMER NOTE FURTHER DOWN IF ADDING/REMOVING/REORDERING LIST BELOW!: */
 static const TupleFieldMap tuple_field_map[] = {
     {N_("Metadata"), Tuple::Invalid, false},
     {N_("Title"), Tuple::Title, true},
@@ -231,18 +232,7 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
 
         if (coverart_fid.length ())
         {
-            int playlist = aud_playlist_get_playing ();
-            int position;
-
-            if (playlist == -1)
-                playlist = aud_playlist_get_active ();
-
-            position = aud_playlist_get_position (playlist);
-
-            if (position == -1)
-                return;
-
-            /* JWT:PROGRAMMER NOTE:  THE 1ST (ZERO-BASED Y) INDEX# (JUST BELOW & 19 LINES BELOW *MUST* BE
+            /* JWT:PROGRAMMER NOTE:  THE 1ST (ZERO-BASED Y) INDEX# (JUST BELOW & 19 LINES BELOW) *MUST* BE
                ADJUSTED WHENEVER THE EDIT-BOX ROWS ARE ADDED TO, REMOVED, OR RE-ORDERED!:
             */
             auto prev_comment = m_model->data (this->createModelIndex (7, 1), Qt::DisplayRole).toString ();
