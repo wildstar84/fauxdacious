@@ -1,5 +1,12 @@
 Version 4.2.1-beta1:
 
+* Handle (parse) metadata from streaming internet stations that are formatted 
+as "artist - title - album - genre".
+
+* Add internet-radio.com and onlineradiobox.com to StreamFinder making many new 
+internet radio-stations (many commercial-free) available for direct-streaming 
+in Fauxdacious (Users must upgrade to StreamFinder v2.0).
+
 * Add file-matching option by Artist for One-off streams (ie. videos and 
 podcasts) to specify a channel-icon for those from frequently-accessed channel 
 creators known to not have one (Rumble has become known for this issue).  
