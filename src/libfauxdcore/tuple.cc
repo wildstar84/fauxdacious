@@ -693,6 +693,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
     bool haveArtworkUrl = false;
     int value;
     bool split_titles = aud_get_bool (nullptr, "split_titles");
+    bool genreisset = false;
 
     ::String val = stream.get_metadata ("track-name");
     if (val && val[0] && strncmp ((const char *) val, "  - ", 4))
@@ -913,10 +914,55 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                             ttloffset += 3;
                             if (junkoffset && junkoffset > ttloffset)
                                 set_str (Title, (const char *) str_printf ("%.*s",
-                                    (int) (junkoffset-ttloffset), ttloffset));
+                                        (int) (junkoffset-ttloffset), ttloffset));
                             else
-                                set_str (Title, ttloffset);
-
+                            {
+                                const char * extrametadata = strstr (ttloffset, " - ");
+                                if (extrametadata)  // JWT:ASSUMING:  "artist - title - album[ - genre]":
+                                {
+                                    set_str (Title, (const char *) str_printf ("%.*s",
+                                            (int) (extrametadata-ttloffset), ttloffset));
+                                    const char * album = extrametadata += 3;
+                                    if (album)
+                                    {
+                                        const char * extrametadata = strstr (album, " - ");
+										 if (! extrametadata || extrametadata > album )
+										 {
+											albumisset = true;
+											::String stream_name = stream.get_metadata ("stream-name");
+											if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+											{
+												if (extrametadata)
+													set_str (Album, (const char *) str_printf ("%.*s%s%s",
+															(int)(extrametadata - album), album, " - ",
+															(const char *) stream_name));
+												else
+													set_str(Album, (const char *) str_printf ("%s%s%s", album,
+															" - ", (const char *) stream_name));
+											}
+											else
+											{
+												if (extrametadata)
+													set_str (Album, (const char *) str_printf ("%.*s",
+															(int)(extrametadata - album), album));
+												else
+													set_str (Album, album);
+											}
+                                        }
+                                        if (extrametadata)
+                                        {
+                                            const char * genre = extrametadata + 3;
+                                            if (genre)
+                                            {
+                                                set_str (Genre, genre);
+                                                genreisset = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                    set_str (Title, ttloffset);
+                            }
                             set_str (Artist, (const char *) str_printf ("%.*s",
                                     (int) ((ttloffset-artoffset)-3), artoffset));
                         }
@@ -925,7 +971,6 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                                     (int) (junkoffset-artoffset), artoffset));
                         else
                             set_str (Title, artoffset);
-
                     }
                     else
                     {
@@ -1028,11 +1073,14 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
             set_str (Artist, val);
             updated = true;
         }
-        ::String stream_genre = stream.get_metadata ("stream-genre");
-        if (stream_genre && stream_genre[0] && stream_genre != get_str (Genre))
+        if (! genreisset)
         {
-            set_str (Genre, stream_genre);
-            updated = true;
+            ::String stream_genre = stream.get_metadata ("stream-genre");
+            if (stream_genre && stream_genre[0] && stream_genre != get_str (Genre))
+            {
+                set_str (Genre, stream_genre);
+                updated = true;
+            }
         }
     }
 
