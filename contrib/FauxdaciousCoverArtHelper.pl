@@ -436,14 +436,14 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 		}
 	}
 
-	my $album_uesc = uri_unescape($album);
+	(my $album_uesc = uri_unescape($album)) =~ s/\s+/ /g;  #SOMETIMES HAVE CONTIGUOUS SPACES.
 	my $artist_uesc = uri_unescape($artist);
 	my $title_uesc = uri_unescape($title);
 	print STDERR "i:ART HELPER: DOING: ALBUM=$album_uesc= TITLE=$title_uesc= ARTIST=$artist_uesc=\n"  if ($DEBUG);
 	foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
 		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/$album_uesc\|/;
-		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E/) {
+		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E/i) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME/TITLE THOUGH!
@@ -711,7 +711,6 @@ sub writeArtImage {   # DOWNLOADS AND SAVES THE FOUND COVER-ART IMAGE AND EXITS:
 		print IMGOUT $art_image;
 		close IMGOUT;
 		if (defined($tee2tmp) && $tee2tmp && open IMGOUT, ">${configPath}/${tee2tmp}.$image_ext") {
-			print STDERR "--6a: will also write art image to (${configPath}/${tee2tmp}.$image_ext)\n"  if ($DEBUG);
 			binmode IMGOUT;
 			print IMGOUT $art_image;
 			close IMGOUT;
