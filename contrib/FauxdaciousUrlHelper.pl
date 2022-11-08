@@ -15,12 +15,15 @@
 ###use StreamFinder::Castbox;
 ###use StreamFinder::Google;
 ###use StreamFinder::IHeartRadio;
+###use StreamFinder::InternetRadio;
 ###use StreamFinder::Odysee;
+###use StreamFinder::OnlineRadiobox;
 ###use StreamFinder::Podbean;
 ###use StreamFinder::PodcastAddict;
 ###use StreamFinder::RadioNet;
 ###use StreamFinder::Rumble;
 ###use StreamFinder::SermonAudio;
+###use StreamFinder::SoundCloud;
 ###use StreamFinder::Spreaker;
 ###use StreamFinder::Tunein;
 ###use StreamFinder::Vimeo;
