@@ -35,7 +35,6 @@ EXPORT QImage art_request (const char * filename, bool * queued)
     AudArtPtr art = aud_art_request (filename, AUD_ART_DATA, queued);
 
     auto data = art.data ();
-//x    return data ? QImage::fromData ((const uchar *) data->begin (), data->len ()) : QImage ();
     if (data)
     {
         Tuple tuple;
@@ -89,7 +88,6 @@ EXPORT QPixmap art_request (const char * filename, unsigned int w, unsigned int 
         return art_scale (img, w, h, want_hidpi);
 
     unsigned size = to_native_dpi (48);
-    //x return get_icon ("audio-x-generic").pixmap (aud::min (w, size), aud::min (h, size));
     return QPixmap (get_icon ("audio-x-generic").pixmap (aud::max (w, size), aud::max (h, size)));
 }
 
