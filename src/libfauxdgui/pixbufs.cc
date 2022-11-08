@@ -17,6 +17,8 @@
  * the use of this software.
  */
 
+#include <string.h>
+
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include <libfauxdcore/audstrings.h>
