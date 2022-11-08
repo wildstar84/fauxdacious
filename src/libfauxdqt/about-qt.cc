@@ -58,7 +58,7 @@ static QDialog * buildAboutWindow ()
 // JWT:FIXME: RETAINED NEXT 2 FOR OUR LOGO TO WORK:
     const char * data_dir = aud_get_path (AudPath::DataDir);
     const char * logo_path = filename_build ({data_dir, "images", "about-logo.png"});
-    const char * about_text = "<big><b>Fauxdacious " VERSION "</b></big><br>" COPYRIGHT;
+    const char * about_text = "<big><b>Fauxdacious " VERSION "</b> (" BUILDSTAMP ")</big><br>" COPYRIGHT;
     const char * website = "https://wildstar84.wordpress.com/fauxdacious";
 
     auto window = new QDialog;
