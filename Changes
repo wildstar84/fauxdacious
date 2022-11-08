@@ -1,4 +1,23 @@
-Version 4.2.1-beta1:
+Version 4.2.1-final:
+
+This version should be up to date with (and ahead of) Audacious's GIT commits 
+through at least 11/01/22 (Audacious v4.3-devel), excluding namely the 
+expansion of Audacious' reading playlist file buffer above 16 MB (Aud. Feature 
+#1194) because I don't think this is necessary at this time.  We also left the 
+GTK "alarm" plugin in for now (that they removed).  
+
+The changes in this release are minor, primarily small features involving new 
+Audacious metadata fields, cover-art handling, new "Search and Select" Playlist 
+feature (improved and now in all interfaces), and more efficient handling of 
+cached cover-art images.  This version also supports the latest StreamFinder 
+(v2.01 - compiled into the M$-Windows versions of the helper scripts) which has 
+added support for additional radio-station websites (internet-radio.com, 
+onlineradiobox.com, and rcast.net)!  This seems like a good point for a new 
+final release due to a lull in development activity both here and at Audacious 
+of late, along with the opportunity to make StreamFinder v2.0 available to 
+M$-Windows users.
+
+Change log:
 
 * Handle (parse) metadata from streaming internet stations that are formatted 
 as "artist - title - album - genre".
