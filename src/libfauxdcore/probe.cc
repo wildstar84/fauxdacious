@@ -192,10 +192,14 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
                 else if (strstr (aud_plugin_get_name (plugin), "FLAC Decoder")  // MUST PROBE FLAC THEN VORBIS FOR OGG*:
                         || strstr (aud_plugin_get_name (plugin), "Ogg Vorbis Decoder"))
                 {
+                    file.set_limit_to_buffer (true);
                     /* JWT:TEST FLAC & VORBIS VIA "our_file()" FN AS THEY CAN ACCEPT EMBEDDED STREAMS OF OTHER TYPES. */
                     auto ip = (InputPlugin *) aud_plugin_get_header (plugin);
                     if (ip && ip->is_our_file (filename, file))
+                    {
+                        file.set_limit_to_buffer (false);
                         return plugin;  // WILL USE FLAC FOR EMBEDDED OGG* OR VORBIS PLUGIN FOR VALID OGG-VORBIS.
+                    }
                 }
             }
         }
