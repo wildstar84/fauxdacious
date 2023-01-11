@@ -73,7 +73,7 @@ static void set_default_preset_dir ()
     }
 }
 
-static void show_preset_browser (const char * title, gboolean save,
+static void show_preset_browser (const char * title, bool save,
         const char * default_filename, PresetAction callback,
         const EqualizerPreset * preset)
 {

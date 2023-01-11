@@ -35,6 +35,7 @@
 #include <libfauxdcore/drct.h>
 #include <libfauxdcore/vfs.h>
 
+#include "gtk-compat.h"
 #include "internal.h"
 #include "libfauxdgui.h"
 #include "libfauxdgui-gtk.h"
@@ -144,7 +145,11 @@ static GtkWidget * small_label_new (const char * text)
 
     GtkWidget * label = gtk_label_new (text);
     gtk_label_set_attributes ((GtkLabel *) label, attrs);
+#ifdef USE_GTK3
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+#else
     gtk_misc_set_alignment ((GtkMisc *) label, 0, 0.5);
+#endif
 
     return label;
 }
@@ -339,10 +344,21 @@ static void add_entry (GtkWidget * grid, const char * title, GtkWidget * entry,
 {
     GtkWidget * label = small_label_new (title);
 
+#ifdef USE_GTK3
+/* JWT:REFER BACK TO:  https://www.manpagez.com/html/gtk3/gtk3-3.20.2/ch30s02.php */
+//    if (y > 0)
+//        gtk_widget_set_margin_top (label, 6);
+    gtk_widget_set_hexpand (entry, true);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+
+    gtk_grid_attach ((GtkGrid *) grid, label, x, y, span, 1);
+    gtk_grid_attach ((GtkGrid *) grid, entry, x, y + 1, span, 1);
+#else
     gtk_table_attach ((GtkTable *) grid, label, x, x + span, y, y + 1,
      (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_FILL, 0, 0);
     gtk_table_attach ((GtkTable *) grid, entry, x, x + span, y + 1, y + 2,
      (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_FILL, 0, 0);
+#endif
 
     g_signal_connect (entry, "changed", (GCallback) entry_changed, nullptr);
 }
@@ -423,17 +439,22 @@ static void create_infowin ()
     gtk_container_set_border_width ((GtkContainer *) infowin, 6);
     gtk_window_set_title ((GtkWindow *) infowin, _("Song Info - Fauxdacious"));
     gtk_window_set_type_hint ((GtkWindow *) infowin,
-     GDK_WINDOW_TYPE_HINT_DIALOG);
+            GDK_WINDOW_TYPE_HINT_DIALOG);
 
-    GtkWidget * main_grid = gtk_table_new (0, 0, false);
-    gtk_table_set_col_spacings ((GtkTable *) main_grid, 6);
-    gtk_table_set_row_spacings ((GtkTable *) main_grid, 6);
+    GtkWidget * main_grid = audgui_grid_new ();
+    audgui_grid_set_row_spacing (main_grid, 6);
+    audgui_grid_set_column_spacing (main_grid, 6);
+
     gtk_container_add ((GtkContainer *) infowin, main_grid);
 
     widgets.image = audgui_scaled_image_new (nullptr);
     gtk_widget_set_size_request (widgets.image, xysize, xysize);
+#ifdef USE_GTK3
+    gtk_grid_attach ((GtkGrid *) main_grid, widgets.image, 0, 0, 1, 1);
+#else
     gtk_table_attach ((GtkTable *) main_grid, widgets.image, 0, 1, 0, 1,
-     GTK_FILL, GTK_FILL, 0, 0);
+            GTK_FILL, GTK_FILL, 0, 0);
+#endif
 
     widgets.location_scrolled = gtk_scrolled_window_new (nullptr, nullptr);
     gtk_scrolled_window_set_shadow_type ((GtkScrolledWindow *) widgets.location_scrolled, GTK_SHADOW_IN);
@@ -449,34 +470,54 @@ static void create_infowin ()
     widgets.textbuffer = gtk_text_view_get_buffer (widgets.location);
 
     gtk_container_add ((GtkContainer *) widgets.location_scrolled, (GtkWidget *) widgets.location);
-    GtkWidget * scrolled_vbox = gtk_vbox_new (false, 6);
+    GtkWidget * scrolled_vbox = audgui_vbox_new (6);
     gtk_box_pack_start ((GtkBox *) scrolled_vbox, widgets.location_scrolled, true, true, 0);
     gtk_widget_show_all (scrolled_vbox);
+#ifdef USE_GTK3
+    gtk_widget_set_vexpand (scrolled_vbox, true);
+    gtk_grid_attach ((GtkGrid *) main_grid, scrolled_vbox, 0, 1, 1, 1);
+#else
     gtk_table_attach ((GtkTable *) main_grid, scrolled_vbox, 0, 1, 1, 2,
      GTK_FILL, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), 0, 0);
+#endif
 
-    GtkWidget * codec_grid = gtk_table_new (0, 0, false);
-    gtk_table_set_row_spacings ((GtkTable *) codec_grid, 2);
-    gtk_table_set_col_spacings ((GtkTable *) codec_grid, 12);
+    GtkWidget * codec_grid = audgui_grid_new ();
+    audgui_grid_set_row_spacing (codec_grid, 2);
+    audgui_grid_set_column_spacing (codec_grid, 12);
+#ifdef USE_GTK3
+    gtk_grid_attach ((GtkGrid *) main_grid, codec_grid, 0, 2, 1, 1);
+#else
     gtk_table_attach ((GtkTable *) main_grid, codec_grid, 0, 1, 2, 3,
-     GTK_FILL, GTK_FILL, 0, 8);
+            GTK_FILL, GTK_FILL, 0, 8);
+#endif
 
     for (int row = 0; row < CODEC_ITEMS; row ++)
     {
         GtkWidget * label = small_label_new (_(codec_labels[row]));
+
+#ifdef USE_GTK3
+        widgets.codec[row] = small_label_new (nullptr);
+        gtk_grid_attach ((GtkGrid *) codec_grid, label, 0, row, 1, 1);
+        gtk_grid_attach ((GtkGrid *) codec_grid, widgets.codec[row], 1, row, 1, 1);
+#else
         gtk_table_attach ((GtkTable *) codec_grid, label, 0, 1, row, row + 1,
          GTK_FILL, GTK_FILL, 0, 0);
 
         widgets.codec[row] = small_label_new (nullptr);
         gtk_table_attach ((GtkTable *) codec_grid, widgets.codec[row], 1, 2, row, row + 1,
          GTK_FILL, GTK_FILL, 0, 0);
+#endif
     }
 
-    GtkWidget * grid = gtk_table_new (0, 0, false);
-    gtk_table_set_row_spacings ((GtkTable *) grid, 2);
-    gtk_table_set_col_spacings ((GtkTable *) grid, 6);
+    GtkWidget * grid = audgui_grid_new ();
+    audgui_grid_set_row_spacing (grid, 2);
+    audgui_grid_set_column_spacing (grid, 6);
+#ifdef USE_GTK3
+    gtk_grid_attach ((GtkGrid *) main_grid, grid, 1, 0, 1, 3);
+#else
     gtk_table_attach ((GtkTable *) main_grid, grid, 1, 2, 0, 3,
-     (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_FILL, 0, 0);
+            (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_FILL, 0, 0);
+#endif
 
     widgets.title = gtk_entry_new ();
     gtk_widget_set_size_request (widgets.title, 3 * dpi, -1);
@@ -521,9 +562,13 @@ static void create_infowin ()
     add_entry (grid, _("Performer (flac, ogg)"), widgets.performer, 1, 18, 1);
 //    gtk_widget_set_sensitive (widgets.performer, false);
 
-    GtkWidget * bottom_hbox = gtk_hbox_new (false, 6);
+    GtkWidget * bottom_hbox = audgui_hbox_new (6);
+#ifdef USE_GTK3
+    gtk_grid_attach ((GtkGrid *) main_grid, bottom_hbox, 0, 3, 2, 1);
+#else
     gtk_table_attach ((GtkTable *) main_grid, bottom_hbox, 0, 2, 3, 4,
      GTK_FILL, GTK_FILL, 0, 0);
+#endif
 
     widgets.autofill = gtk_check_button_new_with_mnemonic (_("_Auto-fill empty fields"));
 

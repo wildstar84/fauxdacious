@@ -1,3 +1,17 @@
+Version 4.2.2-beta1:
+
+Add --enable-gtk3 option to build with GTK-3 and update all code to support 
+both GTK-2 and GTK-3, due to the planned phaseout of GTK-2 support by most 
+distros.
+
+Add hack for flac plugin to check and reject "bad" flac-wrapped ogg streams 
+with incorrectly-formatted metadata that results in a seemingly endless 
+(and fruitless) search for metadata when probing causing display "hangs".
+
+Fix bug in ffaudio plugin that wrongly updated the playing entry's metadata 
+when probing an entry other than the currently-playing one and icy metadata 
+was found.  This dates back to the Aug 12, 2022 commit# ebd614d.
+
 Version 4.2.1-final:
 
 This version should be up to date with (and ahead of) Audacious's GIT commits 

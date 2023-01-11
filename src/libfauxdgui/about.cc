@@ -24,6 +24,7 @@
 #include <libfauxdcore/runtime.h>
 #include <libfauxdcore/vfs.h>
 
+#include "gtk-compat.h"
 #include "internal.h"
 #include "libfauxdgui.h"
 #include "libfauxdgui-gtk.h"
@@ -75,7 +76,7 @@ static GtkWidget * create_about_window ()
 
     audgui_destroy_on_escape (about_window);
 
-    GtkWidget * vbox = gtk_vbox_new (false, 6);
+    GtkWidget * vbox = audgui_vbox_new (6);
     gtk_container_add ((GtkContainer *) about_window, vbox);
 
     StringBuf logo_path = filename_build ({data_dir, "images", "about-logo.png"});
@@ -87,11 +88,16 @@ static GtkWidget * create_about_window ()
     gtk_label_set_justify ((GtkLabel *) label, GTK_JUSTIFY_CENTER);
     gtk_box_pack_start ((GtkBox *) vbox, label, false, false, 0);
 
-    GtkWidget * align = gtk_alignment_new (0.5, 0.5, 0, 0);
-    gtk_box_pack_start ((GtkBox *) vbox, align, false, false, 0);
-
     GtkWidget * button = gtk_link_button_new (website);
+
+#ifdef USE_GTK3
+    gtk_widget_set_halign (button, GTK_ALIGN_CENTER);
+    gtk_box_pack_start ((GtkBox *) vbox, button, false, false, 0);
+#else
+    GtkWidget * align = gtk_alignment_new (0.5, 0.5, 0, 0);
     gtk_container_add ((GtkContainer *) align, button);
+    gtk_box_pack_start ((GtkBox *) vbox, align, false, false, 0);
+#endif
 
     auto credits = VFSFile::read_file (filename_build ({data_dir, "AUTHORS"}), VFS_APPEND_NULL);
     auto license = VFSFile::read_file (filename_build ({data_dir, "COPYING"}), VFS_APPEND_NULL);

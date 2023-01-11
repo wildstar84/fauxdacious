@@ -7,6 +7,7 @@ SRCS = about.cc \
        eq-preset.cc \
        equalizer.cc \
        file-opener.cc \
+       gtk-compat.cc \
        images.c \
        ui_infoarea.cc \
        infopopup.cc \
@@ -33,7 +34,8 @@ SRCS = about.cc \
        url-opener.cc \
        util.cc
 
-INCLUDES = libfauxdgui.h \
+INCLUDES = gtk-compat.h \
+           libfauxdgui.h \
            libfauxdgui-gtk.h \
            ui_infoarea.h \
            list.h \

@@ -22,6 +22,7 @@
 #include <libfauxdcore/hook.h>
 #include <libfauxdcore/i18n.h>
 
+#include "gtk-compat.h"
 #include "internal.h"
 #include "libfauxdgui-gtk.h"
 
@@ -37,7 +38,7 @@ static void create_progress_window ()
     gtk_window_set_resizable ((GtkWindow *) progress_window, false);
     gtk_container_set_border_width ((GtkContainer *) progress_window, 6);
 
-    GtkWidget * vbox = gtk_vbox_new (false, 6);
+    GtkWidget * vbox = audgui_vbox_new (6);
     gtk_container_add ((GtkContainer *) progress_window, vbox);
 
     progress_label = gtk_label_new (nullptr);

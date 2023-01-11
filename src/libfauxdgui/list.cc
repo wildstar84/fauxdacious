@@ -23,6 +23,7 @@
 #include <libfauxdcore/hook.h>
 #include <libfauxdcore/objects.h>
 
+#include "gtk-compat.h"
 #include "libfauxdgui-gtk.h"
 #include "list.h"
 
@@ -389,7 +390,7 @@ static void autoscroll (void * widget)
     ListModel * model = (ListModel *) gtk_tree_view_get_model
      ((GtkTreeView *) widget);
 
-    GtkAdjustment * adj = gtk_tree_view_get_vadjustment ((GtkTreeView *) widget);
+    GtkAdjustment * adj = audgui_tree_view_get_vadjustment ((GtkWidget *) widget);
     g_return_if_fail (adj);
 
     int pos, end;
@@ -406,7 +407,7 @@ static void autoscroll (void * widget)
 
 static void start_autoscroll (ListModel * model, GtkWidget * widget, int speed)
 {
-    GtkAdjustment * adj = gtk_tree_view_get_vadjustment ((GtkTreeView *) widget);
+    GtkAdjustment * adj = audgui_tree_view_get_vadjustment (widget);
     g_return_if_fail (adj);
 
     int pos, end;
@@ -608,7 +609,7 @@ EXPORT GtkWidget * audgui_list_new_real (const AudguiListCallbacks * cbs, int cb
     g_signal_connect (list, "motion-notify-event", (GCallback) motion_notify_cb, model);
     g_signal_connect (list, "leave-notify-event", (GCallback) leave_notify_cb, model);
 
-    gboolean supports_drag = false;
+    bool supports_drag = false;
 
     if (MODEL_HAS_CB (model, data_type) &&
      (MODEL_HAS_CB (model, get_data) || MODEL_HAS_CB (model, receive_data)))

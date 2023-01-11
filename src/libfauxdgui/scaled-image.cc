@@ -18,7 +18,8 @@
  */
 
 #include <libfauxdcore/runtime.h>
-#include <libfauxdgui/libfauxdgui-gtk.h>
+#include "gtk-compat.h"
+#include "libfauxdgui-gtk.h"
 
 static GdkPixbuf * get_scaled (GtkWidget * widget, int maxwidth, int maxheight)
 {
@@ -58,7 +59,11 @@ static GdkPixbuf * get_scaled (GtkWidget * widget, int maxwidth, int maxheight)
     return scaled;
 }
 
-static int expose_cb (GtkWidget * widget, GdkEventExpose * event)
+#ifdef USE_GTK3
+static gboolean draw_cb (GtkWidget * widget, cairo_t * cr)
+#else
+static gboolean draw_cb (GtkWidget * widget, GdkEventExpose * event)
+#endif
 {
     GdkRectangle rect;
     gtk_widget_get_allocation (widget, & rect);
@@ -70,10 +75,15 @@ static int expose_cb (GtkWidget * widget, GdkEventExpose * event)
         int x = (rect.width - gdk_pixbuf_get_width (scaled)) / 2;
         int y = (rect.height - gdk_pixbuf_get_height (scaled)) / 2;
 
+#ifdef USE_GTK3
+        gdk_cairo_set_source_pixbuf (cr, scaled, x, y);
+        cairo_paint (cr);
+#else
         cairo_t * cr = gdk_cairo_create (gtk_widget_get_window (widget));
         gdk_cairo_set_source_pixbuf (cr, scaled, x, y);
         cairo_paint (cr);
         cairo_destroy (cr);
+#endif
     }
 
     return true;
@@ -94,7 +104,7 @@ EXPORT GtkWidget * audgui_scaled_image_new (GdkPixbuf * pixbuf)
 {
     GtkWidget * widget = gtk_drawing_area_new ();
 
-    g_signal_connect (widget, "expose-event", (GCallback) expose_cb, nullptr);
+    g_signal_connect (widget, AUDGUI_DRAW_SIGNAL, (GCallback) draw_cb, nullptr);
 
     audgui_scaled_image_set (widget, pixbuf);
 

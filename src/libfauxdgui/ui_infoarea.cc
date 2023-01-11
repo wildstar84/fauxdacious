@@ -29,9 +29,10 @@
 #include <libfauxdcore/runtime.h>
 #include <libfauxdcore/probe.h>
 #include <libfauxdcore/plugins.h>
-#include <libfauxdgui/libfauxdgui-gtk.h>
 #include <libfauxdcore/audstrings.h>
 
+#include "gtk-compat.h"
+#include "libfauxdgui-gtk.h"
 #include "ui_infoarea.h"
 
 #define VIS_BANDS 12
@@ -259,10 +260,14 @@ static void get_color (GtkWidget * widget, int i, float * r, float * g, float * 
     hsv_to_rgb (h, s, v, r, g, b);
 }
 
-static int expose_vis_cb (GtkWidget * widget, GdkEventExpose * event)
+#ifdef USE_GTK3
+static gboolean draw_vis_cb (GtkWidget * widget, cairo_t * cr)
+{
+#else
+static gboolean draw_vis_cb (GtkWidget * widget, GdkEventExpose * event)
 {
     cairo_t * cr = gdk_cairo_create (gtk_widget_get_window (widget));
-
+#endif
     clear (widget, cr);
 
     for (int i = 0; i < VIS_BANDS; i++)
@@ -283,7 +288,9 @@ static int expose_vis_cb (GtkWidget * widget, GdkEventExpose * event)
         cairo_fill (cr);
     }
 
+#ifndef USE_GTK3
     cairo_destroy (cr);
+#endif
     return true;
 }
 
@@ -340,16 +347,23 @@ static void draw_title (cairo_t * cr)
          0.7, 0.7, area->last_alpha, "9", area->last_album);
 }
 
-static int expose_cb (GtkWidget * widget, GdkEventExpose * event)
+#ifdef USE_GTK3
+static gboolean draw_cb (GtkWidget * widget, cairo_t * cr)
+{
+    g_return_val_if_fail (area, false);
+#else
+static gboolean draw_cb (GtkWidget * widget, GdkEventExpose * event)
 {
     cairo_t * cr = gdk_cairo_create (gtk_widget_get_window (widget));
-
+#endif
     clear (widget, cr);
 
     draw_album_art (cr);
     draw_title (cr);
 
+#ifndef USE_GTK3
     cairo_destroy (cr);
+#endif
     return true;
 }
 
@@ -703,7 +717,7 @@ EXPORT void ui_infoarea_show_vis (bool show)
         gtk_widget_set_size_request (vis.widget, VIS_WIDTH, HEIGHT);
         gtk_box_pack_start ((GtkBox *) area->box, vis.widget, false, false, 0);
 
-        g_signal_connect (vis.widget, "expose-event", (GCallback) expose_vis_cb, nullptr);
+        g_signal_connect (vis.widget, AUDGUI_DRAW_SIGNAL, (GCallback) draw_vis_cb, nullptr);
         gtk_widget_show (vis.widget);
 
         aud_visualizer_add (& vis);
@@ -748,13 +762,13 @@ EXPORT GtkWidget * ui_infoarea_new ()
 
     area = new UIInfoArea ();
     area->widget = nullptr;
-    area->box = gtk_hbox_new (false, 0);
+    area->box = audgui_hbox_new (0);
 
     area->main = gtk_drawing_area_new ();
     gtk_widget_set_size_request (area->main, HEIGHT, HEIGHT);
     gtk_box_pack_start ((GtkBox *) area->box, area->main, true, true, 0);
 
-    g_signal_connect (area->main, "expose-event", (GCallback) expose_cb, nullptr);
+    g_signal_connect (area->main, AUDGUI_DRAW_SIGNAL, (GCallback) draw_cb, nullptr);
 
     hook_associate ("tuple change", (HookFunction) ui_infoarea_set_title, nullptr);
     hook_associate ("playback ready", (HookFunction) ui_infoarea_playback_start, nullptr);

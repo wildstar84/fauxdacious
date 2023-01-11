@@ -25,6 +25,7 @@
 #include <libfauxdcore/interface.h>
 #include <libfauxdcore/runtime.h>
 
+#include "gtk-compat.h"
 #include "internal.h"
 #include "libfauxdgui.h"
 #include "libfauxdgui-gtk.h"
@@ -239,14 +240,14 @@ static void revert_changes ()
     gtk_widget_set_sensitive (revert, false);
 }
 
-static void do_save_file (void)
+static void do_save_file ()
 {
     auto preset = find_one_selected ();
     // JWT:THEY DON'T HAVE TO SELECT ONE IN FAUXDACIOUS!  if (preset)
         eq_preset_save_file (preset);
 }
 
-static void do_save_eqf (void)
+static void do_save_eqf ()
 {
     auto preset = find_one_selected ();
     // JWT:THEY DON'T HAVE TO SELECT ONE IN FAUXDACIOUS!  if (preset)
@@ -308,16 +309,16 @@ static GtkWidget * create_eq_preset_window ()
 
     g_signal_connect (window, "destroy", (GCallback) cleanup_eq_preset_window, nullptr);
 
-    GtkWidget * outer = gtk_vbox_new (false, 0);
+    GtkWidget * outer = audgui_vbox_new (0);
     gtk_container_add ((GtkContainer *) window, outer);
 
     gtk_box_pack_start ((GtkBox *) outer, create_menu_bar (), false, false, 0);
 
-    GtkWidget * vbox = gtk_vbox_new (false, 6);
+    GtkWidget * vbox = audgui_vbox_new (6);
     gtk_container_set_border_width ((GtkContainer *) vbox, 6);
     gtk_box_pack_start ((GtkBox *) outer, vbox, true, true, 0);
 
-    GtkWidget * hbox = gtk_hbox_new (false, 6);
+    GtkWidget * hbox = audgui_hbox_new (6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox, false, false, 0);
 
     entry = gtk_entry_new ();
@@ -331,7 +332,7 @@ static GtkWidget * create_eq_preset_window ()
     g_signal_connect (entry, "activate", (GCallback) add_from_entry, nullptr);
     g_signal_connect (entry, "changed", (GCallback) text_changed, nullptr);
 
-    GtkWidget * hbox1a = gtk_hbox_new (false, 6);
+    GtkWidget * hbox1a = audgui_hbox_new (6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox1a, false, false, 0);
     GtkWidget * localsave_checkbox = gtk_check_button_new ();
     gtk_box_pack_start ((GtkBox *) hbox1a, localsave_checkbox, true, true, 0);
@@ -346,7 +347,7 @@ static GtkWidget * create_eq_preset_window ()
     String eqpreset_dir_default_file = aud_get_str (nullptr, "eqpreset_dir_default_file");
     if (eqpreset_dir_default_file && eqpreset_dir_default_file[0])
     {
-        GtkWidget * hbox1a1 = gtk_hbox_new (false, 6);
+        GtkWidget * hbox1a1 = audgui_hbox_new (6);
         gtk_box_pack_start ((GtkBox *) vbox, hbox1a1, false, false, 0);
         GtkWidget * save_as_dirdefault_checkbox = gtk_check_button_new ();
         gtk_box_pack_start ((GtkBox *) hbox1a1, save_as_dirdefault_checkbox, true, true, 0);
@@ -360,7 +361,7 @@ static GtkWidget * create_eq_preset_window ()
     else
         aud_set_bool (nullptr, "_save_as_dirdefault", false);
 
-    GtkWidget * hbox1a2 = gtk_hbox_new (false, 6);
+    GtkWidget * hbox1a2 = audgui_hbox_new (6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox1a2, false, false, 0);
     GtkWidget * urlbase_checkbox = gtk_check_button_new ();
     gtk_box_pack_start ((GtkBox *) hbox1a2, urlbase_checkbox, true, true, 0);
@@ -371,7 +372,7 @@ static GtkWidget * create_eq_preset_window ()
     if (aud_get_bool (nullptr, "eqpreset_use_url_sitename"))
         gtk_toggle_button_set_active ((GtkToggleButton *) urlbase_checkbox, true);
 
-    GtkWidget * hbox1b = gtk_hbox_new (false, 6);
+    GtkWidget * hbox1b = audgui_hbox_new (6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox1b, false, false, 0);
     GtkWidget * nameonly_checkbox = gtk_check_button_new ();
     gtk_box_pack_start ((GtkBox *) hbox1b, nameonly_checkbox, true, true, 0);
@@ -384,7 +385,7 @@ static GtkWidget * create_eq_preset_window ()
 
     if (aud_get_bool (nullptr, "eqpreset_use_effects"))
     {
-        GtkWidget * hbox1c = gtk_hbox_new (false, 6);
+        GtkWidget * hbox1c = audgui_hbox_new (6);
         gtk_box_pack_start ((GtkBox *) vbox, hbox1c, false, false, 0);
         GtkWidget * save_effects2_checkbox = gtk_check_button_new ();
         gtk_box_pack_start ((GtkBox *) hbox1c, save_effects2_checkbox, true, true, 0);
@@ -409,7 +410,7 @@ static GtkWidget * create_eq_preset_window ()
     audgui_list_add_column (list, nullptr, 0, G_TYPE_STRING, -1);
     gtk_container_add ((GtkContainer *) scrolled, list);
 
-    GtkWidget * hbox2 = gtk_hbox_new (false, 6);
+    GtkWidget * hbox2 = audgui_hbox_new (6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox2, false, false, 0);
 
     GtkWidget * remove = audgui_button_new (_("Delete Selected"), "edit-delete",
