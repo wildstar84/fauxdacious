@@ -416,12 +416,14 @@ static void set_album_art ()
 
     if (! area->show_art)
     {
-        area->pb = AudguiPixbuf ();
+        area->pb = AudguiPixbuf ();  // WE'RE ALREADY SET TO HIDE, SO HIDE & DONE!
         return;
     }
 
-    bool noAltArt = true;   /* JWT:TRUE IF NO CHANNEL-ART FOUND. */
-    bool NOAltArt = false;  /* JWT:FORCE HIDE-DUP TEST IF TRUE, NEEDED FOR PODCASTS,ETC W/O CHANNEL-ART! */
+    bool noChannelArt = true;   /* JWT:TRUE IF NO CHANNEL-ART FOUND. */
+    /* JWT:NOTE:  DIRECTORY ICONS ARE *NOT* CONSIDERED "CHANNEL-ART", THOUGH THEY ARE TREATED AS SUCH,
+       IFF THERE'S NO PRIMARY ART IMAGE FOUND!
+    */
     bool have_dir_icon_art = false;
     bool albumart_plugin_isactive = aud_get_bool ("albumart", "_isactive");
     AudguiPixbuf dir_icon_art;
@@ -443,7 +445,7 @@ static void set_album_art ()
                 {
                     area->pb = audgui_pixbuf_request (tfld_offset);
                     if (area->pb)
-                        noAltArt = false;
+                        noChannelArt = false;
                 }
             }
             else  /* NO CHANNEL ICON IN COMMENT (OVERWRITTEN BY STREAM METATAGS?), SO CHECK tmp_tag_data: */
@@ -462,12 +464,12 @@ static void set_album_art ()
                             {
                                 area->pb = audgui_pixbuf_request (tfld_offset);
                                 if (area->pb)
-                                    noAltArt = false;
+                                    noChannelArt = false;
                             }
                         }
                     }
                     /* FOR tmp_tag_data (1-OFF) STREAMS W/O CHANNEL-ART, CHECK FOR (CHANNEL) ARTIST'S ICON FILE: */
-                    if (noAltArt && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
+                    if (noChannelArt && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
                     {
                         String artist_tag = tuple.get_str (Tuple::Artist);
                         if (artist_tag && artist_tag[0])
@@ -485,15 +487,13 @@ static void set_album_art ()
                                     area->pb = audgui_pixbuf_request ((const char *) coverart_uri);
                                     if (area->pb)  /* FOUND ART IN CACHE, RETURN. */
                                     {
-                                        noAltArt = false;
+                                        noChannelArt = false;
                                         break;
                                     }
                                 }
                             }
                         }
                     }
-                    if (noAltArt)
-                        NOAltArt = true;
                 }
             }
         }
@@ -537,8 +537,7 @@ static void set_album_art ()
             }
         }
     }
-    aud_set_bool ("albumart", "_have_channel_art", ! (noAltArt && ! have_dir_icon_art)); // TELL AlbumArt PLUGIN.
-    if (noAltArt)
+    if (noChannelArt)
         area->pb = (have_dir_icon_art && albumart_plugin_isactive) ? dir_icon_art.ref ()
                 : audgui_pixbuf_request_current ();
 
@@ -559,7 +558,7 @@ static void set_album_art ()
         {
             area->pb = audgui_pixbuf_fallback ();
             aud_set_bool ("albumart", "_last_art_was_fallback", true);
-            /* JWT:USER DOESN'T WANT TO SEE THE FALLBACK IMAGE! */
+            /* JWT:USER DOESN'T WANT TO SEE THE FALLBACK IMAGE, SO FORCE HIDE! */
             if (aud_get_bool ("gtkui", "infoarea_hide_fallback_art"))
             {
                 area->pb = AudguiPixbuf ();
@@ -569,10 +568,21 @@ static void set_album_art ()
         }
     }
     /* JWT:NOW CHECK FOR "m_art_force_dups" (SEE Qt SIDE): */
-    bool m_art_force_dups = true;  /* SET TO HIDE TO FORCE HIDING ALBUM-ART ICON, CLEAR TO ALLOW SHOWING. */
-    int hidelevel = have_dir_icon_art ? 1 : 0;
+    bool m_art_force_dups = true;  /* SET TO TRUE TO FORCE SHOWING ALBUM-ART ICON, FALSE TO CONSIDER HIDING. */
+    int infoarea_hide_art_gtk = aud_get_int ("albumart", "_infoarea_hide_art_gtk");  // ALBUMART SAYS: -1=NOT CALLED/INACTIVE, 0=SHOW!, 1,2,3=DEPENDS(hidelevel).
+    if (infoarea_hide_art_gtk >= 0)
+        aud_set_int ("albumart", "_infoarea_hide_art_gtk_prev", infoarea_hide_art_gtk);  // SAVE IN CASE USER TURNS OFF MINI-FAUXD.
+
+    /* JWT:LOGIC HERE IS IF (DIRECTORY ICON):  HIDE ONLY IF NO ALBUMART(3) B/C THE DIR-ICON *IS* THE ALBUM-ART!
+       OTHERWISE, HIDE ONLY IF ALBUMART ACTIVE AND SAYS IT'S A DUP. (1,2, OR 3).
+       (OF COURSE, THERE MUST BE NO CHANNEL ART, AND ALBUMART PLUGIN MUST BE ACTIVE, AND USER WANTS
+       DUPLICATE IMAGES HIDDEN, AND EITHER INFOBAR OR DOCKED MINI-FAUXDACIOUS (IE. SAME WINDOW)!)
+    */
+    int hidelevel = have_dir_icon_art ? 2 : 0;
+
     /* JWT:THIS CHECK NEEDED ONLY IF ALBUM-ART PLGN ACTIVE && HIDE-DUPS ON && ALBUM-ART SAYS IT'S A DUP!: */
-    if ((NOAltArt || (noAltArt && aud_get_int ("albumart", "_infoarea_hide_art_gtk") > hidelevel))
+    if (noChannelArt
+            && infoarea_hide_art_gtk > hidelevel
             && albumart_plugin_isactive
             && aud_get_bool ("albumart", "hide_dup_art_icon"))
     {
@@ -586,7 +596,7 @@ static void set_album_art ()
                 if (grandparent_window)
                 {
                     if (gtk_widget_is_toplevel (grandparent_window))
-                        m_art_force_dups = true;  // MINI-FAUXDACIOUS IS UNDOCKED.
+                        m_art_force_dups = true;  // MINI-FAUXDACIOUS IS UNDOCKED(FLOATING).
                 }
             }
             else  // NO PARENT WINDOW (YET?! - MINI-FAUXDACIOUS JUST LAUNCHED):
@@ -596,7 +606,7 @@ static void set_album_art ()
         if (! m_art_force_dups)
         {
             area->pb = AudguiPixbuf ();
-            area->show_art = false;
+            area->show_art = false;  // HIDE INFOBAR ART (WE'RE A DUP. IMAGE & MINI-FAUXD DOCKED OR OFF)
             return;
         }
     }
@@ -617,18 +627,27 @@ static void infoarea_next ()
     gtk_widget_queue_draw (area->main);
 }
 
+/* CALLED WHEN PLAYBACK STARTS: */
+/* JWT:NOTE:  REASON FOR THE ADDED HAIRY LOGIC IS DUE TO THE FACT THAT WHEN ALBUMART PLUGIN
+   RUNNING, BOTH THIS AND ui_infoarea_hooked () GET CALLED, BUT THE CALLING ORDER IS NOT RELIABLE!
+   (START WITH INFOBAR, TOGGLE TO MINI-FAUXD & BACK CHANGES THE CALLING ORDER FOR SURE!)
+*/
 static void ui_infoarea_playback_start ()
 {
     g_return_if_fail (area);
 
+    /* -1 MEANS ui_infoarea_hooked() HASN'T (YET) BEEN CALLED FOR THIS ENTRY DURING PLAY: */
+    aud_set_int ("albumart", "_infoarea_hide_art_gtk", -1);
     if (! area->stopped) /* moved to the next song without stopping? */
         infoarea_next ();
 
     area->stopped = false;
-    area->show_art = aud_get_bool ("gtkui", "infoarea_show_art");
+    if (! aud_get_bool ("albumart", "_isactive"))
+        area->show_art = aud_get_bool ("gtkui", "infoarea_show_art");
 
     ui_infoarea_set_title ();
     set_album_art ();
+    gtk_widget_queue_draw (area->main);
 
     timer_add (TimerRate::Hz30, ui_infoarea_do_fade);
 }
@@ -649,37 +668,29 @@ static void realize_cb (GtkWidget * widget)
     gdk_window_ensure_native (gtk_widget_get_window (widget));
 }
 
+/* CALLED BY STARTING/STOPPING THE INFOBAR OR MINI-FAUXDACIOUS: */
 EXPORT void ui_infoarea_show_art (bool show)
 {
     if (! area)
         return;
 
-    /* JWT:NOTE: TOGGLED BY MENU, BUT MUST AND W/OTHER SHOW/HIDE CONDITIONS (IN set_album_art)!: */
+    /* JWT:NOTE: TOGGLED BY MENU, BUT MUST CHECK OTHER SHOW/HIDE CONDITIONS IN set_album_art()!: */
     area->show_art = show;
-    set_album_art ();
+    int infoarea_hide_art_gtk_prev = aud_get_int ("albumart", "_infoarea_hide_art_gtk_prev");
+    if (infoarea_hide_art_gtk_prev >= 0)
+        aud_set_int ("albumart", "_infoarea_hide_art_gtk", infoarea_hide_art_gtk_prev);
+
+    set_album_art ();  // MAY FORCE HIDE!
     gtk_widget_queue_draw (area->main);
 }
 
-EXPORT void ui_infoarea_toggle_art ()
-{
-    if (! area)
-        return;
-
-    area->show_art = aud_get_bool ("gtkui", "infoarea_show_art");
-    set_album_art ();
-    gtk_widget_queue_draw (area->main);
-}
-
-/* JWT:CALLED BY HOOK IN AlbumArt PLUGINS: */
+/* JWT:CALLED BY HOOKS IN AlbumArt PLUGIN, INCL. WHEN USER TOGGLES IT'S "Hide info bar art icon un..." CHECKBOX: */
 EXPORT void ui_infoarea_hooked ()
 {
     if (! area)
         return;
 
     area->show_art = aud_get_bool ("gtkui", "infoarea_show_art");
-    if (area->show_art)
-        area->show_art = (aud_get_int ("albumart", "_infoarea_hide_art_gtk") > 0) ? false : true;
-
     set_album_art ();
     gtk_widget_queue_draw (area->main);
 }
@@ -690,7 +701,10 @@ EXPORT void ui_infoarea_chg_dock_status (PluginHandle * plugin, void *)
     if (! strstr (aud_plugin_get_basename (plugin), "info-bar-plugin-gtk"))
         return;  // CATCHES ANY PLUGIN'S DOCK-STATUS CHANGE, IGNORE ALL BUT THIS ONE!
 
-    ui_infoarea_toggle_art ();
+    int infoarea_hide_art_gtk_prev = aud_get_int ("albumart", "_infoarea_hide_art_gtk_prev");
+    if (infoarea_hide_art_gtk_prev >= 0)
+        aud_set_int ("albumart", "_infoarea_hide_art_gtk", infoarea_hide_art_gtk_prev);
+
     if (! area)
         return;
 
@@ -756,8 +770,6 @@ static void destroy_cb (GtkWidget * widget)
 
 EXPORT GtkWidget * ui_infoarea_new ()
 {
-    g_return_val_if_fail (! area, nullptr);
-
     compute_sizes ();
 
     area = new UIInfoArea ();
