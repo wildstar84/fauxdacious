@@ -192,9 +192,24 @@ void SearchSelectDialog::search ()
 
     /* check if previous selection should be cleared before searching */
     if (m_checkbox_clearprevsel->isChecked ())
-        aud_playlist_select_all (playlist, false);
+        aud_playlist_select_by_patterns (playlist, tuple);
+    else
+    {
+        int entries = aud_playlist_entry_count (playlist);
+        Index<int> entries_already_selected;
+        /* SAVE PREV. SELECTIONS: */
+        for (int entry = 0; entry < entries; entry ++)
+        {
+            if (aud_playlist_entry_get_selected (playlist, entry))
+                entries_already_selected.append (entry);
+        }
 
-    aud_playlist_select_by_patterns (playlist, tuple);
+        aud_playlist_select_by_patterns (playlist, tuple);
+
+        /* RESELECT PREV. SELECTIONS (CLEARED BY aud_playlist_select_by_patterns(): */
+        for (int entry = 0; entry < entries_already_selected.len (); entry ++)
+            aud_playlist_entry_set_selected (playlist, entries_already_selected[entry], true);
+    }
 
     /* check if a new playlist should be created after searching */
     if (m_checkbox_newplaylist->isChecked ())

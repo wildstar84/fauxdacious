@@ -219,9 +219,24 @@ EXPORT void playlist_search_and_select ()
 
         /* check if previous selection should be cleared before searching */
         if (gtk_toggle_button_get_active ((GtkToggleButton *) checkbt_clearprevsel))
-            aud_playlist_select_all (active_playlist, false);
+            aud_playlist_select_by_patterns (active_playlist, tuple);
+        else
+        {
+            int entries = aud_playlist_entry_count (active_playlist);
+            Index<int> entries_already_selected;
+            /* SAVE PREV. SELECTIONS: */
+            for (int entry = 0; entry < entries; entry ++)
+            {
+                if (aud_playlist_entry_get_selected (active_playlist, entry))
+                    entries_already_selected.append (entry);
+            }
 
-        aud_playlist_select_by_patterns (active_playlist, tuple);
+            aud_playlist_select_by_patterns (active_playlist, tuple);
+
+            /* RESELECT PREV. SELECTIONS (CLEARED BY aud_playlist_select_by_patterns(): */
+            for (int entry = 0; entry < entries_already_selected.len (); entry ++)
+                aud_playlist_entry_set_selected (active_playlist, entries_already_selected[entry], true);
+        }
 
         /* check if a new playlist should be created after searching */
         if (gtk_toggle_button_get_active ((GtkToggleButton *) checkbt_newplaylist))
