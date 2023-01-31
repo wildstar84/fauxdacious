@@ -199,11 +199,10 @@ String art_search (const char * filename, Tuple & tuple)
     if (! audio_fn || ! audio_fn[0])
         audio_fn = aud_drct_get_filename ();
 
-    const char * album = (const char *) Album;
-
     if (Title && Title[0])
     {
         bool split_titles = aud_get_bool (nullptr, "split_titles");
+        const char * album = (const char *) Album;
         if (album && album[0])  // ALBUM FIELD NOT BLANK AND NOT A FILE/URL:
         {
             const char * album_uri = strstr (album, "://");  // FOR URI, WE'LL ASSUME LONGEST IS "stdin" (5 chars)
@@ -237,15 +236,17 @@ String art_search (const char * filename, Tuple & tuple)
             }
         }
 
-        StringBuf albart_FN;
+        StringBuf albart_FN, artist_FN;
         StringBuf album_buf = str_copy (Album);
         str_replace_char (album_buf, ' ', '~');  // JWT:PROTECT SPACES, WHICH I STUPIDLY DIDN'T ENCODE IN ALBUMART!
         if (Artist && Artist[0])
         {
             StringBuf artist_buf = str_copy (Artist);
             str_replace_char (artist_buf, ' ', '~');
+            artist_FN = str_encode_percent (artist_buf);
             albart_FN = str_concat ({(const char *) str_encode_percent (album_buf), "__",
-                    (const char *) str_encode_percent (artist_buf)});
+                    (const char *) artist_FN});
+            str_replace_char (artist_FN, '~', ' ');  // JWT:UNPROTECT SPACES!
         }
         else if (Title && Title[0])
         {
@@ -253,10 +254,12 @@ String art_search (const char * filename, Tuple & tuple)
             str_replace_char (title_buf, ' ', '~');
             albart_FN = str_concat ({(const char *) str_encode_percent (album_buf), "__",
                     (const char *) str_encode_percent (title_buf)});
+            artist_FN = StringBuf ();
         }
         else
         {
             albart_FN = str_encode_percent (album_buf);
+            artist_FN = StringBuf ();
         }
         str_replace_char (albart_FN, '~', ' ');  // JWT:UNPROTECT SPACES!
 
@@ -274,6 +277,19 @@ String art_search (const char * filename, Tuple & tuple)
                     AUDWARN ("i:Failed to update art-file time (for easier user-lookup)!\n");
 
                 return String (filename_to_uri (filenamechar));
+            }
+        }
+        /* NO ALBUM IMG. IN CACHE, CHECK FOR IMG. MATCHING THIS ARTIST (ADDED BY USER): */
+        if (artist_FN)
+        {
+            for (auto & ext : extlist)
+            {
+                coverart_file = String (str_concat ({aud_get_path (AudPath::UserDir),
+                        "/albumart/", (const char *) artist_FN, ".", (const char *) ext}));
+                const char * filenamechar = coverart_file;
+                struct stat statbuf;
+                if (stat (filenamechar, &statbuf) >= 0)  // ART IMAGE FILE EXISTS FOR ARTIST:
+                    return String (filename_to_uri (filenamechar));
             }
         }
     }
