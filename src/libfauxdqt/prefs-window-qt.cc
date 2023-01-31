@@ -477,6 +477,9 @@ static const PreferencesWidget song_info_page_widgets[] = {
     WidgetCombo (N_("Save tags to:"),
         WidgetInt (0, "user_tag_data_options"),
         {{user_tag_data_options}}),
+    WidgetCheck (N_("Don't embed images in tags"),
+        WidgetBool (0, "dont_embed_images"),
+        WIDGET_CHILD),
 };
 
 static const PreferencesWidget advanced_page_widgets[] = {

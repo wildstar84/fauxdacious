@@ -112,7 +112,7 @@ static const char * const core_defaults[] = {
  "show_numbers_in_pl", "FALSE",
  "slow_probe", "FALSE",
  "user_tag_data", "TRUE",
-
+ "dont_embed_images", "FALSE",
  nullptr};
 
 enum OpType {

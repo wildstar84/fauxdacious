@@ -1,5 +1,18 @@
 Version 4.2.2-beta1:
 
+Add [Settings].[Song Info].(Fauxdacious Extras)[]"Don't Embed images in tags" 
+checkbox option.  Normally when editing and saving song info (for local song 
+files), when the user adds a file-URI to the Comment: field, Fauxdacious first 
+attempts to store the image data in the file's metatags (along with any other 
+changed tag data).  This will make the cover-art image visible in many other 
+media players, but will usually significantly increase the file's size, which 
+some may find undesirable.  If this option box is checked the image data will 
+not be stored embedded in the file's metatags, but the art-file's URI will 
+remain in the Comment field; and (if the [Save unsavable metadata to file] box 
+is checked) the metadata will be stored in the desired Fauxdacious tag-file.  
+The default is (unchecked) to save the image with the other tag data directly 
+to the file (if possible) as previously (if not then to the tag-file).
+
 Add --enable-gtk3 option to build with GTK-3 and update all code to support 
 both GTK-2 and GTK-3, due to the planned phaseout of GTK-2 support by most 
 distros.

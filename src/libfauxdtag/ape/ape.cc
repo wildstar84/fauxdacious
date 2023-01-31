@@ -468,7 +468,8 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
 
     String comment = tuple.get_str (Tuple::Comment);
     bool wrote_art = false;
-    if (comment && comment[0] && ! strncmp ((const char *) comment, "file://", 7))
+    if (comment && comment[0] && ! strncmp ((const char *) comment, "file://", 7)
+            && ! aud_get_bool (nullptr, "dont_embed_images"))
     {
         const char * comment_ptr = (const char *) comment;
         const char * sep = strstr (comment_ptr, ";file://");
@@ -484,9 +485,7 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
                 if (wrote_art)
                 {
                     items ++;
-                    if (sep)  // WE MAY HAVE A SECOND (CHANNEL) ART IMAGE, WRITE THAT TO COMMENT FIELD (";file:.."):
-                        write_string_value (sep, handle, "Comment", & length, & items);
-
+                    write_string_value (sep, handle, "Comment", & length, & items);
                     aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
                 }
             }
