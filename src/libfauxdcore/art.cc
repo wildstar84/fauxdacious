@@ -351,7 +351,8 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
         else
         {
             art_item_unref_locked (item);
-            return nullptr;
+            item = nullptr;
+            return item;
         }
     }
 

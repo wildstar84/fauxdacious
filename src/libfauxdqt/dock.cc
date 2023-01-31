@@ -170,6 +170,7 @@ EXPORT void register_dock_host(DockHost * host)
     assert(!s_host);
     s_host = host;
 
+    aud_set_bool("audqt", "_dock_host_registered", true);  // JWT:NEEDED TO PREVENT CALLING main_window:m_infobar->setVisible AFTER DESTROYED!
     if (aud_get_bool("audqt", "eq_presets_visible"))
         eq_presets_show();
     if (aud_get_bool("audqt", "equalizer_visible"))
@@ -195,6 +196,7 @@ EXPORT void register_dock_host(DockHost * host)
 
 EXPORT void unregister_dock_host()
 {
+    aud_set_bool("audqt", "_dock_host_registered", false);  // JWT:NEEDED TO PREVENT CALLING main_window:m_infobar->setVisible AFTER DESTROYED!
     assert(s_host);
 
     hook_dissociate("dock plugin enabled", add_dock_plugin);
