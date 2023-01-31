@@ -469,47 +469,47 @@ EXPORT void InfoBar::update_album_art ()
     /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY "CHANNEL ART" ICON FILE INSTEAD: */
     if (noChannelArt)
     {
-	    if (filename && ! strncmp (filename, "file://", 7)  // JWT:SOMETIMES NULL ON GTK-STARTUP, BUT TEST HERE TOO!
-	            && aud_get_bool ("albumart", "seek_directory_channel_art"))
-	    {
-	        /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY CHANNEL ART ICON FILE: */
-	        String dir_channel_icon = aud_get_str ("albumart", "directory_channel_art");
-	        if (dir_channel_icon && dir_channel_icon[0])
-	        {
-	            struct stat statbuf;
-	            StringBuf icon_path = str_concat ({filename_get_parent (uri_to_filename (filename)), "/"});
-	            StringBuf icon_fid = str_concat ({icon_path, dir_channel_icon});
-	            const char * filename;
-	            const char * ext;
-	            int isub_p;
-	            uri_parse (icon_fid, & filename, & ext, nullptr, & isub_p);
-	            if (! ext || ! ext[0])
-	            {
-	                Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
-	                for (auto & ext : extlist)
-	                {
-	                    dir_channel_icon = String (str_concat ({icon_fid, ".", (const char *) ext}));
-	                    struct stat statbuf;
-	                    if (stat ((const char *) dir_channel_icon, &statbuf) < 0)  // ART IMAGE FILE DOESN'T EXIST:
-	                        dir_channel_icon = String ("");
-	                    else
-	                        break;
-	                }
-	            }
-	            else
-	                dir_channel_icon = String (icon_fid);
+        if (filename && ! strncmp (filename, "file://", 7)  // JWT:SOMETIMES NULL ON GTK-STARTUP, BUT TEST HERE TOO!
+                && aud_get_bool ("albumart", "seek_directory_channel_art"))
+        {
+            /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY CHANNEL ART ICON FILE: */
+            String dir_channel_icon = aud_get_str ("albumart", "directory_channel_art");
+            if (dir_channel_icon && dir_channel_icon[0])
+            {
+                struct stat statbuf;
+                StringBuf icon_path = str_concat ({filename_get_parent (uri_to_filename (filename)), "/"});
+                StringBuf icon_fid = str_concat ({icon_path, dir_channel_icon});
+                const char * filename;
+                const char * ext;
+                int isub_p;
+                uri_parse (icon_fid, & filename, & ext, nullptr, & isub_p);
+                if (! ext || ! ext[0])
+                {
+                    Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
+                    for (auto & ext : extlist)
+                    {
+                        dir_channel_icon = String (str_concat ({icon_fid, ".", (const char *) ext}));
+                        struct stat statbuf;
+                        if (stat ((const char *) dir_channel_icon, &statbuf) < 0)  // ART IMAGE FILE DOESN'T EXIST:
+                            dir_channel_icon = String ("");
+                        else
+                            break;
+                    }
+                }
+                else
+                    dir_channel_icon = String (icon_fid);
 
-	            if (dir_channel_icon && dir_channel_icon[0] && stat ((const char *) dir_channel_icon, & statbuf) == 0)
-	            {
-	                dir_icon_art = audqt::art_request ((const char *) dir_channel_icon, ps.IconSize, ps.IconSize);
-	                if (! dir_icon_art.isNull ())
-	                    have_dir_icon_art = true;
-	            }
-	        }
-	    }
+                if (dir_channel_icon && dir_channel_icon[0] && stat ((const char *) dir_channel_icon, & statbuf) == 0)
+                {
+                    dir_icon_art = audqt::art_request ((const char *) dir_channel_icon, ps.IconSize, ps.IconSize);
+                    if (! dir_icon_art.isNull ())
+                        have_dir_icon_art = true;
+                }
+            }
+        }
         sd[Cur].art = (have_dir_icon_art && albumart_plugin_isactive) ? dir_icon_art
                 : audqt::art_request_current (ps.IconSize, ps.IconSize);
-	}
+    }
     aud_set_bool ("albumart", "_have_channel_art", ! (noChannelArt && ! have_dir_icon_art)); // TELL AlbumArt PLUGIN.
     if (sd[Cur].art.isNull () && have_dir_icon_art && ! albumart_plugin_isactive)
         sd[Cur].art = dir_icon_art;
