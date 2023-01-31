@@ -301,7 +301,10 @@ EXPORT void InfoBar::paintEvent (QPaintEvent *)
                     if (item)
                         m_dockwidget = (QDockWidget *) item->host_data ();  // GOT IT!
                     else
-                        m_dockwidget = nullptr;  // DIDN'T GET IT (NOT ALWAYS IMMEDATELY AVAILABLE)!
+                    {
+                        m_dockwidget = nullptr;   // DIDN'T GET IT (NOT ALWAYS IMMEDATELY AVAILABLE)!:
+                        m_art_force_dups = true;  // SO WE CAN'T TELL DOCK-STATUS, SO TREAT AS UNDOCKED.
+                    }
                 }
             }
             /* JWT:FORCE ENABLED ON UNDOCKED (FLOATING) MINI-FAUXDACIOUS AND ONLY HIDDEN B/C OF DUP. ART!: */
@@ -375,8 +378,8 @@ EXPORT void InfoBar::update_album_art ()
     if (! infobar_active)
         return;
 
-    bool noAltArt = true;
-    bool have_dir_icon_art = false;
+    bool noChannelArt = true;
+    bool have_dir_icon_art = false;  /* JWT:BECOMES TRUE IF ENTRY IS FILE AND A DIRECTORY-ICON IS FOUND. */
     bool albumart_plugin_isactive = aud_get_bool ("albumart", "_isactive");
     QPixmap dir_icon_art;
     const char * filename = aud_drct_get_filename ();
@@ -388,6 +391,15 @@ EXPORT void InfoBar::update_album_art ()
         String tfld = tuple.get_str (Tuple::Comment);
         if (tfld && tfld[0])
         {
+            /* NOTE:  ANY "CHANNEL ICON" FILE URI WILL ALWAYS BE IN THE TUPLE COMMENT UNLESS
+               WE'RE A STREAM AND THE COMMENT FIELD HAS SOMETHING ELSE NON-BLANK IN IT!  THIS
+               IS BECAUSE IF A STREAM HAS CHANNEL ART, IT CAME FROM THE URL HELPER AND WILL BE
+               THERE UNLESS THE STREAM'S STREAMING METADATA OVERWRITES IT WITH AN ACTUAL
+               "COMMENT", THEN IT MUST BE IN tmp_tag_data:
+               PROGRAMMER NOTE:  THIS ONLY APPLIES TO "one-off" PODCASTS & VIDEOS, B/C STREAMING
+               STATIONS, ETC. ONLY PROVIDE AN ICON FOR THE STATION, WHICH BECOMES THE CHANNEL-
+               ICON WHEN albumart PLUGIN FINDS A MAIN IMAGE FOR THE CURRENTLY-PLAYING SONG.
+            */
             const char * tfld_offset = strstr ((const char *) tfld, ";file://");
             if (tfld_offset)
             {
@@ -397,52 +409,54 @@ EXPORT void InfoBar::update_album_art ()
                 {
                     sd[Cur].art = audqt::art_request (tfld_offset, ps.IconSize, ps.IconSize);
                     if (! sd[Cur].art.isNull ())
-                        noAltArt = false;
+                        noChannelArt = false;
                 }
             }
-            else  /* NO CHANNEL ICON IN COMMENT (OVERWRITTEN BY STREAM METATAGS?), SO CHECK tmp_tag_data: */
-            {     /* (THIS ONLY APPLIES TO STREAMING VIDEOS/PODCASTS, WHICH ALWAYS PUT IT THERE) */
-                if (filename && aud_read_tag_from_tagfile (filename, "tmp_tag_data", tuple))
+            else if (filename && aud_read_tag_from_tagfile (filename, "tmp_tag_data", tuple)
+                    && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
+            {
+                /* STREAM COMMENT WITHOUT CHANNEL ICON (OVERWRITTEN BY STREAM'S METATAGS?),
+                   (THIS ONLY APPLIES TO STREAMING VIDEOS/PODCASTS, WHICH ALWAYS PUT IT THERE)
+                   SO CHECK tmp_tag_data:
+                */
+                String tfld = tuple.get_str (Tuple::Comment);
+                if (tfld && tfld[0])
                 {
-                    String tfld = tuple.get_str (Tuple::Comment);
-                    if (tfld && tfld[0])
+                    /* THERE'S A COMMENT BUT NO ART FILE IN IT (IE. RUMBLE.COM STREAMS HAVE A COMMENT): */
+                    const char * tfld_offset = strstr ((const char *) tfld, ";file://");
+                    if (tfld_offset)
                     {
-                        /* THERE'S A COMMENT BUT NO ART FILE IN IT (IE. RUMBLE.COM STREAMS HAVE A COMMENT): */
-                        const char * tfld_offset = strstr ((const char *) tfld, ";file://");
+                        tfld_offset += 1;
                         if (tfld_offset)
                         {
-                            tfld_offset += 1;
-                            if (tfld_offset)
-                            {
-                                sd[Cur].art = audqt::art_request (tfld_offset, ps.IconSize, ps.IconSize);
-                                if (! sd[Cur].art.isNull ())
-                                    noAltArt = false;
-                            }
+                            sd[Cur].art = audqt::art_request (tfld_offset, ps.IconSize, ps.IconSize);
+                            if (! sd[Cur].art.isNull ())
+                                noChannelArt = false;
                         }
                     }
-                    /* FOR tmp_tag_data (1-OFF) STREAMS W/O CHANNEL-ART, CHECK FOR (CHANNEL) ARTIST'S ICON FILE: */
-                    if (noAltArt && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
+                }
+                /* FOR tmp_tag_data (1-OFF) STREAMS W/O CHANNEL-ART, CHECK FOR (CHANNEL) ARTIST'S ICON FILE: */
+                if (noChannelArt)
+                {
+                    String artist_tag = tuple.get_str (Tuple::Artist);
+                    if (artist_tag && artist_tag[0])
                     {
-                        String artist_tag = tuple.get_str (Tuple::Artist);
-                        if (artist_tag && artist_tag[0])
+                        Index<String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
+                        for (auto & ext : extlist)
                         {
-                            Index<String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
-                            for (auto & ext : extlist)
+                            String channelfn = String (str_concat ({aud_get_path (AudPath::UserDir),
+                                    "/albumart/", (const char *) artist_tag, ".", (const char *) ext}));
+                            const char * filenamechar = channelfn;
+                            struct stat statbuf;
+                            if (stat (filenamechar, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
                             {
-                                String channelfn = String (str_concat ({aud_get_path (AudPath::UserDir),
-                                        "/albumart/", (const char *) artist_tag, ".", (const char *) ext}));
-                                const char * filenamechar = channelfn;
-                                struct stat statbuf;
-                                if (stat (filenamechar, &statbuf) >= 0)  // ART IMAGE FILE EXISTS:
+                                String coverart_uri = String (filename_to_uri (filenamechar));
+                                sd[Cur].art = audqt::art_request ((const char *) coverart_uri,
+                                        ps.IconSize, ps.IconSize);
+                                if (! sd[Cur].art.isNull ())
                                 {
-                                    String coverart_uri = String (filename_to_uri (filenamechar));
-                                    sd[Cur].art = audqt::art_request ((const char *) coverart_uri,
-                                            ps.IconSize, ps.IconSize);
-                                    if (! sd[Cur].art.isNull ())
-                                    {
-                                        noAltArt = false;
-                                        break;
-                                    }
+                                    noChannelArt = false;
+                                    break;
                                 }
                             }
                         }
@@ -452,49 +466,51 @@ EXPORT void InfoBar::update_album_art ()
         }
     }
 
-    if (filename && ! strncmp (filename, "file://", 7)  // JWT:SOMETIMES NULL ON GTK-STARTUP, BUT TEST HERE TOO!
-            && aud_get_bool ("albumart", "seek_directory_channel_art"))
+    /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY "CHANNEL ART" ICON FILE INSTEAD: */
+    if (noChannelArt)
     {
-        /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY CHANNEL ART ICON FILE: */
-        String dir_channel_icon = aud_get_str ("albumart", "directory_channel_art");
-        if (dir_channel_icon && dir_channel_icon[0])
-        {
-            struct stat statbuf;
-            StringBuf icon_path = str_concat ({filename_get_parent (uri_to_filename (filename)), "/"});
-            StringBuf icon_fid = str_concat ({icon_path, dir_channel_icon});
-            const char * filename;
-            const char * ext;
-            int isub_p;
-            uri_parse (icon_fid, & filename, & ext, nullptr, & isub_p);
-            if (! ext || ! ext[0])
-            {
-                Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
-                for (auto & ext : extlist)
-                {
-                    dir_channel_icon = String (str_concat ({icon_fid, ".", (const char *) ext}));
-                    struct stat statbuf;
-                    if (stat ((const char *) dir_channel_icon, &statbuf) < 0)  // ART IMAGE FILE DOESN'T EXIST:
-                        dir_channel_icon = String ("");
-                    else
-                        break;
-                }
-            }
-            else
-                dir_channel_icon = String (icon_fid);
+	    if (filename && ! strncmp (filename, "file://", 7)  // JWT:SOMETIMES NULL ON GTK-STARTUP, BUT TEST HERE TOO!
+	            && aud_get_bool ("albumart", "seek_directory_channel_art"))
+	    {
+	        /* FOR LOCAL FILES W/O CHANNEL ART, LOOK FOR A DIRECTORY CHANNEL ART ICON FILE: */
+	        String dir_channel_icon = aud_get_str ("albumart", "directory_channel_art");
+	        if (dir_channel_icon && dir_channel_icon[0])
+	        {
+	            struct stat statbuf;
+	            StringBuf icon_path = str_concat ({filename_get_parent (uri_to_filename (filename)), "/"});
+	            StringBuf icon_fid = str_concat ({icon_path, dir_channel_icon});
+	            const char * filename;
+	            const char * ext;
+	            int isub_p;
+	            uri_parse (icon_fid, & filename, & ext, nullptr, & isub_p);
+	            if (! ext || ! ext[0])
+	            {
+	                Index<String> extlist = str_list_to_index ("jpg,png,jpeg", ",");
+	                for (auto & ext : extlist)
+	                {
+	                    dir_channel_icon = String (str_concat ({icon_fid, ".", (const char *) ext}));
+	                    struct stat statbuf;
+	                    if (stat ((const char *) dir_channel_icon, &statbuf) < 0)  // ART IMAGE FILE DOESN'T EXIST:
+	                        dir_channel_icon = String ("");
+	                    else
+	                        break;
+	                }
+	            }
+	            else
+	                dir_channel_icon = String (icon_fid);
 
-            if (dir_channel_icon && dir_channel_icon[0] && stat ((const char *) dir_channel_icon, & statbuf) == 0)
-            {
-                dir_icon_art = audqt::art_request ((const char *) dir_channel_icon, ps.IconSize, ps.IconSize);
-                if (! dir_icon_art.isNull ())
-                    have_dir_icon_art = true;
-            }
-        }
-    }
-    aud_set_bool ("albumart", "_have_channel_art", ! (noAltArt && ! have_dir_icon_art)); // TELL AlbumArt PLUGIN.
-    if (noAltArt)
+	            if (dir_channel_icon && dir_channel_icon[0] && stat ((const char *) dir_channel_icon, & statbuf) == 0)
+	            {
+	                dir_icon_art = audqt::art_request ((const char *) dir_channel_icon, ps.IconSize, ps.IconSize);
+	                if (! dir_icon_art.isNull ())
+	                    have_dir_icon_art = true;
+	            }
+	        }
+	    }
         sd[Cur].art = (have_dir_icon_art && albumart_plugin_isactive) ? dir_icon_art
                 : audqt::art_request_current (ps.IconSize, ps.IconSize);
-
+	}
+    aud_set_bool ("albumart", "_have_channel_art", ! (noChannelArt && ! have_dir_icon_art)); // TELL AlbumArt PLUGIN.
     if (sd[Cur].art.isNull () && have_dir_icon_art && ! albumart_plugin_isactive)
         sd[Cur].art = dir_icon_art;
 
