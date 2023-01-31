@@ -278,7 +278,7 @@ bool ID3v22TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
             id3_associate_string (tuple, Tuple::Publisher, & frame[0], frame.len ());
             break;
           case ID3_COMMENT:
-            id3_decode_comment (tuple, & frame[0], frame.len ());
+            id3_decode_memo (tuple, Tuple::Comment, & frame[0], frame.len ());
             break;
           case ID3_RVA:
             id3_decode_rva (tuple, & frame[0], frame.len ());
@@ -288,7 +288,7 @@ bool ID3v22TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
                 * image = id3_decode_picture (& frame[0], frame.len (), 2);
             break;
           case ID3_LYRICS:
-            id3_decode_lyrics (tuple, & frame[0], frame.len ());
+            id3_decode_memo (tuple, Tuple::Lyrics, & frame[0], frame.len ());
             break;
           default:
             AUDDBG ("Ignoring unsupported ID3 frame %s.\n", (const char *) frame.key);

@@ -495,53 +495,29 @@ static void add_text_frame (int id, const char * text, FrameDict & dict)
     g_free (utf16);
 }
 
-static void add_comment_frame (const char * text, FrameDict & dict)
+static void add_memo_frame (int id, const char * text, FrameDict & dict)
 {
     if (! text)
     {
-        remove_frame (ID3_COMMENT, dict);
+        remove_frame (id, dict);
         return;
     }
-
-    AUDDBG ("Adding comment frame = %s.\n", text);
 
     long words;
     uint16_t * utf16 = g_utf8_to_utf16 (text, -1, nullptr, & words, nullptr);
     g_return_if_fail (utf16);
 
-    GenericFrame & frame = add_generic_frame (ID3_COMMENT, 10 + 2 * words, dict);
+    String lng = aud_get_str ("audacious", "language");
+    if (! lng || ! lng[0] || ! lng[2])
+        lng = String ("eng");
 
-    frame[0] = 1;                              /* UTF-16 encoding */
-    memcpy (& frame[1], "eng", 3);             /* language */
-    * (uint16_t *) (& frame[4]) = 0xfeff;      /* byte order mark */
-    * (uint16_t *) (& frame[6]) = 0;           /* end of content description */
-    * (uint16_t *) (& frame[8]) = 0xfeff;      /* byte order mark */
-    memcpy (& frame[10], utf16, 2 * words);
+    GenericFrame & frame = add_generic_frame (id, 10 + 2 * words, dict);
 
-    g_free (utf16);
-}
-
-static void add_lyrics_frame (const char * text, FrameDict & dict)
-{
-    if (! text)
-    {
-        remove_frame (ID3_LYRICS, dict);
-        return;
-    }
-
-    AUDDBG ("Adding lyrics frame = %s.\n", text);
-
-    long words;
-    uint16_t * utf16 = g_utf8_to_utf16 (text, -1, nullptr, & words, nullptr);
-    g_return_if_fail (utf16);
-
-    GenericFrame & frame = add_generic_frame (ID3_LYRICS, 10 + 2 * words, dict);
-
-    frame[0] = 1;                              /* UTF-16 encoding */
-    memcpy (& frame[1], "eng", 3);             /* language */
-    * (uint16_t *) (& frame[4]) = 0xfeff;      /* byte order mark */
-    * (uint16_t *) (& frame[6]) = 0;           /* end of content description */
-    * (uint16_t *) (& frame[8]) = 0xfeff;      /* byte order mark */
+    frame[0] = 1;                               /* UTF-16 encoding */
+    memcpy (& frame[1], (const char *) lng, 3); /* language */
+    * (uint16_t *) (& frame[4]) = 0xfeff;       /* byte order mark */
+    * (uint16_t *) (& frame[6]) = 0;            /* end of content description */
+    * (uint16_t *) (& frame[8]) = 0xfeff;       /* byte order mark */
     memcpy (& frame[10], utf16, 2 * words);
 
     g_free (utf16);
@@ -654,7 +630,7 @@ bool ID3v24TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
             id3_decode_genre (tuple, & frame[0], frame.len ());
             break;
           case ID3_COMMENT:
-            id3_decode_comment (tuple, & frame[0], frame.len ());
+            id3_decode_memo (tuple, Tuple::Comment, & frame[0], frame.len ());
             break;
           case ID3_TXXX:
             id3_decode_txxx (tuple, & frame[0], frame.len ());
@@ -667,7 +643,7 @@ bool ID3v24TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
                 * image = id3_decode_picture (& frame[0], frame.len (), 4);
             break;
           case ID3_LYRICS:
-            id3_decode_lyrics (tuple, & frame[0], frame.len ());
+            id3_decode_memo (tuple, Tuple::Lyrics, & frame[0], frame.len ());
             break;
           default:
             AUDDBG ("Ignoring unsupported ID3 frame %s.\n", (const char *) frame.key);
@@ -741,19 +717,17 @@ bool ID3v24TagModule::write_tag (VFSFile & f, const Tuple & tuple)
                 mustpreservelength = true;
                 wrote_art = true;
                 aud_set_bool (nullptr, "_user_tag_skipthistime", true);  /* JWT:SKIP DUP. TO user_tag_data. */
-                add_comment_frame (sep, dict);  // EAT 1ST IMG. URI, BUT SAVE THE 2ND ONE (CHANNEL IMG).
+                add_memo_frame (ID3_COMMENT, sep, dict);  // EAT 1ST IMG. URI, BUT SAVE THE 2ND ONE (CHANNEL IMG).
             }
         }
     }
     if (! wrote_art)
-        add_comment_frame (comment, dict);
+        add_memo_frame (ID3_COMMENT, comment, dict);
 
     String lyrics = tuple.get_str (Tuple::Lyrics);
-    if (lyrics && lyrics[9])
-    {
-        add_lyrics_frame (lyrics, dict);
+    add_memo_frame (ID3_LYRICS, lyrics, dict);
+    if (lyrics && lyrics[0])
         mustpreservelength = true;
-    }
 
     if (mustpreservelength)
     {
