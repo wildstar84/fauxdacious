@@ -165,6 +165,28 @@ static String fileinfo_recursive_get_image (const char * path,
 
 String art_search (const char * filename, Tuple & tuple)
 {
+    /* JWT:FIRST CHECK TUPLE.COMMENT: */
+    String tfld = tuple.get_str (Tuple::Comment);
+    Index<String> extlist = str_list_to_index ("jpg,png,jpeg,gif,com,webp", ",");
+    const char * tfld_charptr = (const char *) tfld;
+    if (tfld_charptr && ! strncmp (tfld_charptr, "file://", 7))  // TAG FILE COMMENT CONTAINS A FILE (ASSUME IMG!)!
+    {
+        const char * sep = strstr (tfld_charptr, ";");  // IF "file1;file2" ONLY EXTRACT "file1"!:
+        String art_file = sep ? String (str_printf ("%.*s", (int)(sep - tfld_charptr), tfld_charptr)) : tfld;
+        if (art_file && art_file[0])
+        {
+            String ext = String (uri_get_extension (art_file));
+            for (auto & tryext : extlist)
+            {
+                if (strcmp_nocase (ext, tryext))
+                    continue;
+
+                return art_file;
+            }
+        }
+    }
+
+    /* NEXT, TRY ALL THE USUAL AUDACIOUS OPTIONS: */
     StringBuf local = uri_to_filename (filename);
     if (! local)
         return String ();
@@ -264,7 +286,6 @@ String art_search (const char * filename, Tuple & tuple)
         str_replace_char (albart_FN, '~', ' ');  // JWT:UNPROTECT SPACES!
 
         String coverart_file;
-        Index<String> extlist = str_list_to_index ("jpg,png,gif,jpeg", ",");
         for (auto & ext : extlist)
         {
             coverart_file = String (str_concat ({aud_get_path (AudPath::UserDir),
