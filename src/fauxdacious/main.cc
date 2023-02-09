@@ -25,10 +25,10 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <winbase.h>
-#define SDL_MAIN_HANDLED
 #endif
 
 #ifdef USE_SDL2
+#define SDL_MAIN_HANDLED
 #include <libfauxdcore/sdl_window.h>
 #endif
 
