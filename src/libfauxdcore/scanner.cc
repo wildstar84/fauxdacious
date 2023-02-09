@@ -29,7 +29,6 @@
 #include "probe.h"
 #include "tuple.h"
 #include "vfs.h"
-#include "runtime.h"
 
 static GThreadPool * pool;
 
@@ -95,12 +94,8 @@ void ScanRequest::run ()
         if (! aud_file_read_tag (audio_file, decoder, file, rtuple, pimage, & error))
             goto err;
 
-        if (! image_data.len ())
-        {
-            if (need_image)
-                image_file = art_search (audio_file, rtuple);
-
-        }
+        if (need_image && ! image_data.len ())
+            image_file = art_search (audio_file, rtuple);
     }
 
     /* rewind/reopen the input file */

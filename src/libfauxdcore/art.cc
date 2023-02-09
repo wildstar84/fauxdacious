@@ -41,16 +41,13 @@
 #define FLAG_SENT 2
 
 struct AudArtItem {
-    String filename;
+    bool is_temp = false;  /* album art as (possibly a temporary) file */
     int refcount;
     int flag;
-
+    String filename;
+    String art_file;  /* NEEDS TO BE A URI */
     /* album art as JPEG or PNG data */
     Index<char> data;
-
-    /* album art as (possibly a temporary) file */
-    String art_file;
-    bool is_temp;
 };
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -85,7 +82,8 @@ static void send_requests ()
     for (AudArtItem * item : queued)
     {
         hook_call ("art ready", (void *) (const char *) item->filename);
-        aud_art_unref (item); /* release temporary reference */
+        if (item != current_item) // WORK LIKE AUDACIOUS, CURRENT ONE WILL BE UNREFFED ON SONG-CHANGE|STOP!:
+            aud_art_unref (item); /* release temporary reference */
     }
 }
 
@@ -119,7 +117,7 @@ static void art_item_unref_locked (AudArtItem * item)
     if (! -- item->refcount)
     {
         /* delete temporary file */
-        if (item->art_file && item->is_temp)
+        if (item->is_temp && item->art_file && item->art_file[0])
         {
             StringBuf local = uri_to_filename (item->art_file);
             if (local)
@@ -139,7 +137,6 @@ static void clear_current_locked ()
 }
 
 /* JWT:CHECK THE USER TAG FILES, AND FOR WEB URLS: CHECK FOR ART FILE MATCHING BASE URL: */
-
 static int check_tag_file (const String & filename, AudArtItem * item, const char * tagfile, int prevprec)
 {
     /* JWT:LOOK FOR IMAGE IN TAG DATA FILE(S) UNDER "Comment": */
@@ -230,7 +227,7 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
                     if (item->data.len () > 0)
                     {
                         item->art_file = filename;
-                        return 1;  // FILE IS AN IMAGE, SO WE'RE DONE (FLAG_SENT - DON'T BOTHER SENDING "art ready")!
+                        return 2;  // FILE IS AN IMAGE, SO WE'RE DONE (DON'T BOTHER SENDING "art ready")!
                     }
                 }
             }
@@ -294,13 +291,13 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
                     if (stat ((const char *) coverart_file, &statbuf) >= 0)  // ART IMAGE FILE DOESN'T EXIST:
                     {
                         coverart_file = String (filename_to_uri (coverart_file));
-                        item->art_file = coverart_file;
-                        VFSFile file (item->art_file, "r");
+                        VFSFile file (coverart_file, "r");
                         if (file)
                         {
                             item->data = file.read_all ();
                             if (item->data.len () > 0)
                             {
+                                item->art_file = coverart_file;
                                 foundArt = true;
                                 break;
                             }
@@ -314,6 +311,7 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
     return foundArt ? 1 : 0;
 }
 
+/* CALLED WHEN HOVERING OVER ANY PLAYLIST ENTRY (INFO-POPUP ART): */
 static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 {
     if (queued)
@@ -327,6 +325,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 
     if (item && item->flag)
     {
+        /* MUST BE DONE, NOT SENT, HERE ELSE art_item_unref_locked() NOT CALLED, RESULTING IN LEAK!: */
         if (check_for_user_art (filename, item, true) > 0)  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
             item->flag = FLAG_DONE;
 
@@ -343,6 +342,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
         int chkres = check_for_user_art (filename, item, false);
         if (chkres > 0)
         {
+            /* SENT SEEMS 2B OK HERE: */
             item->flag = FLAG_SENT;  // ART FOUND IN TAG FILE, WE'RE DONE, DON'T SCAN NON-PLAYING ENTRY (SLOW)!
             return item;
         }
@@ -362,6 +362,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
     return nullptr;
 }
 
+/* CALLED WHEN PLAYING SONG CHANGES: */
 void art_cache_current (const String & filename, Index<char> && data, String && art_file)
 {
     pthread_mutex_lock (& mutex);
@@ -379,7 +380,6 @@ void art_cache_current (const String & filename, Index<char> && data, String && 
 
     finish_item_locked (item, std::move (data), std::move (art_file));
 
-    item->refcount ++;
     current_item = item;
 
     pthread_mutex_unlock (& mutex);

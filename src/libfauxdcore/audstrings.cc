@@ -619,10 +619,10 @@ EXPORT StringBuf uri_to_filename (const char * uri, bool use_locale)
 {
     StringBuf buf;
 
-    if (! strncmp (uri, URI_PREFIX, URI_PREFIX_LEN))
-        buf = str_decode_percent (uri + URI_PREFIX_LEN);
-    else if (! strstr (uri, "://"))  /* already a local filename? */
+    if (! strstr (uri, "://"))  /* already a local filename? */
         buf = str_copy (uri);
+    else if (! strncmp (uri, URI_PREFIX, URI_PREFIX_LEN))
+        buf = str_decode_percent (uri + URI_PREFIX_LEN);
     else
         return StringBuf ();
 

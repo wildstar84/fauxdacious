@@ -317,9 +317,14 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
         tuple.set_str (Tuple::AlbumArtist, str_decode_percent (instr));
     else
         tuple.unset (Tuple::AlbumArtist);
-    instr = g_key_file_get_string (rcfile, song_filename, "Comment", nullptr);
+    instr = g_key_file_get_value (rcfile, song_filename, "Comment", nullptr);
     if (instr)
-        tuple.set_str (Tuple::Comment, str_decode_percent (instr));
+    {
+        if (strstr ((const char *) instr, "file://"))
+            tuple.set_str (Tuple::Comment, instr);   // JWT:DON'T DECODE COMMENT IMAGE FILEPATHS!
+        else
+            tuple.set_str (Tuple::Comment, str_decode_percent (instr));
+    }
     else
         tuple.unset (Tuple::Comment);
     instr = g_key_file_get_string (rcfile, song_filename, "Composer", nullptr);
@@ -390,10 +395,9 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
 
     Tuple tuples[4];   // THE TUPLES FROM EACH OF THE POTENTIAL TAG FILES.
     Tuple song_tuple;  // THE TUPLE FROM THE ENTRY'S EMBEDDED ID3, ETC. TAGS.
-    Tuple * override_tuple = nullptr; // POINTER TO TUPLE IF HIGHEST PRIORITY TAG FILE W/"OVERRIDE" SET, IF ANY.
-    int highest_mode = 0;    // HIGHEST PRECEDENCE FOUND IN TAG FILES (0=NONE FOUND, 1=DEFAULT, 2=OVERRIDE, 3=ONLY.
     int from[4] = {0,0,0,0}; // PRECEDENCE FOUND IN EACH TAG FILE.
     bool usrtag = aud_get_bool (nullptr, "user_tag_data"); // ARE WE ALLOWED TO LOOK FOR TAG FILES?
+    bool fileorNOTstdin = file || strncmp (filename, "stdin://", 8);  // JWT:IF stdin, MUST HAVE OPEN FILEHANDLE!
     String individual_tag_file = String ("");  // ./song_filename.tag (local files only)
     String dir_tag_file = String ("");         // ./user_tag_data.tag (directory-wide tag file - local files only)
     String filename_only = String ("");        // "song_filename" (no path or extension - local files only)
@@ -407,26 +411,29 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
         dir_tag_file = String (filename_to_uri (str_concat ({path, "/user_tag_data.tag"})));
         individual_tag_file = String (filename_to_uri (str_concat ({path, "/", filename_only, ".tag"})));
     }
-    /* JWT:blacklist stdin - read_tag does seekeys. :(  if (ip->read_tag (filename, file, song_tuple, image)) */
+
     /* NOTE:TRY EACH CASE, *STOPPING* WHEN ONE RETURNS >2 ("ONLY")!:
        (IF NONE ARE "ONLY", WE TRY ALL CASES, THEN FIND THE FIRST TAG FILE (IF ANY) IN LOOP JUST BELOW - 
        THIS IS SO WE ALSO GET THE ENTRY'S EMBEDDED TAG DATA AS THE STARTING DEFAULT (UNNEEDED IF "ONLY" FOUND)).
        WHEN SUCCESSFUL FETCHING FROM TAG FILE, IT RETURNS TRUE ONLY IF THE "PRECEDENCE" == "ONLY" (3),
-       OTHERWISE, WE KEEP PROCESSING THE CONDITIONS UNTIL AT LAST WE FETCH (ANY UNSET) TAGS FROM THE FILE ITSELF. */
-    bool fileorNOTstdin = file || strncmp (filename, "stdin://", 8);  // JWT:IF stdin, MUST HAVE OPEN FILEHANDLE!
-
+       OTHERWISE, WE KEEP PROCESSING THE CONDITIONS UNTIL AT LAST WE FETCH (ANY UNSET) TAGS FROM THE FILE ITSELF.
+       TAG-FILE PRECEDENCE IS (from[i]):  0:tmp_tag_data, 1:<entry-file>.tag, 2:directory tagfile, 3:user_tag_data.
+    */
     if ((usrtag && (from[0] = aud_read_tag_from_tagfile (filename, "tmp_tag_data", tuples[0])) > 2)
             || (individual_tag_file[0] && (from[1] = aud_read_tag_from_tagfile (filename_only, individual_tag_file, tuples[1])) > 2)
             || (dir_tag_file[0] && (from[2] = aud_read_tag_from_tagfile (filename_only, dir_tag_file, tuples[2])) > 2)
             || (usrtag && (from[3] = aud_read_tag_from_tagfile (filename, "user_tag_data", tuples[3])) > 2)
             || (fileorNOTstdin && ip->read_tag (filename, file, song_tuple, image)))
     {
-        for (int i=0;i<4;i++)  /* HIGH TO LOW PRIORITY */
+        int highest_mode = 0;    // HIGHEST PRECEDENCE FOUND IN TAG FILES (0=NONE FOUND, 1=DEFAULT, 2=OVERRIDE, 3=ONLY.
+        int override_tuple = -1; // INDEX OF TUPLE IF HIGHEST PRIORITY TAG FILE W/"OVERRIDE" SET, IF ANY.
+        for (int i=0;i<4;i++)  /* HIGH TO LOW PRIORITY: */
         {
             if (from[i] >= 1)  /* USE MATCHING TAG FILE W/HIGHEST PRECEDENCE, (HIGHEST PRIORITY IF TIE) */
             {
                 if (from[i] > highest_mode)
-                    override_tuple = & tuples[i];
+                    override_tuple = i;
+
                 highest_mode = from[i];
                 AUDINFO ("Tag data source# %d, mode=%d (Only 1st src. w/highest mode used!).\n", i, highest_mode);
             }
@@ -435,13 +442,13 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
         // cleanly replace existing tuple from file's ID3
         song_tuple.set_state (Tuple::Valid);
 
-        if (highest_mode > 2 && override_tuple)  // 3 - (ONLY) - GOT ALL DATA FROM FILE, ONLY USE THAT (RETAIN START TIME & LENGTH, IF SET BY read_tag())!
-        {
+        if (highest_mode > 2 && override_tuple >= 0)  // 3 - (ONLY) - GOT ALL DATA FROM FILE, ONLY USE THAT!
+        {   /* (BUT RETAIN START TIME & LENGTH, IF SET BY read_tag()) */
             int startTime = tuple.is_set (Tuple::StartTime) ? tuple.get_int (Tuple::StartTime) : -1;
             int tupleLength = tuple.is_set (Tuple::Length) ? tuple.get_int (Tuple::Length) : -1;
-            override_tuple->set_filename (filename);
-            override_tuple->set_state (Tuple::Valid);
-            tuple = std::move (* override_tuple);
+            tuples[override_tuple].set_filename (filename);
+            tuples[override_tuple].set_state (Tuple::Valid);
+            tuple = std::move (tuples[override_tuple]);
             // JWT:TAG FILES PBLY. DON'T HAVE START TIME OR LENGTH, SO IGNORE THE "ONLY" RULE FOR THOSE!:
             if (tupleLength <= 0 && fileorNOTstdin && ip->read_tag (filename, file, song_tuple, image))
             {
@@ -454,134 +461,134 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             if (startTime > 0)
                 tuple.set_int (Tuple::StartTime, startTime);
         }
-        else if (highest_mode > 0 && override_tuple)  // (1 OR 2) TAG FILE(S) FOUND (ALL DEFAULT OR OVERRIDE):
+        else if (highest_mode > 0 && override_tuple >= 0)  // (1 OR 2) TAG FILE(S) FOUND (ALL DEFAULT OR OVERRIDE):
         {
             int i_tfld;
-            const char * tfld;
             tuple = std::move (song_tuple);  // NOTE: THIS *MOVES*, NOT COPIES song_tuple!!! START OUT WITH ALL THE read_tag() DATA.
             if (highest_mode == 2)  // 2 - (OVERRIDE) - REPLACE ONLY TAG FIELDS THAT ARE ALSO FOUND IN THE PRIMARY TAG FILE:
             {
-                tfld = (const char *) override_tuple->get_str (Tuple::Title);
-                if (tfld)
+                String tfld;
+                tfld = tuples[override_tuple].get_str (Tuple::Title);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Title, tfld);  // OVERRIDE TITLE WITH TITLE FROM THE PRIMARY TAG FILE...
-                tfld = (const char *) override_tuple->get_str (Tuple::Artist);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::Artist);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Artist, tfld);
-                tfld = (const char *) override_tuple->get_str (Tuple::Album);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::Album);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Album, tfld);
-                tfld = (const char *) override_tuple->get_str (Tuple::AlbumArtist);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::AlbumArtist);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::AlbumArtist, tfld);
-                tfld = (const char *) override_tuple->get_str (Tuple::Comment);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::Comment);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Comment, tfld);
-                tfld = (const char *) override_tuple->get_str (Tuple::Composer);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::Composer);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Composer, tfld);
-                tfld = (const char *) override_tuple->get_str (Tuple::Performer);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::Performer);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Performer, tfld);
-                tfld = (const char *) override_tuple->get_str (Tuple::Genre);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::Genre);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Genre, tfld);
-                i_tfld = override_tuple->get_int (Tuple::Year);
+                i_tfld = tuples[override_tuple].get_int (Tuple::Year);
                 if (i_tfld && i_tfld >= 0)
                     tuple.set_int (Tuple::Year, i_tfld);
-                i_tfld = override_tuple->get_int (Tuple::Track);
+                i_tfld = tuples[override_tuple].get_int (Tuple::Track);
                 if (i_tfld && i_tfld >= 0)
                     tuple.set_int (Tuple::Track, i_tfld);
-                i_tfld = override_tuple->is_set (Tuple::Length) ? override_tuple->get_int (Tuple::Length) : -1;
+                i_tfld = tuples[override_tuple].is_set (Tuple::Length) ? tuples[override_tuple].get_int (Tuple::Length) : -1;
                 if (i_tfld && i_tfld >= 0)
                     tuple.set_int (Tuple::Length, i_tfld);
-                tfld = (const char *) override_tuple->get_str (Tuple::Lyrics);
-                if (tfld)
+                tfld = tuples[override_tuple].get_str (Tuple::Lyrics);
+                if (tfld && tfld[0])
                     tuple.set_str (Tuple::Lyrics, tfld);
             }
             else  // 1 - (DEFAULT) - REPLACE ONLY EMPTY(MISSING) TAG FIELDS WITH THE HIGHEST PRIORITY DEFAULT FOUND:
             {
-                tfld = (const char *) tuple.get_str (Tuple::Title);
-                if (! tfld)
+                String tfld = tuple.get_str (Tuple::Title);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Title);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Title);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Title, tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::Artist);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::Artist);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Artist);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Artist);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Artist, tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::Album);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::Album);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Album);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Album);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Album, tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::AlbumArtist);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::AlbumArtist);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::AlbumArtist);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::AlbumArtist);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::AlbumArtist, tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::Comment);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::Comment);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Comment);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Comment);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Comment, tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::Composer);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::Composer);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Composer);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Composer);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Composer, tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::Performer);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::Performer);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Performer);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Performer);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Performer, tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::Genre);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::Genre);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Genre);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Genre);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Genre, tfld);
                 }
                 i_tfld = tuple.get_int (Tuple::Year);
                 if (i_tfld < 0)
                 {
-                    i_tfld = override_tuple->get_int (Tuple::Year);
+                    i_tfld = tuples[override_tuple].get_int (Tuple::Year);
                     if (i_tfld >= 0)
                         tuple.set_int (Tuple::Year, i_tfld);
                 }
                 i_tfld = tuple.get_int (Tuple::Track);
                 if (i_tfld < 0)
                 {
-                    i_tfld = override_tuple->get_int (Tuple::Track);
+                    i_tfld = tuples[override_tuple].get_int (Tuple::Track);
                     if (i_tfld >= 0)
                         tuple.set_int (Tuple::Track, i_tfld);
                 }
                 i_tfld = tuple.is_set (Tuple::Length) ? tuple.get_int (Tuple::Length) : -1;
                 if (i_tfld < 0)
                 {
-                    i_tfld = override_tuple->is_set (Tuple::Length) ? override_tuple->get_int (Tuple::Length) : -1;
+                    i_tfld = tuples[override_tuple].is_set (Tuple::Length) ? tuples[override_tuple].get_int (Tuple::Length) : -1;
                     if (i_tfld >= 0)
                         tuple.set_int (Tuple::Length, i_tfld);
                 }
-                tfld = (const char *) tuple.get_str (Tuple::Lyrics);
-                if (! tfld)
+                tfld = tuple.get_str (Tuple::Lyrics);
+                if (! tfld || ! tfld[0])
                 {
-                    tfld = (const char *) override_tuple->get_str (Tuple::Lyrics);
-                    if (tfld)
+                    tfld = tuples[override_tuple].get_str (Tuple::Lyrics);
+                    if (tfld && tfld[0])
                         tuple.set_str (Tuple::Lyrics, tfld);
                 }
             }
@@ -598,18 +605,12 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 tuple.set_int (Tuple::StartTime, startTime);
         }
 
-        filename_only = String ("");
-        dir_tag_file = String ("");
-        individual_tag_file = String ("");
         return true;
     }
 
     if (error)
         * error = String (_("Error reading metadata"));
 
-    filename_only = String ("");
-    dir_tag_file = String ("");
-    individual_tag_file = String ("");
     return false;
 }
 
@@ -652,42 +653,42 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
 
     g_free (precedence);
 
-    const char * tfld;
+    String tfld;
     int i_tfld;
 
-    tfld = (const char *) tuple.get_str (Tuple::Title);
+    tfld = tuple.get_str (Tuple::Title);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Title", tfld);
-    tfld = (const char *) tuple.get_str (Tuple::Artist);
+        g_key_file_set_string (rcfile, song_key_const, "Title", (const char *) tfld);
+    tfld = tuple.get_str (Tuple::Artist);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Artist", tfld);
-    tfld = (const char *) tuple.get_str (Tuple::Album);
+        g_key_file_set_string (rcfile, song_key_const, "Artist", (const char *) tfld);
+    tfld = tuple.get_str (Tuple::Album);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Album", tfld);
-    tfld = (const char *) tuple.get_str (Tuple::AlbumArtist);
+        g_key_file_set_string (rcfile, song_key_const, "Album", (const char *) tfld);
+    tfld = tuple.get_str (Tuple::AlbumArtist);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "AlbumArtist", tfld);
-    tfld = (const char *) tuple.get_str (Tuple::Comment);
+        g_key_file_set_string (rcfile, song_key_const, "AlbumArtist", (const char *) tfld);
+    tfld = tuple.get_str (Tuple::Comment);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Comment", tfld);
-    tfld = (const char *) tuple.get_str (Tuple::Composer);
+        g_key_file_set_string (rcfile, song_key_const, "Comment", (const char *) tfld);
+    tfld = tuple.get_str (Tuple::Composer);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Composer", tfld);
-    tfld = (const char *) tuple.get_str (Tuple::Performer);
+        g_key_file_set_string (rcfile, song_key_const, "Composer", (const char *) tfld);
+    tfld = tuple.get_str (Tuple::Performer);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Performer", tfld);
-    tfld = (const char *) tuple.get_str (Tuple::Genre);
+        g_key_file_set_string (rcfile, song_key_const, "Performer", (const char *) tfld);
+    tfld = tuple.get_str (Tuple::Genre);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Genre", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "Genre", (const char *) tfld);
     i_tfld = tuple.get_int (Tuple::Year);
     if (i_tfld)
         g_key_file_set_double (rcfile, song_key_const, "Year", i_tfld);
     i_tfld = tuple.get_int (Tuple::Track);
     if (i_tfld)
         g_key_file_set_double (rcfile, song_key_const, "Track", i_tfld);
-    tfld = (const char *) tuple.get_str (Tuple::Lyrics);
+    tfld = tuple.get_str (Tuple::Lyrics);
     if (tfld)
-        g_key_file_set_string (rcfile, song_key_const, "Lyrics", tfld);
+        g_key_file_set_string (rcfile, song_key_const, "Lyrics", (const char *) tfld);
 
     size_t len;
     char * data = g_key_file_to_data (rcfile, & len, nullptr);

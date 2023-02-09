@@ -330,8 +330,8 @@ Index<char> id3_decode_picture (const char * data, int size, int tagvsn)
 
     int image_size = body_size - after_nul2;
 
-    AUDDBG ("Picture: mime = %s, type = %d, desc = %s, size = %d.\n", mime,
-            type, (const char *) desc, image_size);
+    AUDDBG ("Picture: tagvsn=%d, encoding=%d= mime = %s, type = %d, desc = %s, size = %d.\n",
+            tagvsn, (int)data[0], mime, type, (const char *) desc, image_size);
 
     if (type == 3 || type == 0)  /* album cover or iTunes */
         buf.insert (body + after_nul2, 0, image_size);

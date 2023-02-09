@@ -672,7 +672,8 @@ static void infowin_show (int list, int entry, const String & filename, const St
 EXPORT void audgui_infowin_show (int playlist, int entry)
 {
     String filename = aud_playlist_entry_get_filename (playlist, entry);
-    g_return_if_fail (filename != nullptr);
+    if (! filename || ! filename[0])
+        return;
 
     String entryfn = filename;
     String error;
