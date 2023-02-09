@@ -19,9 +19,12 @@
 
 #include <QFileDialog>
 #include <QPointer>
+#include <QRegularExpression>
 
+#include <libaudcore/audstrings.h>
 #include <libfauxdcore/drct.h>
 #include <libfauxdcore/i18n.h>
+#include <libaudcore/interface.h>
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/runtime.h>
 #include <libfauxdcore/audstrings.h>
@@ -32,14 +35,14 @@ namespace audqt {
 
 static aud::array<FileMode, QPointer<QFileDialog>> s_dialogs;
 
-static void import_playlist (int playlist, const String & filename)
+static void import_playlist (int playlist, const char * filename)
 {
     aud_playlist_set_filename (playlist, filename);
     aud_playlist_entry_delete (playlist, 0, aud_playlist_entry_count (playlist));
     aud_playlist_entry_insert (playlist, -1, filename, Tuple (), false);
 }
 
-static void export_playlist (int playlist, const String & filename)
+static void export_playlist (int playlist, const char * filename)
 {
     Playlist::GetMode mode = Playlist::Wait;
     if (aud_get_bool (nullptr, "metadata_on_play"))
@@ -47,6 +50,48 @@ static void export_playlist (int playlist, const String & filename)
 
     aud_playlist_set_filename (playlist, filename);
     aud_playlist_save (playlist, filename, mode);
+}
+
+static void export_playlist (int playlist, const char * filename,
+        const char * default_ext)
+{
+    if (uri_get_extension(filename))
+        export_playlist (playlist, filename);
+    else if (default_ext && default_ext[0])
+        export_playlist (playlist, str_concat({filename, ".", default_ext}));
+    else
+        aud_ui_show_error (_("Please type a filename extension or select a "
+                            "format from the drop-down list."));
+}
+
+static QStringList get_format_filters ()
+{
+    QStringList filters;
+    filters.append (QString (_("Select Format by Extension")).append (" (*)"));
+
+    for (auto & format : aud_playlist_save_formats ())
+    {
+        QStringList extensions;
+        for (const char * ext : format.exts)
+            extensions.append (QString("*.%1").arg (ext));
+
+        filters.append(QString("%1 (%2)")
+                .arg(static_cast<const char *> (format.name))
+                .arg(extensions.join (' ')));
+    }
+
+    return filters;
+}
+
+static QString get_extension_from_filter (QString filter)
+{
+    /*
+     * Find first extension in filter string
+     * "Audacious Playlists (*.audpl)" -> audpl
+     * "M3U Playlists (*.m3u *.m3u8)"  -> m3u
+     */
+    QRegularExpression regex (".*\\(\\*\\.(\\S*).*\\)$");
+    return regex.match (filter).captured (1);
 }
 
 EXPORT void fileopener_show (FileMode mode)
@@ -104,6 +149,8 @@ EXPORT void fileopener_show (FileMode mode)
         if (mode == FileMode::ExportPlaylist)
         {
             dialog->setAcceptMode (QFileDialog::AcceptSave);
+            dialog->setNameFilters(get_format_filters());
+
             String filename = aud_playlist_get_filename (playlist);
             if (filename)
             {
@@ -140,7 +187,12 @@ EXPORT void fileopener_show (FileMode mode)
                 break;
             case FileMode::ExportPlaylist:
                 if (files.len () == 1)
-                    export_playlist (playlist, files[0].filename);
+                {
+                    QString filter = dialog->selectedNameFilter ();
+                    QString extension = get_extension_from_filter (filter);
+                    export_playlist (playlist, files[0].filename,
+                            extension.toUtf8 ());
+                }
                 break;
             default:
                 /* not reached */
