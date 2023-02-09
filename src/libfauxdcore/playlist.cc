@@ -800,6 +800,24 @@ void playlist_enable_scan (bool enable)
     LEAVE;
 }
 
+void playlist_clear_updates ()
+{
+    ENTER;
+
+    /* clear updates queued during init sequence */
+    for (auto & playlist : playlists)
+    {
+        playlist->next_update = Update ();
+        playlist->last_update = Update ();
+    }
+
+    queued_update.stop ();
+    update_level = NoUpdate;
+    update_delayed = false;
+
+    LEAVE;
+}
+
 void playlist_end ()
 {
     hook_dissociate ("set metadata_on_play", playlist_trigger_scan);
@@ -2358,10 +2376,10 @@ DecodeInfo playback_entry_read (int serial)
         if ((entry = get_playback_entry (serial)))
         {
             playback_set_info (entry->number, entry->tuple.ref ());
-            art_cache_current (entry->filename, std::move (request->image_data),
+            art_cache_current (request->filename, std::move (request->image_data),
              std::move (request->image_file));
 
-            dec.filename = entry->filename;
+            dec.filename = request->filename;
             dec.ip = request->ip;
             dec.file = std::move (request->file);
             dec.error = std::move (request->error);

@@ -36,6 +36,7 @@ struct DecodeInfo
 /* playlist.cc */
 void playlist_init ();
 void playlist_enable_scan (bool enable);
+void playlist_clear_updates ();
 void playlist_end ();
 
 void playlist_insert_with_id (int at, int id);
