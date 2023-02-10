@@ -1187,6 +1187,9 @@ EXPORT StringBuf str_format_time (int64_t milliseconds)
 /* JWT:RETURN ONLY FIRST "LINE" OF A MULTI-LINE STRING (USED FOR TITLES ON WINDOW TITLEBARS! */
 EXPORT StringBuf str_get_first_line (const char * instr)
 {
+    if (! instr)
+        return StringBuf ();
+
     int len = strlen (instr);
     for (int i=0; i<len; i++)
     {
