@@ -74,6 +74,7 @@ static int stdout_fmt;           /* JWT */
 
 static MainloopType mainloop_type = MainloopType::GLib;
 static bool mainloop_type_set = false;
+static bool restart_requested = false;
 
 static aud::array<AudPath, String> aud_paths;
 
@@ -148,6 +149,14 @@ EXPORT int aud_get_fudge_gain ()
 {
     return fudge_gain;
 }
+
+EXPORT void aud_request_restart()
+{
+    restart_requested = true;
+    aud_quit();
+}
+
+EXPORT bool aud_restart_requested() { return restart_requested; }
 
 static StringBuf get_path_to_self ()
 {
@@ -392,6 +401,7 @@ EXPORT void aud_run ()
      * avoid scanning until the currently playing entry is known, at which time
      * it can be scanned more efficiently (album art read in the same pass). */
     playlist_enable_scan (true);
+    playlist_clear_updates();
     start_plugins_two ();
 
     static QueuedFunc autosave;

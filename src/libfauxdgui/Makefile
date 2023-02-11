@@ -53,12 +53,13 @@ LD = ${CXX}
 CPPFLAGS := -I.. -I../.. \
             ${CPPFLAGS} \
             ${GLIB_CFLAGS} \
-            ${GTK_CFLAGS}
+            ${GTK_CFLAGS} \
+            ${SDL_CFLAGS}
 
 CFLAGS += ${LIB_CFLAGS}
 
 LIBS := -L../libfauxdcore -lfauxdcore \
-        ${LIBS} -lm \
+        ${LIBS} ${SDL_LIBS} -lm \
         ${GLIB_LIBS} \
         ${GTK_LIBS}
 

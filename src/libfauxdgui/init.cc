@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include <libfauxdcore/sdl_window.h>
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/hook.h>
 #include <libfauxdcore/playlist.h>
@@ -186,8 +187,10 @@ static void load_fallback_icon (const char * icon, int size)
 
     if (pixbuf)
     {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
         gtk_icon_theme_add_builtin_icon (icon, size, pixbuf);
         g_object_unref (pixbuf);
+G_GNUC_END_IGNORE_DEPRECATIONS
     }
 }
 
@@ -346,6 +349,34 @@ EXPORT void audgui_init ()
     static char * app_args[] = {app_name, nullptr};
     int dummy_argc = 1;
     char * * dummy_argv = app_args;
+
+    /* JWT:MUST INITIALIZE SDL WINDOW **BEFORE** GTK! */
+#ifdef USE_SDL2
+    if (! SDL_WasInit (SDL_INIT_VIDEO))
+    {
+        if (SDL_InitSubSystem (SDL_INIT_VIDEO))
+            AUDERR ("e:Failed to init SDL (no video playing): %s.\n", SDL_GetError ());
+        else
+        {
+            Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE;
+            if (aud_get_bool ("ffaudio", "allow_highdpi"))
+                flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+
+            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", SDL_WINDOWPOS_UNDEFINED,
+                SDL_WINDOWPOS_UNDEFINED, 1, 1, flags);
+            if (! sdl_window)
+                AUDERR ("Failed to create SDL window (no video playing): %s.\n", SDL_GetError ());
+            else
+            {
+#if SDL_COMPILEDVERSION >= 2004
+                SDL_SetHint (SDL_HINT_VIDEO_X11_NET_WM_PING, "0");
+#endif
+                fauxd_set_sdl_window (sdl_window);
+            }
+        }
+    }
+#endif
+
     gtk_init (& dummy_argc, & dummy_argv);
 
     if (! icons_loaded)
@@ -392,4 +423,9 @@ EXPORT void audgui_cleanup ()
 
     plugin_menu_cleanup ();
     plugin_prefs_cleanup ();
+
+#ifdef USE_SDL2
+    if (SDL_WasInit (SDL_INIT_VIDEO))
+        SDL_QuitSubSystem (SDL_INIT_VIDEO);  // SDL DOCS SAY SDL_Quit () SAFE, BUT SEGFAULTS HERE?!
+#endif
 }

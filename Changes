@@ -1,6 +1,37 @@
-Version 4.2.2-beta1:
+Version 4.3-beta1:
 
-Add [Settings].[Song Info].(Fauxdacious Extras)[]"Don't Embed images in tags" 
+* Merge in Audacious's "hotswitch" feature for restarting on the fly - 
+switching between the GTK* and Qt interfaces from within the Preferences GUI!
+(*the GTK interface will be whichever GTK (2 or 3) Fauxdacious was compiled 
+with).  
+
+NOTE:  Fauxdacious must also have been compiled with both the Qt and one of the 
+GTK interfaces.  Unlike Audacious, the Preferences window tells you which GTK 
+(2 or 3) interface you're using or can switch to.  This involved significant 
+restructuring the SDL (video-window) code to work properly between the two 
+interfaces across restarts, making this more complicated to do than it was 
+in Audacious.
+
+NOTE2:  Previous default mode (if -Q or --qt) flag not specified was to start in 
+GTK mode, however as a result of this merge, the default startup mode is 
+whatever mode Fauxdacious was in when exited (therefore, one should generally 
+start now Fauxdacious using one of the flags (-Q or -G) to force the mode 
+Fauxdacious will start up in.
+
+* Switch version to v4.3-beta1 in keeping with Audacious's current release.
+
+Version 4.2.2-beta1 (2/9/2023):
+
+* Improved stability (more crash-proofing) due to numerous cleanups and 
+refactoring of older and suspected code.
+
+* Fixed more minor issues handling cached cover-art files, particularly ones 
+with odd characters in their names.
+
+# Merged all applicable Audacious commits since last Fauxdacious final release 
+through 2/9/2023.
+
+* Add [Settings].[Song Info].(Fauxdacious Extras)[]"Don't Embed images in tags" 
 checkbox option.  Normally when editing and saving song info (for local song 
 files), when the user adds a file-URI to the Comment: field, Fauxdacious first 
 attempts to store the image data in the file's metatags (along with any other 

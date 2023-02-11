@@ -28,7 +28,6 @@
 #endif
 
 #ifdef USE_SDL2
-#define SDL_MAIN_HANDLED
 #include <libfauxdcore/sdl_window.h>
 #endif
 
@@ -85,35 +84,35 @@ static const struct {
     const char * desc;
 } arg_map[] = {
     {"add-list", 'a', & options.addplaylist, N_("Add Playlist: each use creates new pl. (-a | --add-list[=\"pl name\"])")},
-    {"clear", 'c', & options.clearplaylist, N_("Clear Playlist")},
+    {"clear", 'c', & options.clearplaylist, N_("Clear Playlist.")},
     {"delete", 'D', & options.deleteallplaylists, N_("DELETE all playlists!")},
-    {"enqueue", 'e', & options.enqueue, N_("Add files to the playlist")},
-    {"enqueue-to-temp", 'E', & options.enqueue_to_temp, N_("Add files to a temporary playlist")},
+    {"enqueue", 'e', & options.enqueue, N_("Add files to the playlist.")},
+    {"enqueue-to-temp", 'E', & options.enqueue_to_temp, N_("Add files to a temporary playlist.")},
     {"fwd", 'f', & options.fwd, N_("Skip to next song")},
-    {"gain", 'g', & options.forcenogainchg, N_("Fudge Additional Gain Adjustment")},  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
+    {"gain", 'g', & options.forcenogainchg, N_("Fudge Additional Gain Adjustment.")},  /* JWT:ADD OPTIONAL STARTING GAIN ADJUSTMENT */
 #if defined(USE_QT) && defined(USE_GTK)
-    {"gtk", 'G', &options.gtk, N_("Run in GTK mode (default)")},
+    {"gtk", 'G', &options.gtk, N_("Run in GTK mode.")},
 #endif
-    {"help", 'h', & options.help, N_("Show command-line help")},
-    {"headless", 'H', & options.headless, N_("Start without a graphical interface")},
-    {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window")},
-    {"show-main-window", 'm', & options.mainwin, N_("Display the main window")},
-    {"new", 'n', & options.newinstance, N_("New Instance: number, name, or unnamed (-# | --new=name | -n)")},
-    {"out", 'o', & options.outstd, N_("Output to stdout (extension)")},  /* JWT:FORCE PIPING TO STDOUT, (default "wav"). */
-    {"play", 'p', & options.play, N_("Start playback")},
-    {"pause-mute", 'P', & options.pauseismute, N_("Pause mutes instead of pausing")},  /* JWT:ADD PAUSEMUTE OPTION */
-    {"quit-after-play", 'q', & options.quit_after_play, N_("Quit on playback stop")},
+    {"help", 'h', & options.help, N_("Show command-line help.")},
+    {"headless", 'H', & options.headless, N_("Start without a graphical interface.")},
+    {"show-jump-box", 'j', & options.show_jump_box, N_("Display the jump-to-song window.")},
+    {"show-main-window", 'm', & options.mainwin, N_("Display the main window.")},
+    {"new", 'n', & options.newinstance, N_("New Instance: number, name, or unnamed (-# | --new=name | -n).")},
+    {"out", 'o', & options.outstd, N_("Output to stdout (extension).")},  /* JWT:FORCE PIPING TO STDOUT, (default "wav"). */
+    {"play", 'p', & options.play, N_("Start playback.")},
+    {"pause-mute", 'P', & options.pauseismute, N_("Pause mutes instead of pausing.")},  /* JWT:ADD PAUSEMUTE OPTION */
+    {"quit-after-play", 'q', & options.quit_after_play, N_("Quit on playback stop.")},
 #if defined(USE_QT) && defined(USE_GTK)
-    {"qt", 'Q', & options.qt, N_("Run in Qt mode")},
+    {"qt", 'Q', & options.qt, N_("Run in Qt mode.")},
 #endif
-    {"rew", 'r', & options.rew, N_("Skip to previous song")},
-    {"force_recording", 'R', & options.force_recording, N_("Start Recording")},
-    {"stop", 's', & options.stop, N_("Stop playback")},
-    {"play-pause", 't', & options.play_pause, N_("Pause if playing, play otherwise")},
-    {"pause", 'u', & options.pause, N_("Pause playback")},
-    {"version", 'v', & options.version, N_("Show version")},
-    {"verbose", 'V', & options.verbose, N_("Print debugging messages (may be used twice)")},
-    {"no-equalizer", 'z', & options.forcenoequalizer, N_("Force Equalizer Off")},
+    {"rew", 'r', & options.rew, N_("Skip to previous song.")},
+    {"force_recording", 'R', & options.force_recording, N_("Start Recording.")},
+    {"stop", 's', & options.stop, N_("Stop playback.")},
+    {"play-pause", 't', & options.play_pause, N_("Pause if playing, play otherwise.")},
+    {"pause", 'u', & options.pause, N_("Pause playback.")},
+    {"version", 'v', & options.version, N_("Show version.")},
+    {"verbose", 'V', & options.verbose, N_("Print debugging messages (may be used twice).")},
+    {"no-equalizer", 'z', & options.forcenoequalizer, N_("Force Equalizer Off.")},
 };
 
 /* JWT:ADDED TO ALLOW A LIST OF FILES TO BE PIPED IN VIA STDIN *VERY EARLY* (BEFORE DBUS CAN REDIRECT
@@ -298,10 +297,10 @@ static bool parse_options (int argc, char * * argv)
 
 #if defined(USE_QT) && defined(USE_GTK)
     if (options.qt && options.gtk)
-        fprintf(stderr, "-G and -Q are mutually exclusive, ignoring\n");
+        fprintf(stderr, "-G/--gtk and -Q/--qt are mutually exclusive, ignoring\n");
     else if (options.qt)
         aud_set_mainloop_type (MainloopType::Qt);
-    else
+    else if (options.gtk)
         aud_set_mainloop_type (MainloopType::GLib);
 #endif
 
@@ -739,40 +738,7 @@ int main (int argc, char * * argv)
 
 #ifdef USE_SDL2
     /* JWT:MUST INITIALIZE SDL2 BEFORE ANY GTK WINDOWS POPUP ELSE MAY GET SEGFAULT WHEN OPENING ONE! */
-    bool sdl_initialized = false;  // TRUE IF SDL (VIDEO) IS SUCCESSFULLY INITIALIZED.
     SDL_SetMainReady ();
-#endif
-
-#if defined(USE_GTK)
-#if defined(USE_QT)
-    if (! options.qt)
-#endif
-    {
-#ifdef USE_SDL2
-        fauxd_set_sdl_window (nullptr);
-        if (SDL_Init (SDL_INIT_VIDEO))  // GTK REQUIRES INIT HERE TO AVOID SEGFAULTS, QT PUKES ON EXIT IF SO!:
-            AUDERR ("e:Failed to init SDL in main(): (no video playing): %s.\n", SDL_GetError ());
-        else
-        {
-            sdl_initialized = true;
-            Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE;
-            if (aud_get_bool ("ffaudio", "allow_highdpi"))
-                flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-
-            SDL_Window * sdl_window = SDL_CreateWindow ("Fauxdacious Video", SDL_WINDOWPOS_UNDEFINED,
-                SDL_WINDOWPOS_UNDEFINED, 1, 1, flags);
-            if (! sdl_window)
-            {
-                AUDERR ("Failed to create SDL window (no video playing): %s.\n", SDL_GetError ());
-                return false;
-            }
-#if SDL_COMPILEDVERSION >= 2004
-            SDL_SetHint (SDL_HINT_VIDEO_X11_NET_WM_PING, "0");
-#endif
-            fauxd_set_sdl_window (sdl_window);
-        }
-#endif
-    }
 #endif
 
     aud_init ();
@@ -795,11 +761,6 @@ int main (int argc, char * * argv)
         hook_dissociate ("quit", (HookFunction) aud_quit);
     }
 
-#ifdef USE_SDL2
-    if (sdl_initialized)
-        SDL_QuitSubSystem (SDL_INIT_VIDEO);  // SDL DOCS SAY SDL_Quit () SAFE, BUT SEGFAULTS HERE?!
-#endif
-
     aud_set_bool (nullptr, "record", false);  // JWT:MAKE SURE RECORDING(DUBBING) IS OFF!
 
 #ifdef USE_DBUS
@@ -817,6 +778,16 @@ int main (int argc, char * * argv)
 
     aud_cleanup ();
     initted = false;
+
+    if (aud_restart_requested())
+    {
+        fprintf(stderr, "Restarting %s ...\n", argv[0]);
+        if (execlp(argv[0], argv[0], (char *)NULL) < 0)
+        {
+            fprintf(stderr, "execp failed: %s\n", strerror(errno));
+            return EXIT_FAILURE;
+        }
+    }
 
     return EXIT_SUCCESS;
 }

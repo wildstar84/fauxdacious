@@ -177,10 +177,8 @@ EXPORT void init ()
     log_init ();
 
     /* JWT:IN Qt WE HAVE TO INITIALIZE SDL ONCE HERE INSTEAD OF fauxdacious/main.cc TO AVOID "dbus warnings" ON EXIT! */
-#define SDL_MAIN_HANDLED
     if (! SDL_WasInit (SDL_INIT_VIDEO))
     {
-        SDL_SetMainReady ();
         if (SDL_InitSubSystem (SDL_INIT_VIDEO))
             AUDERR ("e:Failed to init SDL (no video playing): %s.\n", SDL_GetError ());
         else
@@ -230,6 +228,11 @@ EXPORT void cleanup ()
     log_cleanup ();
 
     delete qApp;
+
+#ifdef USE_SDL2
+    if (SDL_WasInit (SDL_INIT_VIDEO))
+        SDL_QuitSubSystem (SDL_INIT_VIDEO);  // SDL DOCS SAY SDL_Quit () SAFE, BUT SEGFAULTS HERE?!
+#endif
 }
 
 EXPORT QIcon get_icon (const char * name)
