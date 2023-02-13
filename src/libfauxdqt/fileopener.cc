@@ -21,10 +21,9 @@
 #include <QPointer>
 #include <QRegularExpression>
 
-#include <libaudcore/audstrings.h>
 #include <libfauxdcore/drct.h>
 #include <libfauxdcore/i18n.h>
-#include <libaudcore/interface.h>
+#include <libfauxdcore/interface.h>
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/runtime.h>
 #include <libfauxdcore/audstrings.h>
