@@ -131,6 +131,7 @@ static void clear (GtkWidget * widget, cairo_t * cr)
     double r = 1, g = 1, b = 1;
 
     /* In a dark theme, try to match the tone of the base color */
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     auto & c = (gtk_widget_get_style (widget))->base[GTK_STATE_NORMAL];
     int v = aud::max (aud::max (c.red, c.green), c.blue);
 
@@ -140,6 +141,7 @@ static void clear (GtkWidget * widget, cairo_t * cr)
         g = (double)c.green / v;
         b = (double)c.blue / v;
     }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
     GtkAllocation alloc;
     gtk_widget_get_allocation (widget, & alloc);
@@ -246,10 +248,12 @@ static void hsv_to_rgb (float h, float s, float v, float * r, float * g,
 
 static void get_color (GtkWidget * widget, int i, float * r, float * g, float * b)
 {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     auto & c = (gtk_widget_get_style (widget))->base[GTK_STATE_SELECTED];
     float h, s, v;
 
     rgb_to_hsv (c.red / 65535.0, c.green / 65535.0, c.blue / 65535.0, & h, & s, & v);
+G_GNUC_END_IGNORE_DEPRECATIONS
 
     if (s < 0.1) /* monochrome theme? use blue instead */
         h = 4.6;
@@ -414,11 +418,9 @@ static void set_album_art ()
 {
     g_return_if_fail (area);
 
+    area->pb = AudguiPixbuf ();
     if (! area->show_art)
-    {
-        area->pb = AudguiPixbuf ();  // WE'RE ALREADY SET TO HIDE, SO HIDE & DONE!
-        return;
-    }
+        return;  // WE'RE ALREADY SET TO HIDE, SO HIDE & DONE!
 
     bool noChannelArt = true;   /* JWT:REMAINS TRUE IF NO CHANNEL-ART FOUND. */
     /* JWT:NOTE:  DIRECTORY ICONS ARE *NOT* CONSIDERED "CHANNEL-ART", THOUGH THEY ARE TREATED AS SUCH,
