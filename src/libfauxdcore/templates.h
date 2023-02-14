@@ -1,6 +1,6 @@
 /*
  * templates.h
- * Copyright 2014 John Lindgren
+ * Copyright 2014-2019 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,8 @@
 #undef min
 #undef max
 
-namespace aud {
+namespace aud
+{
 
 // Utility functions
 // =================
@@ -37,47 +38,65 @@ namespace aud {
 // minimum of two numbers
 template<class T>
 constexpr T min (T a, T b)
-    { return a < b ? a : b; }
+{
+    return a < b ? a : b;
+}
 
 // maximum of two numbers
 template<class T>
 constexpr T max (T a, T b)
-    { return a > b ? a : b; }
+{
+    return a > b ? a : b;
+}
 
 // make sure a number is within the given range
 template<class T>
 constexpr T clamp (T x, T low, T high)
-    { return min (max (x, low), high); }
+{
+    return min (max (x, low), high);
+}
 
 // absolute value
 template<class T>
 constexpr T abs (T x)
-    { return x < 0 ? -x : x; }
+{
+    return x < 0 ? -x : x;
+}
 
 // change the sign of x to the sign of s
 template<class T>
 constexpr T chsign (T x, T s)
-    { return (x < 0) ^ (s < 0) ? -x : x; }
+{
+    return (x < 0) ^ (s < 0) ? -x : x;
+}
 
 // integer division with rounding
 template<class T>
 constexpr T rdiv (T x, T y)
-    { return (x + chsign (y / 2, x)) / y; }
+{
+    return (x + chsign (y / 2, x)) / y;
+}
 
 // convert integer from one scale to another, with rounding
 template<class T>
 constexpr T rescale (T x, T old_scale, T new_scale)
-    { return rdiv (x * new_scale, old_scale); }
+{
+    return rdiv (x * new_scale, old_scale);
+}
 
 // number of characters needed to represent an integer (including minus sign)
 template<class T>
 constexpr T n_digits (T x)
-    { return x < 0 ? 1 + n_digits (-x) : x < 10 ? 1 : 1 + n_digits (x / 10); }
+{
+    return x < 0 ? 1 + n_digits (-x) : x < 10 ? 1 : 1 + n_digits (x / 10);
+}
 
 // number of elements in an array
 template<class T, int N>
 constexpr int n_elems (const T (&) [N])
-    { return N; }
+{
+    return N;
+}
 
 // Casts for storing various data in a void pointer
 // ================================================
@@ -91,7 +110,8 @@ inline void * to_ptr (T t)
         T t;
     } u = {nullptr};
     static_assert (sizeof u == sizeof (void *), "Type cannot be stored in a pointer");
-    u.t = t; return u.v;
+    u.t = t;
+    return u.v;
 }
 
 template<class T>
@@ -125,23 +145,61 @@ T & move_assign (T & a, T && b)
 
 template<class T>
 void delete_obj (void * obj)
-    { (void) sizeof (T); delete (T *) obj; }
+{
+    (void) sizeof (T);
+    delete (T *) obj;
+}
 
 template<class T>
 void delete_typed (T * obj)
-    { (void) sizeof (T); delete obj; }
+{
+    (void) sizeof (T);
+    delete obj;
+}
 
 template<class T, void (* func) (void *)>
 void typed_func (T * obj)
-    { func (obj); }
+{
+    func (obj);
+}
 
 template<class T, void (T::* func) ()>
 static void obj_member (void * obj)
-    { (((T *) obj)->* func) (); }
+{
+    (((T *) obj)->* func) ();
+}
 
 template<class T, void (T::* func) () const>
 static void obj_member (void * obj)
-    { (((T *) obj)->* func) (); }
+{
+    (((T *) obj)->* func) ();
+}
+
+// Class which provides scope-based "ownership" of an object
+// (similar to std::unique_lock, but more flexible)
+// =========================================================
+
+template<class T, void (T::*acquire)(), void (T::*release)()>
+class owner
+{
+public:
+    explicit owner (T * obj = nullptr) : m_obj (obj)
+    {
+        if (m_obj)
+            (m_obj->*acquire) ();
+    }
+    ~owner()
+    {
+        if (m_obj)
+            (m_obj->*release) ();
+    }
+
+    owner (owner && b) : m_obj (b.m_obj) { b.m_obj = nullptr; }
+    owner & operator=(owner && b) { return move_assign(*this, std::move (b)); }
+
+private:
+    T * m_obj;
+};
 
 // Wrapper class allowing enumerations to be used as array indexes;
 // the enumeration must begin with zero and have a "count" constant
@@ -152,28 +210,20 @@ struct array
 {
     // cannot use std::forward here; it is not constexpr until C++14
     template<class ... Args>
-    constexpr array (Args && ... args) :
-        vals { static_cast<Args &&> (args) ...} {}
+    constexpr array (Args && ... args) : vals { static_cast<Args &&> (args) ...} {}
 
     // Due to GCC bug #63707, the forwarding constructor given above cannot be
     // used to initialize the array when V is a class with no copy constructor.
     // As a very limited workaround, provide a second constructor which can be
     // used to initialize the array to default values in this case.
-    constexpr array () :
-        vals () {}
+    constexpr array () : vals () {}
 
-    constexpr const V & operator[] (T t) const
-        { return vals[(int) t]; }
-    constexpr const V * begin () const
-        { return vals; }
-    constexpr const V * end () const
-        { return vals + (int) T::count; }
-    V & operator[] (T t)
-        { return vals[(int) t]; }
-    V * begin ()
-        { return vals; }
-    V * end ()
-        { return vals + (int) T::count; }
+    constexpr const V & operator[] (T t) const { return vals[(int) t]; }
+    constexpr const V * begin () const { return vals; }
+    constexpr const V * end () const { return vals + (int) T::count; }
+    V & operator[] (T t) { return vals[(int) t]; }
+    V * begin () { return vals; }
+    V * end () { return vals + (int) T::count; }
 
 private:
     V vals[(int) T::count];
@@ -185,20 +235,16 @@ private:
 template<class T, T first = (T) 0, T last = (T) ((int) T::count - 1)>
 struct range
 {
-    struct iter {
+    struct iter
+    {
         T v;
-        constexpr T operator* () const
-            { return v; }
-        constexpr bool operator!= (iter other) const
-            { return v != other.v; }
-        void operator++ ()
-            { v = (T) ((int) v + 1); }
+        constexpr T operator* () const { return v; }
+        constexpr bool operator!= (iter other) const { return v != other.v; }
+        void operator++ () { v = (T) ((int) v + 1); }
     };
 
-    static constexpr iter begin ()
-        { return {first}; }
-    static constexpr iter end ()
-        { return {(T) ((int) last + 1)}; }
+    static constexpr iter begin () { return {first}; }
+    static constexpr iter end () { return {(T) ((int) last + 1)}; }
 };
 
 // Replacement for std::allocator::construct, which also supports aggregate
@@ -208,23 +254,30 @@ struct range
 
 // class constructor proxy
 template<class T, bool aggregate>
-struct construct_base {
+struct construct_base
+{
     template<class ... Args>
     static T * make (void * loc, Args && ... args)
-        { return new (loc) T (std::forward<Args> (args) ...); }
+    {
+        return new (loc) T (std::forward<Args> (args) ...);
+    }
 };
 
 // aggregate constructor proxy
 template<class T>
-struct construct_base<T, true> {
+struct construct_base<T, true>
+{
     template<class ... Args>
     static T * make (void * loc, Args && ... args)
-        { return new (loc) T {std::forward<Args> (args) ...}; }
+    {
+        return new (loc) T {std::forward<Args> (args) ...};
+    }
 };
 
 // generic constructor proxy
 template<class T>
-struct construct {
+struct construct
+{
     template<class ... Args>
     static T * make (void * loc, Args && ... args)
     {
@@ -239,25 +292,29 @@ struct construct {
 
 // "metaprogramming" string type: each different string is a unique type
 template<char... args>
-struct metastring {
+struct metastring
+{
     char data[sizeof... (args) + 1] = {args..., '\0'};
 };
 
 // recursive number-printing template, general case (three or more digits)
 template<int size, int x, char... args>
-struct numeric_builder {
+struct numeric_builder
+{
     typedef typename numeric_builder<size - 1, x / 10, '0' + abs (x) % 10, args...>::type type;
 };
 
 // special case for two digits; minus sign is handled here
 template<int x, char... args>
-struct numeric_builder<2, x, args...> {
+struct numeric_builder<2, x, args...>
+{
     typedef metastring<x < 0 ? '-' : '0' + x / 10, '0' + abs (x) % 10, args...> type;
 };
 
 // special case for one digit (positive numbers only)
 template<int x, char... args>
-struct numeric_builder<1, x, args...> {
+struct numeric_builder<1, x, args...>
+{
     typedef metastring<'0' + x, args...> type;
 };
 

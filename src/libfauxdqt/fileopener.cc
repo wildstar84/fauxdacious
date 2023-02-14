@@ -27,8 +27,6 @@
 #include <libfauxdcore/interface.h>
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/runtime.h>
-#include <libfauxdcore/audstrings.h>
-
 #include <libfauxdqt/libfauxdqt.h>
 
 namespace audqt {
