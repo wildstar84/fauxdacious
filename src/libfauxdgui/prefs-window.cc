@@ -459,7 +459,9 @@ static const PreferencesWidget advanced_page_widgets[] = {
     WidgetLabel (N_("Lyrics plugins helper program?:")),
     WidgetEntry (0, WidgetString (0, "lyric_helper")),
     WidgetCheck (N_("Quirky window-managers (ie. AfterStep)?"),
-        WidgetBool (0, "afterstep"))
+        WidgetBool (0, "afterstep")),
+    WidgetCheck (N_("Start dock plugins late? (affects W/M task-bar order)"),
+        WidgetBool ("audgui", "restore_floating_dockapps_late"))
 };
 
 #define TITLESTRING_NPRESETS 8
