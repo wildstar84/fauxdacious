@@ -1,6 +1,25 @@
 Version 4.3-beta1:
 
-* Merge in Audacious's "hotswitch" feature for restarting on the fly - 
+* Added more workarounds for window-managers, particularly AfterStep (the one 
+the author uses) and have modified the recommended AfterStep "database" 
+settings for best results with Fauxdacious:
+
+Style  "*"                 FocusOnMap
+Style  "Fauxdacious_Qt"    NoFocusOnMap, Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
+Style  "Fauxdacious_NF"    NoFocusOnMap, HonorPPosition, HonorExtWMHints
+Style  "* Fauxdacious"     FocusOnMap, Sticky, HonorPPosition, HonorExtWMHints
+Style  "*dacious Video"    NoFocusOnMap, Sticky, HonorPPosition
+Style  "*dacious DVD"      FocusOnMap, Sticky, FocusOnMap, HonorPPosition
+Style  "Mini-Fauxdacious*" NoTitle, NoFrame, NoHandles, Sticky, HonorPPosition
+
+* Merged Qt "restore_floating_dockapps_late" config-file option into GTK to 
+permit starting floating dock windows "late" (AFTER main window is up and 
+focused) to ensure proper window ordering in window-managers' task-bars.
+Also added the option to set this in the Settings gui under [Advanced].
+Fauxdacious Extras section via a check-box.  NOTE: The GTK and Qt have separate 
+values.
+
+* Merged in Audacious's "hotswitch" feature for restarting on the fly - 
 switching between the GTK* and Qt interfaces from within the Preferences GUI!
 (*the GTK interface will be whichever GTK (2 or 3) Fauxdacious was compiled 
 with).  
@@ -13,17 +32,17 @@ interfaces across restarts, making this more complicated to do than it was
 in Audacious.
 
 NOTE2:  Previous default mode (if -Q or --qt) flag not specified was to start in 
-GTK mode, however as a result of this merge, the default startup mode is 
-whatever mode Fauxdacious was in when exited (therefore, one should generally 
-start now Fauxdacious using one of the flags (-Q or -G) to force the mode 
-Fauxdacious will start up in.
+GTK mode, however as a result of this merge, the default startup mode is now 
+whatever mode Fauxdacious was in when exited.  Therefore, now one should 
+generally start Fauxdacious using one of the flags (-Q or -G) to force the 
+mode Fauxdacious will start up in.
 
 * Switch version to v4.3-beta1 in keeping with Audacious's current release.
 
 Version 4.2.2-beta1 (2/9/2023):
 
 * Improved stability (more crash-proofing) due to numerous cleanups and 
-refactoring of older and suspected code.
+refactoring of older and suspicious code.
 
 * Fixed more minor issues handling cached cover-art files, particularly ones 
 with odd characters in their names.
@@ -758,7 +777,7 @@ keyboard focus (until user clickes on the main window).
 We've now added a second workaround for this using window-managers' 
 "FocusOnMap" options (for ones, such as AfterStep which allow app-specific 
 window-management options) by changing the Qt application's "name" from 
-"Fauxdacios" to "Fauxdacious_Qt" to differenciated it from the GTK interface, 
+"Fauxdacios" to "Fauxdacious_Qt" to differenciate it from the GTK interface, 
 so that using the following AfterStep "database" config options, one can have 
 this configured for the Qt plugin windows work properly, but still have the 
 GTK version of the windows still work well too:

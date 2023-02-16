@@ -426,7 +426,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 				next  if (/^\#/o);
 				next  unless (/\S/o);
 				s/^\s+//o;
-				s/\,$//o;
+				s/\,\s*$//o;
 				my $key = (s/^(\w+?)\s*\=\s*//o) ? $1 : 'skip';
 				s/^[\'\"]//o;
 				s/[\'\"]$//o;
@@ -443,7 +443,8 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 	foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
 		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/$album_uesc\|/;
-		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E/i) {
+		$skipit =~ s/\|/\\\|/;
+		if ("$album_uesc|$title_uesc" =~ /^${skipit}/i) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME/TITLE THOUGH!
@@ -492,6 +493,27 @@ print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEB
     }
 
 WEBSEARCH:
+	#LAST DITCH CHECK CACHE FOR BLACKLISTED ARTIST OR ALBUM:
+	my $release = $album;
+	$release =~ s/(?:\%20)+$//o;    #CHOMPIT (TRAILING ESCAPED SPACES)!
+	$release =~ s/\%C2\%B4/\%27/g;  #FIX UNICODE QUOTES.
+	foreach my $skipit (@{$SKIPTHESE{'noalbum'}}) {
+		$skipit = uri_escape($skipit);
+		if ($release =~ /^$skipit/i) {
+			print STDERR "i:ART HELPER: SKIPPING ALBUM ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+			&albumart_done();
+			exit(0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME THOUGH!
+		}
+	}
+	foreach my $skipit (@{$SKIPTHESE{'noartist'}}) {
+		$skipit = uri_escape($skipit);
+		if ($artist =~ /^$skipit/i) {
+			print STDERR "i:ART HELPER: SKIPPING ARTIST ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
+			&albumart_done();
+			exit(0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ARTIST NAME THOUGH!
+		}
+	}
+
 	print STDERR "---ART HELPER WILL SEARCH THE WEB...\n"  if ($DEBUG);
 	my ($url, $response, $mbzid, $art_url, $arthtml, %mbHash, $priority);
 	my $tried = '';
@@ -549,12 +571,6 @@ RELEASETYPE:
 		chomp $release;
 		$release =~ s/(?:\%20)+$//o;    #CHOMPIT (TRAILING ESCAPED SPACES)!
 		$release =~ s/\%C2\%B4/\%27/g;  #FIX UNICODE QUOTES.
-		if ($release eq $album) {
-			foreach my $skipit (@{$SKIPTHESE{'noalbum'}}) {
-				$skipit = uri_escape($skipit);
-				next RELEASETYPE  if ($skipit =~ /^$release$/i);
-			}
-		}
 		$html = '';
 		$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$release";
 		print STDERR "i:ART HELPER:SEARCHURL=$url=\n"  if ($DEBUG);
