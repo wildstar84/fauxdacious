@@ -175,7 +175,12 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 #2			`mkdir ${configPath}/${substationDIR}`  unless (-d "${configPath}/${substationDIR}");
 #2		}
 
-		$comment = 'Album=' . ((defined($client->{album}) && $client->{album} =~ /\S/) ? ($client->{album}." - $ARGV[0]") : $ARGV[0]) . "\n";
+		if (defined($client->{album}) && $client->{album} =~ /\S/) {
+			$comment = 'Album=' . (($client->{album} =~ /^https?\:/)
+					? $client->{album} : ($client->{album}." - $ARGV[0]")) . "\n";
+		} else {
+			$comment = 'Album=' . $ARGV[0] . "\n";
+		}
 		$comment .= 'Artist='.$client->{artist}."\n"  if (defined($client->{artist}) && $client->{artist} =~ /\w/);
 		$comment .= 'AlbumArtist='.$client->{albumartist}."\n"  if (defined($client->{albumartist}) && $client->{albumartist} =~ /\w/);
 		$comment .= 'Year='.$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
@@ -201,13 +206,21 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 					$path =~ s#^(\w)\:#\/$1\%3A#;
 					$path =~ s#\\#\/#g;
+				} elsif ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
+					#GTK CAN'T HANDLE webp, com, ETC.!:
+					`/usr/bin/convert '${path}/${stationID}.$image_ext' '${path}/${stationID}.png'`;
+					if (-e "${path}/${stationID}.png") {
+						unlink "${path}/${stationID}.$image_ext";
+						$image_ext = 'png';
+					}
 				}
 				$comment .= "Comment=file://${path}/${stationID}.$image_ext";
 				my $art_url2 = $client->getIconURL('artist');
 				if ($art_url2 && $art_url2 ne $art_url) {
 					my ($image_ext, $art_image) = $client->getIconData('artist');
 					$image_ext =~ tr/A-Z/a-z/;
-					if ($configPath && $art_image && open IMGOUT, ">${configPath}/${stationID}_channel.$image_ext") {
+					if ($configPath && $art_image && length($art_image) > 499 #SANITY-CHECK (RUMBLE.COM)!
+							&& open IMGOUT, ">${configPath}/${stationID}_channel.$image_ext") {
 						binmode IMGOUT;
 						print IMGOUT $art_image;
 						close IMGOUT;
@@ -215,6 +228,13 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 						if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 							$path =~ s#^(\w)\:#\/$1\%3A#;
 							$path =~ s#\\#\/#g;
+						} elsif ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
+							#GTK CAN'T HANDLE webp, com, ETC.!:
+							`/usr/bin/convert '${path}/${stationID}_channel.$image_ext' '${path}/${stationID}_channel.png'`;
+							if (-e "${path}/${stationID}_channel.png") {
+								unlink "${path}/${stationID}_channel.$image_ext";
+								$image_ext = 'png';
+							}
 						}
 						$comment .= ";file://${path}/${stationID}_channel.$image_ext";
 					}

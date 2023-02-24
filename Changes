@@ -787,11 +787,14 @@ similar options on other WMs for this workaround).  This works because
 AfterStep looks at WM_NAME (window title), then WM_CLASS (application name) to 
 match "Style"s, and applies matching one from first to last:
 
-Style  "*"              FocusOnMap
-Style  "Fauxdacious_Qt" NoFocusOnMap, Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
-Style  "*Fauxdacious"   FocusOnMap, Sticky, HonorPPosition, HonorExtWMHints
-Style  "*dacious Video" NoFocusOnMap, Sticky, HonorPPosition
-Style  "*dacious DVD"   FocusOnMap, Sticky, FocusOnMap, HonorPPosition
+Style  "*"                 FocusOnMap
+Style  "Fauxdacious_Qt"    NoFocusOnMap, Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
+Style  "Fauxdacious_NF"    NoFocusOnMap, Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
+Style  "* Fauxdacious"     FocusOnMap,   Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
+Style  "*dacious Video"    Layer 0, NoFocusOnMap, Sticky, HonorPPosition
+Style  "*dacious DVD"      FocusOnMap, Sticky, HonorPPosition
+Style  "Mini-Fauxdacious*" NoTitle, NoFrame, NoHandles, Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
+Style  "Fauxdacious"       FocusOnMap, Sticky, HonorPPosition, HonorGroupHints, HonorTransientHints, HonorExtWMHints
 
 While at it, fixed GTK side to NOT put Equalizer window "AlwaysOnTop".
 
