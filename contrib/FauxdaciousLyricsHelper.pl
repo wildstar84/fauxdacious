@@ -125,7 +125,7 @@ if ($#ARGV >= 1) {
 	if ($#ARGV >= 3) {
 		foreach my $skipit (@SKIPALBUMS) {
 			print STDERR "-???- ALB=$ARGV[3]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
-			if ("$ARGV[3]" =~ /^\Q${skipit}\E$/i) {
+			if ("$ARGV[3]" =~ /^${skipit}/i) {
 				print STDERR "i:LYRICS HELPER: SKIPPING ALBUM ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 				exit (0)  if ($^O =~ /MSWin/o);
 				exit (4);  #QUIT
@@ -137,8 +137,9 @@ if ($#ARGV >= 1) {
 	foreach my $skipit (@SKIPTHESE) {
 		$skipit =~ s/\|\_$/\|$ARGV[1]/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/$ARGV[0]\|/;
+		$skipit =~ s/\|/\\\|/;
 		print STDERR "-???- AT=$ARGV[0]|$ARGV[1]= SKIPIT=$skipit=\n"  if ($DEBUG > 1);
-		if ("$ARGV[0]|$ARGV[1]" =~ /^\Q${skipit}\E/i) {
+		if ("$ARGV[0]|$ARGV[1]" =~ /^${skipit}/i) {
 			print STDERR "i:LYRICS HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			exit (0)  if ($^O =~ /MSWin/o);
 			exit (4);  #QUIT
@@ -146,19 +147,21 @@ if ($#ARGV >= 1) {
 	}
 
 	my $omit = '';
-	if ($flags =~ /ALBUMART/ && -d $ARGV[2]) {  #ALBUMART PLUG IS ALSO ACTIVE & SET TO PULL FROM WEB.
-		#WAIT FOR 5" & AND SEE IF ALBUMART ALREADY PULLED LYRICS WHILST PULLING AN ALBUM-COVER:
+	if ($flags =~ /ALBUMART/ && defined($ARGV[2]) && -d $ARGV[2]) {
+		#ALBUMART PLUG IS ALSO ACTIVE & SET TO PULL FROM WEB.
+		#WAIT FOR 7" & AND SEE IF ALBUMART ALREADY PULLED LYRICS WHILST PULLING AN ALBUM-COVER:
 		#(THIS STRATEGY IS USED TO AVOID HITTING A LYRIC SITE TWICE, SINCE BOTH ALBUM-ART AND
 		#LYRICWIKI SHARE SOME SITES (CURRENTLY:  Genius.com and Musixmatch.com, AS THESE CAN
 		#PROVIDE BOTH COVER-ART IMAGES AND LYRICS!:
-		my $timeout = 6;
+		my $timeout = 7;
 		our $quit = 0;
 
-		local $SIG{ALRM} = sub { print STDERR "--QUIT!--\n"  if ($DEBUG); $quit = 1; };
+		local $SIG{ALRM} = sub { print STDERR "--TIME'S UP!--\n"  if ($DEBUG); $quit = 1; };
 		alarm $timeout;
 
 		my $checklyrics = 0;
-		while (1) {  #WAIT 5 SECONDS TO GIVE ALBUMART A CHANCE TO FETCH THE LYRICS FOR US:
+		print STDERR "i:Lyrics: waiting $timeout sec. for AlbumArt...\n"  if ($DEBUG);
+		while (1) {  #WAIT 7 SECONDS TO GIVE ALBUMART A CHANCE TO FETCH THE LYRICS FOR US:
 			last  if ($quit);
 			if (-e "$ARGV[2]/_albumart_done.tmp") {
 				if (open IN, "$ARGV[2]/_albumart_done.tmp") {
@@ -178,6 +181,7 @@ if ($#ARGV >= 1) {
 		if ($checklyrics && -e "$ARGV[2]/_tmp_lyrics_from_albumart.txt") {
 			unlink("$ARGV[2]/_tmp_lyrics.txt")  if (-e "$ARGV[2]/_tmp_lyrics.txt");
 			rename "$ARGV[2]/_tmp_lyrics_from_albumart.txt", "$ARGV[2]/_tmp_lyrics.txt";
+			print STDERR "i:LYRICS: Album-art found some lyrics for us, returning them!\n"  if ($DEBUG);
 			exit (0);
 		}
 	}
@@ -185,6 +189,7 @@ if ($#ARGV >= 1) {
 	my $lf = $omit ? new LyricFinder(-omit => $omit) : new LyricFinder();
 	if ($lf) {
 		$lf->agent($agent)  if ($agent);
+		print STDERR "---LYRICS HELPER WILL SEARCH THE WEB...\n"  if ($DEBUG);
 		my $lyrics = $lf->fetch($ARGV[0], $ARGV[1], 'random');
 		if (defined($lyrics) && $lyrics) {
 			my $doschar = ($^O =~ /Win/) ? "\r" : '';
@@ -211,4 +216,4 @@ if ($#ARGV >= 1) {
 } else {
 	print STDERR "..usage: $0 artist title [output_directory [album [flags]]]\n";
 }
-unlink("$ARGV[2]/_tmp_lyrics_from_albumart.txt")  if (-d $ARGV[2] && -e "$ARGV[2]/_tmp_lyrics_from_albumart.txt");
+unlink("$ARGV[2]/_tmp_lyrics_from_albumart.txt")  if (defined($ARGV[2]) && -d $ARGV[2] && -e "$ARGV[2]/_tmp_lyrics_from_albumart.txt");
