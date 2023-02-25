@@ -4,7 +4,9 @@ DISTCLEAN = ${GENERATED_FILES} config.h config.log config.status
 
 DATA = AUTHORS \
        COPYING \
+       MANTEXT \
        images/about-logo.png \
+       images/about-logo-win32.png \
        images/appearance.png \
        images/audio.png \
        images/connectivity.png \

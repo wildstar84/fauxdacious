@@ -34,14 +34,14 @@
 static QTabWidget * buildCreditsNotebook (QWidget * parent)
 {
     const char * data_dir = aud_get_path (AudPath::DataDir);
-    const char * titles[2] = {N_("Credits"), N_("License")};
-    const char * filenames[2] = {"AUTHORS", "COPYING"};
+    const char * titles[3] = {N_("Credits"), N_("License"), N_("Help")};
+    const char * filenames[3] = {"AUTHORS", "COPYING", "MANTEXT"};
 
     auto tabs = new QTabWidget (parent);
     tabs->setDocumentMode (true);
     tabs->setMinimumSize (6 * audqt::sizes.OneInch, 2 * audqt::sizes.OneInch);
 
-    for (int i = 0; i < 2; i ++)
+    for (int i = 0; i < 3; i ++)
     {
         auto text = VFSFile::read_file (filename_build ({data_dir, filenames[i]}), VFS_APPEND_NULL);
         auto edit = new QPlainTextEdit (text.begin (), parent);
@@ -57,7 +57,11 @@ static QDialog * buildAboutWindow ()
 {
 // JWT:FIXME: RETAINED NEXT 2 FOR OUR LOGO TO WORK:
     const char * data_dir = aud_get_path (AudPath::DataDir);
+#ifdef _WIN32
+    const char * logo_path = filename_build ({data_dir, "images", "about-logo-win32.png"});
+#else
     const char * logo_path = filename_build ({data_dir, "images", "about-logo.png"});
+#endif
     const char * about_text = "<big><b>Fauxdacious " VERSION "</b> (" BUILDSTAMP ")</big><br>" COPYRIGHT;
     const char * website = "https://wildstar84.wordpress.com/fauxdacious";
 

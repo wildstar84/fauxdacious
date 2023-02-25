@@ -32,14 +32,14 @@
 static const char about_text[] = "<big><b>Fauxdacious " VERSION "</b> (" BUILDSTAMP ")</big>\n" COPYRIGHT;
 static const char website[] = "https://wildstar84.wordpress.com/fauxdacious";
 
-static GtkWidget * create_credits_notebook (const char * credits, const char * license)
+static GtkWidget * create_credits_notebook (const char * credits, const char * license, const char * manpage)
 {
-    const char * titles[2] = {N_("Credits"), N_("License")};
-    const char * text[2] = {credits, license};
+    const char * titles[3] = {N_("Credits"), N_("License"), N_("Help")};
+    const char * text[3] = {credits, license, manpage};
 
     GtkWidget * notebook = gtk_notebook_new ();
 
-    for (int i = 0; i < 2; i ++)
+    for (int i = 0; i < 3; i ++)
     {
         GtkWidget * label = gtk_label_new (_(titles[i]));
 
@@ -79,7 +79,11 @@ static GtkWidget * create_about_window ()
     GtkWidget * vbox = audgui_vbox_new (6);
     gtk_container_add ((GtkContainer *) about_window, vbox);
 
+#ifdef _WIN32
+    StringBuf logo_path = filename_build ({data_dir, "images", "about-logo-win32.png"});
+#else
     StringBuf logo_path = filename_build ({data_dir, "images", "about-logo.png"});
+#endif
     GtkWidget * image = gtk_image_new_from_file (logo_path);
     gtk_box_pack_start ((GtkBox *) vbox, image, false, false, 0);
 
@@ -101,8 +105,9 @@ static GtkWidget * create_about_window ()
 
     auto credits = VFSFile::read_file (filename_build ({data_dir, "AUTHORS"}), VFS_APPEND_NULL);
     auto license = VFSFile::read_file (filename_build ({data_dir, "COPYING"}), VFS_APPEND_NULL);
+    auto manpage = VFSFile::read_file (filename_build ({data_dir, "MANTEXT"}), VFS_APPEND_NULL);
 
-    GtkWidget * notebook = create_credits_notebook (credits.begin (), license.begin ());
+    GtkWidget * notebook = create_credits_notebook (credits.begin (), license.begin (), manpage.begin ());
     gtk_widget_set_size_request (notebook, 6 * dpi, 2 * dpi);
     gtk_box_pack_start ((GtkBox *) vbox, notebook, true, true, 0);
 
