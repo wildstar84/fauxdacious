@@ -1,4 +1,19 @@
-Version 4.3-beta1:
+Version 4.2.2-final:
+
+This release is a snapshot of v4.3-beta1 as of 2/24/23 in order to do a new 
+Windows release and include most of the improvements since v4.2.1-final, along 
+with many of Audacious's v4.3-beta1 GIT commits as/of 2/03/23 and plugin GIT 
+commits through 2/11/23, since this has shown to be a good stopping-point in 
+both our work and at Audacious.  Notably absent are support for GTK3, and 
+recent Sid-player and AdPlug plugin enhancements (requires recent libsidplay, 
+etc.).  The reason for reverting BACK from v4.3-beta1 to a v4.2.2-final is that 
+we don't want to release a v4.3-final until Audacious ultimately does, but 
+still release another "final" release before then.  For adplug, Fauxdacious for 
+Windows provides the Adplug Classic plugin to handle adplug files.
+
+Change log:
+
+* Added a "Help" tab to the "About" window to display the Fauxdacious man-page.
 
 * Added more workarounds for window-managers, particularly AfterStep (the one 
 the author uses) and have modified the recommended AfterStep "database" 
