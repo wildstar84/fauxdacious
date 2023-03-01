@@ -225,14 +225,20 @@ EXPORT void cleanup ()
     plugin_prefs_hide ();
     prefswin_hide ();
 
-    log_cleanup ();
-
-    delete qApp;
-
 #ifdef USE_SDL2
+    SDL_Window * sdl_window = fauxd_get_sdl_window ();
+    if (sdl_window)
+    {
+        SDL_DestroyWindow (sdl_window);
+        sdl_window = nullptr;
+    }
     if (SDL_WasInit (SDL_INIT_VIDEO))
         SDL_QuitSubSystem (SDL_INIT_VIDEO);  // SDL DOCS SAY SDL_Quit () SAFE, BUT SEGFAULTS HERE?!
 #endif
+
+    log_cleanup ();
+
+    delete qApp;
 }
 
 EXPORT QIcon get_icon (const char * name)
