@@ -133,9 +133,10 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-	if ($ARGV[0] !~ /\.(?:mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta|mk[av])$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
+	if ($ARGV[0] !~ /\.(?:asx|mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta|mk[av])$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
 		#SPECIAL HANDLING FOR rcast.net STREAMS (TOO SIMPLE TO NEED STREAMFINDER):
-		if (($newPlaylistURL = $ARGV[0]) =~ s#https\:\/\/www\.rcast\.net\/dir\/(\d+)\/?(.*)#https\:\/\/stream\.rcast\.net\/$1#) {
+		if ($StreamFinder::VERSION < 2.04
+				&& ($newPlaylistURL = $ARGV[0]) =~ s#https\:\/\/dir\.rcast\.net\/radio\/(\d+)\/?(.*)#https\:\/\/stream\.rcast\.net\/$1#) {
 			$title = $2  if ($2);
 			if ($title) {
 				$title =~ s#\/$##;
@@ -332,7 +333,7 @@ sub writeTagData {
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!
 	# THE LIST IN THE REGEX BELOW ARE THE ONES TO *NOT* DELETE ART IMAGES FOR (ie. STREAMING STATIONS)!:
 	my $tagfid = (!$downloadit && $client && $client->getType()
-			=~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox)$/)  #THESE SITES HAVE STATIONS:
+			=~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast)$/)  #THESE SITES HAVE STATIONS:
 			? 'user_tag_data' : 'tmp_tag_data';
 	#WORKAROUND FOR IHEART & TUNEIN PODCASTS:
 	if ($client && $tagfid =~ /^user/) {
