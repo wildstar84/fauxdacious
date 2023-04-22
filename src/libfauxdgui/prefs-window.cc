@@ -369,6 +369,8 @@ static const PreferencesWidget playlist_page_widgets[] = {
         WidgetBool (0, "split_titles")),
     WidgetCheck (N_("Advance to next selected entry in list"),
         WidgetBool (0, "advance_2_next_selected")),
+    WidgetCheck (N_("On add, select 1st entry added"),
+        WidgetBool (0, "select_latest_entry_added")),
     WidgetCheck (N_("Keep playlist metadata (like cuesheets do)"),
         WidgetBool (0, "keep_playlist_metadata")),
     WidgetCheck (N_("Don't allow streams to change metadata"),

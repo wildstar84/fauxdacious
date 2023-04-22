@@ -1,3 +1,12 @@
+* Add "On add, select 1st entry added" [Playlist] option to highlight (select) 
+the newly-added entry (or the first entry in a list of newly-added entries) 
+when adding entries to a playlist.  This (when combined with the "Advance to 
+next selected entry in list" [Playlist] option just above it is also checked) 
+makes it easy for the user (especially if using the Mini-Fauxdacious plugin) 
+to quickly advance to and play the entry he just added by pressing [Next] or 
+Ctrl-B without having to scroll down to the bottom of the playlist, find, and 
+select and play it manually.
+
 Version 4.2.2-final:
 
 This release is a snapshot of v4.3-beta1 as of 2/24/23 in order to do a new 

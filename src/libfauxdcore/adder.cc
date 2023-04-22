@@ -539,6 +539,9 @@ static void add_finish ()
 
             aud_playlist_play (playlist);
         }
+        /* JWT:MARK FIRST(OR ONLY) ENTRY ADDED (IF USER WISHES) FOR JUMPING TO IT: */
+        if (aud_get_bool (nullptr, "select_latest_entry_added"))
+            aud_playlist_entry_set_selected (playlist, result->at, true);
 
         playlist_enable_scan (true);
 
