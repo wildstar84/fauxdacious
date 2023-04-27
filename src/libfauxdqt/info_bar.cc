@@ -254,8 +254,7 @@ EXPORT InfoBar::InfoBar (QWidget * parent) :
         sd[Cur].alpha = FadeSteps;
     }
     /* JWT:NEEDED FOR KEYPRESS EVENTS TO BE SEEN!: */
-    if (m_parent == nullptr)
-        this->setFocusPolicy (Qt::StrongFocus);
+    this->setFocusPolicy (Qt::StrongFocus);
 }
 
 EXPORT InfoBar::~InfoBar ()
@@ -614,7 +613,7 @@ EXPORT void InfoBar::update_art ()
 
 void InfoBar::keyPressEvent (QKeyEvent * event)
 {
-    if (m_parent != nullptr || ! event)
+    if (! event)
         return;
 
     auto CtrlShiftAlt = Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier;
@@ -655,8 +654,9 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
             break;
         }
     }
-    else if (event->modifiers () & Qt::AltModifier)
+    else if (m_parent == nullptr && (event->modifiers () & Qt::AltModifier))
     {
+        /* NOTE:  Mini-Fauxdacious ONLY (AVOID CONFLICT W/MAIN-WINDOW BINDINGS)!: */
         PluginHandle * plugin;
 
         switch (event->key ())
