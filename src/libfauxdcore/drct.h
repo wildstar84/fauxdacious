@@ -47,6 +47,7 @@ String aud_drct_get_filename ();
 // returns formatted title of playing song
 // connect to the "title change" hook to be notified of changes
 String aud_drct_get_title ();
+String aud_drct_get_title_one_line (bool flatten);
 
 // returns metadata of playing song
 // connect to the "tuple change" hook to be notified of changes

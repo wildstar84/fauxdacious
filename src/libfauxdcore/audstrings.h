@@ -117,6 +117,6 @@ StringBuf double_array_to_str (const double * array, int count);
 /* Requires: aud_init() */
 StringBuf str_format_time (int64_t milliseconds);
 
-StringBuf str_get_first_line (const char * instr);
+StringBuf str_get_one_line (const char * instr, bool flatten);
 
 #endif /* LIBAUDCORE_STRINGS_H */

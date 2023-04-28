@@ -669,7 +669,33 @@ EXPORT String aud_drct_get_title ()
     unlock ();
 
     StringBuf prefix = aud_get_bool (nullptr, "show_numbers_in_pl") ?
-     str_printf ("%d. ", 1 + entry) : StringBuf (0);
+            str_printf ("%d. ", 1 + entry) : StringBuf (0);
+
+    StringBuf time = (length > 0) ? str_format_time (length) : StringBuf ();
+    StringBuf suffix = time ? str_concat ({" (", time, ")"}) : StringBuf (0);
+
+    return String (str_concat ({prefix, title, suffix}));
+}
+
+// thread-safe
+/* JWT:CONVERT MULTILINE TITLES INTO EITHER SINGLE, SPACE-SEPARATED LINE (flatten=true),
+   OR JUST THE FIRST LINE (flatten=false).  SIMILAR TO audstrings.cc:str_get_one_line (),
+   EXCEPT HERE WE APPLY THAT FUNCTION TO JUST THE FORMATTED TITLE *BEFORE* APPENDING ANY
+   USER-OPTION PREFICES OR SUFFICES:
+*/
+EXPORT String aud_drct_get_title_one_line (bool flatten)
+{
+    if (! lock_if (is_ready))
+        return String ();
+
+    StringBuf title = str_get_one_line (pb_info.title, flatten);
+    int entry = pb_info.entry;
+    int length = pb_info.length;
+
+    unlock ();
+
+    StringBuf prefix = aud_get_bool (nullptr, "show_numbers_in_pl") ?
+            str_printf ("%d. ", 1 + entry) : StringBuf (0);
 
     StringBuf time = (length > 0) ? str_format_time (length) : StringBuf ();
     StringBuf suffix = time ? str_concat ({" (", time, ")"}) : StringBuf (0);

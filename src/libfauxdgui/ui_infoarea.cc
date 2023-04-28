@@ -399,12 +399,12 @@ static void ui_infoarea_set_title ()
     g_return_if_fail (area);
 
     Tuple tuple = aud_drct_get_tuple ();
-    String title = tuple.get_str (Tuple::Title);
-    String artist = tuple.get_str (Tuple::Artist);
+    String title = String (str_get_one_line (tuple.get_str (Tuple::Title), true));
+    String artist = String (str_get_one_line (tuple.get_str (Tuple::Artist), true));
     String album = tuple.get_str (Tuple::Album);
 
     if (! g_strcmp0 (title, area->title) && ! g_strcmp0 (artist, area->artist)
-     && ! g_strcmp0 (album, area->album))
+            && ! g_strcmp0 (album, area->album))
         return;
 
     area->title = std::move (title);

@@ -365,8 +365,8 @@ EXPORT void InfoBar::update_title ()
     Tuple tuple = aud_drct_get_tuple ();
 
     sd[Cur].title.setText (QString ());
-    sd[Cur].orig_title = tuple.get_str (Tuple::Title);
-    sd[Cur].artist.setText ((const char *) tuple.get_str (Tuple::Artist));
+    sd[Cur].orig_title = String (str_get_one_line (tuple.get_str (Tuple::Title), true));
+    sd[Cur].artist.setText ((const char *) str_get_one_line (tuple.get_str (Tuple::Artist), true));
     sd[Cur].album.setText ((const char *) tuple.get_str (Tuple::Album));
 
     update ();

@@ -1184,21 +1184,37 @@ EXPORT StringBuf str_format_time (int64_t milliseconds)
     }
 }
 
-/* JWT:RETURN ONLY FIRST "LINE" OF A MULTI-LINE STRING (USED FOR TITLES ON WINDOW TITLEBARS! */
-EXPORT StringBuf str_get_first_line (const char * instr)
+/* JWT:CONVERT A MULTILINE STRING (CONTAINS "\r" AND/OR "\n" CHARACTERS TO EITHER A "FLAT" STRING
+   (REPLACES NEWLINE CHARS WITH SPACES) OR RETURNS ONLY THE FIRST LINE, WITH ELIPSES.
+   (SET flatten=true FOR THE FULL STRING, OR flatten=false FOR ONLY THE FIRST LINE).  Fauxdacious
+   USES THIS FOR ENTRIES WITH MULTILINE TITLES TO MAKE THEM SINGLE-LINE WHERE NEEDED (IE. PLAYLIST
+   WINDOWS, ETC.) AND SHORTEN THEM TO JUST THE FIRST LINE WHERE A SHORTER TITLE IS NEEDED
+   (IE. WINDOW-MANAGER WINDOW TITLE-BARS).
+*/
+EXPORT StringBuf str_get_one_line (const char * instr, bool flatten)
 {
     if (! instr)
         return StringBuf ();
 
     int len = strlen (instr);
+    int full_len = len;
     for (int i=0; i<len; i++)
     {
         if (instr[i] == '\r' || instr[i] == '\n')
         {
+            if (flatten)  // RETURNS FULL STRING AS SINGLE, SPACE-SEPARATED LINE:
+            {
+                StringBuf flatline = str_copy (_(instr));
+                str_replace_char (flatline, '\r', ' ');
+                str_replace_char (flatline, '\n', ' ');
+                return flatline.settle ();
+            }
             len = i;
             break;
         }
     }
 
-    return str_printf (_("%.*s"), len, instr);
+    // TRUNCATE TO 1ST LINE AS NEEDED, AND ADD ELIPSES IF TRUNCATED:
+    return (len < full_len) ? str_printf (_("%.*s%s"), len, instr, "...")
+            : str_printf (_("%.*s"), len, instr);
 }
