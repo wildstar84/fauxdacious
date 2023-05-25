@@ -34,6 +34,7 @@
 
 #include <libfauxdcore/drct.h>
 #include <libfauxdcore/interface.h>
+#include <libfauxdcore/hook.h>
 #include <libfauxdcore/plugins.h>
 #include <libfauxdcore/plugin.h>
 #include <libfauxdcore/runtime.h>
@@ -652,6 +653,10 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
           case Qt::Key_B:
             aud_drct_pl_next ();
             break;
+          case Qt::Key_T:
+            if (m_parent == nullptr)
+                hook_call("reverse minifauxd toolbar", nullptr);
+            break;
         }
     }
     else if (m_parent == nullptr && (event->modifiers () & Qt::AltModifier))
@@ -716,13 +721,16 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
 
 void InfoBar::mouseDoubleClickEvent (QMouseEvent * e)
 {
-    if (m_parent == nullptr || ! e)
+    if (! e)
         return;
-
-    PluginHandle * infobarHandle = aud_plugin_lookup_basename ("info-bar-plugin-qt");
-    if (infobarHandle && ! aud_plugin_get_enabled (infobarHandle))
-        aud_plugin_enable (infobarHandle, true);
-
+    else if (m_parent == nullptr)
+        hook_call("reverse minifauxd toolbar", nullptr);
+    else
+    {
+        PluginHandle * infobarHandle = aud_plugin_lookup_basename ("info-bar-plugin-qt");
+        if (infobarHandle && ! aud_plugin_get_enabled (infobarHandle))
+            aud_plugin_enable (infobarHandle, true);
+    }
     e->accept ();
 }
 

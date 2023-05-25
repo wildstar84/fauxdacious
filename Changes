@@ -1,3 +1,24 @@
+* Add a toolbar option to Qt version of the Mini-Fauxdacious plugin to show a 
+toolbar at the bottom of the Mini-Fauxdacious window very similar to the one 
+in the main playlist window.  The new option is under the Plugins configuration 
+window for the Mini-Fauxdacious Qt plugin.  The idea is to allow 
+Mini-Fauxdacious the option to work more like Audacious's "Moonstone" plugin, 
+to which Mini-Fauxdacious is Fauxdacious's intended alternative.  If active, 
+the toolbar increases the height of the window by it's height, and by default, 
+is styled after Fauxdacious's current style.  A second checkbox option allows 
+displaying the toolbar in the same color-style as the one in Audacious's 
+Moonstone plugin (a very light grey background).  To toggle the toolbar, the 
+user can either double-click on the plugin window or pressing the "T" key (for 
+Toolbar).  NOTE:  While the toolbar remains (if active) between docking and 
+floating (undocking) the plugin window, it is not possible to toggle while 
+docked, as this would corrupt the window-resizing capabilities of the main 
+playlist window requiring a full restart of Fauxdacious.  Also note that 
+toggling the Moonstone/Default toolbar style does not take effect until the 
+plugin is stopped and restarted, sorry.
+
+* Shrink the hight of the toolbar in the main Fauxdacious playlist window 
+(Qt) version by about 6 pixels to save a bit of screen realestate.
+
 * Add "On add, select 1st entry added" [Playlist] option to highlight (select) 
 the newly-added entry (or the first entry in a list of newly-added entries) 
 when adding entries to a playlist.  This (when combined with the "Advance to 
