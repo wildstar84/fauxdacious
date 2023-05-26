@@ -1,4 +1,17 @@
-* Add a toolbar option to Qt version of the Mini-Fauxdacious plugin to show a 
+* Mini-Fauxdacious (Qt): Save separate window-width values for shaded vs. 
+unshaded allowing for easier managing smaller window if shaded while having a 
+wider one sized to accomodate more desired buttons.
+
+* Mini-Fauxdacious (Qt): Add configuration checkboxes allowing user to change 
+which options appear as buttons in the optional toolbar!  Also save separate 
+window widths for the shaded (no toolbar) and unshaded (toolbar) versions of 
+the plugin window making it easier for user to automatically change to a wider 
+window when the toolbar is present (unshaded) if user has a large number of 
+toolbar buttons turned on.  Also make it possible to toggle the toolbar's color 
+scheme style (Audacious "Moonstyle" vs. native style) on the fly (without 
+having to restart the plugin).
+
+* Mini-Fauxdacious (Qt): Add a toolbar option to the plugin to show a 
 toolbar at the bottom of the Mini-Fauxdacious window very similar to the one 
 in the main playlist window.  The new option is under the Plugins configuration 
 window for the Mini-Fauxdacious Qt plugin.  The idea is to allow 
