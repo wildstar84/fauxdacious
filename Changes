@@ -1,6 +1,11 @@
-* Mini-Fauxdacious (Qt): Save separate window-width values for shaded vs. 
-unshaded allowing for easier managing smaller window if shaded while having a 
-wider one sized to accomodate more desired buttons.
+* Mini-Fauxdacious (GTK):  Merge most recent Qt-version feature additions, 
+namely the optional toolbar and related new plugin-configuration options 
+allowing users to select which buttons they want to appear on it.  
+Unfortunately, I was unable to add the ability to toggle the toolbar with 
+a mouse double-click, but one can still click on the plugin window and toggle 
+it using the "t" key.  I also gave up (for the moment) trying to get the 
+"Moonstone" background option to work on the GTK-2 version, but it does work 
+on the GTK-3 version!
 
 * Mini-Fauxdacious (Qt): Add configuration checkboxes allowing user to change 
 which options appear as buttons in the optional toolbar!  Also save separate 
@@ -8,7 +13,7 @@ window widths for the shaded (no toolbar) and unshaded (toolbar) versions of
 the plugin window making it easier for user to automatically change to a wider 
 window when the toolbar is present (unshaded) if user has a large number of 
 toolbar buttons turned on.  Also make it possible to toggle the toolbar's color 
-scheme style (Audacious "Moonstyle" vs. native style) on the fly (without 
+scheme style (Audacious "Moonstone" vs. native style) on the fly (without 
 having to restart the plugin).
 
 * Mini-Fauxdacious (Qt): Add a toolbar option to the plugin to show a 
@@ -25,9 +30,7 @@ user can either double-click on the plugin window or pressing the "T" key (for
 Toolbar).  NOTE:  While the toolbar remains (if active) between docking and 
 floating (undocking) the plugin window, it is not possible to toggle while 
 docked, as this would corrupt the window-resizing capabilities of the main 
-playlist window requiring a full restart of Fauxdacious.  Also note that 
-toggling the Moonstone/Default toolbar style does not take effect until the 
-plugin is stopped and restarted, sorry.
+playlist window requiring a full restart of Fauxdacious.
 
 * Shrink the hight of the toolbar in the main Fauxdacious playlist window 
 (Qt) version by about 6 pixels to save a bit of screen realestate.

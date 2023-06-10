@@ -602,9 +602,15 @@ static void set_album_art ()
             GtkWidget * parent_window = gtk_widget_get_parent (area->widget);
             if (parent_window)
             {
-                GtkWidget * grandparent_window = gtk_widget_get_parent (parent_window);
-                if (grandparent_window && gtk_widget_is_toplevel (grandparent_window))
-                    m_art_hide_dups = false;  // MINI-FAUXDACIOUS IS UNDOCKED(FLOATING), SO SHOW.
+                GdkWindow * gdktop = gtk_widget_get_window (area->widget);
+                if (gdktop)
+                {
+                    GdkWindow * gtkfloating = gdk_window_get_toplevel (gdktop);
+                    if (gtkfloating && gtkfloating == gdktop)
+                        m_art_hide_dups = false;  // WE'RE FLOATING (UNDOCKED).
+                }
+                else
+                    m_art_hide_dups = false;  // LAUNCHED, NOT SURE OF DOCK-STATUS, SO TREAT AS UNDOCKED.
             }
             else  // NO PARENT WINDOW (YET?! - MINI-FAUXDACIOUS JUST LAUNCHED):
                 m_art_hide_dups = false;  // WE CAN'T TELL DOCK-STATUS, SO TREAT AS UNDOCKED.
