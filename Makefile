@@ -13,7 +13,8 @@ DATA = AUTHORS \
        images/playlist.png \
        images/info.png \
        images/plugins.png \
-       images/advanced.png
+       images/advanced.png \
+       images/fauxdacious24.png
  
 include buildsys.mk
 include extra.mk
