@@ -599,21 +599,16 @@ static void set_album_art ()
         bool m_art_hide_dups = true;  // IF HERE, DEFAULT IS HIDE UNLESS DETERMINED OTHERWISE BELOW:
         if (area->widget)  // MINI-FAUXDACIOUS PLUGIN IS RUNNING, CHECK IF DOCKED:
         {
+            /* JWT:FIXME:THERE'S GOTTA BE A BETTER WAY?!: */
             GtkWidget * parent_window = gtk_widget_get_parent (area->widget);
-            if (parent_window)
+            int ancestors = 1;
+            while (parent_window)
             {
-                GdkWindow * gdktop = gtk_widget_get_window (area->widget);
-                if (gdktop)
-                {
-                    GdkWindow * gtkfloating = gdk_window_get_toplevel (gdktop);
-                    if (gtkfloating && gtkfloating == gdktop)
-                        m_art_hide_dups = false;  // WE'RE FLOATING (UNDOCKED).
-                }
-                else
-                    m_art_hide_dups = false;  // LAUNCHED, NOT SURE OF DOCK-STATUS, SO TREAT AS UNDOCKED.
+                parent_window = gtk_widget_get_parent (parent_window);
+                ancestors++;
             }
-            else  // NO PARENT WINDOW (YET?! - MINI-FAUXDACIOUS JUST LAUNCHED):
-                m_art_hide_dups = false;  // WE CAN'T TELL DOCK-STATUS, SO TREAT AS UNDOCKED.
+            if (ancestors <= 5)
+                m_art_hide_dups = false;  // WE'RE FLOATING(5) OR UNMAPPED(3), TREAT AS UNDOCKED.
         }
 
         if (m_art_hide_dups)

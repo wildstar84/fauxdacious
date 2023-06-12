@@ -1,9 +1,8 @@
 * Mini-Fauxdacious (GTK):  Merge most recent Qt-version feature additions, 
 namely the optional toolbar and related new plugin-configuration options 
 allowing users to select which buttons they want to appear on it.  
-Unfortunately, I was unable to add the ability to toggle the toolbar with 
-a mouse double-click, but one can still click on the plugin window and toggle 
-it using the "t" key.  I also gave up (for the moment) trying to get the 
+One can now toggle the toolbar either by double-clicking, or pressing the "t" 
+key when focused.  I gave up (for the moment) trying to get the 
 "Moonstone" background option to work on the GTK-2 version, but it does work 
 on the GTK-3 version!
 
