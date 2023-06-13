@@ -653,6 +653,19 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
           case Qt::Key_B:
             aud_drct_pl_next ();
             break;
+          case Qt::Key_M:
+            {
+                /* JWT:TOGGLE MUTE: */
+                int current_volume = aud_drct_get_volume_main ();
+                if (current_volume)
+                {
+                    aud_set_int ("audacious", "_premuted_volume", current_volume);
+                    aud_drct_set_volume_main (0);
+                }
+                else
+                    aud_drct_set_volume_main (aud_get_int ("audacious", "_premuted_volume"));
+            }
+            break;
           case Qt::Key_T:
             if (m_parent == nullptr)
                 hook_call("reverse minifauxd toolbar", nullptr);
