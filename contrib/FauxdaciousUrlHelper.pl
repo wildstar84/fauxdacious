@@ -3,7 +3,7 @@
 #MUST INSTALL youtube-dl FOR Youtube to work!
 #pp --gui -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
-###(urlhelper_modules.pm contains):
+###(urlhelper_mods.pm contains):
 ###use StreamFinder;
 ###use StreamFinder::_Class;
 ###use StreamFinder::Anystream;
@@ -13,6 +13,7 @@
 ###use StreamFinder::BrandNewTube;
 ###use StreamFinder::Brighteon;
 ###use StreamFinder::Castbox;
+###use StreamFinder::Goodpods;
 ###use StreamFinder::Google;
 ###use StreamFinder::IHeartRadio;
 ###use StreamFinder::InternetRadio;
@@ -20,7 +21,9 @@
 ###use StreamFinder::OnlineRadiobox;
 ###use StreamFinder::Podbean;
 ###use StreamFinder::PodcastAddict;
+###use StreamFinder::Podchaser;
 ###use StreamFinder::RadioNet;
+###use StreamFinder::Rcast;
 ###use StreamFinder::Rumble;
 ###use StreamFinder::SermonAudio;
 ###use StreamFinder::SoundCloud;
@@ -207,7 +210,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 					$path =~ s#^(\w)\:#\/$1\%3A#;
 					$path =~ s#\\#\/#g;
-				} elsif ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
+				}
+				if ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
 					#GTK CAN'T HANDLE webp, com, ETC.!:
 					`/usr/bin/convert '${path}/${stationID}.$image_ext' '${path}/${stationID}.png'`;
 					if (-e "${path}/${stationID}.png") {
@@ -217,7 +221,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				}
 				$comment .= "Comment=file://${path}/${stationID}.$image_ext";
 				my $art_url2 = $client->getIconURL('artist');
-				if ($art_url2 && $art_url2 ne $art_url) {
+				if ($art_url2 && $art_url2 ne $art_url) {  #Handle some bad Apple in-podcast images
 					my ($image_ext, $art_image) = $client->getIconData('artist');
 					$image_ext =~ tr/A-Z/a-z/;
 					if ($configPath && $art_image && length($art_image) > 499 #SANITY-CHECK (RUMBLE.COM)!
@@ -229,7 +233,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 						if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 							$path =~ s#^(\w)\:#\/$1\%3A#;
 							$path =~ s#\\#\/#g;
-						} elsif ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
+						}
+						if ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
 							#GTK CAN'T HANDLE webp, com, ETC.!:
 							`/usr/bin/convert '${path}/${stationID}_channel.$image_ext' '${path}/${stationID}_channel.png'`;
 							if (-e "${path}/${stationID}_channel.png") {
