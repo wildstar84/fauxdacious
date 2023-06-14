@@ -29,6 +29,7 @@ src/libfauxdgui/prefs-widget.cc
 src/libfauxdgui/prefs-window.cc
 src/libfauxdgui/preset-browser.cc
 src/libfauxdgui/queue-manager.cc
+src/libfauxdgui/search-select.cc
 src/libfauxdgui/status.cc
 src/libfauxdgui/url-opener.cc
 src/libfauxdgui/util.cc
@@ -50,6 +51,7 @@ src/libfauxdqt/prefs-pluginlist-model.cc
 src/libfauxdqt/prefs-widget-qt.cc
 src/libfauxdqt/prefs-window-qt.cc
 src/libfauxdqt/queue-manager-qt.cc
+src/libfauxdqt/search-select-qt.cc
 src/libfauxdqt/song-window-qt.cc
 src/libfauxdqt/url-opener-qt.cc
 src/libfauxdqt/util-qt.cc
