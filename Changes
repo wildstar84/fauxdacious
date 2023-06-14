@@ -1,10 +1,41 @@
+Version 4.3-final:
+
+This release is mostly a feature-enhancement release with very few bugs fixed 
+(or found!).  The biggest new feature is the optional toolbar addition to all 
+versions of the Mini-Fauxdacious plugin.  Other notable additions are:  
+
+  * Highlighting the first entry added when adding entries (for easier quick-
+    advance to them to start playing).
+  * Improved handling of multi-line titles, easier access to the Mute 
+    function via middle-button (mouse) and "m" (keyboard).
+  * *Most* all applicable Audacious commits through June 1, 2023.
+  * StreamFinder module upgraded to latest version 2.14, which supports three 
+    new sites:  (Goodpods, Podchaser & RCast).  
+
+Anyway, for full details, see the Changelog below and the GitHub commits since 
+the previous final release.  This release brings us up to date with 
+(and beyond) Audacious's version 4.3.1 final release.  Only notable absence 
+I'm aware of is I have not added their "WM_WINDOW_ROLE" commits yet, as it 
+involves modifying numerous source files and my ancient window-manager 
+(AfterStep) doesn't even see nor need these.  If you're hurting for this, 
+drop me an email and I'll get it done!  We also currently don't support 
+meson builds.
+
+The gory details:
+
+* Transiflex language updates and a shiny new M$-Windows build (as always)!
+
+* Add middle-mousebutton option to toggle mute on the volume-button 
+(addresses Audacious feature-request #1213), but also add "m"-key press option 
+to all versions of Mini-Fauxdacious to also toggle mute.
+
 * Mini-Fauxdacious (GTK):  Merge most recent Qt-version feature additions, 
 namely the optional toolbar and related new plugin-configuration options 
 allowing users to select which buttons they want to appear on it.  
 One can now toggle the toolbar either by double-clicking, or pressing the "t" 
 key when focused.  I gave up (for the moment) trying to get the 
 "Moonstone" background option to work on the GTK-2 version, but it does work 
-on the GTK-3 version!
+on the GTK-3 (and Qt) versions!
 
 * Mini-Fauxdacious (Qt): Add configuration checkboxes allowing user to change 
 which options appear as buttons in the optional toolbar!  Also save separate 
@@ -32,7 +63,7 @@ docked, as this would corrupt the window-resizing capabilities of the main
 playlist window requiring a full restart of Fauxdacious.
 
 * Shrink the hight of the toolbar in the main Fauxdacious playlist window 
-(Qt) version by about 6 pixels to save a bit of screen realestate.
+(Qt) version by about 6 pixels to save a bit of screen real estate.
 
 * Add "On add, select 1st entry added" [Playlist] option to highlight (select) 
 the newly-added entry (or the first entry in a list of newly-added entries) 

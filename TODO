@@ -4,10 +4,6 @@ The effect plugins get properly turned off and on, but the QT screen does NOT
 update the checkboxes unless you click on the screen.  So far I have not
 found a way to fix this minor annoyance.
 
-* (Qt): Deal with occasional crashes on exit related to interaction between 
-the Info-bar and Mini-Fauxdacious, though non-technical users may not actually 
-notice the difference between such "crashes" and normal exits.
-
 * (M$-Windows): Rebuild build-environment to enable building the Qt version for 
 Windows (currently GTK only) and upgrading many ancient library versions.
 Also try to fix Fauxdacious icon disappearance when toggling 
