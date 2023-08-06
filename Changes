@@ -62,7 +62,7 @@ floating (undocking) the plugin window, it is not possible to toggle while
 docked, as this would corrupt the window-resizing capabilities of the main 
 playlist window requiring a full restart of Fauxdacious.
 
-* Shrink the hight of the toolbar in the main Fauxdacious playlist window 
+* Shrink the height of the toolbar in the main Fauxdacious playlist window 
 (Qt) version by about 6 pixels to save a bit of screen real estate.
 
 * Add "On add, select 1st entry added" [Playlist] option to highlight (select) 
