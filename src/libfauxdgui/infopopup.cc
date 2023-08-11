@@ -183,6 +183,7 @@ static GtkWidget * infopopup_create ()
     GtkWidget * infopopup = gtk_window_new (GTK_WINDOW_POPUP);
     gtk_window_set_type_hint ((GtkWindow *) infopopup, GDK_WINDOW_TYPE_HINT_TOOLTIP);
     gtk_window_set_decorated ((GtkWindow *) infopopup, false);
+    gtk_window_set_role ((GtkWindow *) infopopup, "infopopup");
     gtk_container_set_border_width ((GtkContainer *) infopopup, 4);
 
     GtkWidget * hbox = audgui_hbox_new (6);
@@ -265,9 +266,14 @@ static void infopopup_set_fields (const Tuple & tuple)
     infopopup_set_field (widgets.year_header, widgets.year_label,
      (value > 0) ? (const char *) int_to_str (value) : nullptr);
 
+    int disc_value = tuple.get_int (Tuple::Disc);
     value = tuple.get_int (Tuple::Track);
-    infopopup_set_field (widgets.track_header, widgets.track_label,
-     (value > 0) ? (const char *) int_to_str (value) : nullptr);
+    if (disc_value > 0)
+        infopopup_set_field (widgets.track_header, widgets.track_label,
+                (value > 0) ? (const char *) str_printf ("%d.%d", disc_value, value) : nullptr);
+    else
+        infopopup_set_field (widgets.track_header, widgets.track_label,
+                (value > 0) ? (const char *) int_to_str (value) : nullptr);
 }
 
 static void infopopup_move_to_mouse (GtkWidget * infopopup)

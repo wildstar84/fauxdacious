@@ -97,12 +97,13 @@ public:
 
         /* Title formatted for display; input plugins do not need to set this field */
         FormattedTitle,
-        Description,           /* Track description */
-        MusicBrainzID,         /* MusicBrainz identifier */
-        Lyrics,                /* JWT:Lyrics from id3 tags. */
-        Channels,              /* Track channels count */
-        Publisher,  /* Publisher (label) */
-        CatalogNum, /* Catalog number */
+        Description,    /* Track description */
+        MusicBrainzID,  /* MusicBrainz identifier */
+        Lyrics,         /* JWT:Lyrics from id3 tags. */
+        Channels,       /* Track channels count */
+        Publisher,      /* Publisher (label) */
+        CatalogNum,     /* Catalog number */
+        Disc,           /* Disc number from id3 tags. */
 
         n_fields
     };

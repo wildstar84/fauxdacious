@@ -69,6 +69,7 @@ enum SortType {
     Bitrate,
     Publisher,
     CatalogNum,
+    Disc,
     n_sort_types
 };
 

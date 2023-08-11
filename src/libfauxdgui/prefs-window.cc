@@ -120,7 +120,8 @@ static const TitleFieldTag title_field_tags[] = {
     { N_("Year")        , "${year}" },
     { N_("Comment")     , "${comment}" },
     { N_("Codec")       , "${codec}" },
-    { N_("Quality")     , "${quality}" }
+    { N_("Quality")     , "${quality}" },
+    { N_("Disc number") , "${disc-number}" }
 };
 
 static const ComboItem chardet_detector_presets[] = {
@@ -466,7 +467,7 @@ static const PreferencesWidget advanced_page_widgets[] = {
         WidgetBool ("audgui", "restore_floating_dockapps_late"))
 };
 
-#define TITLESTRING_NPRESETS 8
+#define TITLESTRING_NPRESETS 10
 
 static const char * const titlestring_presets[TITLESTRING_NPRESETS] = {
     "${title}",
@@ -476,6 +477,8 @@ static const char * const titlestring_presets[TITLESTRING_NPRESETS] = {
     "${?artist:${artist} - }${?album:${album} - }${title}",
     "${?artist:${artist} - }${?album:${album} - }${?track-number:${track-number}. }${title}",
     "${?artist:${artist} }${?album:[ ${album} ] }${?artist:- }${?track-number:${track-number}. }${title}",
+    "${?artist:${artist} - }${?album:${album} - }${?disc-number:${disc-number}. }${?track-number:${track-number}. }${title}",
+    "${?artist:${artist} }${?album:[ ${album} ] }${?artist:- }${?disc-number:${disc-number}. }${?track-number:${track-number}. }${title}",
     "${?album:${album} - }${title}"
 };
 
@@ -487,6 +490,8 @@ static const char * const titlestring_preset_names[TITLESTRING_NPRESETS] = {
     N_("ARTIST - ALBUM - TITLE"),
     N_("ARTIST - ALBUM - TRACK. TITLE"),
     N_("ARTIST [ ALBUM ] - TRACK. TITLE"),
+    N_("ARTIST - ALBUM - DISC.TRACK. TITLE"),
+    N_("ARTIST [ ALBUM ] - DISC.TRACK. TITLE"),
     N_("ALBUM - TITLE")
 };
 
@@ -986,6 +991,7 @@ static void create_prefs_window ()
     gtk_window_set_type_hint ((GtkWindow *) prefswin, GDK_WINDOW_TYPE_HINT_DIALOG);
     gtk_container_set_border_width ((GtkContainer *) prefswin, 12);
     gtk_window_set_title ((GtkWindow *) prefswin, _("Settings - Fauxdacious"));
+    gtk_window_set_role ((GtkWindow *) prefswin, "settings");
 
     GtkWidget * vbox = audgui_vbox_new (0);
     gtk_container_add ((GtkContainer *) prefswin, vbox);

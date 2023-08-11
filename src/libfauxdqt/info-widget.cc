@@ -53,6 +53,7 @@ static const TupleFieldMap tuple_field_map[] = {
     {N_("Artist"), Tuple::Artist, true},
     {N_("Album"), Tuple::Album, true},
     {N_("Album Artist"), Tuple::AlbumArtist, true},
+    {N_("Disc Number"), Tuple::Disc, true},
     {N_("Track Number"), Tuple::Track, true},
     {N_("Genre"), Tuple::Genre, true},
     {N_("Comment"), Tuple::Comment, true},

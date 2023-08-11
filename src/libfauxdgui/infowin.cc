@@ -174,6 +174,7 @@ static void set_entry_int_from_field (GtkWidget * widget, const Tuple & tuple,
  Tuple::Field field, bool editable, bool clear, bool & changed)
 {
     int value = tuple.get_int (field);
+    int value2 = (field == Tuple::Track) ? tuple.get_int (Tuple::Disc) : -1;
 
     if (value <= 0 && ! clear)
     {
@@ -182,7 +183,12 @@ static void set_entry_int_from_field (GtkWidget * widget, const Tuple & tuple,
         return;
     }
 
-    gtk_entry_set_text ((GtkEntry *) widget, (value > 0) ? (const char *) int_to_str (value) : "");
+    if (value2 > 0)
+        gtk_entry_set_text ((GtkEntry *) widget, (value > 0) ? (const char *) str_printf ("%d.%d",
+                value2, value) : "");
+    else
+        gtk_entry_set_text ((GtkEntry *) widget, (value > 0) ? (const char *) int_to_str (value) : "");
+
     gtk_editable_set_editable ((GtkEditable *) widget, editable);
 }
 
@@ -204,6 +210,32 @@ static void set_field_int_from_entry (Tuple & tuple, Tuple::Field field, GtkWidg
         tuple.set_int (field, atoi (text));
     else
         tuple.unset (field);
+}
+
+static void set_disc_and_track_from_entry (Tuple & tuple, GtkWidget * widget)
+{
+    const char * text = gtk_entry_get_text ((GtkEntry *) widget);
+
+    if (text[0])
+    {
+        const char * dot = strstr (text, ".");
+        if (dot && dot > text)  /* WE HAVE A DISK & TRACK# (#.#), SPLIT 'EM!: */
+        {
+            String disc_part = String (str_printf ("%.*s", (int)(dot - text), text));
+            tuple.set_int (Tuple::Disc, atoi ((const char *) disc_part));
+            tuple.set_int (Tuple::Track, (dot[1]) ? atoi (dot+1) : 0);
+        }
+        else  /* WE JUST HAVE A TRACK#: */
+        {
+            tuple.unset (Tuple::Disc);
+            tuple.set_int (Tuple::Track, atoi (text));
+        }
+    }
+    else
+    {
+        tuple.unset (Tuple::Disc);
+        tuple.unset (Tuple::Track);
+    }
 }
 
 static void entry_changed ()
@@ -242,7 +274,7 @@ static void infowin_update_tuple ()
     set_field_str_from_entry (current_tuple, Tuple::Performer, widgets.performer);
     set_field_str_from_entry (current_tuple, Tuple::CatalogNum, widgets.catalognum);
     set_field_int_from_entry (current_tuple, Tuple::Year, widgets.year);
-    set_field_int_from_entry (current_tuple, Tuple::Track, widgets.track);
+    set_disc_and_track_from_entry (current_tuple, widgets.track);
 
     /* JWT:IF RECORDING ON, USE THE FILE BEING RECORDED TO (BUT WILL FAIL OVER TO USER TAG-FILE)! */
     if (aud_get_bool (nullptr, "record"))
@@ -438,6 +470,7 @@ static void create_infowin ()
     infowin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_container_set_border_width ((GtkContainer *) infowin, 6);
     gtk_window_set_title ((GtkWindow *) infowin, _("Song Info - Fauxdacious"));
+    gtk_window_set_role ((GtkWindow *) infowin, "song-info");
     gtk_window_set_type_hint ((GtkWindow *) infowin,
             GDK_WINDOW_TYPE_HINT_DIALOG);
 
@@ -544,7 +577,7 @@ static void create_infowin ()
     add_entry (grid, _("Year"), widgets.year, 0, 12, 1);
 
     widgets.track = gtk_entry_new ();
-    add_entry (grid, _("Track Number"), widgets.track, 1, 12, 1);
+    add_entry (grid, _("[Disk#.]Track#"), widgets.track, 1, 12, 1);
 
     widgets.description = gtk_entry_new ();
     add_entry (grid, _("Description (flac, ogg)"), widgets.description, 0, 14, 2);

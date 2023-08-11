@@ -268,6 +268,8 @@ bool APETagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * imag
             tuple.set_str (Tuple::CatalogNum, pair.value.begin ());
         else if (! strcmp_nocase (pair.key, "Track"))
             tuple.set_int (Tuple::Track, atoi (pair.value.begin ()));
+        else if (! strcmp_nocase (pair.key, "Disc"))
+            tuple.set_int (Tuple::Disc, atoi (pair.value.begin ()));
         else if (! strcmp_nocase (pair.key, "Year"))
             tuple.set_int (Tuple::Year, atoi (pair.value.begin ()));
         else if (! strcmp_nocase (pair.key, "Lyrics"))
@@ -462,6 +464,7 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
      ! write_string_item (tuple, Tuple::Publisher, handle, "Publisher", & length, & items) ||
      ! write_string_item (tuple, Tuple::CatalogNum, handle, "Catalog", & length, & items) ||
      ! write_integer_item (tuple, Tuple::Track, handle, "Track", & length, & items) ||
+     ! write_integer_item (tuple, Tuple::Disc, handle, "Disc", & length, & items) ||
      ! write_integer_item (tuple, Tuple::Year, handle, "Year", & length, & items) ||
      ! write_string_item (tuple, Tuple::Lyrics, handle, "Lyrics", & length, & items))
         return false;
@@ -500,7 +503,7 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
          ! strcmp_nocase (pair.key, "Album") || ! strcmp_nocase (pair.key, "Comment") ||
          ! strcmp_nocase (pair.key, "Genre") || ! strcmp_nocase (pair.key, "Composer") ||
          ! strcmp_nocase (pair.key, "Publisher") || ! strcmp_nocase (pair.key, "Catalog") ||
-         ! strcmp_nocase (pair.key, "Track") ||
+         ! strcmp_nocase (pair.key, "Track") || ! strcmp_nocase (pair.key, "Disc") ||
          ! strcmp_nocase (pair.key, "Year") || ! strcmp_nocase (pair.key, "Lyrics") ||
          (wrote_art && ! strcmp_nocase (pair.key, "Cover Art", 9)))
             continue;

@@ -152,6 +152,7 @@ static const struct {
     {"channels", Tuple::Int, -1},
     {"publisher", Tuple::String, -1},
     {"catalog-number", Tuple::String, -1},
+    {"disc-number", Tuple::Int, -1},
 
     /* fallbacks */
     {nullptr, Tuple::String, -1},
@@ -181,6 +182,7 @@ static const FieldDictEntry field_dict[] = {
     {"copyright", Tuple::Copyright},
     {"date", Tuple::Date},
     {"description", Tuple::Description},
+    {"disc-number", Tuple::Disc},
     {"file-ext", Tuple::Suffix},
     {"file-name", Tuple::Basename},
     {"file-path", Tuple::Path},
