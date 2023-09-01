@@ -286,6 +286,7 @@ EXPORT GtkWidget * audgui_dialog_new (GtkMessageType type, const char * title,
 
     gtk_window_set_title ((GtkWindow *) dialog, title
             ? (const char *) str_get_one_line (title, false) : "Fauxdacious");
+    gtk_window_set_role ((GtkWindow *) dialog, "message");
 
     GtkWidget * box = gtk_message_dialog_get_message_area ((GtkMessageDialog *) dialog);
     gtk_container_foreach ((GtkContainer *) box, set_label_wrap, nullptr);

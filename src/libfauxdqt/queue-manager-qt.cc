@@ -176,6 +176,7 @@ void QueueManager::keyPressEvent(QKeyEvent * event)
 
 QueueManager::QueueManager(QWidget * parent) : QWidget(parent)
 {
+    setWindowRole ("queue-manager");
     m_btn_unqueue.setText (translate_str (N_("_Unqueue")));
 
     connect (& m_btn_unqueue, & QAbstractButton::clicked, this, & QueueManager::removeSelected);

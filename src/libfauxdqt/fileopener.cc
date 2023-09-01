@@ -134,6 +134,7 @@ EXPORT void fileopener_show (FileMode mode)
             dialog->setOption (QFileDialog::ShowDirsOnly);
         dialog->setLabelText (QFileDialog::Accept, _(labels[mode]));
         dialog->setLabelText (QFileDialog::Reject, _("Cancel"));
+        dialog->setWindowRole ("file-dialog");
 
         /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
         int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");

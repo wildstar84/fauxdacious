@@ -67,6 +67,7 @@ static QDialog * buildAboutWindow ()
 
     auto window = new QDialog;
     window->setWindowTitle (_("About Fauxdacious"));
+    window->setWindowRole ("about");
 
     auto logo = new QLabel (window);
     logo->setPixmap (QPixmap (logo_path));

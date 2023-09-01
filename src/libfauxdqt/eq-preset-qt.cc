@@ -306,6 +306,7 @@ static void show_import_dialog (QDialog * parent, PresetView * view, QPushButton
     dialog->setFileMode (QFileDialog::ExistingFile);
     dialog->setLabelText (QFileDialog::Accept, _("Load"));
     dialog->setNameFilter (_(name_filter));
+    dialog->setWindowRole ("file-dialog");
     set_default_preset_dir ();
     dialog->setDirectory (QString (aud_get_str (nullptr, "_preset_dir")));
 
@@ -352,6 +353,7 @@ static void show_export_dialog (QDialog * parent, const EqualizerPreset & preset
     dialog->setFileMode (QFileDialog::AnyFile);
     dialog->setLabelText (QFileDialog::Accept, _("Save"));
     dialog->setNameFilter (_(name_filter));
+    dialog->setWindowRole("file-dialog");
 
     /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
     int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");

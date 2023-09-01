@@ -75,8 +75,9 @@ EXPORT void playlist_search_and_select ()
 {
     /* create dialog */
     GtkWidget * dialog = gtk_dialog_new_with_buttons (
-     _("Search entries in active playlist"), nullptr, (GtkDialogFlags) 0 ,
-     _("Cancel"), GTK_RESPONSE_REJECT, _("Search"), GTK_RESPONSE_ACCEPT, nullptr);
+            _("Search entries in active playlist"), nullptr, (GtkDialogFlags) 0 ,
+            _("Cancel"), GTK_RESPONSE_REJECT, _("Search"), GTK_RESPONSE_ACCEPT, nullptr);
+    gtk_window_set_role ((GtkWindow *) dialog, "search");
 
     /* help text and logo */
     GtkWidget * hbox = audgui_hbox_new (6);

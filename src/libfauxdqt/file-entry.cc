@@ -62,6 +62,7 @@ QFileDialog * FileEntry::create_dialog ()
     dialog->setAttribute (Qt::WA_DeleteOnClose);
     dialog->setFileMode (m_file_mode);
     dialog->setAcceptMode (m_accept_mode);
+    dialog->setWindowRole ("file-dialog");
 
     /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
     int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");

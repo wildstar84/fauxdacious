@@ -74,6 +74,7 @@ static void displayTupleImage (void * image_fn, void * hookarg);
 InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
 {
     setWindowTitle (_("Song Info - Fauxdacious"));
+    setWindowRole ("song-info");
     setContentsMargins (margins.TwoPt);
 
     m_uri_label.setFixedWidth((int)(2.5 * audqt::sizes.OneInch));
