@@ -225,6 +225,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				$comment .= "Comment=file://${path}/${stationID}.$image_ext";
 				my $art_url2 = $client->getIconURL('artist');
 				if ($art_url2 && $art_url2 ne $art_url) {  #Handle some bad Apple in-podcast images
+					my $site = $client->getType();
+					sleep(5)  if ($site eq 'Rumble');  #THEY MAY INTERPRET 3RD HIT TOO SOON AS DOS & REJECT?
 					my ($image_ext, $art_image) = $client->getIconData('artist');
 					$image_ext =~ tr/A-Z/a-z/;
 					if ($configPath && $art_image && length($art_image) > 499 #SANITY-CHECK (RUMBLE.COM)!
