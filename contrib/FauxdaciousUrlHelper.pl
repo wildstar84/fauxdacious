@@ -3,7 +3,7 @@
 #MUST INSTALL youtube-dl FOR Youtube to work!
 #pp --gui -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
-###(urlhelper_mods.pm contains):
+###(urlhelper_modules.pm contains):
 ###use StreamFinder;
 ###use StreamFinder::_Class;
 ###use StreamFinder::Anystream;
@@ -13,24 +13,25 @@
 ###use StreamFinder::BrandNewTube;
 ###use StreamFinder::Brighteon;
 ###use StreamFinder::Castbox;
-###use StreamFinder::Goodpods;
 ###use StreamFinder::Google;
 ###use StreamFinder::IHeartRadio;
 ###use StreamFinder::InternetRadio;
+###use StreamFinder::LinkTV;
 ###use StreamFinder::Odysee;
 ###use StreamFinder::OnlineRadiobox;
 ###use StreamFinder::Podbean;
 ###use StreamFinder::PodcastAddict;
-###use StreamFinder::Podchaser;
 ###use StreamFinder::RadioNet;
 ###use StreamFinder::Rcast;
 ###use StreamFinder::Rumble;
 ###use StreamFinder::SermonAudio;
 ###use StreamFinder::SoundCloud;
 ###use StreamFinder::Spreaker;
+###use StreamFinder::Subsplash;
 ###use StreamFinder::Tunein;
 ###use StreamFinder::Vimeo;
 ###use StreamFinder::Youtube;
+###use StreamFinder::Zeno;
 ###1;
 
 #FAUXDACIOUS "HELPER" SCRIPT TO HANDLE URLS THAT FAUXDACIOUS CAN'T PLAY DIRECTLY:
@@ -165,7 +166,9 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		die "f:No streams for $ARGV[0]!"  unless ($newPlaylistURL);
 
 		$title = $client->getTitle();
-		$title =~ s/(?:\xe2?\x80\x99|\x{2019})/\'/g;  #*TRY* FIX SOME FUNKY SINGLE-QUOTES IN TITLE.
+		$title =~ s/(?:\xe2?\x80\x99|\x{2019})/\'/g;  #*TRY* FIX SOME FUNKY QUOTES IN TITLE:
+		$title =~ s/\\?u201[89]/\'/g;
+		$title =~ s/\\?u201[cd]/\"/g;
 		my $art_url = $client->getIconURL();
 		my $desc = $client->getTitle('desc');
 
@@ -190,14 +193,14 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		$comment .= 'Year='.$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
 		$comment .= 'Genre='.$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
 		#PUT DESCRIPTION FIELD, IF ANY INTO THE "Lyrics" FOR DISPLAY IN LYRICS PLUGINS.
-		#NOTE:  IF THE STREAM HAS LYRICS IN id3 TAGS, THEY WILL REPLACE THIS, REGARDLESSOF "Precedence".
+		#NOTE:  IF THE STREAM HAS LYRICS IN id3 TAGS, THEY WILL REPLACE THIS, REGARDLESS OF "Precedence".
 		#COMMENT OUT NEXT 7 LINES IF THIS IS NOT DESIRED:
+		my $lyrics = '';
 		if (defined($desc) && $desc =~ /\w/ && $desc ne $title) {
 			$desc =~ s/\R+$//s;
 			$desc =~ s/\R/\x02/gs; #MUST BE A SINGLE LINE, SO WORKAROUND FOR PRESERVING MULTILINE DESCRIPTIONS!
 			$desc =~ s#(p|br)\>\s*\x02\s*\<(p|br)#$1\>\<$2#ig;  #TRY TO REMOVE SOME TRIPLE-SPACING.
-			my $lyrics = "Lyrics=Description:  $desc";
-			$comment .= "$lyrics\n";
+			$lyrics = "Lyrics=Description:  $desc";
 		}
 		if ($art_url) {
 			my ($image_ext, $art_image) = $client->getIconData;
@@ -248,6 +251,14 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				$comment .= "\n";
 			}
 		}
+		if ($lyrics =~ /\w/) {  #PUT THIS LAST, AS IT SOMETIMES HAS GARBAGE THAT BLOCKS OTHER FIELDS.
+			$lyrics =~ tr/\x00-\x01//d;  #ALSO TRY GETTING RID OF THE GARBAGE (BUT \x02 IS SPECIAL)!:
+			$lyrics =~ tr/\x03-\x19//d;
+			$lyrics =~ tr/\x7f-\xff//d;
+			$lyrics =~ s/\\?u201[89]/\'/gs;
+			$lyrics =~ s/\\?u201[cd]/\"/gs;
+			$comment .= "$lyrics\n";
+		}
 		$comment =~ s/\0/ /gs;          #NO NULLS ALLOWED!
 	} else {
 		$newPlaylistURL = $ARGV[0];
@@ -256,12 +267,14 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 	foreach my $s (@downloadServerList) {
 		if ($newPlaylistURL =~ /\Q$s\E/) {
 			$downloadit = 1;
+			$downloadit++  unless ($s =~ /^(https?\:)/o);
 			last;
 		}
 	}
 	if ($downloadit) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
 		my $fn = $1  if ($newPlaylistURL =~ m#([^\/]+)$#);
 		exit (0)  unless ($fn);
+		$newPlaylistURL =~ s#^(\w+)\:#https:#  if ($downloadit > 1);
 		unless (-f "/tmp/$fn") {
 			my $cmd = "curl -o /tmp/$fn \"$newPlaylistURL\"";
 			`$cmd`;
