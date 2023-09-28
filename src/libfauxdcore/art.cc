@@ -129,7 +129,8 @@ static void art_item_unref_locked (AudArtItem * item)
 
 static void clear_current_locked ()
 {
-    if (current_item)
+    /* JWT:KEEP AROUND IF STDIN (IN CASE REPLAY POSSIBLE)!: */
+    if (current_item && strncmp (current_item->filename, "stdin://", 8))
     {
         art_item_unref_locked (current_item);
         current_item = nullptr;
@@ -317,10 +318,6 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
     if (queued)
         * queued = false;
 
-    // blacklist stdin
-    if (! strncmp (filename, "stdin://", 8))
-        return nullptr;
-
     AudArtItem * item = art_items.lookup (filename);
 
     if (item && item->flag)
@@ -399,6 +396,12 @@ void art_cleanup ()
         aud_art_unref (item); /* release temporary reference */
 
     /* playback should already be stopped */
+    /* JWT:WE STILL HAVE CURRENT_ITEM SET IF STDIN, SO MUST FREE IT B4 THE ASSERT!: */
+    if (current_item && ! strncmp (current_item->filename, "stdin://", 8))
+    {
+        aud_art_unref (current_item);
+        current_item = nullptr;
+    }
     assert (! current_item);
 
     if (art_items.n_items ())
