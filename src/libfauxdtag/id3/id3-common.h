@@ -31,6 +31,6 @@ void id3_decode_memo (Tuple & tuple, Tuple::Field field, const char * data, int 
 void id3_decode_rva (Tuple & tuple, const char * data, int size);
 void id3_decode_txxx (Tuple & tuple, const char * data, int size);
 
-Index<char> id3_decode_picture (const char * data, int size, int tagvsn);
+bool id3_decode_picture (Index<char> * image, const char * data, int size, int tagvsn);
 
 #endif

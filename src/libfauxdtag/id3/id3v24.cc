@@ -585,6 +585,7 @@ bool ID3v24TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
     int version, header_size, data_size, footer_size;
     bool syncsafe;
     int64_t offset;
+    bool havefrontcover = false;  /* true IF we find a "front-cover" image. */
 
     if (! read_header (handle, & version, & syncsafe, & offset, & header_size,
      & data_size, & footer_size))
@@ -652,8 +653,8 @@ bool ID3v24TagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * i
             rva_frames.append (std::move (frame));
             break;
           case ID3_APIC:
-            if (image)
-                * image = id3_decode_picture (& frame[0], frame.len (), 4);
+            if (image && ! havefrontcover)
+                havefrontcover = id3_decode_picture (image, & frame[0], frame.len (), 4);
             break;
           case ID3_LYRICS:
             id3_decode_memo (tuple, Tuple::Lyrics, & frame[0], frame.len ());

@@ -306,13 +306,11 @@ void id3_decode_txxx (Tuple & tuple, const char * data, int size)
     }
 }
 
-Index<char> id3_decode_picture (const char * data, int size, int tagvsn)
+bool id3_decode_picture (Index<char> * image, const char * data, int size, int tagvsn)
 {
-    Index<char> buf;
-
     const char * nul;
     if (size < 2 || ! (nul = (char *) memchr (data + 1, 0, size - 2)))
-        return buf;
+        return false;
 
     if (tagvsn == 2)    /* FOR v2.2 THE IMAGE FMT. IS FIXED AT 3 CHARS, *NOT* NULL-TERMINATED STRING! */
         nul = data + 3; /* SEE SPECS AT: v2.2:  https://id3.org/id3v2-00; V2.4: https://id3.org/id3v2.4.0-frames */
@@ -333,8 +331,10 @@ Index<char> id3_decode_picture (const char * data, int size, int tagvsn)
     AUDDBG ("Picture: tagvsn=%d, encoding=%d= mime = %s, type = %d, desc = %s, size = %d.\n",
             tagvsn, (int)data[0], mime, type, (const char *) desc, image_size);
 
-    if (type == 3 || type == 0)  /* album cover or iTunes */
-        buf.insert (body + after_nul2, 0, image_size);
+    image->clear ();
+    image->insert (body + after_nul2, 0, image_size);
 
-    return buf;
+    /* JWT:WE'LL RETURN TRUE (HAVE IT AND STOP) ONLY IF WE'RE FRONT-COVER OR iTUNES: */
+    /* THAT WAY, WE'LL EITHER GET THE FIRST FRONT-COVER, OR, IF NONE, THE LAST IMAGE (AUD BUG# 1220): */
+    return (type == 3 || type == 0);  /* album cover or iTunes */
 }
