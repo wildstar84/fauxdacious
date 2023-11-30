@@ -16,11 +16,11 @@
 ###use StreamFinder::Google;
 ###use StreamFinder::IHeartRadio;
 ###use StreamFinder::InternetRadio;
-###use StreamFinder::LinkTV;
 ###use StreamFinder::Odysee;
 ###use StreamFinder::OnlineRadiobox;
 ###use StreamFinder::Podbean;
 ###use StreamFinder::PodcastAddict;
+###use StreamFinder::Podchaser;
 ###use StreamFinder::RadioNet;
 ###use StreamFinder::Rcast;
 ###use StreamFinder::Rumble;
@@ -99,6 +99,8 @@ use URI::Escape;
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
 #FORMAT:  '//www.problemserver.com' [, ...]
 my @downloadServerList = ();  #USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE OR IN FauxdaciousUrlHelper.ini.
+#NOTE: TO (TEMPORARILY?) FORCE PRE-DOWNLOADING OF ALL VIDEOS AND PODCASTS (IF INTERNET IS BEING FLAKEY)
+#TOUCH THE FILE:  "/tmp/INTERNET_UNSTABLE" TO CAUSE ALL VIDEOS & PODCASTS TO BE PRE-DOWNLOADED.
 my %setPrecedence = ();
 
 die "..usage: $0 URL [download-path]\n"  unless ($ARGV[0]);
@@ -169,6 +171,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		$title =~ s/(?:\xe2?\x80\x99|\x{2019})/\'/g;  #*TRY* FIX SOME FUNKY QUOTES IN TITLE:
 		$title =~ s/\\?u201[89]/\'/g;
 		$title =~ s/\\?u201[cd]/\"/g;
+		$title =~ s/\xe2\x80(?:\x9c\x44|\x9d\x20)/\"/g;
 		my $art_url = $client->getIconURL();
 		my $desc = $client->getTitle('desc');
 
@@ -217,10 +220,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				if ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
 					#GTK CAN'T HANDLE webp, com, ETC.!:
 					`/usr/bin/convert '${path}/${stationID}.$image_ext' '${path}/${stationID}.png'`;
-					if (-e "${path}/${stationID}.png") {
-						unlink "${path}/${stationID}.$image_ext";
-						$image_ext = 'png';
-					}
+					unlink "${path}/${stationID}.$image_ext"  if (-e "${path}/${stationID}.png");
+					$image_ext = 'png';
 				}
 				$comment .= "Comment=file://${path}/${stationID}.$image_ext";
 				my $art_url2 = $client->getIconURL('artist');
@@ -234,18 +235,11 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 						binmode IMGOUT;
 						print IMGOUT $art_image;
 						close IMGOUT;
-						my $path = $configPath;
-						if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
-							$path =~ s#^(\w)\:#\/$1\%3A#;
-							$path =~ s#\\#\/#g;
-						}
 						if ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
 							#GTK CAN'T HANDLE webp, com, ETC.!:
 							`/usr/bin/convert '${path}/${stationID}_channel.$image_ext' '${path}/${stationID}_channel.png'`;
-							if (-e "${path}/${stationID}_channel.png") {
-								unlink "${path}/${stationID}_channel.$image_ext";
-								$image_ext = 'png';
-							}
+							unlink "${path}/${stationID}_channel.$image_ext"  if (-e "${path}/${stationID}_channel.png");
+							$image_ext = 'png';
 						}
 						$comment .= ";file://${path}/${stationID}_channel.$image_ext";
 					}
@@ -259,6 +253,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			$lyrics =~ tr/\x7f-\xff//d;
 			$lyrics =~ s/\\?u201[89]/\'/gs;
 			$lyrics =~ s/\\?u201[cd]/\"/gs;
+			$lyrics =~ s/\xe2\x80(?:\x9c\x44|\x9d\x20)/\"/g;
 			$comment .= "$lyrics\n";
 		}
 		$comment =~ s/\0/ /gs;          #NO NULLS ALLOWED!
@@ -273,12 +268,24 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			last;
 		}
 	}
-	if ($downloadit) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
+
+	#ALLOW USER TO (TEMPORARILY?) FORCE PRE-DOWNLOADING OF ALL VIDEOS AND PODCASTS (IF INTERNET IS BEING FLAKY):
+	#(WON'T WORK FOR NON-FINITE RADIO-STATION STREAMS, SO WE *TRY* TO EXCLUDE THOSE)!
+	my $forcedownload = ((-e '/tmp/INTERNET_UNSTABLE') && ($ARGV[0] =~ m#\/podcasts?\/# || !$client
+			|| $client->getType()
+			!~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast)$/))  #THESE SITES HAVE STATIONS:
+		? 1 : 0;
+
+	if ($downloadit || $forcedownload) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
 		my $fn = $1  if ($newPlaylistURL =~ m#([^\/]+)$#);
 		exit (0)  unless ($fn);
+
+		$fn =~ s/[\?\&\=\s].*$//;  #TRIM
 		$newPlaylistURL =~ s#^(\w+)\:#https:#  if ($downloadit > 1);
 		unless (-f "/tmp/$fn") {
-			my $cmd = "curl -o /tmp/$fn \"$newPlaylistURL\"";
+			my $no_wget = system('wget','-V');
+			my $cmd = $no_wget ? "curl -o /tmp/$fn \"$newPlaylistURL\""
+					: "wget -t 2 -T 20 -O /tmp/$fn \"$newPlaylistURL\" 2>/dev/null ";
 			`$cmd`;
 		}
 		if (-f "/tmp/$fn") {   #TRY TO EXTRACT METADATA FROM THE DOWNLOADED FILE:
