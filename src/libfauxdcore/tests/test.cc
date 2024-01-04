@@ -355,16 +355,22 @@ static void test_ringbuf ()
     ring.alloc (7);
 
     for (int i = 0; i < 7; i ++)
+    {
         assert (ring.push (nums[i]) == nums[i]);
+        assert (ring.nth_from_last (0) == nums[i]);
+    }
 
     for (int i = 0; i < 5; i ++)
     {
         assert (ring.head () == nums[i]);
-        ring.pop ();
+        assert (ring.pop () == nums[i]);
     }
 
     for (int i = 7; i < 10; i ++)
+    {
         assert (ring.push (nums[i]) == nums[i]);
+        assert (ring.nth_from_last (0) == nums[i]);
+    }
 
     assert (ring.size () == 7);
     assert (ring.len () == 5);
@@ -374,7 +380,10 @@ static void test_ringbuf ()
     ring.alloc (5);
 
     for (int i = 0; i < 5; i ++)
+    {
         assert (ring[i] == nums[5 + i]);
+        assert (ring.nth_from_last (i) == nums[9 - i]);
+    }
 
     assert (ring.size () == 5);
     assert (ring.len () == 5);
@@ -400,13 +409,13 @@ static void test_ringbuf ()
     for (int i = 0; i < 5; i ++)
     {
         assert (ring.head () == nums[5 + i]);
-        ring.pop ();
+        assert (ring.pop () == nums[5 + i]);
     }
 
     for (int i = 0; i < 5; i ++)
     {
         assert (ring.head () == nums[4 - i]);
-        ring.pop ();
+        assert (ring.pop () == nums[4 - i]);
     }
 
     ring.copy_in (& nums[5], 5);
@@ -415,13 +424,13 @@ static void test_ringbuf ()
     for (int i = 0; i < 5; i ++)
     {
         assert (ring.head () == nums[5 + i]);
-        ring.pop ();
+        assert (ring.pop () == nums[5 + i]);
     }
 
     for (int i = 0; i < 5; i ++)
     {
         assert (ring.head () == nums[i]);
-        ring.pop ();
+        assert (ring.pop () == nums[i]);
     }
 
     ring.move_in (nums, 10);
@@ -469,6 +478,16 @@ static void test_ringbuf ()
 
     ring.discard (5);
     assert (ring.len () == 5);
+
+    ring.fill_with ("fill");
+
+    assert (ring.size () == 10);
+    assert (ring.len () == 10);
+    assert (ring.linear () == 10);
+    assert (ring.space () == 0);
+
+    for (int i = 0; i < 10; i++)
+        assert (ring[i] == String ("fill"));
 
     ring.discard ();
     assert (ring.len () == 0);
