@@ -6,13 +6,13 @@ dnl Initialize
 dnl ==========
 
 AC_PREREQ([2.59])
-AC_INIT([fauxdacious], [4.3-final])
-AC_COPYRIGHT([Copyright (C) 2001-2023 Jim Turner, Audacious developers and others])
+AC_INIT([fauxdacious], [4.4-devel])
+AC_COPYRIGHT([Copyright (C) 2001-2024 Jim Turner, Audacious developers and others])
 
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE_NAME", [Name of package])
 AC_DEFINE_UNQUOTED(VERSION, "$PACKAGE_VERSION", [Version number of package])
 
-COPYRIGHT="Copyright (C) 2001-2023 Jim Turner, Audacious developers and others"
+COPYRIGHT="Copyright (C) 2001-2024 Jim Turner, Audacious developers and others"
 AC_DEFINE_UNQUOTED(COPYRIGHT, "$COPYRIGHT", [Copyright])
 AC_SUBST(COPYRIGHT)
 
