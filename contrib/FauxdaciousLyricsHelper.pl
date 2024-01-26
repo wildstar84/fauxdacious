@@ -13,6 +13,7 @@
 ###use LyricFinder::_Class;
 ###use LyricFinder::ApiLyricsOvh;
 ###use LyricFinder::AZLyrics;
+###use LyricFinder::ChartLyrics;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Letras;
 ###use LyricFinder::Musixmatch;
@@ -151,8 +152,8 @@ if ($#ARGV >= 1) {
 		#ALBUMART PLUG IS ALSO ACTIVE & SET TO PULL FROM WEB.
 		#WAIT FOR 7" & AND SEE IF ALBUMART ALREADY PULLED LYRICS WHILST PULLING AN ALBUM-COVER:
 		#(THIS STRATEGY IS USED TO AVOID HITTING A LYRIC SITE TWICE, SINCE BOTH ALBUM-ART AND
-		#LYRICWIKI SHARE SOME SITES (CURRENTLY:  Genius.com and Musixmatch.com, AS THESE CAN
-		#PROVIDE BOTH COVER-ART IMAGES AND LYRICS!:
+		#LYRICWIKI SHARE SOME SITES (CURRENTLY:  ChartLyrics, Genius.com and Musixmatch.com,
+		#AS THESE CAN PROVIDE BOTH COVER-ART IMAGES AND LYRICS!:
 		my $timeout = 7;
 		our $quit = 0;
 
