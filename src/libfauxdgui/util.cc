@@ -254,10 +254,13 @@ EXPORT void audgui_file_entry_set_uri (GtkWidget * entry, const char * uri)
     gtk_editable_set_position ((GtkEditable *) entry, -1);
 }
 
-static void set_label_wrap (GtkWidget * label, void *)
+static void set_label_properties (GtkWidget * label, void * label_selectable)
 {
     if (GTK_IS_LABEL (label))
+    {
+        gtk_label_set_selectable ((GtkLabel *) label, GPOINTER_TO_INT (label_selectable));
         gtk_label_set_line_wrap_mode ((GtkLabel *) label, PANGO_WRAP_WORD_CHAR);
+    }
 }
 
 #ifdef USE_GTK3
@@ -274,12 +277,8 @@ static const char * icon_for_message_type (GtkMessageType type)
 }
 #endif
 
-/* style choices should not be enforced by deprecating API functions */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
 EXPORT GtkWidget * audgui_dialog_new (GtkMessageType type, const char * title,
- const char * text, GtkWidget * button1, GtkWidget * button2)
+        const char * text, GtkWidget * button1, GtkWidget * button2)
 {
     GtkWidget * dialog = gtk_message_dialog_new (nullptr, (GtkDialogFlags) 0, type,
      GTK_BUTTONS_NONE, "%s", text);
@@ -288,16 +287,20 @@ EXPORT GtkWidget * audgui_dialog_new (GtkMessageType type, const char * title,
             ? (const char *) str_get_one_line (title, false) : "Fauxdacious");
     gtk_window_set_role ((GtkWindow *) dialog, "message");
 
+    bool label_selectable = (type != GTK_MESSAGE_OTHER);
     GtkWidget * box = gtk_message_dialog_get_message_area ((GtkMessageDialog *) dialog);
-    gtk_container_foreach ((GtkContainer *) box, set_label_wrap, nullptr);
+    gtk_container_foreach ((GtkContainer *) box, set_label_properties,
+            GINT_TO_POINTER (label_selectable));
 
 #ifdef USE_GTK3
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     const char * icon = icon_for_message_type (type);
     if (icon)
     {
         GtkWidget * image = gtk_image_new_from_icon_name (icon, GTK_ICON_SIZE_DIALOG);
         gtk_message_dialog_set_image ((GtkMessageDialog *) dialog, image);
     }
+G_GNUC_END_IGNORE_DEPRECATIONS
 #endif
 
     if (button2)
@@ -314,8 +317,6 @@ EXPORT GtkWidget * audgui_dialog_new (GtkMessageType type, const char * title,
 
     return dialog;
 }
-
-#pragma GCC diagnostic pop
 
 EXPORT void audgui_dialog_add_widget (GtkWidget * dialog, GtkWidget * widget)
 {
