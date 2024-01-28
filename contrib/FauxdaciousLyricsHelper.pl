@@ -9,6 +9,7 @@
 ###use URI::Escape;
 ###use HTML::Entities;
 ###use LWP::UserAgent;
+###use XML::Simple;
 ###use LyricFinder;
 ###use LyricFinder::_Class;
 ###use LyricFinder::ApiLyricsOvh;
@@ -122,6 +123,13 @@ if ($#ARGV >= 1) {
 	unlink "$ARGV[2]/_tmp_lyrics.txt"  if ($ARGV[2] && -d $ARGV[2] && -f "$ARGV[2]/_tmp_lyrics.txt");
 	print STDERR "..LYRICS HELPER: Args=".join('|', @ARGV)."=\n"  if ($DEBUG);
 
+	#SKIP (PUNT) ANYTHING W/O ARTIST OR "NULL" ARTIST:
+	if ($ARGV[0] !~ /\w/ || $ARGV[0] eq 'null') {
+		print STDERR "i:LYRICS HELPER: SKIPPING ENTRY W/O ARTIST (PUNT)!\n"  if ($DEBUG);
+		exit (0)  if ($^O =~ /MSWin/o);
+		exit (4);  #QUIT
+	}
+
 	#SKIP ANY ALBUMS (STATIONS) THE USER DOESN'T WANT LYRICS FETCHED FOR:
 	if ($#ARGV >= 3) {
 		foreach my $skipit (@SKIPALBUMS) {
@@ -195,19 +203,20 @@ if ($#ARGV >= 1) {
 		if (defined($lyrics) && $lyrics) {
 			my $doschar = ($^O =~ /Win/) ? "\r" : '';
 			$lyrics .= "${doschar}\n(Lyrics courtesy: ".$lf->source().")${doschar}\n".$lf->site();
+			print STDERR "..lyrics found (tried=".$lf->tried().")\n"  if ($DEBUG);
 			if ($ARGV[2] && -d $ARGV[2] && open OUT, ">$ARGV[2]/_tmp_lyrics.txt") {
 				binmode OUT;
-				print OUT $lyrics;  #MUST NULL-TERMINATE FOR FAUXDACIOUS'S C CODE!
+				eval "print OUT \$lyrics;";  #MUST NULL-TERMINATE FOR FAUXDACIOUS'S C CODE!
 				close OUT;
 			} else {
-				print STDERR $lyrics;
+				eval "print STDERR \$lyrics;";
 			}
 			unlink("$ARGV[2]/_tmp_lyrics_from_albumart.txt")  if (-d $ARGV[2] && -e "$ARGV[2]/_tmp_lyrics_from_albumart.txt");
 			exit (0);
 		}
 		else
 		{
-			print STDERR "w:No lyrics found (last tried=".$lf->url()."): ".$lf->message()."\n";
+			print STDERR "w:No lyrics found (tried=".$lf->tried()."): ".$lf->message()."\n";
 		}
 	}
 	else

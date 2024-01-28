@@ -9,6 +9,7 @@
 ###use URI::Escape;
 ###use HTML::Entities;
 ###use LWP::UserAgent;
+###use XML::Simple;
 ###use LyricFinder;
 ###use LyricFinder::_Class;
 ###use LyricFinder::ApiLyricsOvh;
@@ -541,16 +542,18 @@ WEBSEARCH:
 					$lyrics .= "${doschar}\n(Lyrics courtesy: ".$lf->source().")${doschar}\n".$lf->site();
 					if ($configPath && open OUT, ">${configPath}/_tmp_lyrics_from_albumart.txt") {
 						binmode OUT;
-						print OUT $lyrics;  #MUST NULL-TERMINATE FOR FAUXDACIOUS'S C CODE!
+						eval "print OUT \$lyrics;";  #MUST NULL-TERMINATE FOR FAUXDACIOUS'S C CODE!
 						close OUT;
 					}
 					print STDERR "i:found (".$lf->source().") IMAGE ($image_url)?\n"  if ($DEBUG);
 					$tried = $lf->tried();
 					&albumart_done($tried);
+					print STDERR "i:Albumart tried lyrics sites: ($tried).\n"  if ($DEBUG); #MUST BE HERE (writeArtImage EXITS on success!)
 					&writeArtImage($image_url, $art2fid, '_tmp_albumart')
 							if ($image_url && $image_url !~ /(?:default|place\-?holder|nocover)/i); #EXCLUDE DUMMY-IMAGES.
 				} else {
 					$tried = $lf->tried();
+					print STDERR "i:Albumart tried lyrics sites: ($tried).\n"  if ($DEBUG);
 				}
 			}
 		} else {
@@ -561,10 +564,12 @@ WEBSEARCH:
 
 	#STEP 3:  SEARCH MUSICBRAINZ - BY ALBUM, THEN TITLE (SLOWER BUT MORE COMPREHENSIVE):
 
-	#LYRICFINDER DID NOT RETURN A COVER IMAGE, SO SEARCH MUSICBRAINZ (FIRST TRY ARTIST/ALBUM, THEN ARTIST/TITLE):
-	#USER NOTE:  IF YOU MOSTLY JUST LISTEN TO STREAMING STATIONS (THAT USUALLY JUST SET THE ALBUM FIELD
-	#TO THE STATION NAME), YOU MIGHT WANT TO REVERSE THIS LIST (IE. $title, /* then */ $album)
-	#FOR EFFICIENCY'S SAKE!!
+	#LYRICFINDER DID NOT RETURN A COVER IMAGE,
+	#SO SEARCH MUSICBRAINZ (FIRST TRY ARTIST/ALBUM, THEN ARTIST/TITLE):
+
+	###### USER NOTE:  IF YOU MOSTLY JUST LISTEN TO STREAMING STATIONS (THAT USUALLY JUST SET THE ALBUM
+	#FIELD TO THE STATION NAME), YOU MIGHT WANT TO REVERSE THIS LIST
+	#(IE. TO "foreach my $release ($title, $album) {") IN THE NEXT LINE BELOW FOR EFFICIENCY'S SAKE!!:
 
 RELEASETYPE:
 	foreach my $release ($album, $title) {
