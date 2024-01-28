@@ -160,7 +160,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 		$client = new StreamFinder($ARGV[0], -debug => $DEBUG,
 				-log => '/tmp/FauxdaciousUrlHelper.log',
-				-logfmt => '[time] "[title]" - [site]: [url] ([total])'
+				-logfmt => '[time] "[title]" - [site]: [url] ([albumartist])'
 		);
 		die "f:Could not open streamfinder or no streams found!"  unless ($client);
 
@@ -174,6 +174,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		$title =~ s/\xe2\x80(?:\x9c\x44|\x9d\x20)/\"/g;
 		my $art_url = $client->getIconURL();
 		my $desc = $client->getTitle('desc');
+		my $site = $client->getType();
 
 		#NOTE:  MOST PODCAST EPISODE mp3's SEEM TO COME WITH THEIR OWN EMBEDDED ICONS OR RELY ON THE ALBUM'S ICON:
 		#(SO OPTIONS #1 & #2 ARE PBLY POINTLESS (CREATE USELESS REDUNDANT ICON FILES):
@@ -313,8 +314,18 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		}
 	}
 
+	#SEE FauxdaciousUrlHelper.ini FILE FOR OVERRIDING TAG-SOURCE PRECEDENCE FOR SITES AND/OR BASE URLS:
 	my $precedence = 'DEFAULT';
-	foreach my $s (keys %setPrecedence) {   #ALLOW USER TO OVERRIDE TAG-SOURCE PRECEDENCE IN INI FILE:
+	my $site = $client ? $client->getType() : '';
+	if ($site) {
+		foreach my $s (keys %setPrecedence) {   #ALLOW USER TO OVERRIDE TAG-SOURCE PRECEDENCE BASED ON SITE:
+			if ($site eq $s) {
+				$precedence = "\U$setPrecedence{$s}\E";
+				last;
+			}
+		}
+	}
+	foreach my $s (keys %setPrecedence) {   #ALLOW USER TO OVERRIDE TAG-SOURCE PRECEDENCE ON BASE URL:
 		if ($ARGV[0] =~ /\Q$s\E/) {
 			$precedence = "\U$setPrecedence{$s}\E";
 			last;
@@ -359,12 +370,13 @@ sub writeTagData {
 	# WE WRITE VIDEOS/PODCASTS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!
 	# THE LIST IN THE REGEX BELOW ARE THE ONES TO *NOT* DELETE ART IMAGES FOR (ie. STREAMING STATIONS)!:
-	my $tagfid = (!$downloadit && $client && $client->getType()
+	my $site = $client->getType();
+	my $tagfid = (!$downloadit && $client && $site
 			=~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast)$/)  #THESE SITES HAVE STATIONS:
 			? 'user_tag_data' : 'tmp_tag_data';
 	#WORKAROUND FOR IHEART & TUNEIN PODCASTS:
 	if ($client && $tagfid =~ /^user/) {
-		my $mediasource = $client->getType();
+		my $mediasource = $site;
 		$tagfid = 'tmp_tag_data'  if ($ARGV[0] =~ m#\/podcasts?\/#);  #CONSIDER ANY PODCASTS TO BE ONE-OFFS:
 	}
 	if (open TAGDATA, "<${configPath}/$tagfid") {
