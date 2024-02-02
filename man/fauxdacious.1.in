@@ -1,4 +1,4 @@
-.TH FAUXDACIOUS "1" "Nov 2020" "Version @PACKAGE_VERSION@" "Fauxdacious"
+.TH FAUXDACIOUS "1" "Feb 2024" "Version @PACKAGE_VERSION@" "Fauxdacious"
 
 .SH NAME
 fauxdacious \- a fork of the Audacious audio player.
@@ -9,7 +9,7 @@ fauxdacious \- a fork of the Audacious audio player.
 
 .SH DESCRIPTION
 Fauxdacious is a free advanced media player for Linux and many other
-UNIX-compatible systems.  Fauxdacious is a fork of the Audacious media
+UNIX-compatible systems.  Fauxdacious is a fork of the Audacious audio
 player and adds many new features including video and DVD play,
 restoration of XMMS file and song-specific equalizer presets and effects
 plugins, full Unix-ish piping support for stdin and stdout, and much more!
@@ -114,8 +114,8 @@ Force Equalizer Off on startup.
 .B -#, -n, --new=instancename
 Starts a new instance.  The new instance started may be controlled with:
 \fBfauxdtool instance instancename\fR.  Copy ~/.config/fauxdacious/config
-to ~/.config/fauxdacious/instancename and edit to tailor configuration.
--n creates a new unnamed instance that can not be controlled by audtool.
+to ~/.config/fauxdacious-instancename/ and edit to tailor configuration.
+-n creates a new unnamed instance that can not be controlled by fauxdtool.
 New instances can also be created and contolled the Audacious way with
 single-digit numbers (1-9), ie. -1, -2, etc.
 .SH KEYBINDINGS

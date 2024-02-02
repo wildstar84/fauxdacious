@@ -4,9 +4,8 @@ Version 4.4-devel:
 
 * Fixed albumart plugins to now properly handle recent in-stream cover-art 
 URLs from some streaming stations (i.iheart.com - I'm lookin' at YOU!) that 
-now include parentheses (previously would fail doe to a "shell error").
+now include parentheses (previously would fail due to a "shell error").
 
-* Merged
 * Merge numerous other recent Audacious improvements & refinements.  
 Note:  some Audacious issue commits such as "plugins menu entry icon", 
 "effects & visualization icons in menus", "c++20 standard" compliance, and 

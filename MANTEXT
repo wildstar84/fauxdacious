@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
        Fauxdacious  is  a  free advanced media player for Linux and many other
-       UNIX-compatible systems.  Fauxdacious is a fork of the Audacious  media
+       UNIX-compatible systems.  Fauxdacious is a fork of the Audacious  audio
        player  and  adds  many  new  features  including  video  and DVD play,
        restoration of XMMS file and song-specific equalizer  presets  and  ef-
        fects  plugins,  full Unix-ish piping support for stdin and stdout, and
@@ -114,7 +114,7 @@ OPTIONS
        -#, -n, --new=instancename
               Starts  a  new  instance.   The new instance started may be con-
               trolled with: fauxdtool  instance  instancename.   Copy  ~/.con-
-              fig/fauxdacious/config to ~/.config/fauxdacious/instancename and
+              fig/fauxdacious/config to ~/.config/fauxdacious-instancename and
               edit to tailor configuration.  -n creates a new unnamed instance
               that  can  not be controlled by audtool.  New instances can also
               be created and contolled the  Audacious  way  with  single-digit
@@ -178,4 +178,4 @@ WEBSITE
        https://wildstar84.wordpress.com/fauxdacious   https://audacious-media-
        player.org
 
-Version 4.2.2-final                Nov 2020                     FAUXDACIOUS(1)
+Version 4.4-devel                  Feb 2024                     FAUXDACIOUS(1)
