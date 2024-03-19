@@ -999,7 +999,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                             set_str (Album, stream_name);
 
                         ::String albumartist = get_str (AlbumArtist);
-                        if ((!albumartist || !albumartist[0]) && (s = find_domain (streampath)))
+                        if ((!albumartist || !albumartist[0]) && streampath && (s = find_domain (streampath)))
                             set_str (AlbumArtist, extract_domain (s));  //JWT:MOVE STREAM URL DOMAIN-NAME DOWN TO ALBUMARTIST.
                     }
                     else
@@ -1007,7 +1007,7 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                         set_str (Artist, stream_name);
                         if (!album || !album[0] || album == stream_name)
                         {
-                            if ((s = find_domain (streampath)))
+                            if (streampath && (s = find_domain (streampath)))
                                 set_str (Album, extract_domain (s));
                             set_str (AlbumArtist, ::String (""));
                         }
