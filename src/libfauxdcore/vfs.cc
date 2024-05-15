@@ -278,7 +278,7 @@ EXPORT void VFSFile::set_limit_to_buffer (bool limit)
 
 EXPORT Index<char> VFSFile::read_all ()
 {
-    constexpr int maxbuf = 16777216;
+    constexpr int maxbuf = 64 * 1024 * 1024;
     constexpr int pagesize = 4096;
 
     Index<char> buf;
