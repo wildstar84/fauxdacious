@@ -1,4 +1,32 @@
-Version 4.4-devel:
+Version 4.4-devel (as/of 5/23/2024):
+
+* Merge most Audacious bugfix & feature commits for Audacious v.4.4-beta1.  
+Notable exceptions (not merged yet) are GTK & Qt default version commits, 
+pending further testing.
+
+* Add/merge Audacious Moonstone Qt interface plugin after massively refactoring 
+to fix the long-standing issue I had with it leaving you trapped (unable to 
+change back to a different interface without having to shut down and manually 
+edit the Audacious settnigs config file).  Also refactored to have a much more 
+refined UI, expecially by allowing the attached playlist pane to be shaded; 
+and basically bring up to Fauxdacious's quality standards.  I submitted a 
+patch request (#1355) to Audacious addressing these issues and they have 
+ignored it (for almost a year now)!  Therefore, I'm merging it here now (so 
+that my work doesn't go to waste, and our users will have another Audacious 
+feature, but much improved (imho)!  Note:  This will not replace 
+Mini-Fauxdacious, which will remain as-is as the preferred option (and is 
+available in both GTK & Qt versions - whereas Moonstone is Qt-only)!
+
+* statusicon - Tweak code & menu to work more in line w/Audacious versions.
+
+* neon - Fix SSL certificate-handling on Windows version.
+
+* ffaudio - Add support for dynamic icy-tags on streaming stations:
+
+* Fix edge case where video window not restored to proper location.
+
+* Harden a cpl code segments to prevent potential crashes (See commits for 
+details.
 
 * Update copyright year to 2024 & allign versioning to Audacious's.
 
