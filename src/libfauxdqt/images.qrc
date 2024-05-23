@@ -44,6 +44,7 @@
     <file alias="go-jump.svg">../../images/go-jump.svg</file>
     <file alias="go-next.svg">../../images/go-next.svg</file>
     <file alias="go-previous.svg">../../images/go-previous.svg</file>
+    <file alias="go-top.svg">../../images/go-top.svg</file>
     <file alias="go-up.svg">../../images/go-up.svg</file>
     <file alias="help-about.svg">../../images/help-about.svg</file>
     <file alias="insert-text.svg">../../images/insert-text.svg</file>
@@ -109,6 +110,7 @@
     <file alias="go-jump.svg">../../images/dark/go-jump.svg</file>
     <file alias="go-next.svg">../../images/dark/go-next.svg</file>
     <file alias="go-previous.svg">../../images/dark/go-previous.svg</file>
+    <file alias="go-top.svg">../../images/dark/go-top.svg</file>
     <file alias="go-up.svg">../../images/dark/go-up.svg</file>
     <file alias="help-about.svg">../../images/dark/help-about.svg</file>
     <file alias="insert-text.svg">../../images/dark/insert-text.svg</file>
