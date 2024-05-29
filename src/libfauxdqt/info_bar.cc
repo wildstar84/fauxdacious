@@ -729,6 +729,15 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
             break;
         }
     }
+    else if (m_parent == nullptr && (event->modifiers () & Qt::ControlModifier))
+    {
+        switch (event->key ())
+        {
+          case Qt::Key_Q:
+              aud_quit ();
+              return;
+        }
+    }
     return;
 }
 
