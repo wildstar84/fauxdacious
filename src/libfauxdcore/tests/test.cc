@@ -62,11 +62,11 @@ static void test_audio_conversion ()
 
 static void test_case_conversion ()
 {
-    const char in[]        = "AÃaÃ¤EÃeÃªIÃiÃ¬OÃoÃµUÃuÃº";
-    const char low_ascii[] = "aÃaÃ¤eÃeÃªiÃiÃ¬oÃoÃµuÃuÃº";
-    const char low_utf8[]  = "aÃ¤aÃ¤eÃªeÃªiÃ¬iÃ¬oÃµoÃµuÃºuÃº";
-    const char hi_ascii[]  = "AÃAÃ¤EÃEÃªIÃIÃ¬OÃOÃµUÃUÃº";
-    const char hi_utf8[]   = "AÃAÃEÃEÃIÃIÃOÃOÃUÃUÃ";
+    const char in[]        = "AÄaäEÊeêIÌiìOÕoõUÚuú";
+    const char low_ascii[] = "aÄaäeÊeêiÌiìoÕoõuÚuú";
+    const char low_utf8[] = "aäaäeêeêiìiìoõoõuúuú";
+    const char hi_ascii[] = "AÄAäEÊEêIÌIìOÕOõUÚUú";
+    const char hi_utf8[] = "AÄAÄEÊEÊIÌIÌOÕOÕUÚUÚ";
 
     assert (! strcmp (low_ascii, str_tolower (in)));
     assert (! strcmp (low_utf8, str_tolower_utf8 (in)));
@@ -96,29 +96,29 @@ static void test_case_conversion ()
     assert (! strcmp_nocase (in, hi_ascii));
     assert (strcmp_nocase (in, hi_utf8));
 
-    assert (str_has_prefix_nocase (low_ascii, "AÃaÃ¤"));
-    assert (! str_has_prefix_nocase (low_utf8, "AÃaÃ¤"));
-    assert (str_has_prefix_nocase (hi_ascii, "AÃaÃ¤"));
-    assert (! str_has_prefix_nocase (hi_utf8, "AÃaÃ¤"));
+    assert(str_has_prefix_nocase(low_ascii, "AÄaä"));
+    assert(!str_has_prefix_nocase(low_utf8, "AÄaä"));
+    assert(str_has_prefix_nocase(hi_ascii, "AÄaä"));
+    assert(!str_has_prefix_nocase(hi_utf8, "AÄaä"));
 
-    assert (str_has_suffix_nocase (low_ascii, "UÃuÃº"));
-    assert (! str_has_suffix_nocase (low_utf8, "UÃuÃº"));
-    assert (str_has_suffix_nocase (hi_ascii, "UÃuÃº"));
-    assert (! str_has_suffix_nocase (hi_utf8, "UÃuÃº"));
+    assert(str_has_suffix_nocase(low_ascii, "UÚuú"));
+    assert(!str_has_suffix_nocase(low_utf8, "UÚuú"));
+    assert(str_has_suffix_nocase(hi_ascii, "UÚuú"));
+    assert(!str_has_suffix_nocase(hi_utf8, "UÚuú"));
 
-    assert (! str_has_suffix_nocase ("abc", "abcd"));
+    assert(!str_has_suffix_nocase("abc", "abcd"));
 
-    assert (! strcmp (strstr_nocase (low_ascii, "OÃoÃµ"), "oÃoÃµuÃuÃº"));
-    assert (strstr_nocase (low_utf8, "OÃoÃµ") == nullptr);
-    assert (! strcmp (strstr_nocase (hi_ascii, "OÃoÃµ"), "OÃOÃµUÃUÃº"));
-    assert (strstr_nocase (hi_utf8, "OÃoÃµ") == nullptr);
+    assert(!strcmp(strstr_nocase(low_ascii, "OÕoõ"), "oÕoõuÚuú"));
+    assert(strstr_nocase(low_utf8, "OÕoõ") == nullptr);
+    assert(!strcmp(strstr_nocase(hi_ascii, "OÕoõ"), "OÕOõUÚUú"));
+    assert(strstr_nocase(hi_utf8, "OÕoõ") == nullptr);
 
-    assert (! strcmp (strstr_nocase_utf8 (low_ascii, "OÃoÃµ"), "oÃoÃµuÃuÃº"));
-    assert (! strcmp (strstr_nocase_utf8 (low_utf8, "OÃoÃµ"), "oÃµoÃµuÃºuÃº"));
-    assert (strstr_nocase_utf8 (low_utf8, "OOoo") == nullptr);
-    assert (! strcmp (strstr_nocase_utf8 (hi_ascii, "OÃoÃµ"), "OÃOÃµUÃUÃº"));
-    assert (! strcmp (strstr_nocase_utf8 (hi_utf8, "OÃoÃµ"), "OÃOÃUÃUÃ"));
-    assert (strstr_nocase_utf8 (hi_utf8, "OOoo") == nullptr);
+    assert(!strcmp(strstr_nocase_utf8(low_ascii, "OÕoõ"), "oÕoõuÚuú"));
+    assert(!strcmp(strstr_nocase_utf8(low_utf8, "OÕoõ"), "oõoõuúuú"));
+    assert(strstr_nocase_utf8(low_utf8, "OOoo") == nullptr);
+    assert(!strcmp(strstr_nocase_utf8(hi_ascii, "OÕoõ"), "OÕOõUÚUú"));
+    assert(!strcmp(strstr_nocase_utf8(hi_utf8, "OÕoõ"), "OÕOÕUÚUÚ"));
+    assert(strstr_nocase_utf8(hi_utf8, "OOoo") == nullptr);
 }
 
 static void test_numeric_conversion ()
