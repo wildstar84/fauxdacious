@@ -171,39 +171,50 @@ dnl Check for POSIX threads
 dnl =======================
 AC_SEARCH_LIBS([pthread_create], [pthread])
 
-dnl Check for GTK+ and pals
-dnl =======================
+dnl Check for GTK and pals
+dnl ======================
 
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.32)
 PKG_CHECK_MODULES(GMODULE, gmodule-2.0 >= 2.32)
 
 AC_DEFINE([GLIB_VERSION_MIN_REQUIRED], [GLIB_VERSION_2_32], [target GLib 2.32])
 
-dnl GTK+ support
-dnl =============
-
-AC_ARG_ENABLE(gtk3,
- AS_HELP_STRING(--enable-gtk3, [Use GTK3 instead of GTK2 (default=disabled)]),
- USE_GTK3=$enableval, USE_GTK3=no)
-
-if test $USE_GTK3 = yes ; then
-    PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.22)
-    AC_DEFINE(USE_GTK, 1, [Define if GTK+ support enabled])
-    AC_DEFINE(USE_GTK3, 1, [Define if GTK3+ support enabled])
-fi
-
-AC_SUBST(USE_GTK3)
+dnl GTK support
+dnl ===========
 
 AC_ARG_ENABLE(gtk,
- AS_HELP_STRING(--disable-gtk, [Disable GTK+ support (default=enabled)]),
+ AS_HELP_STRING(--disable-gtk, [Disable GTK support (default=enabled)]),
  USE_GTK=$enableval, USE_GTK=yes)
 
-if test $USE_GTK = yes -a $USE_GTK3 = no ; then
-    PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.24)
-    AC_DEFINE([USE_GTK], [1], [Define if GTK+ support enabled])
+dnl JWT:WE DON'T SUPPORT GTK3 IN WINDOWS (YET), SO DEFAULT TO GTK2!:
+if test $HAVE_MSWINDOWS = yes ; then
+    AC_ARG_ENABLE(gtk3,
+     AS_HELP_STRING(--enable-gtk3, [Use GTK 3 instead of GTK 2 (default=disabled)]),
+     USE_GTK3=$enableval, USE_GTK3=no)
+    if test $USE_GTK3 = yes ; then
+        PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.22)
+        AC_DEFINE([USE_GTK], [1], [Define if GTK support enabled])
+        AC_DEFINE(USE_GTK3, 1, [Define if GTK 3 support enabled])
+    elif test $USE_GTK = yes ; then
+        PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.24)
+        AC_DEFINE(USE_GTK, 1, [Define if GTK support enabled])
+    fi
+else
+    AC_ARG_ENABLE(gtk2,
+     AS_HELP_STRING(--enable-gtk2, [Use GTK 2 instead of GTK 3 (default=disabled)]),
+     USE_GTK2=$enableval, USE_GTK2=no)
+    if test $USE_GTK2 = yes ; then
+        PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.24)
+        AC_DEFINE([USE_GTK], [1], [Define if GTK support enabled])
+    elif test $USE_GTK = yes ; then
+        PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.22)
+        AC_DEFINE(USE_GTK, 1, [Define if GTK support enabled])
+        AC_DEFINE(USE_GTK3, 1, [Define if GTK 3 support enabled])
+    fi
 fi
 
 AC_SUBST(USE_GTK)
+AC_SUBST(USE_GTK3)
 
 if test $HAVE_MSWINDOWS = yes ; then
     PKG_CHECK_MODULES(GIO, gio-2.0 >= 2.32)
@@ -233,7 +244,10 @@ else
      USE_QT=$enableval, USE_QT=yes)
 fi
 
-if test $USE_QT = yes ; then
+AC_ARG_ENABLE(qt5,
+ AS_HELP_STRING(--enable-qt5, [Use Qt 5 instead of Qt 6 (default=disabled)]),
+ USE_QT5=$enableval, USE_QT5=no)
+if test $USE_QT5 = yes ; then
     PKG_CHECK_MODULES([QTCORE], [Qt5Core >= 5.2])
     PKG_CHECK_VAR([QTBINPATH], [Qt5Core >= 5.2], [host_bins])
     PKG_CHECK_MODULES([QT], [Qt5Core Qt5Gui Qt5Widgets >= 5.2])
@@ -242,9 +256,15 @@ if test $USE_QT = yes ; then
     # needed if Qt was built with -reduce-relocations
     QTCORE_CFLAGS="$QTCORE_CFLAGS -fPIC"
     QT_CFLAGS="$QT_CFLAGS -fPIC"
+elif test $USE_QT = yes ; then
+    PKG_CHECK_MODULES([QTCORE], [Qt6Core >= 6.0])
+    PKG_CHECK_VAR([QTBINPATH], [Qt6Core >= 6.0], [libexecdir])
+    PKG_CHECK_MODULES([QT], [Qt6Core Qt6Gui Qt6Widgets >= 6.0])
+    AC_DEFINE([USE_QT], [1], [Define if Qt support enabled])
 fi
 
 AC_SUBST(USE_QT)
+AC_SUBST(USE_QT5)
 AC_SUBST(QT_CFLAGS)
 AC_SUBST(QT_LIBS)
 AC_SUBST(QTBINPATH)

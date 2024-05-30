@@ -6,7 +6,7 @@ dnl Initialize
 dnl ==========
 
 AC_PREREQ([2.59])
-AC_INIT([fauxdacious], [4.4-devel])
+AC_INIT([fauxdacious], [4.4-beta1])
 AC_COPYRIGHT([Copyright (C) 2001-2024 Jim Turner, Audacious developers and others])
 
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE_NAME", [Name of package])
@@ -120,6 +120,18 @@ dnl Reliably #include "config.h" (for large file support)
 dnl =====================================================
 CPPFLAGS="$CPPFLAGS -include config.h"
 
+dnl Interface versions
+dnl ==================
+if test "x$USE_GTK2" = "xyes"; then
+    GTK_VSN="2"
+else
+    GTK_VSN="3"
+fi
+if test "x$USE_QT5" = "xyes"; then
+    QT_VSN="5"
+else
+    QT_VSN="6"
+fi
 
 ### ---------------------------------------------------------------------------
 dnl Output configuration files
@@ -149,8 +161,14 @@ echo ""
 echo "  Install path:                           $prefix"
 echo ""
 echo "  D-Bus support:                          $USE_DBUS"
-echo "  GTK+ support:                           $USE_GTK"
+echo "  GTK support:                            $USE_GTK"
+if test "x$USE_GTK" = "xyes" ; then
+    echo "  GTK Interface (release#)                $GTK_VSN"
+fi
 echo "  Qt support:                             $USE_QT"
+if test "x$USE_QT" = "xyes" ; then
+    echo "  Qt Interface (release#)                 $QT_VSN"
+fi
 echo "  SDL2 (Video) support:                   $have_sdl2"
 echo "  Valgrind analysis support:              $enable_valgrind"
 echo ""

@@ -1,3 +1,15 @@
+Version 4.4-beta1
+
+* Update library versions of libfauxdgui & libfauxdqt to match Audacious.
+
+* Fix libfauxdcore tests suite to actually function.
+
+* Minor fixes to the Opus plugin; and Qt's dark theme, particularly to work 
+better with Qt6.
+
+* Make Qt6 and GTK3 the default versions (use --enable-gtk2 and/or --enable-qt5 
+to build with the older versions).
+
 Version 4.4-devel (as/of 5/23/2024):
 
 * Merge most Audacious bugfix & feature commits for Audacious v.4.4-beta1.  
