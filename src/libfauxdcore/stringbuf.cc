@@ -144,6 +144,8 @@ EXPORT void StringBuf::resize (int len)
             m_len = header->len = (len < 0) ? max_len : len;
             need_alloc = false;
         }
+        else if (! header->next)
+            throw std::bad_alloc ();  /* not enough space and already at top of stack */
     }
 
     if (need_alloc)
@@ -177,7 +179,7 @@ EXPORT void StringBuf::resize (int len)
             if (header->prev)
                 header->prev->next = header->next;
 
-            /* we know header != stack->top */
+            /* header->next is never null here: */
             header->next->prev = header->prev;
         }
 
