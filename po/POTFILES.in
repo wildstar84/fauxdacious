@@ -55,3 +55,4 @@ src/libfauxdqt/search-select-qt.cc
 src/libfauxdqt/song-window-qt.cc
 src/libfauxdqt/url-opener-qt.cc
 src/libfauxdqt/util-qt.cc
+src/libfauxdqt/volumebutton.cc
