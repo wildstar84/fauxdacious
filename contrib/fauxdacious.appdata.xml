@@ -5,7 +5,10 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>BSD-2-Clause</project_license>
   <name>Fauxdacious</name>
-  <summary>Lightweight audio player</summary>
+  <developer id="org.atheme.fauxdacious">
+    <name>Audacious developers and Jim Turner</name>
+  </developer>
+  <summary>Lightweight media player</summary>
   <description>
     <p>
       Fauxdacious is an open source media player.  A fork of Audacious,
