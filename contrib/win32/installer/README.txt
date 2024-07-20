@@ -1,16 +1,16 @@
-Fauxdacious 4.2.1-final for Windows
+Fauxdacious 4.4-final for Windows
 
-    https://github.com/wildstar84/fauxdacious-windows-easyinstaller
-    https://wildstar84.wordpress.com/fauxdacious
+    https://wildstar84.wordpress.com/fauxdacious/
 
-Fauxdacious is free and open source software.  By installing Fauxdacious, you agree
-to be bound by various licenses governing its use and redistribution.
+Fauxdacious is free and open source software forked from Audacious audio-player.
+By installing Fauxdacious, you agree to be bound by various licenses governing 
+its use and redistribution.
 
-Build date: 8 November, 2022
+Build ID: 20240717
 
 LICENSE
 
-Copyright (C) 2001-2022 Jim Turner, Audacious developers and others
+Copyright (C) 2001-2024 Jim Turner, Audacious developers and others
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -28,17 +28,19 @@ from the use of this software.
 
 EXCEPTIONS
 
-Other than the Fauxdacious logo itself, the images included with Fauxdacious are
-based on the Tango Icon Library and are in the public domain.
+Fauxdacious includes icons adapted from the Paper Icon Set by Sam Hewitt.  These
+icons are distributed under the Creative Commons Attribution-ShareAlike 4.0
+license (see https://creativecommons.org/licenses/by-sa/4.0/).
 
 Please note that many of the plugins distributed with Fauxdacious are under
 different licenses, whose full text may be found either in the "About" window
 of each plugin or in the source code.
 
-Fauxdacious would not exist without the efforts of numerous other free and open
-source software projects, which are listed below.  By installing Fauxdacious, you
-also agree to all relevant licenses governing these projects.  The source code
-and license of each project can be found on the Internet.
+Fauxdacious would not exist without Audacious, and the efforts of the 
+Audacious developers, and numerous other free and open source software projects, 
+which are listed below.  By installing Fauxdacious, you also agree to all 
+relevant licenses governing these projects.  The source code and license 
+of each project can be found on the Internet.
 
     Project          Website
     -------          -------
@@ -72,21 +74,18 @@ and license of each project can be found on the Internet.
     libflac          http://xiph.org/flac
     libogg           http://xiph.org/ogg
     libvorbis        http://xiph.org/vorbis
-    OpenSSL          http://www.openssl.org
     neon             http://webdav.org/neon
     libsamplerate    http://mega-nerd.com/SRC
     WavPack          http://wavpack.com
     FFmpeg           http://ffmpeg.org
     ModPlug          http://modplug-xmms.sourceforge.net
-    libbinio         http://libbinio.sourceforge.net
-    libcurl          http://curl.haxx.se
+    AdPlug           http://adplug.github.io
     libmms           http://libmms.sourceforge.net
     sidplayfp        http://sidplay-residfp.sourceforge.net
     FluidSynth       http://fluidsynth.org
-    SDL              https://www.libsdl.org
-    libdvdread       https://www.videolan.org
 
 If you are an author of one of these projects and do not wish your software
 included with Fauxdacious in binary form, please contact us via the support forum:
 
     mailto:turnerjw784@yahoo.com
+    https://github.com/wildstar84/fauxdacious

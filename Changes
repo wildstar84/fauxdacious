@@ -1,3 +1,44 @@
+Version 4.4-final
+
+*** WARNING: LIKELY FINAL BUILD FOR MS-WINDOWS, SEE BELOW: ***
+
+This release is mostly merged Audacious build improvements and modernization 
+to better support Qt-6 and Wayland.  Some minor code tweaks and bug-fixes all 
+over, nothing spectacularly interesting.  The only shiny new stuff added was 
+Audacious's Moonstone(Qt) plugin with some additional Fauxdacious flare!
+
+One bug of note discovered and fixed at the last minute involved the Skins-GTK 
+playlist window sometimes jumping back to the currently playing song when 
+user would scroll up in the playlist window where the playing song scrolled 
+off the window and the user then clicked on another song.  Sorry for not 
+catching this sooner as I hardly ever use the skins interfaces anymore.  The 
+Skins-Qt version appears to not be affected by this bug.  Another annoying 
+issue was the hot-switching feature would silently switch back to the default 
+instance when hot-switching between GTK & Qt versions while running an 
+instance other than the default (using the --new=instancename) option.
+
+One minor omission is the addition and requirement for the Qt*svg libraries, 
+since unfortunately due to Debian's current "t64 fiasco" in Trixie.  I am 
+currently unable to safely upgrade or install pretty much any new software 
+until this drama settles down, and I did not have these libraries installed 
+before this started.  It's also prevented me from installing and testing the 
+Qt6 stuff, but I've added everything Qt6-related that Audacious has, and 
+(if you have it installed), it should work.
+
+Otherwise, for all the gory details, see the changes below and the commits 
+since the v4.3-final release:
+
+On a rather sad note, I'm strongly considering stopping further work on the 
+MS-Windows version as I do not ever use Windows anymore, it's a lot of extra 
+work to rebuild everything in Windows, the plugin libraries (the subset we 
+actuially support) are now ancient and it seems to be very difficult to 
+update them, and I've seen essentially zero uptake or interest in Fauxdacious 
+for Windows. :(  Therefore, if you are using Fauxdacious on your Windows daily 
+driver machine - PLEASE drop me a line letting me know you are using and 
+appreciate it.  If I find there are actually USERS, I'll strongly consider 
+continuing building.  Just need to know my labor is accomplishing something!  
+Otherwise, v4.4-final will likely be the FINAL official Windows release!
+
 Version 4.4-beta1
 
 * Update library versions of libfauxdgui & libfauxdqt to match Audacious.

@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<h2>Notes for Building Fauxdacious (GTK vsn.) on M$-Windows</h2>
+<h2>Notes for Building Fauxdacious (GTK-2 vsn) on M$-Windows</h2>
 
 <p><em>Jim Turner<br>
 Nov 18, 2019<br>from "Building Audacious (v. 3.8) on Windows", by: John Lindgren<br>
@@ -612,7 +612,7 @@ make install</tt></p></blockquote>
 <blockquote><p><tt>cd /C/fauxdacious<br>
 Fauxdacious Note:&nbsp;  You should make sure that the "-win32.*" versions of the image files are used in (copied over) /C/fauxdacious/src/images/about-logo.*!</B><br><br>
 ./autogen.sh<br>
-./configure --prefix=/C/aud --with-buildstamp=Fauxdacious<br>
+./configure --prefix=/C/aud --with-buildstamp=yyyymmdd --disable-qt --enable-gtk2<br>
 make<br>
 make install</tt></p></blockquote>
 

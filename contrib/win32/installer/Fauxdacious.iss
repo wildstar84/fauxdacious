@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Fauxdacious"
-#define MyAppVersion "4.3-final"
+#define MyAppVersion "4.4-final"
 #define MyAppPublisher "Jim Turner"
 #define MyAppURL "https://wildstar84.wordpress.com/fauxdacious"
 #define MyAppExeName "fauxdacious.exe"
