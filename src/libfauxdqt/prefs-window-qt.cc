@@ -287,12 +287,17 @@ static const ComboItem use_native_sysdialogs[] = {
     ComboItem (N_("Qt"), 2)
 };
 
+#ifdef USE_QT5
 static const PreferencesWidget appearance_page_widgets[] = {
-    WidgetLabel(N_("Fauxdacious is running in Qt mode.")),
+    WidgetLabel(N_("Fauxdacious is running in Qt5 (legacy) mode.")),
+#else
+static const PreferencesWidget appearance_page_widgets[] = {
+    WidgetLabel(N_("Fauxdacious is running in Qt6 mode.")),
+#endif
 #ifdef USE_GTK
     WidgetBox({iface_restart_widgets, true}, WIDGET_CHILD),
 #else
-    WidgetLabel(N_("GTK mode is not available in this build."),
+    WidgetLabel(N_("No GTK mode is not available in this build."),
                 WIDGET_CHILD),
 #endif
     WidgetCombo (N_("Interface:"),

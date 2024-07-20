@@ -102,11 +102,13 @@ AC_REQUIRE([AC_SYS_LARGEFILE])
 if test "x$GCC" = "xyes"; then
     CFLAGS="$CFLAGS -std=gnu99 -ffast-math -Wall -pipe"
     CXXFLAGS="$CXXFLAGS -ffast-math -Wall -pipe"
+
     # use C++17 if possible (Qt 6 requires it)
     AUD_CHECK_CXXFLAGS(-std=gnu++17)
     if test "${CXXFLAGS%gnu++17}" = "$CXXFLAGS" ; then
         CXXFLAGS="$CXXFLAGS -std=gnu++11"
     fi
+
     AUD_CHECK_CFLAGS(-Wtype-limits)
     AUD_CHECK_CFLAGS(-Wno-stringop-truncation)
     AUD_CHECK_CXXFLAGS(-Woverloaded-virtual)
@@ -132,7 +134,7 @@ fi
 
 dnl MinGW-specific flags
 dnl ====================
-if test $HAVE_MSWINDOWS = yes ; then
+if test "x$HAVE_MSWINDOWS" = "xyes" ; then
     AC_DEFINE([__USE_MINGW_ANSI_STDIO], [1], "Use GNU-style printf")
     CFLAGS="$CFLAGS -march=i686"
 fi
@@ -146,7 +148,8 @@ AC_SUBST([BIGENDIAN])
 
 dnl Prevent symbol collisions
 dnl =========================
-if test $HAVE_MSWINDOWS = yes ; then
+dnl if test $HAVE_MSWINDOWS = yes ; then
+if test "x$HAVE_MSWINDOWS" = "xyes" ; then
     EXPORT="__declspec(dllexport)"
 elif test "x$GCC" = "xyes" ; then
     CFLAGS="$CFLAGS -fvisibility=hidden"
@@ -165,7 +168,7 @@ AC_PATH_PROG([MV], [mv])
 AC_PATH_PROG([CP], [cp])
 AC_PATH_TOOL([AR], [ar])
 AC_PATH_TOOL([RANLIB], [ranlib])
-AC_PATH_TOOL([WINDRES], [windres])
+AC_PATH_TOOL([RC], [windres])
 
 dnl Check for POSIX threads
 dnl =======================
@@ -186,37 +189,25 @@ AC_ARG_ENABLE(gtk,
  AS_HELP_STRING(--disable-gtk, [Disable GTK support (default=enabled)]),
  USE_GTK=$enableval, USE_GTK=yes)
 
-dnl JWT:WE DON'T SUPPORT GTK3 IN WINDOWS (YET), SO DEFAULT TO GTK2!:
-if test $HAVE_MSWINDOWS = yes ; then
-    AC_ARG_ENABLE(gtk3,
-     AS_HELP_STRING(--enable-gtk3, [Use GTK 3 instead of GTK 2 (default=disabled)]),
-     USE_GTK3=$enableval, USE_GTK3=no)
-    if test $USE_GTK3 = yes ; then
-        PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.22)
-        AC_DEFINE([USE_GTK], [1], [Define if GTK support enabled])
-        AC_DEFINE(USE_GTK3, 1, [Define if GTK 3 support enabled])
-    elif test $USE_GTK = yes ; then
-        PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.24)
-        AC_DEFINE(USE_GTK, 1, [Define if GTK support enabled])
-    fi
-else
-    AC_ARG_ENABLE(gtk2,
-     AS_HELP_STRING(--enable-gtk2, [Use GTK 2 instead of GTK 3 (default=disabled)]),
-     USE_GTK2=$enableval, USE_GTK2=no)
-    if test $USE_GTK2 = yes ; then
-        PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.24)
-        AC_DEFINE([USE_GTK], [1], [Define if GTK support enabled])
-    elif test $USE_GTK = yes ; then
-        PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.22)
-        AC_DEFINE(USE_GTK, 1, [Define if GTK support enabled])
-        AC_DEFINE(USE_GTK3, 1, [Define if GTK 3 support enabled])
-    fi
+USE_GTK3=""
+AC_ARG_ENABLE(gtk2,
+ AS_HELP_STRING(--enable-gtk2, [Use GTK 2 instead of GTK 3 (default=disabled)]),
+ USE_GTK2=$enableval, USE_GTK2=no)
+
+if test $USE_GTK2 = yes ; then
+    PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.24)
+    AC_DEFINE([USE_GTK], [1], [Define if GTK support enabled])
+elif test $USE_GTK = yes ; then
+    PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.18)
+    AC_DEFINE(USE_GTK, 1, [Define if GTK support enabled])
+    AC_DEFINE(USE_GTK3, 1, [Define if GTK 3 support enabled])
+    USE_GTK3="yes"
 fi
 
 AC_SUBST(USE_GTK)
 AC_SUBST(USE_GTK3)
 
-if test $HAVE_MSWINDOWS = yes ; then
+if test "x$HAVE_MSWINDOWS" = "xyes" ; then
     PKG_CHECK_MODULES(GIO, gio-2.0 >= 2.32)
 else
     PKG_CHECK_MODULES(GIO, gio-2.0 >= 2.32 gio-unix-2.0 >= 2.32)
@@ -234,24 +225,20 @@ AC_SUBST(GTK_LIBS)
 dnl Qt support
 dnl ==========
 
-if test $HAVE_MSWINDOWS = yes ; then
-    AC_ARG_ENABLE(qt,
-     AS_HELP_STRING(--enable-qt, [Enable Qt support (default=disabled)]),
-     USE_QT=$enableval, USE_QT=no)
-else
-    AC_ARG_ENABLE(qt,
-     AS_HELP_STRING(--disable-qt, [Disable Qt support (default=enabled)]),
-     USE_QT=$enableval, USE_QT=yes)
-fi
+AC_ARG_ENABLE(qt,
+ AS_HELP_STRING(--disable-qt, [Disable Qt support (default=enabled)]),
+ USE_QT=$enableval, USE_QT=yes)
 
 AC_ARG_ENABLE(qt5,
  AS_HELP_STRING(--enable-qt5, [Use Qt 5 instead of Qt 6 (default=disabled)]),
  USE_QT5=$enableval, USE_QT5=no)
+
 if test $USE_QT5 = yes ; then
     PKG_CHECK_MODULES([QTCORE], [Qt5Core >= 5.2])
     PKG_CHECK_VAR([QTBINPATH], [Qt5Core >= 5.2], [host_bins])
     PKG_CHECK_MODULES([QT], [Qt5Core Qt5Gui Qt5Widgets >= 5.2])
     AC_DEFINE([USE_QT], [1], [Define if Qt support enabled])
+    AC_DEFINE([USE_QT5], [1], [Define if Legacy Qt5 support enabled])
 
     # needed if Qt was built with -reduce-relocations
     QTCORE_CFLAGS="$QTCORE_CFLAGS -fPIC"
@@ -259,7 +246,7 @@ if test $USE_QT5 = yes ; then
 elif test $USE_QT = yes ; then
     PKG_CHECK_MODULES([QTCORE], [Qt6Core >= 6.0])
     PKG_CHECK_VAR([QTBINPATH], [Qt6Core >= 6.0], [libexecdir])
-    PKG_CHECK_MODULES([QT], [Qt6Core Qt6Gui Qt6Widgets >= 6.0])
+    PKG_CHECK_MODULES([QT], [Qt6Core Qt6Gui Qt6Widgets Qt6Svg >= 6.0])
     AC_DEFINE([USE_QT], [1], [Define if Qt support enabled])
 fi
 

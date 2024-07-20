@@ -24,6 +24,8 @@ AUD_COMMON_PROGS
 
 BUILDSYS_INIT
 BUILDSYS_SHARED_LIB
+BUILDSYS_PLUGIN
+
 AC_DEFINE_UNQUOTED(PLUGIN_SUFFIX, "$PLUGIN_SUFFIX", [Suffix for plugins])
 
 m4_ifdef([PKG_INSTALLDIR], [PKG_INSTALLDIR], AC_SUBST([pkgconfigdir], ${libdir}/pkgconfig))
@@ -42,6 +44,7 @@ LIBS="$LIBS $LIBICONV"
 dnl gettext
 dnl =======
 AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION(0.18.1)
 if test "$MSGFMT" = ":" ; then
     AC_MSG_ERROR([msgfmt was not found; have you installed gettext?])
 fi
@@ -122,7 +125,9 @@ CPPFLAGS="$CPPFLAGS -include config.h"
 
 dnl Interface versions
 dnl ==================
-if test "x$USE_GTK2" = "xyes"; then
+if test "x$USE_GTK3" = "xno"; then
+    GTK_VSN="2"
+elif test "x$USE_GTK3" = "x"; then
     GTK_VSN="2"
 else
     GTK_VSN="3"
