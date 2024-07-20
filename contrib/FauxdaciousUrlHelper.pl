@@ -13,7 +13,7 @@
 ###use StreamFinder::BrandNewTube;
 ###use StreamFinder::Brighteon;
 ###use StreamFinder::Castbox;
-###use StreamFinder::Google;
+###use StreamFinder::EpochTV;
 ###use StreamFinder::IHeartRadio;
 ###use StreamFinder::InternetRadio;
 ###use StreamFinder::Odysee;
@@ -99,8 +99,6 @@ use URI::Escape;
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
 #FORMAT:  '//www.problemserver.com' [, ...]
 my @downloadServerList = ();  #USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE OR IN FauxdaciousUrlHelper.ini.
-#NOTE: TO (TEMPORARILY?) FORCE PRE-DOWNLOADING OF ALL VIDEOS AND PODCASTS (IF INTERNET IS BEING FLAKEY)
-#TOUCH THE FILE:  "/tmp/INTERNET_UNSTABLE" TO CAUSE ALL VIDEOS & PODCASTS TO BE PRE-DOWNLOADED.
 my %setPrecedence = ();
 
 die "..usage: $0 URL [download-path]\n"  unless ($ARGV[0]);
@@ -203,7 +201,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		if (defined($desc) && $desc =~ /\w/ && $desc ne $title) {
 			$desc =~ s/\R+$//s;
 			$desc =~ s/\R/\x02/gs; #MUST BE A SINGLE LINE, SO WORKAROUND FOR PRESERVING MULTILINE DESCRIPTIONS!
-			$desc =~ s#(p|br)\>\s*\x02\s*\<(p|br)#$1\>\<$2#ig;  #TRY TO REMOVE SOME TRIPLE-SPACING.
+			$desc =~ s#(p|br)\>\s*\x02\s*\<(p|br)#$1\>\<$2#igs;  #TRY TO REMOVE SOME TRIPLE-SPACING.
+			$desc =~ s#\%# percent#gs;
 			$lyrics = "Lyrics=Description:  $desc";
 		}
 		if ($art_url) {
