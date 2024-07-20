@@ -20,7 +20,7 @@ SRCS = ../audio.cc \
 FLAGS = -I.. -I../.. -DEXPORT= -DPACKAGE=\"fauxdacious\" -DICONV_CONST= \
         $(shell pkg-config --cflags --libs glib-2.0) \
         -std=c++11 -Wall -g -O0 -fno-elide-constructors \
-        -fprofile-arcs -ftest-coverage -pthread
+        -fprofile-arcs -ftest-coverage -pthread -dumpbase ''
 
 test: ${SRCS} test.cc
 	g++ ${SRCS} test.cc ${FLAGS} -o test
