@@ -187,7 +187,7 @@ static void infopopup_destroyed ()
     infopopup_queued = nullptr;
 }
 
-static GtkWidget * infopopup_create ()
+static GtkWidget * infopopup_create (GtkWindow * parent)
 {
     int dpi = audgui_get_dpi ();
 
@@ -196,6 +196,9 @@ static GtkWidget * infopopup_create ()
     gtk_window_set_decorated ((GtkWindow *) infopopup, false);
     gtk_window_set_role ((GtkWindow *) infopopup, "infopopup");
     gtk_container_set_border_width ((GtkContainer *) infopopup, 4);
+
+    if (parent)
+        gtk_window_set_transient_for ((GtkWindow *) infopopup, parent);
 
     GtkWidget * hbox = audgui_hbox_new (6);
     gtk_container_add ((GtkContainer *) infopopup, hbox);
@@ -225,9 +228,11 @@ static GtkWidget * infopopup_create ()
     gtk_widget_set_margin_top (widgets.progress, 4);
     gtk_grid_attach ((GtkGrid *) grid, widgets.progress, 0, 8, 2, 1);
 #else
-    gtk_table_set_row_spacing ((GtkTable *) grid, 7, 4);
+    if (aud_get_bool (nullptr, "filepopup_showprogressbar"))
+        gtk_table_set_row_spacing ((GtkTable *) grid, 6, 4);
+
     gtk_table_attach ((GtkTable *) grid, widgets.progress, 0, 2, 7, 8,
-     GTK_FILL, GTK_FILL, 0, 0);
+            GTK_FILL, GTK_FILL, 0, 0);
 #endif
 
     /* override background drawing */
@@ -312,13 +317,13 @@ static void infopopup_move_to_mouse (GtkWidget * infopopup)
     gtk_window_move ((GtkWindow *) infopopup, x, y);
 }
 
-static void infopopup_show (const char * filename, const Tuple & tuple)
+static void infopopup_show (GtkWindow * parent, const char * filename, const Tuple & tuple)
 {
     audgui_infopopup_hide ();
 
     current_file = String (filename);
 
-    GtkWidget * infopopup = infopopup_create ();
+    GtkWidget * infopopup = infopopup_create (parent);
     infopopup_set_fields (tuple);
 
     hook_associate ("art ready", (HookFunction) infopopup_art_ready, nullptr);
@@ -338,16 +343,22 @@ static void infopopup_show (const char * filename, const Tuple & tuple)
         infopopup_queued = infopopup;
 }
 
-EXPORT void audgui_infopopup_show (int playlist, int entry)
+EXPORT void audgui_infopopup_show (GtkWindow * parent, int playlist, int entry)
 {
     String filename = aud_playlist_entry_get_filename (playlist, entry);
     Tuple tuple = aud_playlist_entry_get_tuple (playlist, entry);
 
     if (filename && tuple.valid ())
-        infopopup_show (filename, tuple);
+        infopopup_show (parent, filename, tuple);
 }
 
-EXPORT void audgui_infopopup_show_current ()
+/* OVERLOAD!: */
+EXPORT void audgui_infopopup_show (int playlist, int entry)
+{
+    audgui_infopopup_show (nullptr, playlist, entry);
+}
+
+EXPORT void audgui_infopopup_show_current (GtkWindow * parent)
 {
     int playlist = aud_playlist_get_playing ();
     if (playlist < 0)
@@ -357,7 +368,13 @@ EXPORT void audgui_infopopup_show_current ()
     if (position < 0)
         return;
 
-    audgui_infopopup_show (playlist, position);
+    audgui_infopopup_show (parent, playlist, position);
+}
+
+/* OVERLOAD!: */
+EXPORT void audgui_infopopup_show_current ()
+{
+    audgui_infopopup_show_current (nullptr);
 }
 
 EXPORT void audgui_infopopup_hide ()

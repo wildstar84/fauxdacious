@@ -46,6 +46,10 @@ public:
         { return AudguiPixbuf (get () ? (GdkPixbuf *) g_object_ref (get ()) : nullptr); }
 };
 
+/* infopopup.c */
+void audgui_infopopup_show_current (GtkWindow * parent);
+void audgui_infopopup_show (GtkWindow * parent, int playlist, int entry);
+
 /* pixbufs.c */
 AudguiPixbuf audgui_pixbuf_from_data (const void * data, int64_t size);
 AudguiPixbuf audgui_pixbuf_fallback ();
