@@ -336,6 +336,7 @@ EXPORT void QueuedFunc::stop ()
 // unregister a pending callback at shutdown
 static bool cleanup_node (QueuedFuncNode * node)
     { delete node; return true; }
+
 // inhibit all future callbacks at shutdown
 static void enter_lockdown ()
     { in_lockdown = true; }
@@ -358,10 +359,12 @@ EXPORT void mainloop_run ()
         static int dummy_argc = 1;
         static char * dummy_argv[] = {app_name, nullptr};
 
-        if (qApp) // did audqt create a QApplication already?
-            qApp->exec ();
-        else
-            QCoreApplication (dummy_argc, dummy_argv).exec ();
+        // Create QCoreApplication instance if running in headless mode
+        // (otherwise audqt will have created a QApplication already).
+        if (! qApp)
+            new QCoreApplication (dummy_argc, dummy_argv);
+
+        qApp->exec ();
     }
     else
 #endif
@@ -377,12 +380,16 @@ EXPORT void mainloop_quit ()
 {
 #ifdef USE_QT
     if (aud_get_mainloop_type () == MainloopType::Qt)
-    {
         qApp->quit ();
-    }
     else
 #endif
-    {
         g_main_loop_quit (glib_mainloop);
-    }
+}
+
+void mainloop_cleanup()
+{
+#ifdef USE_QT
+    if (aud_get_mainloop_type () == MainloopType::Qt)
+        delete qApp;
+#endif
 }
