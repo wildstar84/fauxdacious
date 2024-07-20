@@ -446,7 +446,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/$album_uesc\|/;
 		$skipit =~ s/\|/\\\|/;
-		if ("$album_uesc|$title_uesc" =~ /^${skipit}/i) {
+		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E/i) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME/TITLE THOUGH!
@@ -572,7 +572,7 @@ WEBSEARCH:
 	#(IE. TO "foreach my $release ($title, $album) {") IN THE NEXT LINE BELOW FOR EFFICIENCY'S SAKE!!:
 
 RELEASETYPE:
-	foreach my $release ($album, $title) {
+	foreach my $release ($title, $album) {
 		next  if ($release eq '_');
 		chomp $release;
 		$release =~ s/(?:\%20)+$//o;    #CHOMPIT (TRAILING ESCAPED SPACES)!
