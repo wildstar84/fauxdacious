@@ -21,6 +21,10 @@
 #include <sys/stat.h>
 #include <string.h>
 
+#include <gdk/gdk.h>
+#ifndef _WIN32
+#include <gdk/gdkx.h>
+#endif
 #include <gtk/gtk.h>
 
 #include <libfauxdcore/drct.h>
@@ -670,11 +674,15 @@ static void ui_infoarea_playback_stop ()
     timer_add (TimerRate::Hz30, ui_infoarea_do_fade);
 }
 
+#ifdef USE_GTK3
 static void realize_cb (GtkWidget * widget)
 {
     /* using a native window avoids redrawing parent widgets */
-    gdk_window_ensure_native (gtk_widget_get_window (widget));
+    /* Check for X11 (supported since GTK 3) and only enable this if so (NOT Wayland)!: */
+    if (GDK_IS_X11_DISPLAY (gdk_display_get_default ()))
+        gdk_window_ensure_native (gtk_widget_get_window (widget));
 }
+#endif
 
 /* CALLED BY STARTING/STOPPING THE INFOBAR OR MINI-FAUXDACIOUS: */
 EXPORT void ui_infoarea_show_art (bool show)
@@ -734,7 +742,11 @@ EXPORT void ui_infoarea_show_vis (bool show)
         vis.widget = gtk_drawing_area_new ();
 
         /* note: "realize" signal must be connected before adding to box */
-        g_signal_connect (vis.widget, "realize", (GCallback) realize_cb, nullptr);
+#ifdef USE_GTK3
+        /* Check for X11 (supported since GTK 3) and only enable this if so (NOT Wayland)!: */
+        if (GDK_IS_X11_DISPLAY (gdk_display_get_default ()))
+            g_signal_connect (vis.widget, "realize", (GCallback) realize_cb, nullptr);
+#endif
 
         gtk_widget_set_size_request (vis.widget, VIS_WIDTH, HEIGHT);
         gtk_box_pack_start ((GtkBox *) area->box, vis.widget, false, false, 0);
