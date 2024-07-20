@@ -781,8 +781,8 @@ int main (int argc, char * * argv)
 
     if (aud_restart_requested())
     {
-        fprintf(stderr, "Restarting %s ...\n", argv[0]);
-        if (execlp(argv[0], argv[0], (char *)NULL) < 0)
+        String instance = String (str_printf ("--new=%s", (const char *)aud_get_instancename ()));
+        if (execlp(argv[0], argv[0], (const char *)instance, (char *)NULL) < 0)
         {
             fprintf(stderr, "execp failed: %s\n", strerror(errno));
             return EXIT_FAILURE;
