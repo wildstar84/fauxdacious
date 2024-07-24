@@ -157,6 +157,8 @@ EXPORT void aud_playlist_sort_by_scheme (int playlist, Playlist::SortType scheme
         aud_playlist_sort_by_filename (playlist, filename_comparisons[scheme]);
     else if (tuple_comparisons[scheme])
         aud_playlist_sort_by_tuple (playlist, tuple_comparisons[scheme]);
+
+    hook_call ("set playlist sort indicator", aud::to_ptr (scheme));
 }
 
 EXPORT void aud_playlist_sort_selected_by_scheme (int playlist, Playlist::SortType scheme)
