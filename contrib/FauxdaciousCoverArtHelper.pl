@@ -446,7 +446,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/$album_uesc\|/;
 		$skipit =~ s/\|/\\\|/;
-		if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E/i) {
+		if ("$album_uesc|$title_uesc" =~ /^${skipit}/i) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			&albumart_done();
 			exit(0);  #QUIT - USER DOES NOT WISH TO LOOK UP *THIS* ALBUM NAME/TITLE THOUGH!

@@ -1,4 +1,20 @@
-Version 4.4-final
+Version 4.4-final [Updated 07/24/24]:
+
+* helpers - CoverArt:  An emergency hotfix was made to partially REVERT 
+latest commit# 924c3db of 7/20 "Fix regex for titles w/unmatched '('" as this 
+proved to be aregression (sorry!).  A new v4.4-final Windows build will be 
+performed to include this correction, and in future updated heler binaries will 
+bemade available for individual downloads & upgrades, as there are currently no 
+plans to release new Windows builds going forward (for now, as stated here in 
+the Changes file).
+
+* Moonstone:  Add plugin configuration section to the Settings window for 
+gui-configuration of important Moonston plugin parameters.
+
+* GTK-ui:  Make playlist column sort-indicator arrows work for menu-initiated 
+sorts and when multiple playlist tabs exist.  It is intended to also be 
+included in the extra Windows 4.4-final build to correct the aformentioned 
+CoverArt error hotfix.
 
 *** WARNING: LIKELY FINAL BUILD FOR MS-WINDOWS, SEE BELOW: ***
 
