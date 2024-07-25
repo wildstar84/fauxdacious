@@ -146,6 +146,8 @@ enum
     CATEGORY_COUNT
 };
 
+QAction * toolbar_actions[CATEGORY_COUNT];
+
 static const Category categories[] = {   // Modern QT-Themed icons (default)
     { "applications-graphics", N_("Appearance") },
     { "audio-volume-medium", N_("Audio") },
@@ -274,6 +276,37 @@ static const ComboItem icon_theme_elements[] = {
     ComboItem (N_("Flat (dark)"), "fauxdacious-flat-dark")
 };
 
+static void toggle_classic_icons ()
+{
+    bool headless = aud_get_headless_mode();
+    if (aud_get_bool(nullptr, "use_classic_icons"))
+    {
+        const char * data_dir = aud_get_path (AudPath::DataDir);
+        for (int i = 0; i < CATEGORY_COUNT; i ++)
+        {
+            if (headless && i == CATEGORY_APPEARANCE)
+                continue;
+            else if (toolbar_actions[i])
+            {
+                QIcon ico (QString (filename_build ({data_dir, "images", classic_categories[i].icon})));
+                toolbar_actions[i]->setIcon (ico);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < CATEGORY_COUNT; i ++)
+        {
+            if (headless && i == CATEGORY_APPEARANCE)
+                continue;
+            else if (toolbar_actions[i])
+            {
+                toolbar_actions[i]->setIcon (get_icon (categories[i].icon));
+            }
+        }
+    }
+}
+
 static void icon_theme_changed ()
 {
     set_icon_theme ();
@@ -297,7 +330,7 @@ static const PreferencesWidget appearance_page_widgets[] = {
 #ifdef USE_GTK
     WidgetBox({iface_restart_widgets, true}, WIDGET_CHILD),
 #else
-    WidgetLabel(N_("No GTK mode is not available in this build."),
+    WidgetLabel(N_("No GTK mode is available in this build."),
                 WIDGET_CHILD),
 #endif
     WidgetCombo (N_("Interface:"),
@@ -308,8 +341,8 @@ static const PreferencesWidget appearance_page_widgets[] = {
     WidgetCombo (N_("Icon theme:"),
                 WidgetString ("audqt", "icon_theme", icon_theme_changed),
                 {{icon_theme_elements}}),
-    WidgetCheck (N_("Use Classic icons for this dialog's tabs (next time)"),
-        WidgetBool (0, "use_classic_icons")),
+    WidgetCheck (N_("Use Classic icons for this dialog's tabs"),
+        WidgetBool (0, "use_classic_icons", toggle_classic_icons)),
     WidgetCombo (N_("File Dialog Windows:"),
         WidgetInt ("audqt", "use_native_sysdialogs"),
         {{use_native_sysdialogs}}),
@@ -833,11 +866,15 @@ PrefsWindow::PrefsWindow () :
         for (int i = 0; i < CATEGORY_COUNT; i ++)
         {
             if (headless && i == CATEGORY_APPEARANCE)
+            {
+                toolbar_actions[i] = nullptr;
                 continue;
+            }
 
             QIcon ico (QString (filename_build ({data_dir, "images", classic_categories[i].icon})));
             QAction * a = new QAction (ico, translate_str (classic_categories[i].name), toolbar);
 
+            toolbar_actions[i] = a;
             toolbar->addAction (a);
             int j = (headless ? i - 1 : i);
             connect (a, & QAction::triggered, [j] () {
@@ -850,11 +887,15 @@ PrefsWindow::PrefsWindow () :
         for (int i = 0; i < CATEGORY_COUNT; i ++)
         {
             if (headless && i == CATEGORY_APPEARANCE)
+            {
+                toolbar_actions[i] = nullptr;
                 continue;
+            }
 
             auto a = new QAction (get_icon (categories[i].icon),
              translate_str (categories[i].name), toolbar);
 
+            toolbar_actions[i] = a;
             toolbar->addAction (a);
             int j = (headless ? i - 1 : i);
             connect (a, & QAction::triggered, [j] () {

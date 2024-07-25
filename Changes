@@ -2,11 +2,15 @@ Version 4.4-final [Updated 07/24/24]:
 
 * helpers - CoverArt:  An emergency hotfix was made to partially REVERT 
 latest commit# 924c3db of 7/20 "Fix regex for titles w/unmatched '('" as this 
-proved to be aregression (sorry!).  A new v4.4-final Windows build will be 
+proved to be a regression (sorry!).  A new v4.4-final Windows build will be 
 performed to include this correction, and in future updated heler binaries will 
-bemade available for individual downloads & upgrades, as there are currently no 
-plans to release new Windows builds going forward (for now, as stated here in 
-the Changes file).
+be made available for individual downloads & upgrades, as there are currently 
+no plans to release new full Windows builds of Fauxdacious & plugins going 
+forward (for now, as stated here in the Changes file).  NOTE:  The rebuilt 
+binary still has the same 07192024 buildstamp, as only a tiny part needed 
+recompiling whereas a complete rebuild (extremely SLOW on my Windows 
+environment) is required to change it.  Just make sure you download and 
+reinstall on or after 07/24!
 
 * Moonstone:  Add plugin configuration section to the Settings window for 
 gui-configuration of important Moonston plugin parameters.

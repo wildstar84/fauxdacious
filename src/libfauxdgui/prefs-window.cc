@@ -197,6 +197,7 @@ static const PreferencesWidget iface_restart_widgets[] = {
 static ArrayRef<ComboItem> iface_combo_fill ();
 static void iface_combo_changed ();
 static void * iface_create_prefs_box ();
+static void toggle_classic_icons ();
 
 static const PreferencesWidget appearance_page_widgets[] = {
 #ifdef USE_GTK3
@@ -207,13 +208,13 @@ static const PreferencesWidget appearance_page_widgets[] = {
 #ifdef USE_QT
     WidgetBox ({iface_restart_widgets, true}, WIDGET_CHILD),
 #else
-    WidgetLabel (N_("No Qt mode is not available in this build."), WIDGET_CHILD),
+    WidgetLabel (N_("No Qt mode is available in this build."), WIDGET_CHILD),
 #endif
     WidgetCombo (N_("Interface:"),
         WidgetInt (iface_combo_selected, iface_combo_changed),
         {0, iface_combo_fill}),
-    WidgetCheck (N_("Use Classic icons for this dialog's tabs (next time)"),
-        WidgetBool (0, "use_classic_icons")),
+    WidgetCheck (N_("Use Classic icons for this dialog's tabs"),
+        WidgetBool (0, "use_classic_icons", toggle_classic_icons)),
     WidgetSeparator ({true}),
     WidgetCustomGTK (iface_create_prefs_box)
 };
@@ -596,28 +597,15 @@ static void on_titlestring_cbox_changed (GtkComboBox * cbox, GtkEntry * entry)
         gtk_entry_set_text (entry, titlestring_presets[preset]);
 }
 
-static void fill_category_list (GtkTreeView * treeview, GtkNotebook * notebook)
+static void toggle_classic_icons ()
 {
-    GtkTreeViewColumn * column = gtk_tree_view_column_new ();
-    gtk_tree_view_column_set_title (column, _("Category"));
-    gtk_tree_view_append_column (treeview, column);
-    gtk_tree_view_column_set_spacing (column, 2);
-
-    GtkCellRenderer * renderer = gtk_cell_renderer_pixbuf_new ();
-    gtk_tree_view_column_pack_start (column, renderer, false);
-    gtk_tree_view_column_set_attributes (column, renderer, "pixbuf", 0, nullptr);
-
-    renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_column_pack_start (column, renderer, false);
-    gtk_tree_view_column_set_attributes (column, renderer, "text", 1, nullptr);
-
     GtkListStore * store = gtk_list_store_new (CATEGORY_VIEW_N_COLS,
-     GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
-    gtk_tree_view_set_model (treeview, (GtkTreeModel *) store);
+            GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
+    gtk_tree_view_set_model ((GtkTreeView *) category_treeview, (GtkTreeModel *) store);
 
     int icon_size = audgui_to_native_dpi (48);
 
-    if (aud_get_bool(nullptr, "use_classic_icons"))
+    if (aud_get_bool (nullptr, "use_classic_icons"))
     {
         const char * data_dir = aud_get_path (AudPath::DataDir);
 
@@ -661,7 +649,24 @@ static void fill_category_list (GtkTreeView * treeview, GtkNotebook * notebook)
     }
 
     g_object_unref (store);
+}
 
+static void fill_category_list (GtkTreeView * treeview, GtkNotebook * notebook)
+{
+    GtkTreeViewColumn * column = gtk_tree_view_column_new ();
+    gtk_tree_view_column_set_title (column, _("Category"));
+    gtk_tree_view_append_column (treeview, column);
+    gtk_tree_view_column_set_spacing (column, 2);
+
+    GtkCellRenderer * renderer = gtk_cell_renderer_pixbuf_new ();
+    gtk_tree_view_column_pack_start (column, renderer, false);
+    gtk_tree_view_column_set_attributes (column, renderer, "pixbuf", 0, nullptr);
+
+    renderer = gtk_cell_renderer_text_new ();
+    gtk_tree_view_column_pack_start (column, renderer, false);
+    gtk_tree_view_column_set_attributes (column, renderer, "text", 1, nullptr);
+
+    toggle_classic_icons ();
     GtkTreeSelection * selection = gtk_tree_view_get_selection (treeview);
     g_signal_connect (selection, "changed", (GCallback) category_changed, nullptr);
 }
