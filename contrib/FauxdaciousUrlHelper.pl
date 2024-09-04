@@ -369,7 +369,7 @@ sub writeTagData {
 	# WE WRITE VIDEOS/PODCASTS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!
 	# THE LIST IN THE REGEX BELOW ARE THE ONES TO *NOT* DELETE ART IMAGES FOR (ie. STREAMING STATIONS)!:
-	my $site = $client->getType();
+	my $site = $client ? $client->getType() : '';
 	my $tagfid = (!$downloadit && $client && $site
 			=~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast)$/)  #THESE SITES HAVE STATIONS:
 			? 'user_tag_data' : 'tmp_tag_data';
