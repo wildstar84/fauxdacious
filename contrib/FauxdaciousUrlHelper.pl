@@ -93,8 +93,9 @@ BEGIN
 	}
 }
 use strict;
-use StreamFinder;
 use URI::Escape;
+use LWP::UserAgent ();
+use StreamFinder;
 
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
 #FORMAT:  '//www.problemserver.com' [, ...]
@@ -113,6 +114,7 @@ my $title = $ARGV[0];
 my $comment = '';
 my $client = 0;
 my $downloadit = 0;
+my $hls_bandwidth = 0;
 my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 	if ($configPath && open IN, "<${configPath}/FauxdaciousUrlHelper.ini") {
@@ -127,7 +129,11 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			s/^[\'\"]//o;
 			s/[\'\"]$//o;
 			if ($key) {
-				$setPrecedence{$_} = $key;
+				if ($key eq 'hls_bandwidth') {
+					$hls_bandwidth = $_;
+				} else {
+					$setPrecedence{$_} = $key;
+				}
 			} else {
 				push @downloadServerList, $_;
 			}
@@ -137,7 +143,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-	if ($ARGV[0] !~ /\.(?:asx|mp3|mpv|m3u|m3u8|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta|mk[av])$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
+	if ($ARGV[0] !~ /\.(?:asx|mp3|mpv|m3u|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta|mk[av])$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
 		#SPECIAL HANDLING FOR rcast.net STREAMS (TOO SIMPLE TO NEED STREAMFINDER):
 		if ($StreamFinder::VERSION < 2.04
 				&& ($newPlaylistURL = $ARGV[0]) =~ s#https\:\/\/dir\.rcast\.net\/radio\/(\d+)\/?(.*)#https\:\/\/stream\.rcast\.net\/$1#) {
@@ -183,6 +189,102 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 #2			my $substationDIR = $1;
 #2			`mkdir ${configPath}/${substationDIR}`  unless (-d "${configPath}/${substationDIR}");
 #2		}
+
+		if ($newPlaylistURL =~ /\.m3u8/ && $hls_bandwidth) {
+			#HANDLE HLS BANDWIDTH LIMITS IN HLS PLAYLISTS MANUALLY SINCE FFMPEG DOESN'T!:
+			#WE DO THIS BY LOOKING AT 1ST 2048 BYTES TO SEE IF WE'RE AN HLS "MASTER PLAYLIST".
+			#IF SO, WE WRITE IT OUT TO A TEMP. FILE, EXCLUDING ANY STREAMS THAT EXCEED THE
+			#BANDWIDTH LIMIT.  THEN WE SET THE "newPlaylistURL" TO THAT FILE AND LET FFMPEG
+			#PROCESS IT TO SELECT THE STREAM (WHICH CAN INVOLVE MELDING SEPARATE AUDIO AND
+			#VIDEO STREAMS).
+			#WE HAVE TO DO THIS B/C (CURRENTLY), FFMPEG WILL PICK THE HIGHEST BANDWIDTH AND DOES
+			#NOT APPEAR TO OFFER A PARAMETER OPTION TO LIMIT THE BANDWIDTH IT SELECTS, AND HLS
+			#DOES *NOT* (CURRENTLY) SEEM TO "ADJUST" BANDWIDTH (ENOUGH?) TO NOT STUDDER IN
+			#SLOWER INTERNET CONNECTIONS:
+			#NOTE:  TO AVOID THIS, DON'T SET AN "hls_bandwidth" VALUE IN FauxdaciousUrlHelper.ini,
+			#IE. IF YOU HAVE A MODERN INTERNET CONNECTION (CURRENTLY AROUND 20mbps OR BETTER).
+			my $ua = LWP::UserAgent->new(@{$client->{'_userAgentOps'}});
+			$ua->timeout($client->{'timeout'});
+			$ua->max_size(2048);  #LIMIT FETCH-SIZE TO AVOID POSSIBLY DOWNLOADING A FULL HLS STREAM!
+			$ua->cookie_jar({});
+			$ua->env_proxy;
+			my $html = '';
+			#TEMPORARILY NEED NEXT LINE UNTIL PPL. HAVE A CHANCE TO UPGRADE:
+			$newPlaylistURL = $ARGV[0]  if ($StreamFinder::VERSION < 2.42);
+
+			my $response = $ua->get($newPlaylistURL);
+			if ($response->is_success) {
+				$html = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line  if ($DEBUG);
+				my $no_wget = system('wget','-V');
+				unless ($no_wget) {
+					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					$html = `wget -t 2 -T 20 -O- -o /dev/null \"$newPlaylistURL\" 2>/dev/null `;
+				}
+			}
+			if ($stationID && open OUT, ">/tmp/${stationID}.m3u8") {
+				my @lines = split(/\r?\n/, $html);
+				my $line = 0;
+				(my $urlpath = $newPlaylistURL) =~ s#[^\/]+$##;
+				my $highestBW = 0;
+				my $lowestBW = -1;
+				my $worstStream = '';
+				my $tried = 0;
+				my $bwexp = 'BANDWIDTH';
+TRYIT:
+				while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
+					if ($lines[$line] =~ /\s*\#EXT\-X\-STREAM\-INF\:(?:.*?)${bwexp}\=(\d+)/) {
+						$line++;
+						if ($line <= $#lines) {
+							(my $bw = $1) =~ s/^\d*x//o;
+							if ($bw > $highestBW && $lines[$line] =~ m#\.m3u8#o
+									&& ($hls_bandwidth <= 0	|| $bw <= $hls_bandwidth)) {
+								$highestBW = $bw;
+								unless ($lines[$line] =~ m#^https?\:\/\/#o) {
+									$lines[$line] =~ s#^\/##o;
+									$lines[$line] = $urlpath . $lines[$line];
+								}
+								print STDERR "++++($bw): found stream at bw=$bw=...\n"  if ($DEBUG);
+								print OUT "$lines[$line-1]\n$lines[$line]\n";
+							} elsif ($lowestBW < 0 || $bw < $lowestBW) {
+								$lowestBW = $bw;
+								if ($lines[$line] =~ m#^https?\:\/\/#o) {
+									$worstStream = "$lines[$line-1]\n$lines[$line]\n";
+								} else {
+									$lines[$line] =~ s#^\/##o;
+									$worstStream = "$lines[$line-1]\n$urlpath" . $lines[$line] . "\n";
+								}
+								print STDERR "++++($bw): found WORST stream at bw=$bw=...\n"  if ($DEBUG);
+							}
+						}
+					} elsif ($tried == 0) {
+						$lines[$line] =~ s#URI\=\"\/#URI\=\"#o;
+						$lines[$line] =~ s#URI\=\"#URI\=\"${urlpath}#;
+						print OUT "$lines[$line]\n";
+					}
+
+					$line++;
+				}
+				if ($highestBW == 0) {
+					if ($tried == 0) {
+						++$tried;
+						$bwexp = 'AVERAGE-BANDWIDTH';
+						$line = 1;
+						print STDERR "w:ALL streams exceed bandwidth limit, try AVERAGE BW...\n";
+						goto TRYIT;
+					} elsif ($worstStream) {
+						print OUT $worstStream;
+						print STDERR "w:ALL streams exceed bandwidth limit, returning WORST stream(bw=$lowestBW)!\n";
+						$newPlaylistURL = "file:///tmp/${stationID}.m3u8";
+					}
+				} else {
+					$newPlaylistURL = "file:///tmp/${stationID}.m3u8";
+				}
+				close OUT;
+				print STDERR "-getURL(m3u8/HLS) 1st=$newPlaylistURL=\n"  if ($DEBUG);
+			}
+		}
 
 		if (defined($client->{album}) && $client->{album} =~ /\S/) {
 			$comment = 'Album=' . (($client->{album} =~ /^https?\:/)
@@ -276,11 +378,17 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			!~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast)$/))  #THESE SITES HAVE STATIONS:
 		? 1 : 0;
 
+	$forcedownload = $downloadit = 0  if ($newPlaylistURL =~ /^file\:/);  #ALREADY "DOWNLOADED!"
 	if ($downloadit || $forcedownload) {  #SOME SERVERS HANG UP IF TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE INSTEAD!:
-		my $fn = $1  if ($newPlaylistURL =~ m#([^\/]+)$#);
-		exit (0)  unless ($fn);
-
+		my $fn = ($newPlaylistURL =~ m#([^\/]+)$#) ? $1 : 'tmpurl';
 		$fn =~ s/[\?\&\=\s].*$//;  #TRIM
+		#APPEND PROCESS-ID FOR UNIQUENESS:
+		if ($fn =~ /\./) {
+			$fn =~ s/\./\_$$\./;
+		} else {
+			$fn .= '_' . $$;
+		}
+
 		$newPlaylistURL =~ s#^(\w+)\:#https:#  if ($downloadit > 1);
 		unless (-f "/tmp/$fn") {
 			my $no_wget = system('wget','-V');

@@ -464,10 +464,12 @@ static void set_album_art ()
                 }
             }
             else if (filename && aud_read_tag_from_tagfile (filename, "tmp_tag_data", tuple)
-                    && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)))
+                    && (! strncmp (filename, "http://", 7) || ! strncmp (filename, "https://", 8)
+                        || ! strncmp (filename, "file:///tmp/", 12)))
             {
                 /* STREAM COMMENT WITHOUT CHANNEL ICON (OVERWRITTEN BY STREAM'S METATAGS?),
                    (THIS ONLY APPLIES TO STREAMING VIDEOS/PODCASTS, WHICH ALWAYS PUT IT THERE)
+                   (NOW CAN ALSO APPLY TO DOWNLOAD-FORCED STREAMS & HLS MASTER PLAYLISTS IN /tmp!)
                    SO CHECK tmp_tag_data:
                 */
                 String tfld = tuple.get_str (Tuple::Comment);
