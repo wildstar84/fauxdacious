@@ -31,6 +31,7 @@
 #include <libfauxdcore/sdl_window.h>
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/i18n.h>
+#include <libaudcore/interface.h>
 #include <libfauxdcore/runtime.h>
 
 #include "libfauxdqt-internal.h"
@@ -192,10 +193,16 @@ EXPORT void init ()
     // to use 9 pt in most places so let's try to do the same.
     QApplication::setFont (QApplication::font("QMenu"));
 #endif
-#ifdef Q_OS_MAC  // Mac-specific font tweaks
+#ifdef Q_OS_MAC
+    // Mac-specific font tweaks
     QApplication::setFont (QApplication::font ("QSmallFont"), "QDialog");
     QApplication::setFont (QApplication::font ("QSmallFont"), "QTreeView");
     QApplication::setFont (QApplication::font ("QTipLabel"), "QStatusBar");
+
+    // Handle MacOS dock activation (AppKit applicationShouldHandleReopen)
+    QObject::connect (qapp, &QApplication::applicationStateChanged, [] (auto state) {
+        if (state == Qt::ApplicationState::ApplicationActive)
+            aud_ui_show (true);
 #endif
 
     /* JWT:IN Qt WE HAVE TO INITIALIZE SDL ONCE HERE INSTEAD OF fauxdacious/main.cc TO AVOID "dbus warnings" ON EXIT! */
