@@ -1,5 +1,5 @@
 /*
- * playlist-management.cc
+ * playlist-management-qt.cc
  * Copyright 2014 William Pitcock
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,11 @@ static QDialog * buildDeleteDialog (int playlist)
     remove->setIcon (audqt::get_icon ("edit-delete"));
     cancel->setIcon (audqt::get_icon ("process-stop"));
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    QObject::connect (skip_prompt, & QCheckBox::checkStateChanged, [] (Qt::CheckState state) {
+#else
     QObject::connect (skip_prompt, & QCheckBox::stateChanged, [] (int state) {
+#endif
         aud_set_bool ("audgui", "no_confirm_playlist_delete", (state == Qt::Checked));
     });
 

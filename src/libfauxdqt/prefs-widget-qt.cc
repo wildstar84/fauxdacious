@@ -64,9 +64,14 @@ BooleanWidget::BooleanWidget (const PreferencesWidget * parent, const char * dom
 {
     update ();
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    QObject::connect (this, & QCheckBox::checkStateChanged, [this] (Qt::CheckState state) {
+#else
     QObject::connect (this, & QCheckBox::stateChanged, [this] (int state) {
+#endif
         if (m_updating)
             return;
+
         m_parent->cfg.set_bool (state != Qt::Unchecked);
         if (m_child_layout)
             enable_layout (m_child_layout, state != Qt::Unchecked);

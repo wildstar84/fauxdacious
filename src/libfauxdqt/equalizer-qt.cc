@@ -1,5 +1,5 @@
 /*
- * equalizer.cc
+ * equalizer-qt.cc
  * Copyright 2014 William Pitcock
  *
  * Redistribution and use in source and binary forms, with or without
@@ -182,7 +182,11 @@ EqualizerWindow::EqualizerWindow () :
     auto_checkbox->setCheckState (aud_get_bool (nullptr, "equalizer_autoload") 
             ? Qt::Checked : Qt::Unchecked);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect (& m_onoff_checkbox, & QCheckBox::checkStateChanged, [] (Qt::CheckState state) {
+#else
     connect (& m_onoff_checkbox, & QCheckBox::stateChanged, [] (int state) {
+#endif
         aud_set_bool (nullptr, "equalizer_active", (state == Qt::Checked));
     });
 
@@ -196,7 +200,11 @@ EqualizerWindow::EqualizerWindow () :
 
     connect (preset_button, & QPushButton::clicked, audqt::eq_presets_show);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect (auto_checkbox, & QCheckBox::checkStateChanged, [] (Qt::CheckState state) {
+#else
     connect (auto_checkbox, & QCheckBox::stateChanged, [] (int state) {
+#endif
         aud_set_bool (nullptr, "equalizer_autoload", (state == Qt::Checked));
     });
 
