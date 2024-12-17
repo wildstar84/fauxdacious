@@ -1,4 +1,90 @@
-Version 4.4-final [Updated 07/27/27]:
+Version 4.4.2-final [Updated 12/17/2024]:
+
+This release is mostly to merge numerous Audacious fixes/tweaks under the hood, 
+but also a couple specific to Fauxdacious, along with a shiny new feature we 
+added to the Lyrics plugins, but otherwise, mostly minor bugfixes & code 
+touchups all over.  The gory details below (see commits list since v4.4-final 
+for even gorier details). ;)  This release is mostly equivalent to Audacious 
+version 4.5-devel.
+
+Also note that this is the first release without a MS-Windows binary build, as 
+I'm not able/willing to upgrade / overhaul my entire Windows build environment 
+to that now used by Audacious and because I'm not a MS-Windows user.  I need 
+someone who is and wishes to keep Fauxdacious for Windows relavent, to please 
+step up and take over the Windows binary builds for me!  The last one 
+(v4.4-final) is and will remain available for the forseeable future though!
+
+* Cover Art Helper - Tweak a regular expression that sometimes failed cover-art 
+fetching if the song's title or album name included parentheses.
+
+* URL Helper - Add "hls_bandwidth=###" (kbps) option to the 
+FauxdaciousUrlHelper.ini file for manually limiting the highest bandwidth 
+stream selected by the FFAudio plugin (for users with limited bandwidth 
+internet connections) as many HLS streams offer very high bandwidth streams 
+now as their default (best) streams and the ffmpeg library does not appear 
+to have an option to force selection of a lower-bandwidth stream when 
+used programatically.
+
+* Because nearly all .m3u8 entries these days are HLS streams & require 
+the URL helper script to handle, no longer handle these as playlists via the 
+M3u plugin (if problem, users should rename or symlink with .m3u extension & 
+report here).
+
+* Handle fonts whose font family names contain digits properly. (Audacious fix)
+
+* Remove any white-space bracketing URLs added via the URL opener dialog 
+(Audacious fix)
+
+* Pulseaudio - Specify properties for application ID and icon name.  This 
+allows Pavucontrol for example to display the Fauxdacious icon instead of a 
+general fallback icon. (Audacious)  Also correct previously wrong default 
+stream name to "Fauxdacious" (was always "Audacious").
+
+* Opus:  ReplayGain values for Opus files are now supported in both R128_* 
+and REPLAYGAIN_* tags. (Audacious feature request #1500)
+
+* FFAudio:  Added .adx file extension to entension list directly handled by 
+ffaudio plugin. (Audacious feature request# 1466)
+
+* Lyrics:  Merge in pull-request #4 by "lecheel" (https://github.com/lecheel) 
+that adds an option to display lyrics data that includes "timestamps" in a 
+dynamic display of three lines of lyrics at a time (previous, current & next) 
+lines with current line highlighted (larger text) synced between each 
+timestamp and the current playing position in the song entry.  The new option 
+is on (checked) by default under Lyric plugin configuration as:  
+"Enable scrolling lyric sync. by timestamps".  If the option is unchecked, OR 
+if lyrics data does not include timestamps, then lyrics are displayed in their 
+entirity, headed up by the song title & artist (as has always been the case).
+Also added an "About" section.  These changes apply to all Qt & GTK versions 
+of the Lyrics plugins.
+
+* Several Audacious fixes/tweaks for Mac users merged.
+
+* Numerous general code cleanups from Audacious.
+
+Audacious changes omitted, deferred or non-applicable:
+
+* Pipewire plugin changes - We currently do not include the Audacious Pipewire 
+plugin, as I believe the PulseAudio plugin can already handle Pipewire.  Since 
+I use neither Pulse nor Pipewire (I use Alsa sound), I have no way to test 
+either.  If this is no longer true, file a report & I'll be happy to merge the 
+Pipewire plugin.
+
+* Alternative build environments (ie. Mesa, et. al.) - We do not currently 
+support Meson building, as this would mean extensive changes and labor I'm not 
+willing to expend on my own, as now just merging in all of Audacious's .meson 
+files alone would not work due to numerous differences in our code-bases & I 
+have zero-familiarity with meson (Pull requests WITH PATCHES welcome)! ;)
+
+* libcddb build requirement - Audacious has removed this at the request of 
+FreeBSD (Audacious request #1437) as archaic.  Upon attempting to remove this, 
+I realized that we require it's ability to generate CD disk-IDs for use as 
+keys to custom user-created metadata files (a feature Audacious does not 
+offer).  I an not rejecting this outright, but deferring it for now until I can 
+figure out a workable solution.  In other words, this is going to require alot 
+more labor here than it did for Audacious (patches from FreeBSD'ers welcome)!  
+
+Version 4.4-final [Updated 07/27/2024]:
 
 * Welp, ONE DAY after this build was released, Youtube decided to screw up 
 their streams necessitating a quick hotfix update for StreamFinder to enable 
