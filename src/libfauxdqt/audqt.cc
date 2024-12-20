@@ -31,7 +31,7 @@
 #include <libfauxdcore/sdl_window.h>
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/i18n.h>
-#include <libaudcore/interface.h>
+#include <libfauxdcore/interface.h>
 #include <libfauxdcore/runtime.h>
 
 #include "libfauxdqt-internal.h"
