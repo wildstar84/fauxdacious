@@ -31,7 +31,7 @@
 #include <libfauxdcore/sdl_window.h>
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/i18n.h>
-#include <libaudcore/interface.h>
+#include <libfauxdcore/interface.h>
 #include <libfauxdcore/runtime.h>
 
 #include "libfauxdqt-internal.h"
@@ -269,7 +269,7 @@ EXPORT void cleanup ()
 
     // We do not delete the QApplication here due to issues that arise
     // if it is deleted and then re-created. Instead, it is deleted
-    // later during shutdown; see mainloop_cleanup() in libaudcore.
+    // later during shutdown; see mainloop_cleanup() in libfauxdcore.
 }
 
 EXPORT QIcon get_icon (const char * name)
