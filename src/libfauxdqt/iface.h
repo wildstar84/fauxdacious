@@ -39,8 +39,8 @@ public:
         { fileopener_show (open ? FileMode::Open : FileMode::Add); }
 
     void hide_filebrowser () {}
-    void show_jump_to_song () {}
-    void hide_jump_to_song () {}
+    void show_jump_to_song () { songwin_show(); }
+    void hide_jump_to_song () { songwin_hide(); }
     void show_prefs_window () { prefswin_show (); }
     void hide_prefs_window () { prefswin_hide (); }
 

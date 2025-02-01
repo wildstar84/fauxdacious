@@ -655,6 +655,9 @@ void InfoBar::keyPressEvent (QKeyEvent * event)
           case Qt::Key_B:
             aud_drct_pl_next ();
             break;
+          case Qt::Key_J:
+            aud_ui_show_jump_to_song ();
+            break;
           case Qt::Key_M:
             {
                 /* JWT:TOGGLE MUTE: */
