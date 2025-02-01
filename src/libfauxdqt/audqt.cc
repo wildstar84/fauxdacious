@@ -53,6 +53,7 @@ static const char * const audqt_defaults[] = {
     "eq_presets_visible", "FALSE",
     "equalizer_visible", "FALSE",
     "queue_manager_visible", "FALSE",
+    "close_jtf_dialog", "TRUE",
     "restore_floating_dockapps_late", "TRUE",
 /* JWT:HACK FOR OLDER Qt'S (I KNOW THRU 5.7.1) WHERE MAIN WINDOW "WALKS" DOWN BY WINDOW DECORATION HEIGHT 
    IF *ANY* DOCKED PLUGINS OTHER THAN albumart-qt AND search-tool-qt ARE ACTIVE AT STARTUP!
@@ -90,7 +91,7 @@ static void load_qt_translations()
         QApplication::installTranslator(&translators[1]);
 }
 
-void set_icon_theme (void)
+void set_icon_theme ()
 {
     QIcon::setThemeName ((QString) aud_get_str ("audqt", "icon_theme"));
 
@@ -253,6 +254,7 @@ EXPORT void cleanup ()
     log_inspector_hide ();
     plugin_prefs_hide ();
     prefswin_hide ();
+    songwin_hide ();
 
 #ifdef USE_SDL2
     SDL_Window * sdl_window = fauxd_get_sdl_window ();
