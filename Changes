@@ -1,3 +1,29 @@
+Version 4.5-devel1 [Updated 2/2/2025]:
+
+* Merged in all Audacious bug-fixes & feature enhancements since v4.4.2-final 
+release.  Details below:
+
+* Added Vumeter plugin to GTK versions (already in Qt versions).
+
+* Added new Playback-History plugin to Qt versions.
+
+* Fixed memory leaks in Jump-to-Song dialog window and other code-cleanups and 
+efficiencies found by Audacious sysbot affecting aac plugin, blur-scope, etc.
+
+* Added some hotkeys & icons for Cut/Copy/Paste & a few other menu items.
+
+* Note:  We did NOT remove the Moonstone(Qt) plugin from Fauxdacious, nor do we 
+have any current intentions to do so in the future!
+
+Additional Fauxdacious changes:
+
+* Added "J" hotkey & menu entries for the Jump-to-Song dialog to various other 
+places where it could be very useful, ie. Mini-Fauxdacious, Moonstone, & the 
+main Qt playback menus.
+
+* Added option to the new Playback-History(Qt) plugin to better record song/
+album changes dynamically occuring in streaming radio-stations.
+
 Version 4.4.2-final [Updated 12/17/2024]:
 
 This release is mostly to merge numerous Audacious fixes/tweaks under the hood, 
