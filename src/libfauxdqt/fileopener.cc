@@ -42,6 +42,9 @@ static void import_playlist (int playlist, const char * filename)
 
 static void export_playlist (int playlist, const char * filename)
 {
+    if (playlist < 0)
+        return;
+
     Playlist::GetMode mode = Playlist::Wait;
     if (aud_get_bool (nullptr, "metadata_on_play"))
         mode = Playlist::NoWait;
@@ -148,7 +151,7 @@ EXPORT void fileopener_show (FileMode mode)
         if (mode == FileMode::ExportPlaylist)
         {
             dialog->setAcceptMode (QFileDialog::AcceptSave);
-            dialog->setNameFilters(get_format_filters());
+            dialog->setNameFilters (get_format_filters ());
 
             String filename = aud_playlist_get_filename (playlist);
             if (filename)
@@ -160,6 +163,8 @@ EXPORT void fileopener_show (FileMode mode)
                     dialog->selectUrl (QUrl ((const char *) filename));
             }
         }
+        else if (mode == FileMode::ImportPlaylist)
+            dialog->setNameFilters(get_format_filters());
 
         QObject::connect (dialog.data (), & QFileDialog::directoryEntered, [] (const QString & path)
             { aud_set_str ("audgui", "filesel_path", path.toUtf8 ().constData ()); });
@@ -182,7 +187,15 @@ EXPORT void fileopener_show (FileMode mode)
                 break;
             case FileMode::ImportPlaylist:
                 if (files.len () == 1)
-                    import_playlist (playlist, files[0].filename);
+                {
+                    /* JWT:IMPORT TO NEW BLANK PLAYLIST UNLESS CURRENT LIST IS EMPTY:
+                       ADDRESSES AUDACIOUS ISSUE# 1508.
+                    */
+                    int list = (aud_playlist_entry_count (playlist) > 0)
+                            ? aud_playlist_new () : playlist;
+
+                    import_playlist (list, files[0].filename);
+                }
                 break;
             case FileMode::ExportPlaylist:
                 if (files.len () == 1)

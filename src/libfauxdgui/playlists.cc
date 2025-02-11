@@ -70,13 +70,20 @@ static void finish_job (void * data)
 
     if (list >= 0)
     {
-        aud_playlist_set_filename (list, job->filename);
-
         if (job->save)
+        {
+            aud_playlist_set_filename (list, job->filename);
             aud_playlist_save (list, job->filename, mode);
+		}
         else
         {
-            aud_playlist_entry_delete (list, 0, aud_playlist_entry_count (list));
+            /* JWT:IMPORT TO NEW BLANK PLAYLIST UNLESS CURRENT LIST IS EMPTY:
+               ADDRESSES AUDACIOUS ISSUE# 1508.
+            */
+            if (aud_playlist_entry_count (list) > 0)
+                list = aud_playlist_new ();
+
+            aud_playlist_set_filename (list, job->filename);
             aud_playlist_entry_insert (list, 0, job->filename, Tuple (), false);
         }
     }
@@ -196,8 +203,7 @@ static void create_selector (ImportExportJob * job, const char * filename, const
     gtk_widget_set_can_default (button1, true);
     gtk_widget_grab_default (button1);
 
-    if (job->save)
-        set_format_filters (job->selector);
+    set_format_filters (job->selector);
 
     g_signal_connect_swapped (job->selector, "destroy", (GCallback) cleanup_job, job);
 

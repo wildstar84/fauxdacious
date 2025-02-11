@@ -1,11 +1,18 @@
-Version 4.5-devel1 [Updated 2/2/2025]:
+Version 4.5-devel1 [Updated 2/11/2025]:
 
 * Merged in all Audacious bug-fixes & feature enhancements since v4.4.2-final 
 release.  Details below:
 
+* Prevent user from overriting existing playlist when importing a playlist - 
+We automatically create a new playlist containing the imported list unless the 
+current/active playlist is empty, ie. newly-created.  This addresses 
+Audacious issue# 1508 ("Avoid Audacious overwriting/replacing current playlist 
+with imported one").
+
 * Added Vumeter plugin to GTK versions (already in Qt versions).
 
-* Added new Playback-History plugin to Qt versions.
+* Added new Playback-History plugin to Qt versions.  Also enhance by adding an 
+option to also report song metadata changes by streaming radio-stations.
 
 * Fixed memory leaks in Jump-to-Song dialog window and other code-cleanups and 
 efficiencies found by Audacious sysbot affecting aac plugin, blur-scope, etc.
