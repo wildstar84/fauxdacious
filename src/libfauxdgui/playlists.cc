@@ -74,7 +74,7 @@ static void finish_job (void * data)
         {
             aud_playlist_set_filename (list, job->filename);
             aud_playlist_save (list, job->filename, mode);
-		}
+        }
         else
         {
             /* JWT:IMPORT TO NEW BLANK PLAYLIST UNLESS CURRENT LIST IS EMPTY:

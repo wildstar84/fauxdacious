@@ -267,6 +267,15 @@ static void add_playlist (const char * filename, PlaylistFilterFunc filter,
         if (item_limit > 0 && item_count >= item_limit)  // JWT:LIMIT # ENTRIES ADDED FROM PLAYLIST (IF URL):
             break;
     }
+    /* JWT:RETAIN FILE URI WHEN ADDING FILE-BASED PLAYLISTS TO MAKE EXPORTING (UPDATING) EASIER
+       BY SHOWING THE PLAYLIST FILENAME IT CAME FROM AS DEFAULT IN THE FILE-BROWSER WINDOW:
+    */
+    if (filename && ! strncmp (filename, "file://", 7))
+    {
+        int playlist = aud_playlist_by_unique_id (result->playlist_id);
+        if (playlist >= 0)
+            aud_playlist_set_filename (playlist, filename);
+    }
 }
 
 static void add_cuesheets (Index<String> & files, PlaylistFilterFunc filter,
