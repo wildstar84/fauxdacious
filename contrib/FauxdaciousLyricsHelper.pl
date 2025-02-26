@@ -17,6 +17,7 @@
 ###use LyricFinder::ChartLyrics;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Letras;
+###use LyricFinder::Lrclib;
 ###use LyricFinder::Musixmatch;
 ###1;
 

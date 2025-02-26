@@ -17,6 +17,7 @@
 ###use LyricFinder::ChartLyrics;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Letras;
+###use LyricFinder::Lrclib;
 ###use LyricFinder::Musixmatch;
 ###1;
 
@@ -531,7 +532,9 @@ WEBSEARCH:
 		my $haveLyricFinder = 0;
 		eval "use LyricFinder; \$haveLyricFinder = \$LyricFinder::VERSION; 1";
 		if ($haveLyricFinder >= 1.2) {
-			my $lf = new LyricFinder(-omit => 'ApiLyricsOvh,AZLyrics,Letras'); #OMIT LYRICS SITES THAT DON'T RETURN ALBUMART:
+			my $omitlist = 'ApiLyricsOvh,AZLyrics,Letras';
+			$omitlist .= ',Lrclib'  if ($haveLyricFinder >= 1.4);
+			my $lf = new LyricFinder(-omit => $omitlist); #OMIT LYRICS SITES THAT DON'T RETURN ALBUMART:
 			if ($lf) {
 				my $artist = uri_unescape($ARGV[3]);
 				my $title = uri_unescape($ARGV[4]);
@@ -557,7 +560,7 @@ WEBSEARCH:
 				}
 			}
 		} else {
-			warn "w:FauxdaciousCoverArtHelper needs LyricFinder v1.2 or better for best results!";
+			warn "w:FauxdaciousCoverArtHelper needs LyricFinder v1.2 or better!";
 		}
 	}
 	&albumart_done($tried);
@@ -567,9 +570,10 @@ WEBSEARCH:
 	#LYRICFINDER DID NOT RETURN A COVER IMAGE,
 	#SO SEARCH MUSICBRAINZ (FIRST TRY ARTIST/ALBUM, THEN ARTIST/TITLE):
 
-	###### USER NOTE:  IF YOU MOSTLY JUST LISTEN TO STREAMING STATIONS (THAT USUALLY JUST SET THE ALBUM
-	#FIELD TO THE STATION NAME), YOU MIGHT WANT TO REVERSE THIS LIST
-	#(IE. TO "foreach my $release ($title, $album) {") IN THE NEXT LINE BELOW FOR EFFICIENCY'S SAKE!!:
+	###### USER NOTE:  IF YOU MOSTLY JUST LISTEN TO YOUR LOCAL MUSIC FILES AND NEARLY ALL OF YOUR
+	#MUSIC SOURCES HAVE VALID ALBUM NAMES, YOU MIGHT WANT TO REVERSE THIS LIST
+	#(IE. TO "foreach my $release ($album, $title) {") IN THE NEXT LINE BELOW FOR POSSIBLY
+	#MORE ACCURATE RESULTS FROM MUSICBRAINZ:
 
 RELEASETYPE:
 	foreach my $release ($title, $album) {

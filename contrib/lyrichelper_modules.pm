@@ -14,6 +14,7 @@ use LyricFinder::ChartLyrics;
 use LyricFinder::Cache;
 use LyricFinder::Genius;
 use LyricFinder::Letras;
+use LyricFinder::Lrclib;
 use LyricFinder::Musixmatch;
 
 ################# END PAR COMPILER SECTION ##################
