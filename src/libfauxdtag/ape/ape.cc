@@ -256,6 +256,8 @@ bool APETagModule::read_tag (VFSFile & handle, Tuple & tuple, Index<char> * imag
             tuple.set_str (Tuple::Title, pair.value.begin ());
         else if (! strcmp_nocase (pair.key, "Album"))
             tuple.set_str (Tuple::Album, pair.value.begin ());
+        else if (! strcmp_nocase (pair.key, "Album Artist"))
+            tuple.set_str (Tuple::AlbumArtist, pair.value.begin ());
         else if (! strcmp_nocase (pair.key, "Comment"))
             tuple.set_str (Tuple::Comment, pair.value.begin ());
         else if (! strcmp_nocase (pair.key, "Genre"))
@@ -459,6 +461,7 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
     if (! write_string_item (tuple, Tuple::Artist, handle, "Artist", & length, & items) ||
      ! write_string_item (tuple, Tuple::Title, handle, "Title", & length, & items) ||
      ! write_string_item (tuple, Tuple::Album, handle, "Album", & length, & items) ||
+     ! write_string_item (tuple, Tuple::AlbumArtist, handle, "AlbumArtist", & length, & items) ||
      ! write_string_item (tuple, Tuple::Genre, handle, "Genre", & length, & items) ||
      ! write_string_item (tuple, Tuple::Composer, handle, "Composer", & length, & items) ||
      ! write_string_item (tuple, Tuple::Publisher, handle, "Publisher", & length, & items) ||
@@ -500,11 +503,12 @@ bool APETagModule::write_tag (VFSFile & handle, const Tuple & tuple)
     for (const ValuePair & pair : list)
     {
         if (! strcmp_nocase (pair.key, "Artist") || ! strcmp_nocase (pair.key, "Title") ||
-         ! strcmp_nocase (pair.key, "Album") || ! strcmp_nocase (pair.key, "Comment") ||
-         ! strcmp_nocase (pair.key, "Genre") || ! strcmp_nocase (pair.key, "Composer") ||
-         ! strcmp_nocase (pair.key, "Publisher") || ! strcmp_nocase (pair.key, "Catalog") ||
-         ! strcmp_nocase (pair.key, "Track") || ! strcmp_nocase (pair.key, "Disc") ||
-         ! strcmp_nocase (pair.key, "Year") || ! strcmp_nocase (pair.key, "Lyrics") ||
+         ! strcmp_nocase (pair.key, "Album") || ! strcmp_nocase (pair.key, "AlbumArtist") ||
+         ! strcmp_nocase (pair.key, "Comment") || ! strcmp_nocase (pair.key, "Genre") ||
+         ! strcmp_nocase (pair.key, "Composer") || ! strcmp_nocase (pair.key, "Publisher") ||
+         ! strcmp_nocase (pair.key, "Catalog") || ! strcmp_nocase (pair.key, "Track") ||
+         ! strcmp_nocase (pair.key, "Disc") || ! strcmp_nocase (pair.key, "Year") ||
+         ! strcmp_nocase (pair.key, "Lyrics") ||
          (wrote_art && ! strcmp_nocase (pair.key, "Cover Art", 9)))
             continue;
 
