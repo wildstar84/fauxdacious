@@ -180,7 +180,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 		my $art_url = '';
 		$url2 = 'https://musicbrainz.org' . $url2  unless ($url2 =~ /^http/);
 		print STDERR "-2: URL2=$url2=\n"  if ($DEBUG);
-		$art_url = &lookup_art_on_mb_release_by_mbid($url2);
+		$art_url = &lookup_art_on_mb_release_by_mbid(0, $url2);
 		print STDERR "-4: cover url=$art_url=\n"  if ($DEBUG);
 		my $trk = 0;
 		my $haveTrackData = 0;
@@ -235,7 +235,7 @@ if ($ARGV[0] =~ /^DELETE/ && $ARGV[1] =~ /^COVERART/ && $configPath) {  #WE'RE R
 				}
 				#NOW WRITE OUT THE DOWNLOADED IMAGE TO A FILE Fauxdacious CAN FIND:
 				if ($configPath && $art_image && open IMGOUT, ">${configPath}/$ARGV[1].$image_ext") {
-					print STDERR "-6: will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
+					print STDERR "-6:SUCCESS, will write art image to (${configPath}/$ARGV[1].$image_ext)\n"  if ($DEBUG);
 					binmode IMGOUT;
 					print IMGOUT $art_image;
 					close IMGOUT;
@@ -581,6 +581,15 @@ RELEASETYPE:
 		chomp $release;
 		$release =~ s/(?:\%20)+$//o;    #CHOMPIT (TRAILING ESCAPED SPACES)!
 		$release =~ s/\%C2\%B4/\%27/g;  #FIX UNICODE QUOTES.
+		if ($release eq $album) {
+			foreach my $skipit (@{$SKIPTHESE{'nombalbum'}}) {
+				$skipit = uri_escape($skipit);
+				if ($skipit =~ /^$release$/i) {
+					print STDERR "--SKIPPING ALBUM($release)-LOOKUP ON MUSICBRAINZ!\n"  if ($DEBUG);
+					next RELEASETYPE;
+				}
+			}
+		}
 		$html = '';
 		$url = "https://musicbrainz.org/taglookup?tag-lookup.artist=$artist&tag-lookup.release=$release";
 		print STDERR "i:ART HELPER:SEARCHURL=$url=\n"  if ($DEBUG);
@@ -603,14 +612,17 @@ RELEASETYPE:
 		%mbHash = ();
 		$html =~ s/\x{2019}/\'/gs;  #THEY HAVE SOME STUPID UNICODE SINGLE-QUOTES SOMETIMES!
 		$html =~ s/\&\#x27\;/\'/gs; #AND OTHER TIMES THEY ESCAPE THEM, SO CONVERT TO COMMON FORMAT FOR NEXT REGEX!:
-		while ($html =~ s#\<tr\s+class\=\"(?:odd|even)\"\s+data\-score\=\"\d*\"\>\<td\>\<a\s+href\=\"\/release\/[0-9a-f\-]+\/cover-art\"\>\<span\s+class\=\"caa\-icon\"\s+title\=\"This release has artwork in the Cover Art Archive\"\>\<\/span\>\<\/a\>\<a\s+href\=\"\/release\/([0-9a-f\-]+)\"\>\<bdi\>\Q${release}\E(.*?)\<\/tr\>##is) {
+		while ($html =~ s#\<tr\s+class\=\"(?:odd|even)\"\s+data\-score\=\"\d*\"\>\<td\>\<a\s+href\=\"\/release\/[0-9a-f\-]+\/cover-art\"\>\<span\s+class\=\"[^\"]+\"\s+title\=\"This release has artwork in the Cover Art Archive\"\>\<\/span\>\<\/a\>\<a\s+href\=\"\/release\/([0-9a-f\-]+)\"\>\<bdi\>\Q${release}\E(.*?)\<\/tr\>##is) {
 			$mbzid = $1;
 			my $rowhtml = $2;
 			print STDERR "---found MBZID1=$mbzid=\n"  if ($DEBUG);
 			my $primaryArtistFactor = 20;
-			while ($rowhtml =~ s#^.*?\<bdi\>([^\<]+)\<\/bdi\>##iso)
+			while ($rowhtml =~ s#^.*?\<bdi\>(.+?)\<\/bdi\>##iso)
 			{
 				(my $thisartist = $1) =~ s/\&\#x([0-9A-Fa-f]{2})\;/chr(hex($1))/eg;  #THEY HAVE SOME "&#X..;" STUFF TOO!
+				$thisartist =~ s#\<a href\=\"\/artist\/[^\>]+\>##;  #cadded
+				$thisartist =~ s#\<[^\>]+\>##;  #cadded
+				print STDERR "----THIS artist=$thisartist=\n"  if ($DEBUG);
 				$primaryArtistFactor -= 3;
 				print STDERR "i:ART:found ARTIST=$thisartist= ESCAPED=$artistEscaped=\n"  if ($DEBUG > 1);
 				next  unless ($artistEscaped =~ /$thisartist/i
@@ -637,9 +649,11 @@ RELEASETYPE:
 		}
 		print STDERR '..ART: '.scalar(%mbHash)." potential Musicbrainz entries found...\n"  if ($DEBUG);
 		#LOOK UP ART LINKS FOR EACH MATCHING MUSICBRAINZ ID IN ORDER OF DESCENDING PRIORITY, STOPPING IF ONE FOUND:
+		my $toFidAndExit = $art2fid;
 		foreach $mbzid (sort { $mbHash{$b} <=> $mbHash{$a} } keys %mbHash) {
-			$art_url = &lookup_art_on_mb_release_by_mbid("https://musicbrainz.org/release/$mbzid");
+			$art_url = &lookup_art_on_mb_release_by_mbid($art2fid, "https://musicbrainz.org/release/$mbzid");
 			&writeArtImage($art_url, $art2fid, '_tmp_albumart')  if ($art_url);
+			$toFidAndExit = 0;  #ONLY DO DOWNLOAD-CHECKS ON 1ST MBZID, OTHERWISE COULD TAKE LOOOONG TIME!
 		}
 		print STDERR "-----ART:AT END OF FOR-LOOP($release), CONTINUE OR PUNT...\n"  if ($DEBUG > 1);
 	}
@@ -654,6 +668,7 @@ else
 exit(0);
 
 sub lookup_art_on_mb_release_by_mbid {
+	my $toFidAndExit = shift;
 	my $url = shift;
 
 	$html = '';
@@ -673,6 +688,7 @@ sub lookup_art_on_mb_release_by_mbid {
 			$art_url = $1;
 			$art_url = 'https:' . $art_url  if ($art_url =~ m#^\/\/#);
 			print STDERR "ART:FOUND ($i) THUMBNAIL($art_url)!\n"  if ($DEBUG);
+			&writeArtImage($art_url, $toFidAndExit, '_tmp_albumart')  if ($toFidAndExit);
 			return $art_url;
 		}
 	}
@@ -680,6 +696,7 @@ sub lookup_art_on_mb_release_by_mbid {
 		$art_url = $1;
 		$art_url = 'https:' . $art_url  if ($art_url =~ m#^\/\/#);
 		print STDERR "ART:FOUND FALLBACK IMG($art_url)!\n"  if ($DEBUG);
+		&writeArtImage($art_url, $toFidAndExit, '_tmp_albumart')  if ($toFidAndExit);
 		return $art_url;
 	} elsif ($html =~ s#\<div\s+class\=\"cover\-art\"[^\>]?\>\s*\<img([^\>]+)\>##so) {
 		my $imghtml = $1;
@@ -687,6 +704,7 @@ sub lookup_art_on_mb_release_by_mbid {
 			$art_url = $1;
 			$art_url = 'https:' . $art_url  if ($art_url =~ m#^\/\/#);
 			print STDERR "ART:found (AMAZON?) IMAGE ($1)?\n"  if ($DEBUG);
+			&writeArtImage($art_url, $toFidAndExit, '_tmp_albumart')  if ($toFidAndExit);
 			return $art_url;
 		}
 	}
@@ -703,7 +721,8 @@ sub lookup_art_on_mb_release_by_mbid {
 	if ($html2 =~ s#class\=\"artwork-image\"\s+href\=\"([^\"]+)\"##s) {
 		$art_url = $1;
 		$art_url = 'https:' . $art_url  if ($art_url =~ m#^\/\/#);
-		print STDERR "i:ART:FOUND ALT COVERART ARCHIVE IMAGE ($art_url)\n";
+		print STDERR "i:ART:FOUND ALT COVERART ARCHIVE IMAGE ($art_url)\n"  if ($DEBUG);
+		&writeArtImage($art_url, $toFidAndExit, '_tmp_albumart')  if ($toFidAndExit);
 	}
 
 	return $art_url;
@@ -730,6 +749,7 @@ sub writeArtImage {   # DOWNLOADS AND SAVES THE FOUND COVER-ART IMAGE AND EXITS:
 		print STDERR $response->status_line;
 		print STDERR "! ($art_url)\n";
 		$art_image = '';
+		return;
 	}
 	if ($configPath && $art_image && open IMGOUT, ">${filename}.$image_ext") {
 		print STDERR "-6: will write art image to (${filename}.$image_ext)\n"  if ($DEBUG);
