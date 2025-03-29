@@ -23,10 +23,10 @@
 #include <QTreeView>
 #include <libfauxdqt/export.h>
 
-namespace audqt {
+namespace audqt
+{
 
 // This class extends QTreeView and adds:
-//  - Some useful QStyle overrides
 //  - A method to remove all selected rows (Delete key),
 //  - and some useful QStyle overrides
 class LIBAUDQT_PUBLIC TreeView : public QTreeView
@@ -39,12 +39,6 @@ public:
 
 protected:
     void keyPressEvent (QKeyEvent * event) override;
-
-    // deprecated, use QTreeView::mouseDoubleClickEvent() instead
-    void mouseDoubleClickEvent (QMouseEvent * event) override;
-
-    // deprecated, connect to QTreeView::activated() instead
-    virtual void activate (const QModelIndex & index);
 };
 
 } // namespace audqt
