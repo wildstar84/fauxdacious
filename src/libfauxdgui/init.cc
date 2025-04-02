@@ -198,7 +198,6 @@ static void load_fallback_icons ()
         "application-exit",
         "applications-graphics",
         "applications-internet",
-        "applications-system",
         "appointment-new",
         "fauxdacious",
         "audio-card",
@@ -246,6 +245,7 @@ static void load_fallback_icons ()
         "media-skip-backward",
         "media-skip-forward",
         "multimedia-volume-control",
+        "preferences-other",
         "preferences-system",
         "process-stop",
         "system-run",
@@ -289,11 +289,11 @@ static void load_fallback_icons ()
     static const char * const category_icons[] = {
         "applications-graphics",
         "applications-internet",
-        "applications-system",
         "fauxdacious", /* for window icons */
-        "audio-volume-medium",
         "audio-x-generic", /* also used for fallback album art */
         "dialog-information",
+        "multimedia-volume-control",
+        "preferences-other",
         "preferences-system"
     };
 

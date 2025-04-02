@@ -1,6 +1,6 @@
 /*
  * prefs-window.cc
- * Copyright 2006-2019 William Pitcock, Tomasz Moń, Michael Färber, and
+ * Copyright 2006-2025 Ariadne Conill, Tomasz Moń, Michael Färber, and
  *                     John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,11 +81,11 @@ enum {
 /* keep this in sync with the list in load_fallback_icons (init.cc) */
 static const Category categories[] = {   // Modern GTK-Themed icons (default)
     { "applications-graphics", N_("Appearance") },
-    { "audio-volume-medium", N_("Audio") },
+    { "multimedia-volume-control", N_("Audio") },
     { "applications-internet", N_("Network") },
     { "audio-x-generic", N_("Playlist")} ,
     { "dialog-information", N_("Song Info") },
-    { "applications-system", N_("Plugins") },
+    { "preferences-other", N_("Plugins") },
     { "preferences-system", N_("Advanced") }
 };
 static const Category classic_categories[] = {   // Classic Audacious icons
@@ -117,6 +117,7 @@ static const TitleFieldTag title_field_tags[] = {
     { N_("File name")   , "${file-name}" },
     { N_("File path")   , "${file-path}" },
     { N_("Date")        , "${date}" },
+    { N_("Description") , "${description}" },
     { N_("Year")        , "${year}" },
     { N_("Comment")     , "${comment}" },
     { N_("Codec")       , "${codec}" },
@@ -651,7 +652,7 @@ static void toggle_classic_icons ()
     g_object_unref (store);
 }
 
-static void fill_category_list (GtkTreeView * treeview, GtkNotebook * notebook)
+static void fill_category_list (GtkTreeView * treeview)
 {
     GtkTreeViewColumn * column = gtk_tree_view_column_new ();
     gtk_tree_view_column_set_title (column, _("Category"));
@@ -661,6 +662,7 @@ static void fill_category_list (GtkTreeView * treeview, GtkNotebook * notebook)
     GtkCellRenderer * renderer = gtk_cell_renderer_pixbuf_new ();
     gtk_tree_view_column_pack_start (column, renderer, false);
     gtk_tree_view_column_set_attributes (column, renderer, "pixbuf", 0, nullptr);
+    g_object_set (renderer, "stock-size", GTK_ICON_SIZE_DIALOG, nullptr);
 
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_column_pack_start (column, renderer, false);
@@ -1064,7 +1066,7 @@ static void create_prefs_window ()
     gtk_container_add ((GtkContainer *) prefswin_button_box, close);
     gtk_widget_set_can_default (close, true);
 
-    fill_category_list ((GtkTreeView *) category_treeview, (GtkNotebook *) category_notebook);
+    fill_category_list ((GtkTreeView *) category_treeview);
 
     record_update ();
     hook_associate ("enable record", record_update, nullptr);
