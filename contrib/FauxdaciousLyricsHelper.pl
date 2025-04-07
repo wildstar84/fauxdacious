@@ -196,11 +196,26 @@ if ($#ARGV >= 1) {
 		}
 	}
 
-	my $lf = $omit ? new LyricFinder(-omit => $omit) : new LyricFinder();
+	my $lyric_format;
+	my %LyricFinderOpts = $omit ? (-omit => $omit) : ();
+	my $lyric_sites = 'random';
+	if ($LyricFinder::VERSION >= 1.5) {
+		$lyric_format = ($flags =~ /SYNC\=(\d)/) ? $1 : 0;
+		if ($lyric_format == 1) {
+			$LyricFinderOpts{'-synced'} = 'OK';
+		} elsif ($lyric_format == 2) {
+			$LyricFinderOpts{'-synced'} = 'YES';
+			$lyric_sites = 'Lrclib,random';
+		} elsif ($lyric_format == 3) {
+			$LyricFinderOpts{'-synced'} = 'ONLY';
+			$lyric_sites = 'Lrclib';
+		}
+	}
+	my $lf = new LyricFinder(%LyricFinderOpts);
 	if ($lf) {
 		$lf->agent($agent)  if ($agent);
 		print STDERR "---LYRICS HELPER WILL SEARCH THE WEB...\n"  if ($DEBUG);
-		my $lyrics = $lf->fetch($ARGV[0], $ARGV[1], 'random');
+		my $lyrics = $lf->fetch($ARGV[0], $ARGV[1], $lyric_sites);
 		if (defined($lyrics) && $lyrics) {
 			my $doschar = ($^O =~ /Win/) ? "\r" : '';
 			$lyrics .= "${doschar}\n(Lyrics courtesy: ".$lf->source().")${doschar}\n".$lf->site();
