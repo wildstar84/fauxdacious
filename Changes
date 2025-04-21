@@ -1,5 +1,11 @@
 Version 4.5-devel1 [Updated 2/11/2025]:
 
+* Add a GTK version of the recently-added Qt-only Playback-History plugin!
+Includes all the features in the Fauxdacious-enhanced version plus the ability 
+to select (highlight) all history-entries (by pressing Ctrl-a), and pasting 
+the list of highlighted entries (titles or albums) into another app. perhaps 
+to save to a text file!  TODO:  Add these two features to the Qt verson too.
+
 * Merged in all Audacious bug-fixes & feature enhancements since v4.4.2-final 
 release.  Details below:
 
