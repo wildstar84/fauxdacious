@@ -55,6 +55,14 @@ MenuAction::MenuAction (const MenuItem & item, const char * domain, QWidget * pa
 
     setText (translate_str (item.text.name, domain));
 
+    /* JWT:DON'T APPLY MAIN MENU SHORTCUTS TO OTHER WINDOWS! (ie. Ctrl-C)!!
+       (WE DO NOT WANT GLOBAL APPLICATION-WIDE SHORTCUTS B/C PLUGIN WINDOWS OFTEN
+       HAVE THEIR OWN KEYBOARD SHORTCUTS THAT WE DON'T WANT OVERRIDDEN,
+       IE. playback-history-qt, WHICH USES Ctrl-A & Ctrl-C WHICH WERE GETTING
+       "EATEN" BY THE MAIN PLAYLIST WINDOW'S CONTEXT MENU!:
+    */
+    setShortcutContext (Qt::WidgetShortcut);  // JWT:SEE https://doc.qt.io/qt-6/qt.html#ShortcutContext-enum
+
     if (item.cfg.name)
     {
         setCheckable (true);
