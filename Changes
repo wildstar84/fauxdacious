@@ -1,4 +1,37 @@
-Version 4.5-devel1 [Updated 2/11/2025]:
+Version 4.5-devel1 [Updated 5/06/2025]:
+
+* Skins(*) - Fix main window to display the old Winamp "OAIDU" menu-column of 
+buttons such that the state of ones that are togglable are displayed such that 
+the user can see which ones are toggled "on".  This addresses Audacious feature 
+request# 1513 and summitted a working version to Audacious.  They came back 
+and rewrote my patch to work differently both from what I had done and from how 
+Audacious was previously displaying these buttons.  I actually like the way 
+it looks after their rewrite and also confirmed that this is the way that Xmms 
+also works.  However, the skins offer two different sets of these buttons, and 
+after reviewing several of them, it appears that Audacious may have been 
+handling this "correctly" before (based on this duel set of buttons, otherwise 
+there appears to be no reason for this second column.  On some skins, this 
+second set of buttons is set to a plain part of the skin's background, giving 
+the impression that the skin's author intended for the buttons to be hidden 
+until a user presses the mouse down over the menu area?  Therefore, I'm 
+somewhat confused on how this "should" work, and I believe that some users 
+using these skins may prefer the "old" Audacious way of displaying the buttons, 
+at least for these skins and perhaps others.  Therefore, I've added an option 
+under [Appearance](Skins interfaces only) called "Winamp [OAIDU] menu style" 
+with two optons:  "Xmms" and "Legacy", which work as follows:  1) "Xmms" works 
+like Xmms and the "new" Audacious way (only using the 1st column of buttons) 
+resulting in the buttons looking the same when the user presses on the menu 
+(except for the letter under the mouse-button).  Advantage:  All option letters 
+are always visible.  This is now the DEFAULT.  2) "Legacy" works the way 
+Audacious (and Fauxdacious) displayed this menu before, except any togglable 
+options will display using the alternate appearance from the proper row among 
+the 5 others in another part of the skin at all times.  Advantage:  The skin 
+appears as before (and intended?) except any toggled option letters are now 
+always shown (addressing Feature request# 1513).  Both Qt & GTK versions are 
+fixed & now provide users with this options to decide what looks best to them 
+using their preferred skin.  The "columns" of buttons I'm referencing refer 
+to an image file used by most skins called 
+/usr[/[local]/share/fauxdacious/Skins/[skinname/titlebar.[png|bmp|xpm].
 
 * Add a GTK version of the recently-added Qt-only Playback-History plugin!
 Includes all the features in the Fauxdacious-enhanced version plus the ability 
