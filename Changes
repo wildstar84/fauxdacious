@@ -1,37 +1,78 @@
-Version 4.5-devel1 [Updated 5/06/2025]:
+Version 4.5-devel1 [Updated 5/15/2025]:
 
-* Skins(*) - Fix main window to display the old Winamp "OAIDU" menu-column of 
-buttons such that the state of ones that are togglable are displayed such that 
-the user can see which ones are toggled "on".  This addresses Audacious feature 
-request# 1513 and summitted a working version to Audacious.  They came back 
-and rewrote my patch to work differently both from what I had done and from how 
-Audacious was previously displaying these buttons.  I actually like the way 
-it looks after their rewrite and also confirmed that this is the way that Xmms 
-also works.  However, the skins offer two different sets of these buttons, and 
-after reviewing several of them, it appears that Audacious may have been 
-handling this "correctly" before (based on this duel set of buttons, otherwise 
-there appears to be no reason for this second column.  On some skins, this 
-second set of buttons is set to a plain part of the skin's background, giving 
-the impression that the skin's author intended for the buttons to be hidden 
-until a user presses the mouse down over the menu area?  Therefore, I'm 
-somewhat confused on how this "should" work, and I believe that some users 
-using these skins may prefer the "old" Audacious way of displaying the buttons, 
-at least for these skins and perhaps others.  Therefore, I've added an option 
-under [Appearance](Skins interfaces only) called "Winamp [OAIDU] menu style" 
-with two optons:  "Xmms" and "Legacy", which work as follows:  1) "Xmms" works 
-like Xmms and the "new" Audacious way (only using the 1st column of buttons) 
-resulting in the buttons looking the same when the user presses on the menu 
-(except for the letter under the mouse-button).  Advantage:  All option letters 
-are always visible.  This is now the DEFAULT.  2) "Legacy" works the way 
-Audacious (and Fauxdacious) displayed this menu before, except any togglable 
-options will display using the alternate appearance from the proper row among 
-the 5 others in another part of the skin at all times.  Advantage:  The skin 
-appears as before (and intended?) except any toggled option letters are now 
-always shown (addressing Feature request# 1513).  Both Qt & GTK versions are 
-fixed & now provide users with this options to decide what looks best to them 
-using their preferred skin.  The "columns" of buttons I'm referencing refer 
-to an image file used by most skins called 
-/usr[/[local]/share/fauxdacious/Skins/[skinname/titlebar.[png|bmp|xpm].
+* Skins (both GTK & Qt) - Overhauled numerous things to make them work much 
+better.  This was overdue as I haven't used the Skins interfaces for a few 
+years now!  This all started when I attempted to address Audacious feature-
+request #1513, sent them a patch, and they redid it resulting in not only 
+satisfying that request, but also fixing an (unknown to me at the time) long-
+standing issue in how Audacious handled the old Winamp "OAIDU" menu-column of 
+buttons.  This prompted me to look more in-depth into how this "should" be 
+handled.  Since this had been "broken" for some time, I decided to add a new  
+config. option to either use the "fixed & now-correct" ("Xmms") appearance or 
+retain the long-standing Audacious ("Legacy") appearance (which even I think 
+looks better on some of my and some Audacious-created skins, which I found 
+also contain a separate hints file called "skin-classic.hints".  With some 
+more tinkering & experimenting, I ended up needing to add a new hint option 
+called "MainWinStreamInfoLabels" to deal with some "Classic" (WinAMP-2) 
+skins displayed using the new "Classic Hints" config. option that don't 
+include the bitrate & frequency abbreviations on the main window image.
+
+In addition, I discovered that due to recent changes in the Qt main-window 
+menus setup (see mains commit# 9403ee "Make playlist shortcuts require 
+playlist focus", which has the bad side-effect of making most of the keyboard 
+shortcuts defined for the skins menus not work now) necessitating re-defining 
+most of them for the main window itself (in the playlist-widget).
+
+To summarize, the main changes / improvements to the Skins interfaces are:
+
+1) 2 new "Appearance" options:  "Use Classic skin hints, if available" and 
+"Winamp [OAIDU] menustyle:".  
+
+2) By default, the [OAIDU] menu, ie. the "clutterbar" is now always shown, 
+instead of hidden (on most skins) until clicked or moused on ("Xmms" option).
+Select "Legacy" for the old (hidden unless moused on) appearance.  Either way 
+though, we now always show the state of the two "togglable" menu-options 
+("A" and "D") as either "pressed" or "unpressed" (to address Audacious 
+request# 1513) regardless of which option is chosen.
+
+3) The default for "Display active titlebar when any window is focused" is 
+now FALSE, as it should be more beneficial for most users to see which skins 
+window has keyboard focus, as some bindings (namely the up & down arrows) now 
+do different things depending on whether the main or playlist window has focus. 
+If TRUE, Fauxdacious shows either all skins windows "focused" or none of them.
+
+4) Tweaked the graphics and hints (skin[-classic].hints file(s)) for several of 
+the skins created by me or Audacious due to a few minor flaws in how they were 
+displayed that are somewhat more noticable to me now.  The Lavadacious (mine) 
+looks much better, especially the titlebars & buttons in unshaded mode.  I 
+also slightly adjusted the Default* skins (originally from Audacious) to now 
+include the "OAIDU" menu-column by default (use the new "Legacy" option to 
+hide it).
+
+5) Most skins have a little triangle/arrow that points right when playing and 
+a square or double-bar when stopped or paused respectively on the upper-left 
+part of the main window.  Just to the left of this indicator is another tiny 
+indicator, usually either an even tinier right-arrow or one, or two tiny 
+squares one above the other that never change, either in Xmms or Audacious, but 
+appear to be useful in indicating whether playback is set to continue (default) 
+or stop or repeat the current song.  Therefore, I've modified the skins logic 
+to display them in 1 of 3 states:  "Normal", "No Playlist Advance" (bottom 
+indicator) and "Stop After This Song" (top indicator changes, in skins that 
+support this).
+
+6) Added main-window bindings for the [Up] & [Down] arrows to make it much 
+easier to quickly change the volume (previously they moved the active row in 
+the playlist window up and down, and still do if the playlist window has the 
+keyboard focus).
+
+7) (Re)Added most of the main menu keyboard shortcuts to the main-window 
+key-bindings such that they're bound to both the main and playlist windows.
+
+8) Fixed the [Shift-[Tab]] binding to actually work now (both Qt & GTK).  
+This had apparently never worked.  Supposed to move the playlist screen to 
+show the previous playlist (if multiple playlists are defined).
+
+9) Found & fixed a cpl. main-window notifications to be more consistant.
 
 * Add a GTK version of the recently-added Qt-only Playback-History plugin!
 Includes all the features in the Fauxdacious-enhanced version plus the ability 
