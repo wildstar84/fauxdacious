@@ -104,7 +104,7 @@ void shutdown_audacious_server (int argc, char * * argv)
 void get_handlers_list (int argc, char * * argv)
 {
     fauxdtool_report ("Usage: fauxdtool [-#|instance name] COMMAND ...");
-    fauxdtool_report ("       where # (1-9 and name) selects the instance of Fauxdacious to control");
+    fauxdtool_report ("       where (0-9 or name) selects the instance of Fauxdacious to control");
     fauxdtool_report ("");
 
     for (int i = 0; handlers[i].name; i ++)
@@ -118,7 +118,7 @@ void get_handlers_list (int argc, char * * argv)
     fauxdtool_report ("");
     fauxdtool_report ("Commands may be prefixed with '--' (GNU-style long options) or not, your choice.");
     fauxdtool_report ("Show/hide and enable/disable commands take an optional 'on' or 'off' argument.");
-    fauxdtool_report ("Report bugs to https://redmine.audacious-media-player.org/projects/audacious");
+    fauxdtool_report ("Report bugs to:  https://github.com/wildstar84/fauxdacious/issues");
 }
 
 void get_version (int argc, char * * argv)

@@ -14,8 +14,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
-"Report-Msgid-Bugs-To: https://redmine.audacious-media-player.org/\n"
-"POT-Creation-Date: 2024-12-14 11:58-0600\n"
+"Report-Msgid-Bugs-To: https://github.com/wildstar84/fauxdacious/issues\n"
+"POT-Creation-Date: 2025-06-13 00:10-0500\n"
 "PO-Revision-Date: 2018-07-08 10:34+0000\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/audacious/audacious/language/"
@@ -196,7 +196,7 @@ msgstr ""
 msgid "stdin://"
 msgstr ""
 
-#: src/libfauxdcore/adder.cc:341 src/libfauxdcore/adder.cc:433
+#: src/libfauxdcore/adder.cc:350 src/libfauxdcore/adder.cc:442
 #, c-format
 msgid ""
 "Error reading %s:\n"
@@ -205,7 +205,7 @@ msgstr ""
 "Fout tijdens lezen van %s:\n"
 "%s"
 
-#: src/libfauxdcore/adder.cc:499
+#: src/libfauxdcore/adder.cc:508
 msgid "No files found."
 msgstr "Geen bestanden gevonden."
 
@@ -404,7 +404,7 @@ msgid "About Fauxdacious"
 msgstr "Over Audacious"
 
 #: src/libfauxdgui/confirm.cc:36 src/libfauxdgui/jump-to-time.cc:48
-#: src/libfauxdgui/playlists.cc:93 src/libfauxdgui/playlists.cc:190
+#: src/libfauxdgui/playlists.cc:100 src/libfauxdgui/playlists.cc:197
 #: src/libfauxdgui/plugin-prefs.cc:162 src/libfauxdgui/url-opener.cc:105
 #: src/libfauxdqt/playlist-management.cc:41
 #: src/libfauxdqt/playlist-management.cc:60 src/libfauxdqt/prefs-plugin.cc:136
@@ -450,12 +450,12 @@ msgid "EQF File ..."
 msgstr "EQF-bestand ..."
 
 #: src/libfauxdgui/eq-preset.cc:289 src/libfauxdqt/eq-preset-qt.cc:573
-#: src/libfauxdqt/fileopener.cc:115
+#: src/libfauxdqt/fileopener.cc:118
 msgid "Import"
 msgstr "Importeren"
 
 #: src/libfauxdgui/eq-preset.cc:290 src/libfauxdqt/eq-preset-qt.cc:576
-#: src/libfauxdqt/fileopener.cc:116
+#: src/libfauxdqt/fileopener.cc:119
 msgid "Export"
 msgstr "Exporteren"
 
@@ -493,12 +493,12 @@ msgid "Delete Selected"
 msgstr "Selectie verwijderen"
 
 #: src/libfauxdgui/eq-preset.cc:422 src/libfauxdgui/file-opener.cc:139
-#: src/libfauxdgui/infowin.cc:623 src/libfauxdgui/jump-to-track.cc:316
-#: src/libfauxdgui/plugin-prefs.cc:168 src/libfauxdgui/prefs-window.cc:1062
+#: src/libfauxdgui/infowin.cc:623 src/libfauxdgui/jump-to-track.cc:315
+#: src/libfauxdgui/plugin-prefs.cc:168 src/libfauxdgui/prefs-window.cc:1064
 #: src/libfauxdgui/queue-manager.cc:195 src/libfauxdgui/util.cc:367
-#: src/libfauxdqt/audqt.cc:409 src/libfauxdqt/infowin-qt.cc:100
+#: src/libfauxdqt/audqt.cc:419 src/libfauxdqt/infowin-qt.cc:100
 #: src/libfauxdqt/log-inspector.cc:229 src/libfauxdqt/prefs-plugin.cc:146
-#: src/libfauxdqt/prefs-window-qt.cc:857 src/libfauxdqt/song-window-qt.cc:373
+#: src/libfauxdqt/prefs-window-qt.cc:857 src/libfauxdqt/song-window-qt.cc:376
 msgid "_Close"
 msgstr "_Sluiten"
 
@@ -579,7 +579,7 @@ msgstr ""
 msgid "Preamp"
 msgstr "Voorversterker"
 
-#: src/libfauxdgui/file-opener.cc:79 src/libfauxdqt/fileopener.cc:102
+#: src/libfauxdgui/file-opener.cc:79 src/libfauxdqt/fileopener.cc:105
 #, fuzzy
 msgid "Open Files - Fauxdacious"
 msgstr "Audacious"
@@ -593,7 +593,7 @@ msgstr "_Openen"
 msgid "Close _dialog on open"
 msgstr "_Venster sluiten bij openen"
 
-#: src/libfauxdgui/file-opener.cc:87 src/libfauxdqt/fileopener.cc:104
+#: src/libfauxdgui/file-opener.cc:87 src/libfauxdqt/fileopener.cc:107
 #, fuzzy
 msgid "Add Files - Fauxdacious"
 msgstr "Over Audacious"
@@ -620,7 +620,7 @@ msgid "Artist"
 msgstr "Artiest"
 
 #: src/libfauxdgui/infopopup.cc:217 src/libfauxdgui/infowin.cc:563
-#: src/libfauxdgui/prefs-window.cc:112 src/libfauxdgui/prefs-window.cc:171
+#: src/libfauxdgui/prefs-window.cc:112 src/libfauxdgui/prefs-window.cc:172
 #: src/libfauxdqt/infopopup-qt.cc:98 src/libfauxdqt/info-widget.cc:54
 #: src/libfauxdqt/prefs-window-qt.cc:172 src/libfauxdqt/prefs-window-qt.cc:231
 msgid "Album"
@@ -633,12 +633,12 @@ msgid "Genre"
 msgstr "Genre"
 
 #: src/libfauxdgui/infopopup.cc:219 src/libfauxdgui/infowin.cc:577
-#: src/libfauxdgui/prefs-window.cc:120 src/libfauxdqt/infopopup-qt.cc:102
+#: src/libfauxdgui/prefs-window.cc:121 src/libfauxdqt/infopopup-qt.cc:102
 #: src/libfauxdqt/prefs-window-qt.cc:180
 msgid "Year"
 msgstr "Jaar"
 
-#: src/libfauxdgui/infopopup.cc:220 src/libfauxdgui/prefs-window.cc:170
+#: src/libfauxdgui/infopopup.cc:220 src/libfauxdgui/prefs-window.cc:171
 #: src/libfauxdqt/infopopup-qt.cc:104 src/libfauxdqt/prefs-window-qt.cc:230
 msgid "Track"
 msgstr "Nummer"
@@ -831,12 +831,12 @@ msgstr ""
 
 #: src/libfauxdgui/infowin.cc:433 src/libfauxdgui/preset-browser.cc:83
 #: src/libfauxdgui/search-select.cc:79 src/libfauxdgui/util.cc:209
-#: src/libfauxdqt/fileopener.cc:136 src/libfauxdqt/search-select-qt.cc:104
+#: src/libfauxdqt/fileopener.cc:139 src/libfauxdqt/search-select-qt.cc:104
 msgid "Cancel"
 msgstr "Annuleren"
 
 #: src/libfauxdgui/infowin.cc:434 src/libfauxdgui/util.cc:209
-#: src/libfauxdqt/fileopener.cc:111 src/libfauxdqt/fileopener.cc:112
+#: src/libfauxdqt/fileopener.cc:114 src/libfauxdqt/fileopener.cc:115
 msgid "Open"
 msgstr "Openen"
 
@@ -879,7 +879,7 @@ msgstr "Albumartiest"
 msgid "Coverart File"
 msgstr "Kies bestand"
 
-#: src/libfauxdgui/infowin.cc:570 src/libfauxdgui/prefs-window.cc:121
+#: src/libfauxdgui/infowin.cc:570 src/libfauxdgui/prefs-window.cc:122
 #: src/libfauxdqt/info-widget.cc:59 src/libfauxdqt/prefs-window-qt.cc:181
 msgid "Comment"
 msgstr "Opmerking"
@@ -935,8 +935,8 @@ msgstr "%d kb/s"
 msgid "N/A"
 msgstr "n/b"
 
-#: src/libfauxdgui/jump-to-time.cc:47 src/libfauxdgui/jump-to-track.cc:321
-#: src/libfauxdqt/song-window-qt.cc:371
+#: src/libfauxdgui/jump-to-time.cc:47 src/libfauxdgui/jump-to-track.cc:320
+#: src/libfauxdqt/song-window-qt.cc:373
 msgid "_Jump"
 msgstr "_Spoelen"
 
@@ -949,12 +949,12 @@ msgid "Enter time (minutes:seconds):"
 msgstr "Voer tijd in (minuten:seconden):"
 
 #: src/libfauxdgui/jump-to-track.cc:96 src/libfauxdgui/jump-to-track.cc:104
-#: src/libfauxdgui/jump-to-track.cc:312 src/libfauxdqt/song-window-qt.cc:293
-#: src/libfauxdqt/song-window-qt.cc:370
+#: src/libfauxdgui/jump-to-track.cc:311 src/libfauxdqt/song-window-qt.cc:291
+#: src/libfauxdqt/song-window-qt.cc:371
 msgid "_Queue"
 msgstr "_In wachtrij"
 
-#: src/libfauxdgui/jump-to-track.cc:102 src/libfauxdqt/song-window-qt.cc:293
+#: src/libfauxdgui/jump-to-track.cc:102 src/libfauxdqt/song-window-qt.cc:291
 msgid "Un_queue"
 msgstr "_Uit wachtrij"
 
@@ -962,54 +962,50 @@ msgstr "_Uit wachtrij"
 msgid "Jump to Song"
 msgstr "Ga naar nummer"
 
-#: src/libfauxdgui/jump-to-track.cc:267 src/libfauxdqt/song-window-qt.cc:324
-msgid "Filter: "
-msgstr "Filter: "
-
-#: src/libfauxdgui/jump-to-track.cc:268
+#: src/libfauxdgui/jump-to-track.cc:267 src/libfauxdqt/song-window-qt.cc:323
 msgid "_Filter:"
 msgstr "_Filter:"
 
-#: src/libfauxdgui/jump-to-track.cc:305 src/libfauxdqt/song-window-qt.cc:365
+#: src/libfauxdgui/jump-to-track.cc:304 src/libfauxdqt/song-window-qt.cc:366
 msgid "C_lose on jump"
 msgstr "S_luiten bij spoelen"
 
-#: src/libfauxdgui/playlists.cc:92
+#: src/libfauxdgui/playlists.cc:99
 msgid "_Overwrite"
 msgstr "_Overschrijven"
 
-#: src/libfauxdgui/playlists.cc:96
+#: src/libfauxdgui/playlists.cc:103
 msgid "Confirm Overwrite"
 msgstr "Overschrijven bevestigen"
 
-#: src/libfauxdgui/playlists.cc:96
+#: src/libfauxdgui/playlists.cc:103
 #, c-format
 msgid "Overwrite %s?"
 msgstr "%s overschrijven?"
 
-#: src/libfauxdgui/playlists.cc:122 src/libfauxdqt/fileopener.cc:61
+#: src/libfauxdgui/playlists.cc:129 src/libfauxdqt/fileopener.cc:64
 msgid ""
 "Please type a filename extension or select a format from the drop-down list."
 msgstr ""
 "Voer een bestandsextensie in of selecteer een formaat uit de keuzelijst."
 
-#: src/libfauxdgui/playlists.cc:141 src/libfauxdqt/fileopener.cc:68
+#: src/libfauxdgui/playlists.cc:148 src/libfauxdqt/fileopener.cc:71
 msgid "Select Format by Extension"
 msgstr "Formaat selecteren per extensie"
 
-#: src/libfauxdgui/playlists.cc:168
+#: src/libfauxdgui/playlists.cc:175
 msgid "Export Playlist"
 msgstr "Afspeellijst exporteren"
 
-#: src/libfauxdgui/playlists.cc:169
+#: src/libfauxdgui/playlists.cc:176
 msgid "_Export"
 msgstr "_Exporteren"
 
-#: src/libfauxdgui/playlists.cc:175
+#: src/libfauxdgui/playlists.cc:182
 msgid "Import Playlist"
 msgstr "Afspeellijst importeren"
 
-#: src/libfauxdgui/playlists.cc:176
+#: src/libfauxdgui/playlists.cc:183
 msgid "_Import"
 msgstr "_Importeren"
 
@@ -1031,14 +1027,14 @@ msgstr "%s Instellingen"
 msgid "_Set"
 msgstr "In_stellen"
 
-#: src/libfauxdgui/plugin-view.cc:236 src/libfauxdgui/prefs-window.cc:874
-#: src/libfauxdgui/prefs-window.cc:914 src/libfauxdqt/prefs-window-qt.cc:808
+#: src/libfauxdgui/plugin-view.cc:236 src/libfauxdgui/prefs-window.cc:876
+#: src/libfauxdgui/prefs-window.cc:916 src/libfauxdqt/prefs-window-qt.cc:808
 #: src/libfauxdqt/prefs-window-qt.cc:811
 msgid "_Settings"
 msgstr "In_stellingen"
 
-#: src/libfauxdgui/plugin-view.cc:243 src/libfauxdgui/prefs-window.cc:888
-#: src/libfauxdgui/prefs-window.cc:926 src/libfauxdqt/prefs-window-qt.cc:809
+#: src/libfauxdgui/plugin-view.cc:243 src/libfauxdgui/prefs-window.cc:890
+#: src/libfauxdgui/prefs-window.cc:928 src/libfauxdqt/prefs-window-qt.cc:809
 #: src/libfauxdqt/prefs-window-qt.cc:812
 msgid "_About"
 msgstr "_Over"
@@ -1133,595 +1129,599 @@ msgstr "Bestandspad"
 msgid "Date"
 msgstr "Datum"
 
-#: src/libfauxdgui/prefs-window.cc:122 src/libfauxdqt/info-widget.cc:71
+#: src/libfauxdgui/prefs-window.cc:120 src/libfauxdqt/info-widget.cc:60
+msgid "Description"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:123 src/libfauxdqt/info-widget.cc:71
 #: src/libfauxdqt/prefs-window-qt.cc:182
 msgid "Codec"
 msgstr "Codec"
 
-#: src/libfauxdgui/prefs-window.cc:123 src/libfauxdqt/info-widget.cc:72
+#: src/libfauxdgui/prefs-window.cc:124 src/libfauxdqt/info-widget.cc:72
 #: src/libfauxdqt/prefs-window-qt.cc:183
 msgid "Quality"
 msgstr "Kwaliteit"
 
-#: src/libfauxdgui/prefs-window.cc:124 src/libfauxdqt/prefs-window-qt.cc:184
+#: src/libfauxdgui/prefs-window.cc:125 src/libfauxdqt/prefs-window-qt.cc:184
 #, fuzzy
 msgid "Disc number"
 msgstr "Titelnummer"
 
-#: src/libfauxdgui/prefs-window.cc:128 src/libfauxdqt/prefs-window-qt.cc:188
+#: src/libfauxdgui/prefs-window.cc:129 src/libfauxdqt/prefs-window-qt.cc:188
 msgid "None"
 msgstr "Geen"
 
-#: src/libfauxdgui/prefs-window.cc:129 src/libfauxdqt/prefs-window-qt.cc:189
+#: src/libfauxdgui/prefs-window.cc:130 src/libfauxdqt/prefs-window-qt.cc:189
 msgid "Arabic"
 msgstr "Arabisch"
 
-#: src/libfauxdgui/prefs-window.cc:130 src/libfauxdqt/prefs-window-qt.cc:190
+#: src/libfauxdgui/prefs-window.cc:131 src/libfauxdqt/prefs-window-qt.cc:190
 msgid "Baltic"
 msgstr "Baltisch"
 
-#: src/libfauxdgui/prefs-window.cc:131 src/libfauxdqt/prefs-window-qt.cc:191
+#: src/libfauxdgui/prefs-window.cc:132 src/libfauxdqt/prefs-window-qt.cc:191
 msgid "Chinese"
 msgstr "Chinees"
 
-#: src/libfauxdgui/prefs-window.cc:132 src/libfauxdqt/prefs-window-qt.cc:192
+#: src/libfauxdgui/prefs-window.cc:133 src/libfauxdqt/prefs-window-qt.cc:192
 msgid "Greek"
 msgstr "Grieks"
 
-#: src/libfauxdgui/prefs-window.cc:133 src/libfauxdqt/prefs-window-qt.cc:193
+#: src/libfauxdgui/prefs-window.cc:134 src/libfauxdqt/prefs-window-qt.cc:193
 msgid "Hebrew"
 msgstr "Hebreeuws"
 
-#: src/libfauxdgui/prefs-window.cc:134 src/libfauxdqt/prefs-window-qt.cc:194
+#: src/libfauxdgui/prefs-window.cc:135 src/libfauxdqt/prefs-window-qt.cc:194
 msgid "Japanese"
 msgstr "Japans"
 
-#: src/libfauxdgui/prefs-window.cc:135 src/libfauxdqt/prefs-window-qt.cc:195
+#: src/libfauxdgui/prefs-window.cc:136 src/libfauxdqt/prefs-window-qt.cc:195
 msgid "Korean"
 msgstr "Koreaans"
 
-#: src/libfauxdgui/prefs-window.cc:136 src/libfauxdqt/prefs-window-qt.cc:196
+#: src/libfauxdgui/prefs-window.cc:137 src/libfauxdqt/prefs-window-qt.cc:196
 msgid "Polish"
 msgstr "Pools"
 
-#: src/libfauxdgui/prefs-window.cc:137 src/libfauxdqt/prefs-window-qt.cc:197
+#: src/libfauxdgui/prefs-window.cc:138 src/libfauxdqt/prefs-window-qt.cc:197
 msgid "Russian"
 msgstr "Russisch"
 
-#: src/libfauxdgui/prefs-window.cc:138 src/libfauxdqt/prefs-window-qt.cc:198
+#: src/libfauxdgui/prefs-window.cc:139 src/libfauxdqt/prefs-window-qt.cc:198
 msgid "Taiwanese"
 msgstr "Taiwanees"
 
-#: src/libfauxdgui/prefs-window.cc:139 src/libfauxdqt/prefs-window-qt.cc:199
+#: src/libfauxdgui/prefs-window.cc:140 src/libfauxdqt/prefs-window-qt.cc:199
 msgid "Turkish"
 msgstr "Turks"
 
-#: src/libfauxdgui/prefs-window.cc:143 src/libfauxdqt/prefs-window-qt.cc:203
+#: src/libfauxdgui/prefs-window.cc:144 src/libfauxdqt/prefs-window-qt.cc:203
 msgid "Automatic"
 msgstr "Automatisch"
 
-#: src/libfauxdgui/prefs-window.cc:147 src/libfauxdqt/prefs-window-qt.cc:207
+#: src/libfauxdgui/prefs-window.cc:148 src/libfauxdqt/prefs-window-qt.cc:207
 msgid "Floating point"
 msgstr "Zwevende komma"
 
-#: src/libfauxdgui/prefs-window.cc:151 src/libfauxdqt/prefs-window-qt.cc:211
+#: src/libfauxdgui/prefs-window.cc:152 src/libfauxdqt/prefs-window-qt.cc:211
 msgid "As decoded"
 msgstr "Zoals gedecodeerd"
 
-#: src/libfauxdgui/prefs-window.cc:152 src/libfauxdqt/prefs-window-qt.cc:212
+#: src/libfauxdgui/prefs-window.cc:153 src/libfauxdqt/prefs-window-qt.cc:212
 msgid "After applying ReplayGain"
 msgstr "Na het toepassen van normaliseren"
 
-#: src/libfauxdgui/prefs-window.cc:153 src/libfauxdqt/prefs-window-qt.cc:213
+#: src/libfauxdgui/prefs-window.cc:154 src/libfauxdqt/prefs-window-qt.cc:213
 msgid "After applying effects"
 msgstr "Na het toepassen van effecten"
 
-#: src/libfauxdgui/prefs-window.cc:154 src/libfauxdqt/prefs-window-qt.cc:214
+#: src/libfauxdgui/prefs-window.cc:155 src/libfauxdqt/prefs-window-qt.cc:214
 msgid "After applying equalization"
 msgstr "Na het toepassen van equalization"
 
-#: src/libfauxdgui/prefs-window.cc:158 src/libfauxdqt/prefs-window-qt.cc:218
+#: src/libfauxdgui/prefs-window.cc:159 src/libfauxdqt/prefs-window-qt.cc:218
 msgid "Never"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:159 src/libfauxdqt/prefs-window-qt.cc:219
+#: src/libfauxdgui/prefs-window.cc:160 src/libfauxdqt/prefs-window-qt.cc:219
 msgid "URLs NOT in playlists"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:160 src/libfauxdqt/prefs-window-qt.cc:220
+#: src/libfauxdgui/prefs-window.cc:161 src/libfauxdqt/prefs-window-qt.cc:220
 msgid "Always"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:164 src/libfauxdqt/prefs-window-qt.cc:224
+#: src/libfauxdgui/prefs-window.cc:165 src/libfauxdqt/prefs-window-qt.cc:224
 msgid "<song file-name>.tag (if local)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:165 src/libfauxdqt/prefs-window-qt.cc:225
+#: src/libfauxdgui/prefs-window.cc:166 src/libfauxdqt/prefs-window-qt.cc:225
 msgid "Directory tagfile (if local)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:166 src/libfauxdqt/prefs-window-qt.cc:226
+#: src/libfauxdgui/prefs-window.cc:167 src/libfauxdqt/prefs-window-qt.cc:226
 msgid "Global tagfile"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:172 src/libfauxdqt/prefs-window-qt.cc:232
+#: src/libfauxdgui/prefs-window.cc:173 src/libfauxdqt/prefs-window-qt.cc:232
 msgid "Based on shuffle"
 msgstr "Op basis van willekeurig"
 
-#: src/libfauxdgui/prefs-window.cc:188
+#: src/libfauxdgui/prefs-window.cc:189
 #, fuzzy
 msgid "Restart in Qt5 (legacy) mode"
 msgstr "Draaien in Qt-modus"
 
-#: src/libfauxdgui/prefs-window.cc:192
+#: src/libfauxdgui/prefs-window.cc:193
 #, fuzzy
 msgid "Restart in Qt6 mode"
 msgstr "Draaien in Qt-modus"
 
-#: src/libfauxdgui/prefs-window.cc:204
+#: src/libfauxdgui/prefs-window.cc:205
 msgid "Fauxdacious is running in GTK3 mode."
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:206
+#: src/libfauxdgui/prefs-window.cc:207
 msgid "Fauxdacious is running in GTK2 (legacy) mode."
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:211
+#: src/libfauxdgui/prefs-window.cc:212
 msgid "No Qt mode is available in this build."
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:213 src/libfauxdqt/prefs-window-qt.cc:336
+#: src/libfauxdgui/prefs-window.cc:214 src/libfauxdqt/prefs-window-qt.cc:336
 msgid "Interface:"
 msgstr "Uiterlijk:"
 
-#: src/libfauxdgui/prefs-window.cc:216 src/libfauxdqt/prefs-window-qt.cc:344
+#: src/libfauxdgui/prefs-window.cc:217 src/libfauxdqt/prefs-window-qt.cc:344
 msgid "Use Classic icons for this dialog's tabs"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:234 src/libfauxdqt/prefs-window-qt.cc:356
+#: src/libfauxdgui/prefs-window.cc:235 src/libfauxdqt/prefs-window-qt.cc:356
 msgid "Output plugin:"
 msgstr "Uitvoerplug-in:"
 
-#: src/libfauxdgui/prefs-window.cc:255 src/libfauxdqt/prefs-window-qt.cc:371
+#: src/libfauxdgui/prefs-window.cc:256 src/libfauxdqt/prefs-window-qt.cc:371
 msgid "Amplify all files:"
 msgstr "Alle bestanden versterken:"
 
-#: src/libfauxdgui/prefs-window.cc:257 src/libfauxdgui/prefs-window.cc:260
+#: src/libfauxdgui/prefs-window.cc:258 src/libfauxdgui/prefs-window.cc:261
 #: src/libfauxdqt/prefs-window-qt.cc:373 src/libfauxdqt/prefs-window-qt.cc:376
 msgid "dB"
 msgstr "dB"
 
-#: src/libfauxdgui/prefs-window.cc:258 src/libfauxdqt/prefs-window-qt.cc:374
+#: src/libfauxdgui/prefs-window.cc:259 src/libfauxdqt/prefs-window-qt.cc:374
 msgid "Amplify untagged files:"
 msgstr "Bestanden zonder label versterken:"
 
-#: src/libfauxdgui/prefs-window.cc:264 src/libfauxdqt/prefs-window-qt.cc:380
+#: src/libfauxdgui/prefs-window.cc:265 src/libfauxdqt/prefs-window-qt.cc:380
 msgid "<b>Output Settings</b>"
 msgstr "<b>Uitvoerinstellingen</b>"
 
-#: src/libfauxdgui/prefs-window.cc:266 src/libfauxdqt/prefs-window-qt.cc:382
+#: src/libfauxdgui/prefs-window.cc:267 src/libfauxdqt/prefs-window-qt.cc:382
 msgid "Bit depth:"
 msgstr "Bitdiepte:"
 
-#: src/libfauxdgui/prefs-window.cc:269 src/libfauxdgui/prefs-window.cc:314
+#: src/libfauxdgui/prefs-window.cc:270 src/libfauxdgui/prefs-window.cc:315
 #: src/libfauxdqt/prefs-window-qt.cc:385 src/libfauxdqt/prefs-window-qt.cc:430
 msgid "Buffer size:"
 msgstr "Bufferomvang:"
 
-#: src/libfauxdgui/prefs-window.cc:271 src/libfauxdqt/prefs-window-qt.cc:387
+#: src/libfauxdgui/prefs-window.cc:272 src/libfauxdqt/prefs-window-qt.cc:387
 msgid "ms"
 msgstr "ms"
 
-#: src/libfauxdgui/prefs-window.cc:272 src/libfauxdqt/prefs-window-qt.cc:388
+#: src/libfauxdgui/prefs-window.cc:273 src/libfauxdqt/prefs-window-qt.cc:388
 msgid "Soft clipping"
 msgstr "Zacht afknippen"
 
-#: src/libfauxdgui/prefs-window.cc:274 src/libfauxdqt/prefs-window-qt.cc:390
+#: src/libfauxdgui/prefs-window.cc:275 src/libfauxdqt/prefs-window-qt.cc:390
 msgid "Use software volume control (not recommended)"
 msgstr "Software-volumeregelaar gebruiken (niet aanbevolen)"
 
-#: src/libfauxdgui/prefs-window.cc:276 src/libfauxdqt/prefs-window-qt.cc:392
+#: src/libfauxdgui/prefs-window.cc:277 src/libfauxdqt/prefs-window-qt.cc:392
 msgid "<b>Recording Settings</b>"
 msgstr "<b>Opname-instellingen</b>"
 
-#: src/libfauxdgui/prefs-window.cc:280 src/libfauxdqt/prefs-window-qt.cc:396
+#: src/libfauxdgui/prefs-window.cc:281 src/libfauxdqt/prefs-window-qt.cc:396
 msgid "Record stream:"
 msgstr "Stream opnemen:"
 
-#: src/libfauxdgui/prefs-window.cc:283 src/libfauxdqt/prefs-window-qt.cc:399
+#: src/libfauxdgui/prefs-window.cc:284 src/libfauxdqt/prefs-window-qt.cc:399
 msgid "<b>ReplayGain</b>"
 msgstr "<b>Normaliseren</b>"
 
-#: src/libfauxdgui/prefs-window.cc:284 src/libfauxdqt/prefs-window-qt.cc:400
+#: src/libfauxdgui/prefs-window.cc:285 src/libfauxdqt/prefs-window-qt.cc:400
 msgid "Enable ReplayGain"
 msgstr "Normaliseren inschakelen"
 
-#: src/libfauxdgui/prefs-window.cc:286 src/libfauxdqt/prefs-window-qt.cc:402
+#: src/libfauxdgui/prefs-window.cc:287 src/libfauxdqt/prefs-window-qt.cc:402
 msgid "Mode:"
 msgstr "Modus:"
 
-#: src/libfauxdgui/prefs-window.cc:290 src/libfauxdqt/prefs-window-qt.cc:406
+#: src/libfauxdgui/prefs-window.cc:291 src/libfauxdqt/prefs-window-qt.cc:406
 msgid "Prevent clipping (recommended)"
 msgstr "Afknippen voorkomen (aanbevolen)"
 
-#: src/libfauxdgui/prefs-window.cc:298 src/libfauxdqt/prefs-window-qt.cc:414
+#: src/libfauxdgui/prefs-window.cc:299 src/libfauxdqt/prefs-window-qt.cc:414
 msgid "Proxy hostname:"
 msgstr "Proxy-hostnaam:"
 
-#: src/libfauxdgui/prefs-window.cc:300 src/libfauxdqt/prefs-window-qt.cc:416
+#: src/libfauxdgui/prefs-window.cc:301 src/libfauxdqt/prefs-window-qt.cc:416
 msgid "Proxy port:"
 msgstr "Proxy-poort:"
 
-#: src/libfauxdgui/prefs-window.cc:305 src/libfauxdqt/prefs-window-qt.cc:421
+#: src/libfauxdgui/prefs-window.cc:306 src/libfauxdqt/prefs-window-qt.cc:421
 msgid "Proxy username:"
 msgstr "Proxy-gebruikersnaam:"
 
-#: src/libfauxdgui/prefs-window.cc:307 src/libfauxdqt/prefs-window-qt.cc:423
+#: src/libfauxdgui/prefs-window.cc:308 src/libfauxdqt/prefs-window-qt.cc:423
 msgid "Proxy password:"
 msgstr "Proxy-wachtwoord:"
 
-#: src/libfauxdgui/prefs-window.cc:313 src/libfauxdqt/prefs-window-qt.cc:429
+#: src/libfauxdgui/prefs-window.cc:314 src/libfauxdqt/prefs-window-qt.cc:429
 msgid "<b>Network Settings</b>"
 msgstr "<b>Netwerkinstellingen</b>"
 
-#: src/libfauxdgui/prefs-window.cc:316 src/libfauxdqt/prefs-window-qt.cc:432
+#: src/libfauxdgui/prefs-window.cc:317 src/libfauxdqt/prefs-window-qt.cc:432
 msgid "KiB"
 msgstr "KiB"
 
-#: src/libfauxdgui/prefs-window.cc:317 src/libfauxdqt/prefs-window-qt.cc:433
+#: src/libfauxdgui/prefs-window.cc:318 src/libfauxdqt/prefs-window-qt.cc:433
 msgid "<b>Proxy Configuration</b>"
 msgstr "<b>Proxy-configuratie</b>"
 
-#: src/libfauxdgui/prefs-window.cc:318 src/libfauxdqt/prefs-window-qt.cc:434
+#: src/libfauxdgui/prefs-window.cc:319 src/libfauxdqt/prefs-window-qt.cc:434
 msgid "Enable proxy usage"
 msgstr "Proxy gebruiken"
 
-#: src/libfauxdgui/prefs-window.cc:322 src/libfauxdqt/prefs-window-qt.cc:438
+#: src/libfauxdgui/prefs-window.cc:323 src/libfauxdqt/prefs-window-qt.cc:438
 msgid "Use authentication with proxy"
 msgstr "Authenticatie gebruiken voor proxy"
 
-#: src/libfauxdgui/prefs-window.cc:326 src/libfauxdqt/prefs-window-qt.cc:442
+#: src/libfauxdgui/prefs-window.cc:327 src/libfauxdqt/prefs-window-qt.cc:442
 msgid "Use SOCKS proxy"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:328 src/libfauxdqt/prefs-window-qt.cc:444
+#: src/libfauxdgui/prefs-window.cc:329 src/libfauxdqt/prefs-window-qt.cc:444
 msgid "SOCKS v4a"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:332 src/libfauxdqt/prefs-window-qt.cc:448
+#: src/libfauxdgui/prefs-window.cc:333 src/libfauxdqt/prefs-window-qt.cc:448
 msgid "SOCKS v5"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:339 src/libfauxdqt/prefs-window-qt.cc:455
+#: src/libfauxdgui/prefs-window.cc:340 src/libfauxdqt/prefs-window-qt.cc:455
 msgid "Auto character encoding detector for:"
 msgstr "Automatische karaktercodering-detector ingeschakeld voor:"
 
-#: src/libfauxdgui/prefs-window.cc:342 src/libfauxdqt/prefs-window-qt.cc:458
+#: src/libfauxdgui/prefs-window.cc:343 src/libfauxdqt/prefs-window-qt.cc:458
 msgid "Fallback character encodings:"
 msgstr "Terugvallen op karaktercoderingen:"
 
-#: src/libfauxdgui/prefs-window.cc:350 src/libfauxdqt/prefs-window-qt.cc:466
+#: src/libfauxdgui/prefs-window.cc:351 src/libfauxdqt/prefs-window-qt.cc:466
 msgid "<b>Behavior</b>"
 msgstr "<b>Gedrag</b>"
 
-#: src/libfauxdgui/prefs-window.cc:351 src/libfauxdqt/prefs-window-qt.cc:467
+#: src/libfauxdgui/prefs-window.cc:352 src/libfauxdqt/prefs-window-qt.cc:467
 msgid "Resume playback on startup"
 msgstr "Afspelen hervatten bij opstarten"
 
-#: src/libfauxdgui/prefs-window.cc:353 src/libfauxdqt/prefs-window-qt.cc:469
+#: src/libfauxdgui/prefs-window.cc:354 src/libfauxdqt/prefs-window-qt.cc:469
 #, fuzzy
 msgid "...but Pause instead of resuming immediately"
 msgstr "Pauzeren in plaats van onmiddellijk hervatten"
 
-#: src/libfauxdgui/prefs-window.cc:356 src/libfauxdqt/prefs-window-qt.cc:472
+#: src/libfauxdgui/prefs-window.cc:357 src/libfauxdqt/prefs-window-qt.cc:472
 msgid "Advance when the current song is deleted"
 msgstr "Doorgaan zodra het huidige nummer verwijderd is"
 
-#: src/libfauxdgui/prefs-window.cc:358 src/libfauxdqt/prefs-window-qt.cc:474
+#: src/libfauxdgui/prefs-window.cc:359 src/libfauxdqt/prefs-window-qt.cc:474
 #, fuzzy
 msgid "Clear the playlist when Opening (not \"Adding\") files"
 msgstr "Afspeellijst wissen bij openen van bestanden"
 
-#: src/libfauxdgui/prefs-window.cc:360 src/libfauxdqt/prefs-window-qt.cc:476
+#: src/libfauxdgui/prefs-window.cc:361 src/libfauxdqt/prefs-window-qt.cc:476
 #, fuzzy
 msgid "Open files in a temporary (\"Now Playing\") playlist"
 msgstr "Bestanden openen in een tijdelijke afspeellijst"
 
-#: src/libfauxdgui/prefs-window.cc:362 src/libfauxdqt/prefs-window-qt.cc:478
+#: src/libfauxdgui/prefs-window.cc:363 src/libfauxdqt/prefs-window-qt.cc:478
 msgid "<b>Song Display</b>"
 msgstr "<b>Nummerweergave</b>"
 
-#: src/libfauxdgui/prefs-window.cc:363 src/libfauxdqt/prefs-window-qt.cc:479
+#: src/libfauxdgui/prefs-window.cc:364 src/libfauxdqt/prefs-window-qt.cc:479
 msgid "Show song numbers"
 msgstr "Titelnummers tonen"
 
-#: src/libfauxdgui/prefs-window.cc:365 src/libfauxdqt/prefs-window-qt.cc:481
+#: src/libfauxdgui/prefs-window.cc:366 src/libfauxdqt/prefs-window-qt.cc:481
 msgid "Show leading zeroes (02:00 vs. 2:00)"
 msgstr "Voorloopnullen tonen (02:00 i.p.v. 2:00)"
 
-#: src/libfauxdgui/prefs-window.cc:367 src/libfauxdqt/prefs-window-qt.cc:483
+#: src/libfauxdgui/prefs-window.cc:368 src/libfauxdqt/prefs-window-qt.cc:483
 msgid "Show hours separately (1:30:00 vs. 90:00)"
 msgstr "Uren gescheiden tonen (1:30:00 i.p.v. 90:00)"
 
-#: src/libfauxdgui/prefs-window.cc:370 src/libfauxdqt/prefs-window-qt.cc:486
+#: src/libfauxdgui/prefs-window.cc:371 src/libfauxdqt/prefs-window-qt.cc:486
 msgid "<b>Export</b>"
 msgstr "<b>Exporteren</b>"
 
-#: src/libfauxdgui/prefs-window.cc:371 src/libfauxdqt/prefs-window-qt.cc:487
+#: src/libfauxdgui/prefs-window.cc:372 src/libfauxdqt/prefs-window-qt.cc:487
 msgid "Use relative paths when possible"
 msgstr "Relatieve paden gebruiken (indien mogelijk)"
 
-#: src/libfauxdgui/prefs-window.cc:373 src/libfauxdgui/prefs-window.cc:428
-#: src/libfauxdgui/prefs-window.cc:464 src/libfauxdqt/prefs-window-qt.cc:489
+#: src/libfauxdgui/prefs-window.cc:374 src/libfauxdgui/prefs-window.cc:429
+#: src/libfauxdgui/prefs-window.cc:465 src/libfauxdqt/prefs-window-qt.cc:489
 #: src/libfauxdqt/prefs-window-qt.cc:541 src/libfauxdqt/prefs-window-qt.cc:577
 #, fuzzy
 msgid "<b>Fauxdacious Extras</b>"
 msgstr "Audacious-instellingen"
 
-#: src/libfauxdgui/prefs-window.cc:374 src/libfauxdqt/prefs-window-qt.cc:490
+#: src/libfauxdgui/prefs-window.cc:375 src/libfauxdqt/prefs-window-qt.cc:490
 #, fuzzy
 msgid "Pause mutes instead of pausing"
 msgstr "Pauzeren in plaats van onmiddellijk hervatten"
 
-#: src/libfauxdgui/prefs-window.cc:376 src/libfauxdqt/prefs-window-qt.cc:492
+#: src/libfauxdgui/prefs-window.cc:377 src/libfauxdqt/prefs-window-qt.cc:492
 msgid "Split Artist - Title in streams"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:378 src/libfauxdqt/prefs-window-qt.cc:494
+#: src/libfauxdgui/prefs-window.cc:379 src/libfauxdqt/prefs-window-qt.cc:494
 msgid "Advance to next selected entry in list"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:380 src/libfauxdqt/prefs-window-qt.cc:496
+#: src/libfauxdgui/prefs-window.cc:381 src/libfauxdqt/prefs-window-qt.cc:496
 msgid "...and keep selected (for repetition)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:383 src/libfauxdqt/prefs-window-qt.cc:499
+#: src/libfauxdgui/prefs-window.cc:384 src/libfauxdqt/prefs-window-qt.cc:499
 msgid "On add, select 1st entry added"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:385 src/libfauxdqt/prefs-window-qt.cc:501
+#: src/libfauxdgui/prefs-window.cc:386 src/libfauxdqt/prefs-window-qt.cc:501
 msgid "Keep playlist metadata (like cuesheets do)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:387 src/libfauxdqt/prefs-window-qt.cc:503
+#: src/libfauxdgui/prefs-window.cc:388 src/libfauxdqt/prefs-window-qt.cc:503
 msgid "Don't allow streams to change metadata"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:389 src/libfauxdqt/prefs-window-qt.cc:505
+#: src/libfauxdgui/prefs-window.cc:390 src/libfauxdqt/prefs-window-qt.cc:505
 msgid "Limit playlist URLs to"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:391 src/libfauxdqt/prefs-window-qt.cc:507
+#: src/libfauxdgui/prefs-window.cc:392 src/libfauxdqt/prefs-window-qt.cc:507
 msgid "entries (0=no limit)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:395 src/libfauxdqt/prefs-window-qt.cc:511
+#: src/libfauxdgui/prefs-window.cc:396 src/libfauxdqt/prefs-window-qt.cc:511
 msgid "<b>Album Art</b>"
 msgstr "<b>Albumhoes</b>"
 
-#: src/libfauxdgui/prefs-window.cc:396 src/libfauxdqt/prefs-window-qt.cc:512
+#: src/libfauxdgui/prefs-window.cc:397 src/libfauxdqt/prefs-window-qt.cc:512
 msgid "Search for images matching these words (comma-separated):"
 msgstr ""
 "Zoeken naar afbeeldingen die overeenkomen met deze woorden (kommagescheiden):"
 
-#: src/libfauxdgui/prefs-window.cc:398 src/libfauxdqt/prefs-window-qt.cc:514
+#: src/libfauxdgui/prefs-window.cc:399 src/libfauxdqt/prefs-window-qt.cc:514
 msgid "Exclude images matching these words (comma-separated):"
 msgstr ""
 "Afbeeldingen negeren die overeenkomen met deze woorden (kommagescheiden): "
 
-#: src/libfauxdgui/prefs-window.cc:400 src/libfauxdqt/prefs-window-qt.cc:516
+#: src/libfauxdgui/prefs-window.cc:401 src/libfauxdqt/prefs-window-qt.cc:516
 msgid "Directory Channel-icon image (filename[.ext] only)?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:402 src/libfauxdqt/prefs-window-qt.cc:518
+#: src/libfauxdgui/prefs-window.cc:403 src/libfauxdqt/prefs-window-qt.cc:518
 msgid "Fallback cover image file? (full path required):"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:404 src/libfauxdqt/prefs-window-qt.cc:520
+#: src/libfauxdgui/prefs-window.cc:405 src/libfauxdqt/prefs-window-qt.cc:520
 msgid "Use Directory Channel-icon image file (see above)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:406 src/libfauxdqt/prefs-window-qt.cc:522
+#: src/libfauxdgui/prefs-window.cc:407 src/libfauxdqt/prefs-window-qt.cc:522
 msgid "Search for images matching song file name"
 msgstr "Zoeken naar afbeeldingen die overeenkomen met de bestandsnaam"
 
-#: src/libfauxdgui/prefs-window.cc:408 src/libfauxdqt/prefs-window-qt.cc:524
+#: src/libfauxdgui/prefs-window.cc:409 src/libfauxdqt/prefs-window-qt.cc:524
 #, fuzzy
 msgid "Search for images matching Album tag (file name overrides)"
 msgstr "Zoeken naar afbeeldingen die overeenkomen met de bestandsnaam"
 
-#: src/libfauxdgui/prefs-window.cc:410 src/libfauxdqt/prefs-window-qt.cc:526
+#: src/libfauxdgui/prefs-window.cc:411 src/libfauxdqt/prefs-window-qt.cc:526
 #, fuzzy
 msgid "Search for images in album-art cache"
 msgstr "Zoeken naar afbeeldingen die overeenkomen met de bestandsnaam"
 
-#: src/libfauxdgui/prefs-window.cc:412 src/libfauxdqt/prefs-window-qt.cc:528
+#: src/libfauxdgui/prefs-window.cc:413 src/libfauxdqt/prefs-window-qt.cc:528
 msgid "Search recursively"
 msgstr "Recursief zoeken"
 
-#: src/libfauxdgui/prefs-window.cc:414 src/libfauxdqt/prefs-window-qt.cc:530
+#: src/libfauxdgui/prefs-window.cc:415 src/libfauxdqt/prefs-window-qt.cc:530
 msgid "Search depth:"
 msgstr "Zoekdiepte:"
 
-#: src/libfauxdgui/prefs-window.cc:418 src/libfauxdqt/prefs-window-qt.cc:534
+#: src/libfauxdgui/prefs-window.cc:419 src/libfauxdqt/prefs-window-qt.cc:534
 msgid "<b>Popup Information</b>"
 msgstr "<b>Pop-upinformatie</b>"
 
-#: src/libfauxdgui/prefs-window.cc:419 src/libfauxdqt/prefs-window-qt.cc:535
+#: src/libfauxdgui/prefs-window.cc:420 src/libfauxdqt/prefs-window-qt.cc:535
 msgid "Show popup information"
 msgstr "Pop-upinformatie tonen"
 
-#: src/libfauxdgui/prefs-window.cc:421 src/libfauxdqt/prefs-window-qt.cc:537
+#: src/libfauxdgui/prefs-window.cc:422 src/libfauxdqt/prefs-window-qt.cc:537
 msgid "Popup delay (tenths of a second):"
 msgstr "Pop-upvertraging (tienden van een seconde):"
 
-#: src/libfauxdgui/prefs-window.cc:425
+#: src/libfauxdgui/prefs-window.cc:426
 msgid "Show time scale for current song"
 msgstr "Tijdschaal tonen voor huidige nummer"
 
-#: src/libfauxdgui/prefs-window.cc:429 src/libfauxdqt/prefs-window-qt.cc:542
+#: src/libfauxdgui/prefs-window.cc:430 src/libfauxdqt/prefs-window-qt.cc:542
 msgid "Save unsavable metadata to file"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:432 src/libfauxdqt/prefs-window-qt.cc:545
+#: src/libfauxdgui/prefs-window.cc:433 src/libfauxdqt/prefs-window-qt.cc:545
 #, fuzzy
 msgid "Save tags to:"
 msgstr "Op_slaan naar geschiedenis"
 
-#: src/libfauxdgui/prefs-window.cc:435 src/libfauxdqt/prefs-window-qt.cc:548
+#: src/libfauxdgui/prefs-window.cc:436 src/libfauxdqt/prefs-window-qt.cc:548
 msgid "Don't embed images in tags"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:441 src/libfauxdqt/prefs-window-qt.cc:554
+#: src/libfauxdgui/prefs-window.cc:442 src/libfauxdqt/prefs-window-qt.cc:554
 msgid "<b>Compatibility</b>"
 msgstr "<b>Compatibiliteit</b>"
 
-#: src/libfauxdgui/prefs-window.cc:442 src/libfauxdqt/prefs-window-qt.cc:555
+#: src/libfauxdgui/prefs-window.cc:443 src/libfauxdqt/prefs-window-qt.cc:555
 msgid "Interpret \\ (backward slash) as a folder delimiter"
 msgstr ""
 "\\ (achterwaartse schuine streep) interpreteren als begrenzingsteken voor "
 "een map"
 
-#: src/libfauxdgui/prefs-window.cc:445 src/libfauxdqt/prefs-window-qt.cc:558
+#: src/libfauxdgui/prefs-window.cc:446 src/libfauxdqt/prefs-window-qt.cc:558
 msgid "<b>Playlist</b>"
 msgstr "<b>Afspeellijst</b>"
 
-#: src/libfauxdgui/prefs-window.cc:446 src/libfauxdqt/prefs-window-qt.cc:559
+#: src/libfauxdgui/prefs-window.cc:447 src/libfauxdqt/prefs-window-qt.cc:559
 msgid "Add folders recursively"
 msgstr "Mappen recursief toevoegen"
 
-#: src/libfauxdgui/prefs-window.cc:448 src/libfauxdqt/prefs-window-qt.cc:561
+#: src/libfauxdgui/prefs-window.cc:449 src/libfauxdqt/prefs-window-qt.cc:561
 msgid "Add folders nested within playlist files"
 msgstr "Mappen in afspeellijstbestanden toevoegen"
 
-#: src/libfauxdgui/prefs-window.cc:450 src/libfauxdqt/prefs-window-qt.cc:563
+#: src/libfauxdgui/prefs-window.cc:451 src/libfauxdqt/prefs-window-qt.cc:563
 msgid "<b>Metadata</b>"
 msgstr "<b>Metagegevens</b>"
 
-#: src/libfauxdgui/prefs-window.cc:451 src/libfauxdqt/prefs-window-qt.cc:564
+#: src/libfauxdgui/prefs-window.cc:452 src/libfauxdqt/prefs-window-qt.cc:564
 msgid "Guess missing metadata from file path"
 msgstr "Ontbrekende metagegevens herleiden uit bestandspad"
 
-#: src/libfauxdgui/prefs-window.cc:453 src/libfauxdqt/prefs-window-qt.cc:566
+#: src/libfauxdgui/prefs-window.cc:454 src/libfauxdqt/prefs-window-qt.cc:566
 msgid "Do not load metadata for songs until played"
 msgstr "Geen metagegevens laden voordat nummers worden afgespeeld"
 
-#: src/libfauxdgui/prefs-window.cc:455 src/libfauxdqt/prefs-window-qt.cc:568
+#: src/libfauxdgui/prefs-window.cc:456 src/libfauxdqt/prefs-window-qt.cc:568
 msgid "Probe content of files with no recognized file name extension"
 msgstr "Inhoud onderzoeken van bestanden met niet-erkende bestandsextensie"
 
-#: src/libfauxdgui/prefs-window.cc:457 src/libfauxdqt/prefs-window-qt.cc:570
+#: src/libfauxdgui/prefs-window.cc:458 src/libfauxdqt/prefs-window-qt.cc:570
 msgid "<b>Miscellaneous</b>"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:458 src/libfauxdqt/prefs-window-qt.cc:571
+#: src/libfauxdgui/prefs-window.cc:459 src/libfauxdqt/prefs-window-qt.cc:571
 msgid "Step forward/backward by:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:460 src/libfauxdqt/prefs-window-qt.cc:573
+#: src/libfauxdgui/prefs-window.cc:461 src/libfauxdqt/prefs-window-qt.cc:573
 msgid "seconds"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:461 src/libfauxdqt/prefs-window-qt.cc:574
+#: src/libfauxdgui/prefs-window.cc:462 src/libfauxdqt/prefs-window-qt.cc:574
 msgid "Adjust volume by:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:463 src/libfauxdqt/prefs-window-qt.cc:576
+#: src/libfauxdgui/prefs-window.cc:464 src/libfauxdqt/prefs-window-qt.cc:576
 msgid "percent"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:465 src/libfauxdqt/prefs-window-qt.cc:578
+#: src/libfauxdgui/prefs-window.cc:466 src/libfauxdqt/prefs-window-qt.cc:578
 msgid "Allow URL-helper:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:468 src/libfauxdqt/prefs-window-qt.cc:581
+#: src/libfauxdgui/prefs-window.cc:469 src/libfauxdqt/prefs-window-qt.cc:581
 msgid "URL-helper program?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:470 src/libfauxdqt/prefs-window-qt.cc:583
+#: src/libfauxdgui/prefs-window.cc:471 src/libfauxdqt/prefs-window-qt.cc:583
 msgid "Cover Art-helper program?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:472 src/libfauxdqt/prefs-window-qt.cc:585
+#: src/libfauxdgui/prefs-window.cc:473 src/libfauxdqt/prefs-window-qt.cc:585
 msgid "Lyrics plugins helper program?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:474 src/libfauxdqt/prefs-window-qt.cc:587
+#: src/libfauxdgui/prefs-window.cc:475 src/libfauxdqt/prefs-window-qt.cc:587
 msgid "Quirky window-managers (ie. AfterStep)?"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:476 src/libfauxdqt/prefs-window-qt.cc:589
+#: src/libfauxdgui/prefs-window.cc:477 src/libfauxdqt/prefs-window-qt.cc:589
 msgid "Start dock plugins late? (affects W/M task-bar order)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:496 src/libfauxdqt/prefs-window-qt.cc:611
+#: src/libfauxdgui/prefs-window.cc:497 src/libfauxdqt/prefs-window-qt.cc:611
 msgid "TITLE"
 msgstr "TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:497 src/libfauxdqt/prefs-window-qt.cc:612
+#: src/libfauxdgui/prefs-window.cc:498 src/libfauxdqt/prefs-window-qt.cc:612
 msgid "TITLE - ARTIST"
 msgstr "TITEL - ARTIEST"
 
-#: src/libfauxdgui/prefs-window.cc:498 src/libfauxdqt/prefs-window-qt.cc:613
+#: src/libfauxdgui/prefs-window.cc:499 src/libfauxdqt/prefs-window-qt.cc:613
 msgid "TITLE - ARTIST - ALBUM"
 msgstr "TITEL - ARTIEST - ALBUM"
 
-#: src/libfauxdgui/prefs-window.cc:499 src/libfauxdqt/prefs-window-qt.cc:614
+#: src/libfauxdgui/prefs-window.cc:500 src/libfauxdqt/prefs-window-qt.cc:614
 msgid "ARTIST - TITLE"
 msgstr "ARTIEST - TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:500 src/libfauxdqt/prefs-window-qt.cc:615
+#: src/libfauxdgui/prefs-window.cc:501 src/libfauxdqt/prefs-window-qt.cc:615
 msgid "ARTIST - ALBUM - TITLE"
 msgstr "ARTIEST - ALBUM -TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:501 src/libfauxdqt/prefs-window-qt.cc:616
+#: src/libfauxdgui/prefs-window.cc:502 src/libfauxdqt/prefs-window-qt.cc:616
 msgid "ARTIST - ALBUM - TRACK. TITLE"
 msgstr "ARTIEST - ALBUM - NUMMER. TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:502 src/libfauxdqt/prefs-window-qt.cc:617
+#: src/libfauxdgui/prefs-window.cc:503 src/libfauxdqt/prefs-window-qt.cc:617
 msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
 msgstr "ARTIEST [ ALBUM ] - NUMMER. TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:503 src/libfauxdqt/prefs-window-qt.cc:618
+#: src/libfauxdgui/prefs-window.cc:504 src/libfauxdqt/prefs-window-qt.cc:618
 #, fuzzy
 msgid "ARTIST - ALBUM - DISC.TRACK. TITLE"
 msgstr "ARTIEST - ALBUM - NUMMER. TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:504 src/libfauxdqt/prefs-window-qt.cc:619
+#: src/libfauxdgui/prefs-window.cc:505 src/libfauxdqt/prefs-window-qt.cc:619
 #, fuzzy
 msgid "ARTIST [ ALBUM ] - DISC.TRACK. TITLE"
 msgstr "ARTIEST [ ALBUM ] - NUMMER. TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:505 src/libfauxdqt/prefs-window-qt.cc:620
+#: src/libfauxdgui/prefs-window.cc:506 src/libfauxdqt/prefs-window-qt.cc:620
 msgid "ALBUM - TITLE"
 msgstr "ALBUM - TITEL"
 
-#: src/libfauxdgui/prefs-window.cc:657
+#: src/libfauxdgui/prefs-window.cc:658
 msgid "Category"
 msgstr "Categorie"
 
-#: src/libfauxdgui/prefs-window.cc:696 src/libfauxdqt/prefs-window-qt.cc:638
+#: src/libfauxdgui/prefs-window.cc:698 src/libfauxdqt/prefs-window-qt.cc:638
 msgid "Custom"
 msgstr "Aangepast"
 
-#: src/libfauxdgui/prefs-window.cc:714 src/libfauxdqt/prefs-window-qt.cc:630
+#: src/libfauxdgui/prefs-window.cc:716 src/libfauxdqt/prefs-window-qt.cc:630
 msgid "Title format:"
 msgstr "Titelopmaak:"
 
-#: src/libfauxdgui/prefs-window.cc:715 src/libfauxdqt/prefs-window-qt.cc:641
+#: src/libfauxdgui/prefs-window.cc:717 src/libfauxdqt/prefs-window-qt.cc:641
 msgid "Custom string:"
 msgstr "Aangepast:"
 
-#: src/libfauxdgui/prefs-window.cc:940 src/libfauxdqt/prefs-window-qt.cc:970
+#: src/libfauxdgui/prefs-window.cc:942 src/libfauxdqt/prefs-window-qt.cc:970
 #, fuzzy, c-format
 msgid "Enable audio stream recording with %s"
 msgstr "Audiostream-opname inschakelen met behulp van %s"
 
-#: src/libfauxdgui/prefs-window.cc:949 src/libfauxdqt/prefs-window-qt.cc:981
+#: src/libfauxdgui/prefs-window.cc:951 src/libfauxdqt/prefs-window-qt.cc:981
 msgid "No audio recording plugin available"
 msgstr "Geen plug-in beschikbaar voor audio-opname"
 
-#: src/libfauxdgui/prefs-window.cc:1010 src/libfauxdqt/prefs-window-qt.cc:820
+#: src/libfauxdgui/prefs-window.cc:1012 src/libfauxdqt/prefs-window-qt.cc:820
 #, fuzzy
 msgid "Settings - Fauxdacious"
 msgstr "Over Audacious"
@@ -1879,7 +1879,7 @@ msgstr ""
 "\n"
 "(Verdere berichten zijn verborgen.)"
 
-#: src/libfauxdqt/audqt.cc:171
+#: src/libfauxdqt/audqt.cc:180
 #, fuzzy
 msgid "Fauxdacious_Qt"
 msgstr "Audacious"
@@ -1923,27 +1923,27 @@ msgstr "Automatisch"
 msgid "Browse"
 msgstr ""
 
-#: src/libfauxdqt/fileopener.cc:103
+#: src/libfauxdqt/fileopener.cc:106
 #, fuzzy
 msgid "Open Folder - Fauxdacious"
 msgstr "Over Audacious"
 
-#: src/libfauxdqt/fileopener.cc:105
+#: src/libfauxdqt/fileopener.cc:108
 #, fuzzy
 msgid "Add Folder - Fauxdacious"
 msgstr "Over Audacious"
 
-#: src/libfauxdqt/fileopener.cc:106
+#: src/libfauxdqt/fileopener.cc:109
 #, fuzzy
 msgid "Import Playlist - Fauxdacious"
 msgstr "Afspeellijst importeren"
 
-#: src/libfauxdqt/fileopener.cc:107
+#: src/libfauxdqt/fileopener.cc:110
 #, fuzzy
 msgid "Export Playlist - Fauxdacious"
 msgstr "Afspeellijst exporteren"
 
-#: src/libfauxdqt/fileopener.cc:113 src/libfauxdqt/fileopener.cc:114
+#: src/libfauxdqt/fileopener.cc:116 src/libfauxdqt/fileopener.cc:117
 msgid "Add"
 msgstr "Toevoegen"
 
@@ -1963,10 +1963,6 @@ msgstr "Titelnummer"
 #: src/libfauxdqt/info-widget.cc:57
 msgid "Track Number"
 msgstr "Titelnummer"
-
-#: src/libfauxdqt/info-widget.cc:60
-msgid "Description"
-msgstr ""
 
 #: src/libfauxdqt/info-widget.cc:61
 msgid "Composer"
@@ -2130,6 +2126,9 @@ msgstr "Kopiëren"
 #, c-format
 msgid "%d%%"
 msgstr ""
+
+#~ msgid "Filter: "
+#~ msgstr "Filter: "
 
 #, fuzzy
 #~ msgid "Run in GTK mode (default)"

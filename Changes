@@ -1,5 +1,9 @@
 Version 4.5-devel1 [Updated 5/15/2025]:
 
+* Update bug-reporting url from old Audacious redmine bug-tracker url to 
+our github's issues page url.  This also required a full Transiflex update to 
+correct it there as well.  This closes Issue# 21.
+
 * Skins (both GTK & Qt) - Overhauled numerous things to make them work much 
 better.  This was overdue as I haven't used the Skins interfaces for a few 
 years now!  This all started when I attempted to address Audacious feature-
@@ -10,7 +14,7 @@ buttons.  This prompted me to look more in-depth into how this "should" be
 handled.  Since this had been "broken" for some time, I decided to add a new  
 config. option to either use the "fixed & now-correct" ("Xmms") appearance or 
 retain the long-standing Audacious ("Legacy") appearance (which even I think 
-looks better on some of my and some Audacious-created skins, which I found 
+looks better on some of my and some Audacious-created skins), which I found 
 also contain a separate hints file called "skin-classic.hints".  With some 
 more tinkering & experimenting, I ended up needing to add a new hint option 
 called "MainWinStreamInfoLabels" to deal with some "Classic" (WinAMP-2) 
@@ -28,7 +32,7 @@ To summarize, the main changes / improvements to the Skins interfaces are:
 1) 2 new "Appearance" options:  "Use Classic skin hints, if available" and 
 "Winamp [OAIDU] menustyle:".  
 
-2) By default, the [OAIDU] menu, ie. the "clutterbar" is now always shown, 
+2) By default, the [OAIDU] menu, aka. the "clutterbar" is now always shown, 
 instead of hidden (on most skins) until clicked or moused on ("Xmms" option).
 Select "Legacy" for the old (hidden unless moused on) appearance.  Either way 
 though, we now always show the state of the two "togglable" menu-options 
@@ -39,7 +43,8 @@ request# 1513) regardless of which option is chosen.
 now FALSE, as it should be more beneficial for most users to see which skins 
 window has keyboard focus, as some bindings (namely the up & down arrows) now 
 do different things depending on whether the main or playlist window has focus. 
-If TRUE, Fauxdacious shows either all skins windows "focused" or none of them.
+If TRUE, Fauxdacious shows either all skins windows or none of them 
+as "focused" as a group based on whether any of them have keyboard focused.
 
 4) Tweaked the graphics and hints (skin[-classic].hints file(s)) for several of 
 the skins created by me or Audacious due to a few minor flaws in how they were 
@@ -74,6 +79,14 @@ show the previous playlist (if multiple playlists are defined).
 
 9) Found & fixed a cpl. main-window notifications to be more consistant.
 
+10) Add new skin (WinAMP v2.9 default skin).
+
+11) Fix failure of the "shaded" version of the playlist window to always 
+display (ie. stay in sync with) the proper title (of the currently-playing 
+song, if any), as it did not update when song title changed in streaming 
+radio-stations, or when "rolled up" (shaded from an unshaded state).  
+Seems to have been long-broken since Audacious.
+
 * Add a GTK version of the recently-added Qt-only Playback-History plugin!
 Includes all the features in the Fauxdacious-enhanced version plus the ability 
 to select (highlight) all history-entries (by pressing Ctrl-a), and pasting 
@@ -83,19 +96,21 @@ to save to a text file!  TODO:  Add these two features to the Qt verson too.
 * Merged in all Audacious bug-fixes & feature enhancements since v4.4.2-final 
 release.  Details below:
 
-* Prevent user from overriting existing playlist when importing a playlist - 
+* Prevent user from overwriting existing playlist when importing a playlist - 
 We automatically create a new playlist containing the imported list unless the 
 current/active playlist is empty, ie. newly-created.  This addresses 
 Audacious issue# 1508 ("Avoid Audacious overwriting/replacing current playlist 
 with imported one").
 
-* Added Vumeter plugin to GTK versions (already in Qt versions).
+* Merged: Added Vumeter plugin to GTK versions (already in Qt versions).
 
-* Added new Playback-History plugin to Qt versions.  Also enhance by adding an 
-option to also report song metadata changes by streaming radio-stations.
+* Merged: Added new Playback-History plugin to Qt versions.  Also enhance by 
+adding an option to also report song metadata changes by streaming 
+radio-stations.
 
-* Fixed memory leaks in Jump-to-Song dialog window and other code-cleanups and 
-efficiencies found by Audacious sysbot affecting aac plugin, blur-scope, etc.
+* Merged: Fixed memory leaks in Jump-to-Song dialog window and other code-
+cleanups and efficiencies found by Audacious sysbot affecting aac plugin, 
+blur-scope, etc.
 
 * Added some hotkeys & icons for Cut/Copy/Paste & a few other menu items.
 
@@ -143,10 +158,10 @@ the URL helper script to handle, no longer handle these as playlists via the
 M3u plugin (if problem, users should rename or symlink with .m3u extension & 
 report here).
 
-* Handle fonts whose font family names contain digits properly. (Audacious fix)
+* Merged: Handle fonts whose font family names contain digits properly.
 
-* Remove any white-space bracketing URLs added via the URL opener dialog 
-(Audacious fix)
+* Merged: Remove any white-space bracketing URLs added via the URL opener 
+dialog.
 
 * Pulseaudio - Specify properties for application ID and icon name.  This 
 allows Pavucontrol for example to display the Fauxdacious icon instead of a 

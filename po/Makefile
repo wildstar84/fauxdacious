@@ -63,7 +63,7 @@ update-pot:
 	@echo Updating $(POTTEMPLATE) ...
 	xgettext --default-domain=$(PACKAGE_NAME) --language=C \
 	--keyword=_ --keyword=N_ --from-code="utf-8" \
-	--msgid-bugs-address="https://redmine.audacious-media-player.org/" \
+	--msgid-bugs-address="https://github.com/wildstar84/fauxdacious/issues" \
 	--directory=.. --files-from=POTFILES.in -o $(POTTEMPLATE)
 
 update-po: update-pot
