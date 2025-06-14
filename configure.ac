@@ -80,9 +80,10 @@ AC_SUBST(USE_DBUS)
 dnl SDL (needed for SDL audio and/or any Video play)!
 dnl =========================
 
-AC_ARG_ENABLE(sdl2,
- AS_HELP_STRING(--disable-sdl2, [Disable SDL2 (Video) support (default=enabled)]),
- USE_SDL2=$enableval, USE_SDL2=yes)
+dnl (SDL2 NOW REQUIRED TO BUILD FAUXDACIOUS!) AC_ARG_ENABLE(sdl2,
+dnl  AS_HELP_STRING(--disable-sdl2, [Disable SDL2 (Video) support (default=enabled)]),
+dnl  USE_SDL2=$enableval, USE_SDL2=yes)
+USE_SDL2=yes
 
 have_sdl2=no
 if test $USE_SDL2 = yes ; then
@@ -90,7 +91,7 @@ if test $USE_SDL2 = yes ; then
         have_sdl2=yes
         AC_DEFINE(USE_SDL2, 1, [Defined if SDL2 support enabled])
     ], [
-        AC_MSG_WARN([SDL2 support unavailable due to missing dependency: sdl2 >= 2.0])
+        AC_MSG_ERROR([SDL2 support REQUIRED, but unavailable due to missing dependency: sdl2 >= 2.0])
     ])
 fi
 
