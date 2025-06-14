@@ -626,7 +626,11 @@ static QDialog * create_preset_win ()
     /* JWT:OUR CHECKBOXES: */
     localsave_checkbox->setCheckState (aud_get_bool (nullptr, "try_local_preset_files") 
             ? Qt::Checked : Qt::Unchecked);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    QObject::connect (localsave_checkbox, & QCheckBox::checkStateChanged, [] (Qt::CheckState state) {
+#else
     QObject::connect (localsave_checkbox, & QCheckBox::stateChanged, [] (int state) {
+#endif
         aud_set_bool (nullptr, "try_local_preset_files", (state == Qt::Checked));
     });
 
@@ -634,20 +638,36 @@ static QDialog * create_preset_win ()
     {
         save_as_dirdefault_checkbox->setCheckState (aud_get_bool (nullptr, "_save_as_dirdefault") 
                 ? Qt::Checked : Qt::Unchecked);
-        QObject::connect (save_as_dirdefault_checkbox, & QCheckBox::stateChanged, [] (int state) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+        QObject::connect (save_as_dirdefault_checkbox, & QCheckBox::checkStateChanged,
+                [] (Qt::CheckState state) {
+#else
+        QObject::connect (save_as_dirdefault_checkbox, & QCheckBox::stateChanged,
+                [] (int state) {
+#endif
             aud_set_bool (nullptr, "_save_as_dirdefault", (state == Qt::Checked));
         });
     }
 
     urlbase_checkbox->setCheckState (aud_get_bool (nullptr, "eqpreset_use_url_sitename")
             ? Qt::Checked : Qt::Unchecked);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    QObject::connect (urlbase_checkbox, & QCheckBox::checkStateChanged,
+            [] (Qt::CheckState state) {
+#else
     QObject::connect (urlbase_checkbox, & QCheckBox::stateChanged, [] (int state) {
+#endif
         aud_set_bool (nullptr, "eqpreset_use_url_sitename", (state == Qt::Checked));
     });
 
     nameonly_checkbox->setCheckState (aud_get_bool (nullptr, "eqpreset_nameonly") 
             ? Qt::Checked : Qt::Unchecked);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    QObject::connect (nameonly_checkbox, & QCheckBox::checkStateChanged,
+            [] (Qt::CheckState state) {
+#else
     QObject::connect (nameonly_checkbox, & QCheckBox::stateChanged, [] (int state) {
+#endif
         aud_set_bool (nullptr, "eqpreset_nameonly", (state == Qt::Checked));
     });
 
@@ -655,7 +675,12 @@ static QDialog * create_preset_win ()
     {
         save_effects2_checkbox->setCheckState (aud_get_bool (nullptr, "eqpreset_save_effects") 
                 ? Qt::Checked : Qt::Unchecked);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+        QObject::connect (save_effects2_checkbox, & QCheckBox::checkStateChanged,
+                [] (Qt::CheckState state) {
+#else
         QObject::connect (save_effects2_checkbox, & QCheckBox::stateChanged, [] (int state) {
+#endif
             aud_set_bool (nullptr, "OUR CHECKBOXES", (state == Qt::Checked));
         });
     }
