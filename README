@@ -19,17 +19,21 @@ Install the following Dependencies:
 sudo apt-get install git automake build-essential libasound2-dev \
 libavformat-dev libbinio-dev libbs2b-dev libcddb2-dev libcdio-cdda-dev \
 libcue-dev libcurl4-gnutls-dev libdbus-glib-1-dev libfaad-dev libflac-dev \
-libfluidsynth-dev libgtk2.0-dev libjack-jackd2-dev liblircclient-dev \
-libmms-dev libmodplug-dev libmp3lame-dev libmpg123-dev libneon27-gnutls-dev \
-libnotify-dev libpulse-dev libsamplerate0-dev libsdl2-dev libsidplayfp-dev \
-libsndfile1-dev libsoxr-dev libvorbis-dev libwavpack-dev libxml2-dev \
-libswscale-dev
+libfluidsynth-dev libgtk2.0-dev libgtk-3-dev libjack-jackd2-dev \
+liblircclient-dev libmms-dev libmodplug-dev libmp3lame-dev libmpg123-dev \
+libneon27-gnutls-dev libnotify-dev libpulse-dev libsamplerate0-dev \
+libsdl2-dev libsidplayfp-dev libsndfile1-dev libsoxr-dev libvorbis-dev \
+libwavpack-dev libxml2-dev libswscale-dev
 
-If building the Qt version, you'll also need at least the following (which 
+NOTE:  libgtk2.0-dev only needed for building for GTK-2 and libgtk-3-dev for GTK-3.
+
+NOTE2:  If building the Qt version, you'll also need at least the following (which 
 should also bring in their dependencies):
 
 sudo apt-get install qtbase5-dev qt5-qmake libglu-dev libvulkan-dev \
 libxext-dev libqt5opengl5-dev libqt5x11extras5-dev
+
+NOTE3:  If building for Qt6, you'll also / instead need:  qt6-base-dev, qt6-svg-dev
 
 Please report any others it reports as missing when building, so I can make 
 sure they're included here too!
@@ -46,7 +50,8 @@ Build Fauxdacious:
 
 	cd /tmp/fauxdacious
 	./autogen.sh
-	./configure --prefix=/usr/local [--enable-qt] --with-buildstamp=Fauxdacious
+	./configure --prefix=/usr/local [--enable-qt] --with-buildstamp=yyyymmdd
+        #(yyyymmdd = year month day, ie. 20250123)
 	make
 	(sudo) make install
 

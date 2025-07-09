@@ -1,4 +1,36 @@
-Version 4.5-devel1 [Updated 5/15/2025]:
+Version 4.5-devel1 [Updated 7/9/2025]:
+
+* Playlist display (non-skinned interfaces):
+
+1) Include file extension in the File Name column as part of the file-name 
+(Audacious change), but also add new checkbox option (default checked) for 
+this under Settings.Appearance:  "Include file ext. in Filename Column" to 
+allow user to still show the old way (filename only, no extension) by 
+unchecking.  Feature applies to GTK, Qt, & Moonstone playlist display.  GTK & 
+Qt settings have separate setting for this, & Moonstone plugin uses the Qt 
+setting.
+
+2) Fix long-standing Audacious bug affecting the width of the last column in 
+the GTK version.  Last column is expanded to fill remaining window space, but 
+wouldn't remember the user-set width on restart.  Should work now, as this 
+widget has a horizontal scrollbar.
+
+Note:  In the GTK version, the only way to rearrange / reorder the columns 
+selected for display is via dragging them within the righthand sid box titled 
+"Displayed columns" in the Settings.Appearance screen, as the actual column 
+headers are not themselves draggable (unlike the Qt version).  Therefore, I 
+added a note in the Settings screen informing users of this "feature".
+
+3) (Qt & Moonstone):  When right-clicking on a column header in the header-
+bar to add a column to display, the new column will now be inserted just 
+right of the column who's header was right-clicked on.  Previously new 
+columns were appended to the right of the right-most column.  Note:  This 
+won't add a column as the left-most column, but the "Now Playing" (status) 
+column should generally always be the left-most column.  To force a different 
+column to the leftmost position, simply drag it's header all the way to the 
+left.
+
+* Fix some Qt6 compiler warnings.
 
 * Update bug-reporting url from old Audacious redmine bug-tracker url to 
 our github's issues page url.  This also required a full Transiflex update to 
