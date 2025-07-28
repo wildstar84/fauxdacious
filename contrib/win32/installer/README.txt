@@ -1,4 +1,4 @@
-Fauxdacious 4.4-final for Windows
+Fauxdacious 4.5-final for Windows
 
     https://wildstar84.wordpress.com/fauxdacious/
 
@@ -6,11 +6,11 @@ Fauxdacious is free and open source software forked from Audacious audio-player.
 By installing Fauxdacious, you agree to be bound by various licenses governing 
 its use and redistribution.
 
-Build ID: 20240717
+Build ID: 20250725
 
 LICENSE
 
-Copyright (C) 2001-2024 Jim Turner, Audacious developers and others
+Copyright (C) 2001-2025 Jim Turner, Audacious developers and others
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:

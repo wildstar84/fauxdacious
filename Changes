@@ -1,4 +1,31 @@
-Version 4.5-devel1 [Updated 7/9/2025]:
+Version 4.5-final [Updated 7/22/2025]:
+
+This release provides numerous improvements to the "Skins" interfaces, 
+minor improvements to the Qt and Moonstone interface playlist displays, 
+numerous minor code and interface cleanups and polishing, removed support for 
+.m4v videos (never worked properly), and all applicable Audacious changes 
+in their latest v4.5 release.  See the gory details below and in the 
+git commits.  Also Egnrse (https://github.com/egnrse) has been kind enough to 
+create installable Fauxdacious packages for Arch Linux and has added them to 
+their "AUR" repository (See Fauxdacious issue #20)!  For best results, All 
+users should also take this opportunity to make sure that their Perl modules:  
+StreamFinder, LyricFinder, LWP::Simple, LWP::UserAgent etc.; and Fauxdacious's 
+helper-scripts are all up to date!
+
+I've also broken with recent tradition and decided to release a new Windows 
+release of v4.5-final!
+
+The Gory Details:
+
+* Updated transiflex translation files.
+
+* Hopefully (I don't have Qt6 installed yet) eliminate all Qt6 depreciation 
+compiler warnings.
+
+* Queue-manager window (Qt) - Add ability to rearrange order of entries via 
+drag & drop (Audacious change), and add a dedicated [Close] button to work 
+more like the GTK version.  Also some other minor code changes to bring code 
+up to date with Audacious.
 
 * Playlist display (non-skinned interfaces):
 

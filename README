@@ -75,7 +75,7 @@ for M$-Windows users):
 	sudo cp fauxdacious/contrib/Fauxdacious*.pl /usr/local/bin/
 	sudo chmod 755 Fauxdacious*.pl
 	Install prerequesite Perl modules (see FAQ #36 for details):
-		File::Copy, HTML::Entities, HTML::Strip, HTTP::Request, 
+		File::Copy, HTML::Entities, HTML::Strip, HTTP::Request, HTTP::Cookies, 
 		LWP::UserAgent, URI::Escape, StreamFinder, and LyricFinder.
 
 Optional (copy your existing Audacious profile to Fauxdacious):  
