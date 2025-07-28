@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #MUST INSTALL youtube-dl FOR Youtube to work!
-#pp --gui -o FauxdaciousUrlHelper.exe -M urlhelper_mods.pm -M utf8_heavy.pl -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
+#pp --gui -o FauxdaciousUrlHelper.exe -M utf8_heavy.pl -M urlhelper_mods.pm -l libeay32_.dll -l zlib1_.dll -l ssleay32_.dll FauxdaciousUrlHelper.pl
 
 ###(urlhelper_modules.pm contains):
 ###use StreamFinder;
@@ -95,6 +95,7 @@ BEGIN
 use strict;
 use URI::Escape;
 use LWP::UserAgent ();
+use HTTP::Cookies;     #YES, THIS REQUIRED IN WINDOWS .EXE VERSION!
 use StreamFinder;
 
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:

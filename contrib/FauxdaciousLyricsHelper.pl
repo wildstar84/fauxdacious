@@ -67,6 +67,7 @@ BEGIN
 }
 use strict;
 use warnings;
+use HTTP::Cookies;     #YES, THIS REQUIRED IN WINDOWS .EXE VERSION!
 use LyricFinder;
 
 #USER: EDIT ~/.config/fauxdacious[_instancename]/FauxdaciousLyricsHelper.txt TO

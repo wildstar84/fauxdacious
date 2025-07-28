@@ -64,10 +64,11 @@ BEGIN
 use strict;
 use File::Copy;
 use HTML::Entities ();
+use HTTP::Cookies;     #YES, THIS REQUIRED IN WINDOWS .EXE VERSION!
 use LWP::UserAgent ();
 use URI::Escape;
 
-die "..usage: $0 {CD[T] diskID | DVD title | ALBUM album} [configpath] [artist] | DELETE COVERART configpath\n"  unless ($ARGV[0] && $ARGV[1]);
+die "..usage: $0 {CD[T] diskID | DVD title | ALBUM album} [configpath] artist title [NOWEB|image-URL]| DELETE COVERART configpath\n"  unless ($ARGV[0] && $ARGV[1]);
 my $configPath = '';
 
 for (my $a=0;$a<=$#ARGV;$a++) {  #STRIP QUOTES AROUND ARGUMENTS OFF!:
