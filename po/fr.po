@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: https://github.com/wildstar84/fauxdacious/issues\n"
-"POT-Creation-Date: 2025-06-13 00:10-0500\n"
+"POT-Creation-Date: 2025-07-21 22:54-0500\n"
 "PO-Revision-Date: 2018-07-04 21:45+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/audacious/audacious/language/"
@@ -504,7 +504,8 @@ msgstr "Supprimer le préréglage sélectionné"
 #: src/libfauxdgui/queue-manager.cc:195 src/libfauxdgui/util.cc:367
 #: src/libfauxdqt/audqt.cc:419 src/libfauxdqt/infowin-qt.cc:100
 #: src/libfauxdqt/log-inspector.cc:229 src/libfauxdqt/prefs-plugin.cc:146
-#: src/libfauxdqt/prefs-window-qt.cc:857 src/libfauxdqt/song-window-qt.cc:376
+#: src/libfauxdqt/prefs-window-qt.cc:857 src/libfauxdqt/queue-manager-qt.cc:330
+#: src/libfauxdqt/song-window-qt.cc:376
 msgid "_Close"
 msgstr "_Fermer"
 
@@ -616,6 +617,7 @@ msgstr "Fermer la fenêtre de _dialogue lors de l’ajout"
 #: src/libfauxdgui/infopopup.cc:215 src/libfauxdgui/infowin.cc:557
 #: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/infopopup-qt.cc:94
 #: src/libfauxdqt/info-widget.cc:52 src/libfauxdqt/prefs-window-qt.cc:174
+#: src/libfauxdqt/queue-manager-qt.cc:123
 msgid "Title"
 msgstr "Titre"
 
@@ -1781,11 +1783,11 @@ msgstr "Enregistrer le fichier de préréglage"
 msgid "Save EQF File - Fauxdacious"
 msgstr "Enregistrer le fichier EQF"
 
-#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:228
+#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:350
 msgid "Queue Manager"
 msgstr "Gestionnaire de la file d’attente"
 
-#: src/libfauxdgui/queue-manager.cc:194 src/libfauxdqt/queue-manager-qt.cc:180
+#: src/libfauxdgui/queue-manager.cc:194 src/libfauxdqt/queue-manager-qt.cc:326
 msgid "_Unqueue"
 msgstr "Supprimer de la _file d’attente"
 

@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: https://github.com/wildstar84/fauxdacious/issues\n"
-"POT-Creation-Date: 2025-06-13 00:10-0500\n"
+"POT-Creation-Date: 2025-07-21 22:54-0500\n"
 "PO-Revision-Date: 2018-07-02 04:50+0000\n"
 "Last-Translator: Γιάννης Ανθυμίδης\n"
 "Language-Team: Greek (http://www.transifex.com/audacious/audacious/language/"
@@ -507,7 +507,8 @@ msgstr "Διαγραφή επιλεγμένων"
 #: src/libfauxdgui/queue-manager.cc:195 src/libfauxdgui/util.cc:367
 #: src/libfauxdqt/audqt.cc:419 src/libfauxdqt/infowin-qt.cc:100
 #: src/libfauxdqt/log-inspector.cc:229 src/libfauxdqt/prefs-plugin.cc:146
-#: src/libfauxdqt/prefs-window-qt.cc:857 src/libfauxdqt/song-window-qt.cc:376
+#: src/libfauxdqt/prefs-window-qt.cc:857 src/libfauxdqt/queue-manager-qt.cc:330
+#: src/libfauxdqt/song-window-qt.cc:376
 msgid "_Close"
 msgstr "_Κλείσιμο"
 
@@ -619,6 +620,7 @@ msgstr "Κλείσιμο του διαλόγου κατά την προσθήκ�
 #: src/libfauxdgui/infopopup.cc:215 src/libfauxdgui/infowin.cc:557
 #: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/infopopup-qt.cc:94
 #: src/libfauxdqt/info-widget.cc:52 src/libfauxdqt/prefs-window-qt.cc:174
+#: src/libfauxdqt/queue-manager-qt.cc:123
 msgid "Title"
 msgstr "Τίτλος"
 
@@ -1783,11 +1785,11 @@ msgstr "Αποθήκευση αρχείου προκαθορισμένων τι�
 msgid "Save EQF File - Fauxdacious"
 msgstr "Αποθήκευση αρχείου EQF"
 
-#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:228
+#: src/libfauxdgui/queue-manager.cc:175 src/libfauxdqt/queue-manager-qt.cc:350
 msgid "Queue Manager"
 msgstr "Διαχειριστής σειράς αναμονής"
 
-#: src/libfauxdgui/queue-manager.cc:194 src/libfauxdqt/queue-manager-qt.cc:180
+#: src/libfauxdgui/queue-manager.cc:194 src/libfauxdqt/queue-manager-qt.cc:326
 msgid "_Unqueue"
 msgstr "Α_φαίρεση από την σειρά"
 
