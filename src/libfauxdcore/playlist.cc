@@ -528,7 +528,7 @@ static void scan_queue_entry (PlaylistData * playlist, Entry * entry, bool for_p
 
     /* scanner uses Tuple::AudioFile from existing tuple, if valid */
     auto request = new ScanRequest (entry->filename, flags, scan_finish,
-     entry->decoder, (flags & SCAN_TUPLE) ? Tuple () : entry->tuple.ref ());
+            entry->decoder, (flags & SCAN_TUPLE) ? Tuple () : entry->tuple.ref ());
 
     scan_list.append (new ScanItem (playlist, entry, request, for_playback));
 
@@ -586,8 +586,8 @@ static bool scan_queue_next_entry ()
 
                 // blacklist stdin
                 if (entry->tuple.state () == Tuple::Initial &&
-                 ! scan_list_find_entry (entry) &&
-                 strncmp (entry->filename, "stdin://", 8))
+                        ! scan_list_find_entry (entry) &&
+                        strncmp (entry->filename, "stdin://", 8))
                 {
                     scan_queue_entry (playlist, entry);
                     return true;
@@ -1225,14 +1225,14 @@ EXPORT void aud_playlist_entry_delete (int playlist_num, int at, int number)
         number = entries - at;
 
     if (playlist->position && playlist->position->number >= at &&
-     playlist->position->number < at + number)
+            playlist->position->number < at + number)
     {
         set_position (playlist, nullptr, false);
         position_changed = true;
     }
 
     if (playlist->focus && playlist->focus->number >= at &&
-     playlist->focus->number < at + number)
+            playlist->focus->number < at + number)
     {
         if (at + number < entries)
             playlist->focus = playlist->entries[at + number].get ();
@@ -1810,7 +1810,7 @@ EXPORT void aud_playlist_sort_by_tuple (int playlist_num, PlaylistTupleCompareFu
 }
 
 EXPORT void aud_playlist_sort_selected_by_filename (int playlist_num,
- PlaylistStringCompareFunc compare)
+        PlaylistStringCompareFunc compare)
 {
     ENTER_GET_PLAYLIST ();
 
@@ -1821,7 +1821,7 @@ EXPORT void aud_playlist_sort_selected_by_filename (int playlist_num,
 }
 
 EXPORT void aud_playlist_sort_selected_by_tuple (int playlist_num,
- PlaylistTupleCompareFunc compare)
+        PlaylistTupleCompareFunc compare)
 {
     ENTER_GET_PLAYLIST ();
 
@@ -1867,7 +1867,8 @@ static void playlist_rescan_real (int playlist_num, bool selected)
     for (auto & entry : playlist->entries)
     {
         if (! selected || entry->selected)
-            playlist->set_entry_tuple (entry.get (), Tuple (), 1);  // USER-REFRESHED ENTRY OR PLAYLIST.
+            playlist->set_entry_tuple (entry.get (), Tuple (),
+                    (selected ? 2 : 1));  // USER-REFRESHED ENTRY(2) OR PLAYLIST(1).
     }
 
     queue_update (Metadata, playlist, 0, playlist->entries.len ());
@@ -2130,7 +2131,7 @@ static bool shuffle_next (PlaylistData * playlist)
     auto is_choice = [&] (Entry * prev, Entry * entry)
     {
         return (! entry->shuffle_num) && (! by_album || ! prev ||
-         prev->shuffle_num || ! same_album (prev->tuple, entry->tuple));
+                prev->shuffle_num || ! same_album (prev->tuple, entry->tuple));
     };
 
     if (playlist->position)
@@ -2141,7 +2142,7 @@ static bool shuffle_next (PlaylistData * playlist)
         for (auto & entry : playlist->entries)
         {
             if (entry->shuffle_num > playlist->position->shuffle_num &&
-             (! next || entry->shuffle_num < next->shuffle_num))
+                    (! next || entry->shuffle_num < next->shuffle_num))
                 next = entry.get ();
         }
 
