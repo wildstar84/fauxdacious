@@ -34,6 +34,7 @@
 #include <libfauxdcore/tuple.h>
 #include <libfauxdcore/drct.h>
 #include <libfauxdcore/vfs.h>
+#include <libfauxdtag/util.h>
 
 #include "gtk-compat.h"
 #include "internal.h"
@@ -87,51 +88,7 @@ static Tuple current_tuple;
 static PluginHandle * current_decoder = nullptr;
 static bool can_write = false;
 static QueuedFunc ministatus_timer;
-
-/* This is by no means intended to be a complete list.  If it is not short, it
- * is useless: scrolling through ten pages of dropdown list is more work than
- * typing out the genre. */
-
-static const char * genre_table[] = {
- N_("Acid Jazz"),
- N_("Acid Rock"),
- N_("Ambient"),
- N_("Bebop"),
- N_("Bluegrass"),
- N_("Blues"),
- N_("Chamber Music"),
- N_("Classical"),
- N_("Country"),
- N_("Death Metal"),
- N_("Disco"),
- N_("Easy Listening"),
- N_("Folk"),
- N_("Funk"),
- N_("Gangsta Rap"),
- N_("Gospel"),
- N_("Grunge"),
- N_("Hard Rock"),
- N_("Heavy Metal"),
- N_("Hip-hop"),
- N_("House"),
- N_("Jazz"),
- N_("Jungle"),
- N_("Metal"),
- N_("New Age"),
- N_("New Wave"),
- N_("Noise"),
- N_("Pop"),
- N_("Punk Rock"),
- N_("Rap"),
- N_("Reggae"),
- N_("Rock"),
- N_("Rock and Roll"),
- N_("Rhythm and Blues"),
- N_("Ska"),
- N_("Soul"),
- N_("Swing"),
- N_("Techno"),
- N_("Trip-hop")};
+static Index<const char *> comboItems;
 
 static GtkWidget * small_label_new (const char * text)
 {
@@ -328,13 +285,16 @@ static void infowin_next ()
 
 static void genre_fill (GtkWidget * combo)
 {
-    Index<const char *> list;
-    for (auto genre : genre_table)
-        list.append (_(genre));
+    if (comboItems.len () < 1)
+    {
+        /* GENRE LIST HASN'T YET BEEN LOADED! */
+        for (int i=0; i<=ID3v1_GENRE_MAX; i++)
+            comboItems.append (id3v1_genres[i]);
 
-    list.sort (g_utf8_collate);
+        comboItems.sort (g_utf8_collate);
+    }
 
-    for (auto genre : list)
+    for (auto genre : comboItems)
         gtk_combo_box_text_append_text ((GtkComboBoxText *) combo, genre);
 }
 
