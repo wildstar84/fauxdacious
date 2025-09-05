@@ -25,6 +25,12 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QPointer>
+#include <QStyledItemDelegate>
+#include <QComboBox>
+#include <QStylePainter>
+#include <QApplication>
+#include <QStyleOption>
+#include <QStyle>
 
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/probe.h>
@@ -37,6 +43,7 @@
 #include <libfauxdcore/audstrings.h>
 #include <libfauxdcore/runtime.h>
 #include <libfauxdcore/hook.h>
+#include <libfauxdtag/util.h>
 
 namespace audqt {
 
@@ -100,6 +107,17 @@ static QModelIndex sibling_field_index (const QModelIndex & current, int directi
     }
 }
 
+/* Delegate class & function curtesy https://github.com/mugiseyebrows/combobox-delegate */
+class Delegate : public QStyledItemDelegate
+{
+public:
+    explicit Delegate(QObject *parent = nullptr);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
+
 class InfoModel : public QAbstractTableModel
 {
 public:
@@ -155,10 +173,100 @@ private:
     QList<QPointer<QWidget>> m_linked_widgets;
 };
 
+/* Delegate class & function curtesy https://github.com/mugiseyebrows/combobox-delegate */
+Delegate::Delegate (QObject *parent) : QStyledItemDelegate (parent)
+{
+}
+
+QWidget *Delegate::createEditor (QWidget *parent, const QStyleOptionViewItem &option,
+        const QModelIndex &index) const
+{
+    /* JWT:PROGRAMMER NOTE:  THE ROW INDEX# () BELOW & IN EACH Delegate FN. *MUST* BE
+       ADJUSTED WHENEVER THE EDIT-BOX ROWS ARE ADDED TO, REMOVED, OR RE-ORDERED!:
+    */
+    if (index.row () == 7 && index.column () == 1)
+        return new QComboBox (parent);
+    else
+        return QStyledItemDelegate::createEditor (parent, option, index);
+}
+
+void Delegate::setEditorData (QWidget *editor, const QModelIndex &index) const
+{
+    if (index.row () == 7 && index.column () == 1)
+    {
+        QComboBox* comboBox = qobject_cast<QComboBox*>(editor);
+        if (! comboBox)
+            QStyledItemDelegate::setEditorData (editor, index);
+
+        comboBox->setEditable (true);
+        if (! comboItems.contains (N_("Blues")))
+        {
+            /* GENRE LIST HASN'T YET BEEN LOADED (SHOULD HAVE "Blues"!) */
+            for (int i=0; i<=ID3v1_GENRE_MAX; i++)
+                comboItems << QString (id3v1_genres[i]);
+
+            comboItems.sort ();
+        }
+        comboBox->addItems (comboItems);
+        QString value = index.data ().toString ();
+        int current = comboItems.indexOf (value);
+        if (current == -1)
+        {
+            /* CURRENT VALUE NOT IN LIST, MUST TEMP-ADD IT FOR IT TO SHOW IN TEXT BOX! */
+            QStringList justthisvalue;
+            justthisvalue << value;
+            comboBox->insertItems (0, justthisvalue);
+            current = 0;
+        }
+        comboBox->setCurrentIndex (current);
+    }
+    else
+        QStyledItemDelegate::setEditorData (editor, index);
+}
+
+void Delegate::setModelData (QWidget *editor, QAbstractItemModel *model,
+        const QModelIndex &index) const
+{
+    if (index.row () == 7 && index.column () == 1)
+    {
+        QComboBox* comboBox = qobject_cast<QComboBox*>(editor);
+        if (! comboBox)
+            QStyledItemDelegate::setModelData (editor, model, index);
+
+        model->setData (index, comboBox->currentText ());
+    }
+    else
+        QStyledItemDelegate::setModelData (editor, model, index);
+}
+
+void Delegate::paint (QPainter *painter, const QStyleOptionViewItem &option,
+        const QModelIndex &index) const
+{
+    if (index.row () == 7 && index.column () == 1)
+    {
+        QStyle* style = qApp->style ();
+        QStyleOptionComboBox opt;
+        opt.rect = option.rect;
+        opt.currentText = index.data ().toString ();
+        opt.palette = option.palette;
+        opt.state = option.state;
+        opt.subControls = QStyle::SC_All;
+        opt.activeSubControls = QStyle::SC_All;
+        opt.editable = false;
+        opt.frame = true;
+        style->drawComplexControl (QStyle::CC_ComboBox, &opt, painter, 0);
+        style->drawControl (QStyle::CE_ComboBoxLabel, &opt, painter, 0);
+    }
+    else
+        QStyledItemDelegate::paint(painter, option, index);
+}
+
 EXPORT InfoWidget::InfoWidget (QWidget * parent) :
     QTreeView (parent),
     m_model (new InfoModel (this))
 {
+    Delegate* delegate = new Delegate(this);
+    setItemDelegate(delegate);
     setModel (m_model);
     header ()->hide ();
     setIndentation (0);
@@ -236,7 +344,7 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
             /* JWT:PROGRAMMER NOTE:  THE 1ST (ZERO-BASED Y) INDEX# (JUST BELOW & 19 LINES BELOW) *MUST* BE
                ADJUSTED WHENEVER THE EDIT-BOX ROWS ARE ADDED TO, REMOVED, OR RE-ORDERED!:
             */
-            auto prev_comment = m_model->data (this->createModelIndex (7, 1), Qt::DisplayRole).toString ();
+            auto prev_comment = m_model->data (this->createModelIndex (8, 1), Qt::DisplayRole).toString ();
             if (! prev_comment.isEmpty ())
             {
                 int album_img_index = prev_comment.indexOf (";file:");
@@ -255,7 +363,7 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
                 prev_comment = coverart_fid;
 
             /* JWT:PUT THE IMAGE FILE INTO THE Comment FIELD & UPDATE FIELD AND IMAGE DISPLAYED: */
-            m_model->setData (this->createModelIndex (7, 1), prev_comment.toUtf8 ().constData (), Qt::EditRole);
+            m_model->setData (this->createModelIndex (8, 1), prev_comment.toUtf8 ().constData (), Qt::EditRole);
             hook_call ("image change", aud::to_ptr (coverart_fid.constData ()));
             dialog->deleteLater ();
 

@@ -50,6 +50,7 @@ protected:
     void keyPressEvent (QKeyEvent * event) override;
 };
 
+static QStringList comboItems;
 } // namespace audqt
 
 #endif // LIBAUDQT_INFO_WIDGET_H
