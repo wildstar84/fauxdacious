@@ -101,6 +101,7 @@ void aud_drct_set_volume_balance (int balance);
 void aud_drct_pl_next ();
 void aud_drct_pl_prev ();
 
+void aud_drct_pl_add_list_wrapper (Index<PlaylistAddItem> && items, int at, bool to_temp, bool play);
 void aud_drct_pl_add (const char * filename, int at);
 void aud_drct_pl_add_list (Index<PlaylistAddItem> && items, int at);
 void aud_drct_pl_open (const char * filename);

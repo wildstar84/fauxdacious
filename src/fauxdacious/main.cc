@@ -537,6 +537,10 @@ static void do_commands ()
         }
     }
 
+    bool pause_on_startup = options.play ? false : (options.pause
+            || ! aud_get_bool (nullptr, "resume_playback_on_startup")
+            || aud_get_bool (nullptr, "always_resume_paused"));
+
     if (filenames.len ())
     {
         bool isFirst = true;
@@ -551,26 +555,28 @@ static void do_commands ()
                 if (list.len () > 0)
                 {
                     if (options.enqueue_to_temp)
-                    {
-                        aud_drct_pl_open_temp_list (std::move (list));
-                        resume = false;
-                    }
+                        // aud_drct_pl_open_temp_list (std::move (list));
+                        aud_drct_pl_add_list_wrapper (std::move (list), -1, true,
+                                ! pause_on_startup);
                     else if (isFirst)
                     {
                         if (options.enqueue)
                             aud_drct_pl_add_list (std::move (list), -1);
                         else
-                            aud_drct_pl_open_list (std::move (list));
-                        resume = false;
+                            // aud_drct_pl_open_list (std::move (list));
+                            aud_drct_pl_add_list_wrapper (std::move (list), -1,
+                                    aud_get_bool (nullptr, "open_to_temporary"),
+                                    ! pause_on_startup);
                     }
                     else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
                     {
                         int playlist_num = aud_playlist_new ();
                         if (playlist_name && playlist_name[0])
                             aud_playlist_set_title (playlist_num, playlist_name);
+
                         aud_drct_pl_add_list (std::move (list), -1);
-                        resume = false;
                     }
+                    resume = false;
                 }
                 else if (emptyList)
                 {
@@ -592,26 +598,28 @@ static void do_commands ()
         if (list.len () > 0)  // GET ANY REMAINING ENTRIES.
         {
             if (options.enqueue_to_temp)
-            {
-                aud_drct_pl_open_temp_list (std::move (list));
-                resume = false;
-            }
+                // aud_drct_pl_open_temp_list (std::move (list));
+                aud_drct_pl_add_list_wrapper (std::move (list), -1, true,
+                        ! pause_on_startup);
             else if (isFirst)
             {
                 if (options.enqueue)
                     aud_drct_pl_add_list (std::move (list), -1);
                 else
-                    aud_drct_pl_open_list (std::move (list));
-                resume = false;
+                    // aud_drct_pl_open_list (std::move (list));
+                    aud_drct_pl_add_list_wrapper (std::move (list), -1,
+                            aud_get_bool (nullptr, "open_to_temporary"),
+                            ! pause_on_startup);
             }
             else  // WE'RE A "-a list", SO CREATE NEW PLAYLIST FOR IT.
             {
                 int playlist_num = aud_playlist_new ();
                 if (playlist_name && playlist_name[0])
                     aud_playlist_set_title (playlist_num, playlist_name);
+
                 aud_drct_pl_add_list (std::move (list), -1);
-                resume = false;
             }
+            resume = false;
         }
         else if (emptyList)
         {
@@ -627,13 +635,22 @@ static void do_commands ()
     if (resume)
         aud_resume ();
 
-    if (options.play || options.play_pause)
+    if (options.play || options.play_pause || ! pause_on_startup)
     {
         if (! aud_drct_get_playing ())
             aud_drct_play ();
         else if (aud_drct_get_paused ())
             aud_drct_pause ();
     }
+    if (options.deleteallplaylists && aud_playlist_count () > 1)
+        aud_playlist_set_active (0);  /* JWT:HACK TO MAKE WORK LIKE PLAY ON STARTUP. */
+
+    int current_playlist = aud_playlist_get_active ();
+    int current_song = aud_playlist_get_position (current_playlist);
+    if (current_song < 0)
+        current_song = 0;
+
+    aud_playlist_set_position (current_playlist, current_song);
 
     if (options.pauseismute) /* JWT: ADDED 20100205 "-P" COMMAND-LINE OPTION TO ALLOW MUTING OF OUTPUT ON PAUSE (INPUT CONTINUES)! */
         aud_set_pausemute_mode (true);

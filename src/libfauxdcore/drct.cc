@@ -226,6 +226,12 @@ static void add_list (Index<PlaylistAddItem> && items, int at, bool to_temp, boo
     aud_playlist_entry_insert_batch (aud_playlist_get_active (), at, std::move (items), play);
 }
 
+/* JWT:NEEDED add_list() EXPORTED TO main.cc TO ALLOW to_temp & play FLAGS TO BE SET: */
+EXPORT void aud_drct_pl_add_list_wrapper (Index<PlaylistAddItem> && items, int at, bool to_temp, bool play)
+{
+    add_list (std::move (items), at, to_temp, play);
+}
+
 EXPORT void aud_drct_pl_add (const char * filename, int at)
 {
     Index<PlaylistAddItem> items;
