@@ -445,9 +445,9 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 	my $title_uesc = uri_unescape($title);
 	print STDERR "i:ART HELPER: DOING: ALBUM=$album_uesc= TITLE=$title_uesc= ARTIST=$artist_uesc=\n"  if ($DEBUG);
 	foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
-		$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
-		$skipit =~ s/^\_\|/$album_uesc\|/;
-		$skipit =~ s/([\|\(\)])/\\$1/g;
+		$skipit =~ s/\|/\\\|/g;
+		$skipit =~ s/\|\_$/\|\Q$title_uesc\E/;  #WILDCARDS:
+		$skipit =~ s/^\_\|/\Q$album_uesc\E\|/;
 		if ("$album_uesc|$title_uesc" =~ /^${skipit}/i) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			&albumart_done();
@@ -470,7 +470,7 @@ print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEB
 		} else {
 			#OTHERWISE, ASSUME WE HAVE A COVER-ART URL FROM TAG-DATA, SO GRAB IT INSTEAD OF SEARCHING!
 			foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {  #FIRST CHECK FOR notagart="image-url", QUIT ON MATCH.
-				if ($ARGV[5] =~ /^\Q${skipit}\E$/) {
+				if ($ARGV[5] =~ /^${skipit}$/) {
 					print STDERR "i:ART HELPER: SKIPPING ART LOOKUP FOR THIS TAG-URL ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 					&albumart_done();  #QUIT - USER DOES NOT WISH TO USE METATAG ART OR SEARCH WEB FOR *THIS* ART URL!
 					exit(0);
@@ -481,7 +481,7 @@ print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEB
 		foreach my $skipit (@{$SKIPTHESE{'notagart'}}) {  #NEXT CHECK FOR notagart="album/title", SKIP & SEARCH WEB INSTEAD ON MATCH.
 			$skipit =~ s/\|\_$/\|$title_uesc/;  #WILDCARDS:
 			$skipit =~ s/^\_\|/$album_uesc\|/;
-			if ("$album_uesc|$title_uesc" =~ /^\Q${skipit}\E$/) {
+			if ("$album_uesc|$title_uesc" =~ /^${skipit}$/) {
 				print STDERR "i:ART HELPER: NOT USING ART TAG-URL FOR ($skipit) AS CONFIGURED...\n"  if ($DEBUG);
 				goto WEBSEARCH;  #USER DOES NOT WISH TO USE STATION-SUPPLIED ART URL FOR *THIS* ALBUM NAME/TITLE, BUT SEARCH WEB!
 			}
