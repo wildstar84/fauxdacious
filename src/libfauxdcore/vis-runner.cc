@@ -40,7 +40,7 @@ struct VisNode : public ListNode
         data (new float[channels * FRAMES_PER_NODE]) {}
 
     ~VisNode ()
-        { delete[] data; }
+        { if (data != nullptr)  delete[] data; }
 
     const int channels;
     int time;
