@@ -129,9 +129,17 @@ static void art_item_unref_locked (AudArtItem * item)
 
 static void clear_current_locked ()
 {
-    /* JWT:KEEP AROUND IF STDIN (IN CASE REPLAY POSSIBLE)!: */
-    if (current_item && strncmp (current_item->filename, "stdin://", 8))
+    if (current_item)
     {
+        if (current_item->filename && current_item->filename[0])
+        {
+            StringBuf scheme = uri_get_scheme (current_item->filename);
+            if (! strcmp_safe (scheme, "stdin"))
+                return;  // (if stdin)
+        }
+        else
+            AUDWARN("w:Current art item has no filename!\n");
+
         art_item_unref_locked (current_item);
         current_item = nullptr;
     }
@@ -397,8 +405,17 @@ void art_cleanup ()
 
     /* playback should already be stopped */
     /* JWT:WE STILL HAVE CURRENT_ITEM SET IF STDIN, SO MUST FREE IT B4 THE ASSERT!: */
-    if (current_item && ! strncmp (current_item->filename, "stdin://", 8))
+    if (current_item)
     {
+        if (current_item->filename && current_item->filename[0])
+        {
+            StringBuf scheme = uri_get_scheme (current_item->filename);
+            if (strcmp_safe (scheme, "stdin"))
+                return;  // (unless stdin)
+        }
+        else
+            AUDWARN("w:Current art item had no filename!\n");
+
         aud_art_unref (current_item);
         current_item = nullptr;
     }
