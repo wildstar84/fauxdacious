@@ -418,6 +418,8 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
        WHEN SUCCESSFUL FETCHING FROM TAG FILE, IT RETURNS TRUE ONLY IF THE "PRECEDENCE" == "ONLY" (3),
        OTHERWISE, WE KEEP PROCESSING THE CONDITIONS UNTIL AT LAST WE FETCH (ANY UNSET) TAGS FROM THE FILE ITSELF.
        TAG-FILE PRECEDENCE IS (from[i]):  0:tmp_tag_data, 1:<entry-file>.tag, 2:directory tagfile, 3:user_tag_data.
+
+       ALSO NOTE:QUESHEET-SUPPLIED METADATA FIELDS *ALWAYS* TAKE HIGHEST PRECEDENCE!!
     */
     if ((usrtag && (from[0] = aud_read_tag_from_tagfile (filename, "tmp_tag_data", tuples[0])) > 2)
             || (individual_tag_file[0] && (from[1] = aud_read_tag_from_tagfile (filename_only, individual_tag_file, tuples[1])) > 2)
@@ -647,11 +649,17 @@ EXPORT int aud_write_tag_to_tagfile (const char * song_filename, const Tuple & t
             (const char *) filename);
 
     const char * song_key_const = (const char *) song_key;
-    char * precedence = g_key_file_get_string (rcfile, song_key_const, "Precedence", nullptr);
-    if (! precedence)
-        g_key_file_set_string (rcfile, song_key_const, "Precedence", "DEFAULT");
+    String precedence_str = aud_get_str (nullptr, "__tag_precedence");
+    if (precedence_str && precedence_str[0]) // JWT:Save Song File screen edits as "OVERRIDE"!
+        g_key_file_set_string (rcfile, song_key_const, "Precedence", (const char *) precedence_str);
+    else
+    {
+        char * precedence = g_key_file_get_string (rcfile, song_key_const, "Precedence", nullptr);
+        if (! precedence)
+            g_key_file_set_string (rcfile, song_key_const, "Precedence", "DEFAULT");
 
-    g_free (precedence);
+        g_free (precedence);
+    }
 
     String tfld;
     int i_tfld;
@@ -730,91 +738,94 @@ EXPORT bool aud_delete_tag_from_tagfile (const char * song_filename, const char 
 }
 
 EXPORT bool aud_file_write_tuple (const char * filename,
- PluginHandle * decoder, const Tuple & tuple)
+        PluginHandle * decoder, const Tuple & tuple)
 {
-    bool success = true;
+    bool success = false;
 
     if (!strcmp (filename, "-") || strstr (filename, "://-."))  /* JWT:NO SONG-INFO SAVING ON STDIN!!! */
         return false;
 
-    auto ip = (InputPlugin *) aud_plugin_get_header (decoder);
-    if (! ip)
-        success = false;
-
-    if (success)
+    if (decoder)  /* JWT:NO DECODER (nullptr) MEANS SKIP & ONLY SAVE TO A TAG FILE: */
     {
-        String cue_suffix = tuple.get_str (Tuple::Suffix);
-        String actual_filename = String (filename);
-        if (cue_suffix && cue_suffix[0] && strstr_nocase ((const char *) cue_suffix, "cue"))
-        {
-            /* JWT:MUST USE ACTUAL AUDIO FILE FOR CUESHEETS! */
-            String audio_file = tuple.get_str (Tuple::AudioFile);
-            if (! audio_file || ! audio_file[0])
-                return false;  // PUNT!
+        auto ip = (InputPlugin *) aud_plugin_get_header (decoder);
+        if (ip)
+            success = true;
 
-            actual_filename = audio_file;
-        }
-        if (! strncmp (actual_filename, "cdda://", 7) || ! strncmp (actual_filename, "dvd://", 6))  // FILE IS A DISK:
+        if (success)
         {
-            String diskID = aud_get_str (nullptr, "playingdiskid");
-
-            /* JWT:MUST WRITE TO BOTH DISK-SPECIFIC AND TEMP. TAG FILES, SINCE aud_file_read_tag ONLY READS LATTER! */
-            success = aud_write_tag_to_tagfile (actual_filename, tuple, "tmp_tag_data");
-            if (! strstr ((const char *) diskID, "tmp_tag_data"))
+            String cue_suffix = tuple.get_str (Tuple::Suffix);
+            String actual_filename = String (filename);
+            if (cue_suffix && cue_suffix[0] && strstr_nocase ((const char *) cue_suffix, "cue"))
             {
-                String tag_file = String (str_concat ({diskID, ".tag"}));
-                success = aud_write_tag_to_tagfile (actual_filename, tuple, tag_file);
+                /* JWT:MUST USE ACTUAL AUDIO FILE FOR CUESHEETS! */
+                String audio_file = tuple.get_str (Tuple::AudioFile);
+                if (! audio_file || ! audio_file[0])
+                    return false;  // PUNT!
+
+                actual_filename = audio_file;
             }
-            if (success)
+            if (! strncmp (actual_filename, "cdda://", 7) || ! strncmp (actual_filename, "dvd://", 6))  // FILE IS A DISK:
             {
-                int track;
-                if (! (strncmp (filename, "cdda://?", 8) || sscanf (filename + 8, "%d", &track) != 1))
+                String diskID = aud_get_str (nullptr, "playingdiskid");
+
+                /* JWT:MUST WRITE TO BOTH DISK-SPECIFIC AND TEMP. TAG FILES, SINCE aud_file_read_tag ONLY READS LATTER! */
+                success = aud_write_tag_to_tagfile (actual_filename, tuple, "tmp_tag_data");
+                if (! strstr ((const char *) diskID, "tmp_tag_data"))
                 {
-                    aud_set_int (nullptr, "_disktagrefresh", track);
-                    aud_playlist_rescan_file (actual_filename);
+                    String tag_file = String (str_concat ({diskID, ".tag"}));
+                    success = aud_write_tag_to_tagfile (actual_filename, tuple, tag_file);
                 }
-                else if (! (strncmp (filename, "dvd://?", 7) || sscanf (filename + 7, "%d", &track) != 1))
+                if (success)
                 {
-                    aud_set_int (nullptr, "_disktagrefresh", track+1); // OFF-BY-ONE B/C THERE'S A TRACK ZERO & ZERO==NO REFRESH!
-                    aud_playlist_rescan_file (actual_filename);
+                    int track;
+                    if (! (strncmp (filename, "cdda://?", 8) || sscanf (filename + 8, "%d", &track) != 1))
+                    {
+                        aud_set_int (nullptr, "_disktagrefresh", track);
+                        aud_playlist_rescan_file (actual_filename);
+                    }
+                    else if (! (strncmp (filename, "dvd://?", 7) || sscanf (filename + 7, "%d", &track) != 1))
+                    {
+                        aud_set_int (nullptr, "_disktagrefresh", track+1); // OFF-BY-ONE B/C THERE'S A TRACK ZERO & ZERO==NO REFRESH!
+                        aud_playlist_rescan_file (actual_filename);
+                    }
                 }
+
+                return success;
             }
-
-            return success;
-        }
-        else if (! strncmp (actual_filename, "file://", 7) && ! aud_get_bool (nullptr, "record"))  // FILE IS A FILE:
-        {
-            VFSFile file;
-
-            if (! open_input_file (actual_filename, "r+", ip, file))
-                success = false;
-
-            if (success)
+            else if (! strncmp (actual_filename, "file://", 7) && ! aud_get_bool (nullptr, "record"))  // FILE IS A FILE:
             {
-                if (! file)  /* JWT:ADDED TO PREVENT SEGFAULT - <input_plugins>.write_tuple () EXPECTS AN OPEN FILE!!! */
-                    file = VFSFile (actual_filename, "r+");
-                success = file ? ip->write_tuple (actual_filename, file, tuple) : false;
-            }
+                VFSFile file;
 
-            if (success && file && file.fflush () != 0)
-                success = false;
-
-            if (success && aud_get_bool (nullptr, "user_tag_data") && ! aud_get_bool (nullptr, "_user_tag_skipthistime"))
-            {
-                /* JWT:IF COMMENT IS AN ART IMAGE FILE, FORCE A WRITE TO TAG FILE ALSO (OTHERWISE, ART WON'T
-                    BE PICKED UP AS TUPLE.COMMENT CAN ONLY BE CHECKED IN TAG FILES, NOT THE MP3 ITSELF)!
-                    NOTE:  WE NOW SKIP THIS IF WE WERE ABLE TO WRITE THE IMAGE INTO AN ID3V24 TAG!
-                */
-                String TupleComment = tuple.get_str (Tuple::Comment);
-                if (TupleComment && TupleComment[0] && ! strncmp ((const char *) TupleComment, "file://", 7))
+                if (! open_input_file (actual_filename, "r+", ip, file))
                     success = false;
+
+                if (success)
+                {
+                    if (! file)  /* JWT:ADDED TO PREVENT SEGFAULT - <input_plugins>.write_tuple () EXPECTS AN OPEN FILE!!! */
+                        file = VFSFile (actual_filename, "r+");
+                    success = file ? ip->write_tuple (actual_filename, file, tuple) : false;
+                }
+
+                if (success && file && file.fflush () != 0)
+                    success = false;
+
+                if (success && aud_get_bool (nullptr, "user_tag_data") && ! aud_get_bool (nullptr, "_user_tag_skipthistime"))
+                {
+                    /* JWT:IF COMMENT IS AN ART IMAGE FILE, FORCE A WRITE TO TAG FILE ALSO (OTHERWISE, ART WON'T
+                        BE PICKED UP AS TUPLE.COMMENT CAN ONLY BE CHECKED IN TAG FILES, NOT THE MP3 ITSELF)!
+                        NOTE:  WE NOW SKIP THIS IF WE WERE ABLE TO WRITE THE IMAGE INTO AN ID3V24 TAG!
+                    */
+                    String TupleComment = tuple.get_str (Tuple::Comment);
+                    if (TupleComment && TupleComment[0] && ! strncmp ((const char *) TupleComment, "file://", 7))
+                        success = false;
+                }
+                aud_set_bool (nullptr, "_user_tag_skipthistime", false);
             }
-            aud_set_bool (nullptr, "_user_tag_skipthistime", false);
+            else
+                success = false;
         }
-        else
-            success = false;
     }
-    /* JWT:IF CAN'T SAVE TAGS TO FILE (IE. STREAM, RECORDING), TRY SAVING TO USER'S CONFIG: */
+    /* JWT:NEED TO SAVE TO A TAG FILE: */
     if (! success && aud_get_bool (nullptr, "user_tag_data"))
     {
         if (! strncmp (filename, "file://", 7))

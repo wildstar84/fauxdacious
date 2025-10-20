@@ -1,3 +1,31 @@
+Version 4.5.1-devel1 [Updated 10/19/2025]
+
+* There are now 2 separate "Save" buttons available in the [Song Info] dialog 
+window:  [Embed] (renames the old [Save] button), and (if the 
+[Settings].[Song Info]."Save unsavable metadata to file" box is checked) a 
+new button labeled [Tagfile].  The new button permits user to force saving of 
+metadata to a tag file and NOT embed it into the song's file itself.  Tag 
+file metadata saved via this button will now be saved with 
+"precedence=OVERRIDE" instead of "precedence=DEFAULT" so that if conflicting 
+metadata is alreade embedded in the song file, the metadata in the tag file 
+will be used (shown) instead now.  This closes Fauxdacious feature request# 
+23:  "Need option to force save tag-data to tag-file with OVERRIDE option from 
+Song Info screen".  See updated FAQ# 15 for more details.
+
+* The various startup resume/paused/play options (-p, -u, and related 
+"Resume playback..." [Settings.Playlist] options should now work consistently 
+regardless of whether Fauxdacious is started up with or without song or 
+playlist entry(s).  As far as I can tell, this had been broken for years in 
+Audacious (and therefore Fauxdacious, but we have fixed here).
+
+* The Genre field in the Song Info window now has a dropdown list for selecting 
+the genre (but one can still type in genres that aren't included in the list.
+
+* "[F6] - Refresh Selected" option now actually forces a metadata-display 
+refresh (previously had been depreciated to a silent no-op due to much improved 
+auto-refreshing metadata when user made changed), but apparently wasn't 
+*always* doing it!
+
 Version 4.5-final [Updated 7/22/2025]:
 
 This release provides numerous improvements to the "Skins" interfaces, 

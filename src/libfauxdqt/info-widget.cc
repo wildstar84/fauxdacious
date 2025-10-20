@@ -126,6 +126,9 @@ public:
         Col_Value = 1
     };
 
+    /* JWT:NEED ACCESS (SET IN infowin-qt.cc) IN ORDER TO ENABLE/DISABLE IN setDirty()!: */
+    QPushButton * EmbedButton = nullptr;
+
     InfoModel (QObject * parent = nullptr) :
         QAbstractTableModel (parent) {}
 
@@ -141,6 +144,7 @@ public:
 
     void setTupleData (const Tuple & tuple, String filename, PluginHandle * plugin)
     {
+        /* JWT:PROGRAMMER NOTE: filename is entryfn IN THIS FUNCTION!: */
         m_tuple = tuple.ref ();
         m_filename = filename;
         m_plugin = plugin;
@@ -153,7 +157,7 @@ public:
         m_linked_widgets.append (widget);
     }
 
-    bool updateFile () const;
+    bool updateFile (bool tagfile_only) const;
 
 private:
     void setDirty (bool dirty)
@@ -164,6 +168,8 @@ private:
             if (widget)
                 widget->setEnabled (dirty);
         }
+        if (EmbedButton)
+            EmbedButton->setEnabled (dirty);
     }
 
     Tuple m_tuple;
@@ -286,18 +292,29 @@ EXPORT InfoWidget::InfoWidget (QWidget * parent) :
 
 EXPORT InfoWidget::~InfoWidget () {}
 
-EXPORT void InfoWidget::fillInfo (int playlist, int entry, const char * filename, const Tuple & tuple,
- PluginHandle * decoder, bool updating_enabled)
+/* JWT:NEED ACCESS (FROM infowin-qt.cc) IN ORDER TO ENABLE/DISABLE IN setDirty()!: */
+EXPORT void InfoWidget::setEmbedButton (QPushButton * EmbedButton)
 {
+    m_model->EmbedButton = EmbedButton;
+}
+
+EXPORT void InfoWidget::fillInfo (int playlist, int entry,
+        const char * filename, const Tuple & tuple, PluginHandle * decoder,
+        bool updating_enabled)
+{
+    /* JWT:PROGRAMMER NOTE: filename is entryfn IN THIS FUNCTION!: */
+    bool user_tag_data = aud_get_bool (nullptr, "user_tag_data");
     m_model->setTupleData (tuple, String (filename), decoder);
     reset ();
 
-    setEditTriggers (updating_enabled ? QAbstractItemView::CurrentChanged :
-                                        QAbstractItemView::NoEditTriggers);
+    /* THIS CONTROLS WHETHER DATA FIELDS ARE USER-EDITABLE: */
+    setEditTriggers ((updating_enabled || user_tag_data)
+            ? QAbstractItemView::CurrentChanged
+            : QAbstractItemView::NoEditTriggers);
 
     auto initial_index = m_model->index (1 /* title */, InfoModel::Col_Value);
     setCurrentIndex (initial_index);
-    if (updating_enabled)
+    if (updating_enabled || user_tag_data)
         edit (initial_index);
 }
 
@@ -306,9 +323,9 @@ EXPORT void InfoWidget::linkEnabled (QWidget * widget)
     m_model->linkEnabled (widget);
 }
 
-EXPORT bool InfoWidget::updateFile ()
+EXPORT bool InfoWidget::updateFile (bool tagfile_only)
 {
-    return m_model->updateFile ();
+    return m_model->updateFile (tagfile_only);
 }
 
 /* JWT:POP UP IMAGE FILE SELECTOR WHEN NEW [Art Lookup] BUTTON PRESSED: */
@@ -321,7 +338,8 @@ EXPORT void InfoWidget::show_coverart_dialog (QDialog * parent)
     dialog->setFileMode (QFileDialog::ExistingFile);
     dialog->setLabelText (QFileDialog::Accept, _("Load"));
     dialog->setNameFilter (_(name_filter));
-    dialog->setDirectory (QString (aud_get_path (AudPath::UserDir)));
+    dialog->setDirectory (QString (str_concat ({aud_get_path (AudPath::UserDir),
+            "/albumart"})));
 
     /* JWT:DON'T USE DEFAULT NATIVE DIALOG IF DARK THEME OR ICON-THEME IS SET (WILL IGNORE DARK THEME/ICONS)!: */
     int use_native_sysdialogs = aud_get_int ("audqt", "use_native_sysdialogs");
@@ -404,12 +422,15 @@ void InfoWidget::keyPressEvent (QKeyEvent * event)
     QTreeView::keyPressEvent (event);
 }
 
-bool InfoModel::updateFile () const
+bool InfoModel::updateFile (bool tagfile_only) const
 {
     bool success = false;
 
     if (! m_dirty)
         return true;
+
+    if (tagfile_only)
+        aud_set_str (nullptr, "__tag_precedence", "OVERRIDE");
 
     /* JWT:IF RECORDING ON, USE THE FILE BEING RECORDED TO (BUT WILL FAIL OVER TO USER TAG-FILE)! */
     if (aud_get_bool (nullptr, "record"))
@@ -420,13 +441,18 @@ bool InfoModel::updateFile () const
             AUDDBG ("-infowin_update_tuple: RECORDING ON - SAVE TO (%s)!\n", (const char *) recording_file);
             String error;
             VFSFile file (recording_file, "r");
-            PluginHandle * out_plugin = aud_file_find_decoder (recording_file, true, file, & error);
+            PluginHandle * out_plugin = tagfile_only ? nullptr
+                    : aud_file_find_decoder (recording_file, true, file, & error);
 
             success = aud_file_write_tuple (recording_file, out_plugin, m_tuple);
         }
     }
+    else if (tagfile_only)
+        success = aud_file_write_tuple (m_filename, nullptr, m_tuple);
     else
         success = aud_file_write_tuple (m_filename, m_plugin, m_tuple);
+
+    aud_set_str (nullptr, "__tag_precedence", "");
 
     return success;
 }

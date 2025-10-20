@@ -76,6 +76,7 @@ static struct {
     GtkWidget * image;
     GtkWidget * codec[3];
     GtkWidget * apply;
+    GtkWidget * apply2tagfile;
     GtkWidget * autofill;
     GtkWidget * ministatus;
 } widgets;
@@ -199,6 +200,8 @@ static void entry_changed ()
 {
     if (can_write)
         gtk_widget_set_sensitive (widgets.apply, true);
+    if (aud_get_bool (nullptr, "user_tag_data"))
+        gtk_widget_set_sensitive (widgets.apply2tagfile, true);
 }
 
 static void ministatus_display_message (const char * text)
@@ -213,10 +216,8 @@ static void ministatus_display_message (const char * text)
     });
 }
 
-static void infowin_update_tuple ()
+static void infowin_update_tuple_data ()
 {
-    bool success = false;
-
     /* JWT:INCLUDE ALL SAVABLE FIELDS HERE!: */
     set_field_str_from_entry (current_tuple, Tuple::Title, widgets.title);
     set_field_str_from_entry (current_tuple, Tuple::Artist, widgets.artist);
@@ -232,6 +233,12 @@ static void infowin_update_tuple ()
     set_field_str_from_entry (current_tuple, Tuple::CatalogNum, widgets.catalognum);
     set_field_int_from_entry (current_tuple, Tuple::Year, widgets.year);
     set_disc_and_track_from_entry (current_tuple, widgets.track);
+}
+
+static void infowin_update_tuple ()
+{
+    bool success = false;
+    infowin_update_tuple_data ();
 
     /* JWT:IF RECORDING ON, USE THE FILE BEING RECORDED TO (BUT WILL FAIL OVER TO USER TAG-FILE)! */
     if (aud_get_bool (nullptr, "record"))
@@ -253,9 +260,42 @@ static void infowin_update_tuple ()
     {
         ministatus_display_message (_("Save successful"));
         gtk_widget_set_sensitive (widgets.apply, false);
+        if (aud_get_bool (nullptr, "user_tag_data"))
+            gtk_widget_set_sensitive (widgets.apply2tagfile, false);
     }
     else
         ministatus_display_message (_("Save error"));
+}
+
+static void infowin_update_tuple_tagfile ()
+{
+    bool success = false;
+    aud_set_str (nullptr, "__tag_precedence", "OVERRIDE");
+    infowin_update_tuple_data ();
+
+    if (aud_get_bool (nullptr, "record"))
+    {
+        String recording_file = aud_get_str ("filewriter", "_record_fid");
+        if (recording_file && recording_file[0])
+        {
+            String error;
+            VFSFile file (recording_file, "r");
+            success = aud_file_write_tuple (recording_file, nullptr, current_tuple);
+        }
+    }
+    else
+        success = aud_file_write_tuple (current_file, nullptr, current_tuple);
+
+    if (success)
+    {
+        ministatus_display_message (_("Save successful"));
+        gtk_widget_set_sensitive (widgets.apply, false);
+        gtk_widget_set_sensitive (widgets.apply2tagfile, false);
+    }
+    else
+        ministatus_display_message (_("Save error"));
+
+    aud_set_str (nullptr, "__tag_precedence", "");
 }
 
 static void infowin_select_entry (int entry)
@@ -401,7 +441,8 @@ static void coverart_entry_browse_cb (GtkWidget * entry, GtkEntryIconPosition po
     gtk_file_filter_add_pattern (filter, _("*.gif"));
     gtk_file_chooser_add_filter ((GtkFileChooser *) dialog, filter);
     gtk_file_chooser_set_current_folder_uri ((GtkFileChooser *) dialog,
-            filename_to_uri (aud_get_path (AudPath::UserDir)));
+            filename_to_uri (str_concat ({aud_get_path (AudPath::UserDir),
+            "/albumart"})));
     gtk_file_chooser_set_local_only ((GtkFileChooser *) dialog, false);
 
     g_signal_connect (dialog, "response", (GCallback) coverart_entry_response_cb, entry);
@@ -577,8 +618,14 @@ static void create_infowin ()
     gtk_widget_set_no_show_all (widgets.ministatus, true);
     gtk_box_pack_start ((GtkBox *) bottom_hbox, widgets.ministatus, true, true, 0);
 
-    widgets.apply = audgui_button_new (_("_Save"), "document-save",
+    widgets.apply = audgui_button_new (_("Embed"), "document-save",
      (AudguiCallback) infowin_update_tuple, nullptr);
+
+    if (aud_get_bool (nullptr, "user_tag_data"))
+    {
+        widgets.apply2tagfile = audgui_button_new (_("_Tagfile"), "document-save",
+         (AudguiCallback) infowin_update_tuple_tagfile, nullptr);
+    }
 
     GtkWidget * close_button = audgui_button_new (_("_Close"), "window-close",
      (AudguiCallback) audgui_infowin_hide, nullptr);
@@ -590,6 +637,8 @@ static void create_infowin ()
      (AudguiCallback) infowin_next, nullptr);
 
     gtk_box_pack_end ((GtkBox *) bottom_hbox, close_button, false, false, 0);
+    if (aud_get_bool (nullptr, "user_tag_data"))
+        gtk_box_pack_end ((GtkBox *) bottom_hbox, widgets.apply2tagfile, false, false, 0);
     gtk_box_pack_end ((GtkBox *) bottom_hbox, widgets.apply, false, false, 0);
     gtk_box_pack_end ((GtkBox *) bottom_hbox, next_button, false, false, 0);
     gtk_box_pack_end ((GtkBox *) bottom_hbox, prev_button, false, false, 0);
@@ -613,27 +662,27 @@ static void infowin_show (int list, int entry, const String & filename, const St
     current_tuple = tuple.ref ();
     current_decoder = decoder;
     can_write = writable;
-
+    bool editable = writable || aud_get_bool (nullptr, "user_tag_data");
     bool clear = aud_get_bool ("audgui", "clear_song_fields");
     bool changed = false;
 
-    set_entry_str_from_field (widgets.title, tuple, Tuple::Title, writable, clear, changed);
-    set_entry_str_from_field (widgets.artist, tuple, Tuple::Artist, writable, clear, changed);
-    set_entry_str_from_field (widgets.album, tuple, Tuple::Album, writable, clear, changed);
-    set_entry_str_from_field (widgets.album_artist, tuple, Tuple::AlbumArtist, writable, clear, changed);
-    set_entry_str_from_field (widgets.comment, tuple, Tuple::Comment, writable, clear, changed);
-    set_entry_str_from_field (widgets.description, tuple, Tuple::Description, writable, clear, changed);
-    set_entry_str_from_field (widgets.publisher, tuple, Tuple::Publisher, writable, clear, changed);
-    set_entry_str_from_field (widgets.catalognum, tuple, Tuple::CatalogNum, writable, clear, changed);
-    set_entry_str_from_field (widgets.composer, tuple, Tuple::Composer, writable, clear, changed);
-    set_entry_str_from_field (widgets.performer, tuple, Tuple::Performer, writable, clear, changed);
+    set_entry_str_from_field (widgets.title, tuple, Tuple::Title, editable, clear, changed);
+    set_entry_str_from_field (widgets.artist, tuple, Tuple::Artist, editable, clear, changed);
+    set_entry_str_from_field (widgets.album, tuple, Tuple::Album, editable, clear, changed);
+    set_entry_str_from_field (widgets.album_artist, tuple, Tuple::AlbumArtist, editable, clear, changed);
+    set_entry_str_from_field (widgets.comment, tuple, Tuple::Comment, editable, clear, changed);
+    set_entry_str_from_field (widgets.description, tuple, Tuple::Description, editable, clear, changed);
+    set_entry_str_from_field (widgets.publisher, tuple, Tuple::Publisher, editable, clear, changed);
+    set_entry_str_from_field (widgets.catalognum, tuple, Tuple::CatalogNum, editable, clear, changed);
+    set_entry_str_from_field (widgets.composer, tuple, Tuple::Composer, editable, clear, changed);
+    set_entry_str_from_field (widgets.performer, tuple, Tuple::Performer, editable, clear, changed);
     set_entry_str_from_field (gtk_bin_get_child ((GtkBin *) widgets.genre),
-     tuple, Tuple::Genre, writable, clear, changed);
+     tuple, Tuple::Genre, editable, clear, changed);
 
-    gtk_text_buffer_set_text (widgets.textbuffer, uri_to_display (filename), -1);
+    gtk_text_buffer_set_text (widgets.textbuffer, uri_to_display (entryfn), -1);
 
-    set_entry_int_from_field (widgets.year, tuple, Tuple::Year, writable, clear, changed);
-    set_entry_int_from_field (widgets.track, tuple, Tuple::Track, writable, clear, changed);
+    set_entry_int_from_field (widgets.year, tuple, Tuple::Year, editable, clear, changed);
+    set_entry_int_from_field (widgets.track, tuple, Tuple::Track, editable, clear, changed);
 
     String codec_values[CODEC_ITEMS];
 
@@ -653,9 +702,12 @@ static void infowin_show (int list, int entry, const String & filename, const St
     infowin_display_image (entryfn);
 
     /* JWT:IF RECORDING && USER_TAG_DATA, ALLOW [Save] WITHOUT ANY CHANGES: */
-    bool allowsave = changed || (writable && aud_get_bool (nullptr, "record")
-            && aud_get_bool (nullptr, "user_tag_data"));
-    gtk_widget_set_sensitive (widgets.apply, allowsave);
+    bool allowembed = changed && writable;
+    gtk_widget_set_sensitive (widgets.apply, allowembed);
+
+    if (changed && aud_get_bool (nullptr, "user_tag_data"))
+        gtk_widget_set_sensitive (widgets.apply2tagfile, true);
+
     gtk_widget_grab_focus (widgets.title);
 
     if (! audgui_reshow_unique_window (AUDGUI_INFO_WINDOW))
@@ -668,12 +720,15 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
     if (! filename || ! filename[0])
         return;
 
-    String entryfn = filename;
     String error;
     PluginHandle * decoder = aud_playlist_entry_get_decoder (playlist, entry,
-     Playlist::Wait, & error);
+            Playlist::Wait, & error);
     Tuple tuple = decoder ? aud_playlist_entry_get_tuple (playlist, entry,
-     Playlist::Wait, & error) : Tuple ();
+            Playlist::Wait, & error) : Tuple ();
+
+    String entryfn = tuple.get_str (Tuple::AudioFile);
+    if (! entryfn || ! entryfn[0])
+        entryfn = filename;
 
     if (aud_get_bool (nullptr, "record"))  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
     {
@@ -685,13 +740,11 @@ EXPORT void audgui_infowin_show (int playlist, int entry)
     if (decoder && tuple.valid () && ! aud_custom_infowin (filename, decoder))
     {
         /* cuesheet entries cannot be updated - JWT:THEY CAN NOW IN FAUXDACIOUS (EXCEPT CUESHEET CAN OVERRIDE)! */
-        bool can_write;
+        bool can_write = false;
 
-        if (aud_get_bool (nullptr, "user_tag_data"))
-            can_write = true;  /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
-        else if (aud_get_bool (nullptr, "record"))
+        if (aud_get_bool (nullptr, "record"))
             can_write = false; /* JWT:DON'T LET 'EM SAVE IF RECORDING AND NOT USING TAG-FILES! */
-        else
+        else if (! strncmp (entryfn, "file://", 7))  /* JWT:MUST BE A LOCAL FILE! */
             can_write = aud_file_can_write_tuple (filename, decoder);
 
         tuple.delete_fallbacks ();

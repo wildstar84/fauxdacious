@@ -63,6 +63,9 @@ private:
     QLabel m_image;
     QTextEdit m_uri_label;
     QDialogButtonBox * bbox;
+    QPushButton * ArtLookupButton;
+    QPushButton * Save2TagfileButton = nullptr;
+    QPushButton * EmbedButton;
 
     const HookReceiver<InfoWindow, const char *>
      art_hook {"art ready", this, & InfoWindow::displayImage};
@@ -73,6 +76,7 @@ static void displayTupleImage (void * image_fn, void * hookarg);
 
 InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
 {
+    bool user_tag_data = aud_get_bool (nullptr, "user_tag_data");
     setWindowTitle (_("Song Info - Fauxdacious"));
     setWindowRole ("song-info");
     setContentsMargins (margins.TwoPt);
@@ -93,18 +97,27 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
     auto vbox = make_vbox (this);
     vbox->addLayout (hbox);
 
-    auto ArtLookupButton = new QPushButton (_("Art Lookup"), this);
+    ArtLookupButton = new QPushButton (_("Art Lookup"), this);
     ArtLookupButton->setIcon (get_icon ("document-open"));
-    bbox = new QDialogButtonBox (QDialogButtonBox::Save | QDialogButtonBox::Close, this);
-    bbox->button (QDialogButtonBox::Save)->setText (translate_str (N_("_Save")));
+    if (user_tag_data)
+    {
+        Save2TagfileButton = new QPushButton (_("Tagfile"), this);
+        Save2TagfileButton->setIcon (get_icon ("document-save"));
+    }
+    EmbedButton = new QPushButton (_("Embed"), this);
+    EmbedButton->setIcon (get_icon ("document-save"));
+    bbox = new QDialogButtonBox (QDialogButtonBox::Close, this);
     bbox->button (QDialogButtonBox::Close)->setText (translate_str (N_("_Close")));
     bbox->addButton (ArtLookupButton, QDialogButtonBox::ActionRole);
+    bbox->addButton (EmbedButton, QDialogButtonBox::ActionRole);
+    if (user_tag_data && Save2TagfileButton)
+        bbox->addButton (Save2TagfileButton, QDialogButtonBox::ActionRole);
     vbox->addWidget (bbox);
 
-    m_infowidget.linkEnabled (bbox->button (QDialogButtonBox::Save));
-
-    connect (bbox, & QDialogButtonBox::accepted, [this] () {
-        m_infowidget.updateFile ();
+//    m_infowidget.linkEnabled (EmbedButton);
+    EmbedButton->setDisabled (true);
+    connect (EmbedButton, & QPushButton::clicked, [this] () {
+        m_infowidget.updateFile (false);
         deleteLater ();
     });
 
@@ -113,22 +126,39 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
         m_infowidget.show_coverart_dialog (this);
     });
 
+    if (user_tag_data && Save2TagfileButton)
+    {
+        connect (Save2TagfileButton, & QPushButton::clicked, [this] () {
+            m_infowidget.updateFile (true);
+            deleteLater ();
+        });
+    }
+
     connect (bbox, & QDialogButtonBox::rejected, this, & QObject::deleteLater);
 }
 
 void InfoWindow::fillInfo (int playlist, int entry, const char * filename, const Tuple & tuple,
  PluginHandle * decoder, bool updating_enabled)
 {
-    m_filename = String (filename);
-    m_uri_label.setPlainText ((QString) uri_to_display (filename));
+    String entryfn = tuple.get_str (Tuple::AudioFile);
+
+    if (! entryfn || ! entryfn[0])
+        entryfn = String (filename);
+
+    m_filename = entryfn;
+
+    m_uri_label.setPlainText ((QString) uri_to_display ((const char *) entryfn));
     force_image = false;
-    displayImage (filename);
-    if (! updating_enabled)
-        bbox->button (QDialogButtonBox::Save)->setDisabled (true);
-    m_infowidget.fillInfo (playlist, entry, filename, tuple, decoder, updating_enabled);
-    /* JWT:IF RECORDING && USER_TAG_DATA, ALLOW [Save] WITHOUT ANY CHANGES: */
-    if (updating_enabled && aud_get_bool (nullptr, "record") && aud_get_bool (nullptr, "user_tag_data"))
-        bbox->button (QDialogButtonBox::Save)->setDisabled (false);
+    displayImage (entryfn);
+    m_infowidget.fillInfo (playlist, entry, (const char *) entryfn, tuple,
+            decoder, updating_enabled);
+    if (! updating_enabled || aud_get_bool (nullptr, "record"))
+    {
+        m_infowidget.setEmbedButton (nullptr);
+        EmbedButton->setDisabled (true);
+    }
+    else
+        m_infowidget.setEmbedButton (EmbedButton);
 }
 
 void InfoWindow::displayImage (const char * filename)
@@ -186,6 +216,10 @@ EXPORT void infowin_show (int playlist, int entry)
     Tuple tuple = decoder ? aud_playlist_entry_get_tuple (playlist, entry,
      Playlist::Wait, & error) : Tuple ();
 
+    String entryfn = tuple.get_str (Tuple::AudioFile);
+    if (! entryfn || ! entryfn[0])
+        entryfn = filename;
+
     if (aud_get_bool (nullptr, "record"))  //JWT:SWITCH TO RECORDING FILE, IF RECORDING!:
     {
         filename = aud_get_str ("filewriter", "_record_fid");
@@ -197,13 +231,11 @@ EXPORT void infowin_show (int playlist, int entry)
     if (decoder && tuple.valid () && ! aud_custom_infowin (filename, decoder))
     {
         /* cuesheet entries cannot be updated - JWT:THEY CAN NOW IN FAUXDACIOUS (EXCEPT CUESHEET CAN OVERRIDE)! */
-        bool can_write;
+        bool can_write = false;
 
-        if (aud_get_bool (nullptr, "user_tag_data"))
-            can_write = true;  /* JWT:LET 'EM SAVE TO USER'S CONFIG FILE IF CAN'T SAVE TO FILE/STREAM: */
-        else if (aud_get_bool (nullptr, "record"))
+        if (aud_get_bool (nullptr, "record"))
             can_write = false; /* JWT:DON'T LET 'EM SAVE IF RECORDING AND NOT USING TAG-FILES! */
-        else
+        else if (! strncmp (entryfn, "file://", 7))  /* JWT:MUST BE A LOCAL FILE! */
             can_write = aud_file_can_write_tuple (filename, decoder);
 
         tuple.delete_fallbacks ();

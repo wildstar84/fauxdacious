@@ -22,6 +22,7 @@
 #define LIBAUDQT_INFO_WIDGET_H
 
 #include <QTreeView>
+#include <QPushButton>
 #include <libfauxdqt/export.h>
 
 class PluginHandle;
@@ -40,9 +41,10 @@ public:
     void fillInfo (int playlist, int entry, const char * filename, const Tuple & tuple,
      PluginHandle * decoder, bool updating_enabled);
     void linkEnabled (QWidget * widget);
-    bool updateFile ();
+    bool updateFile (bool tagfile_only);
     void show_coverart_dialog (QDialog * parent);
     bool setData (const QModelIndex & index, const QVariant & value, int role);
+    void setEmbedButton (QPushButton * EmbedButton);
     QModelIndex createModelIndex (int row, int column);
     InfoModel * m_model;
 
