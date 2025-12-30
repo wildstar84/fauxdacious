@@ -40,14 +40,15 @@
 #define FLAG_DONE 1
 #define FLAG_SENT 2
 
-struct AudArtItem {
-    bool is_temp = false;  /* album art as (possibly a temporary) file */
+struct AudArtItem
+{
+    String filename;
     int refcount;
     int flag;
-    String filename;
-    String art_file;  /* NEEDS TO BE A URI */
     /* album art as JPEG or PNG data */
     Index<char> data;
+    String art_file;  /* NEEDS TO BE A URI */
+    bool is_temp = false;  /* album art as (possibly a temporary) file */
 };
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -131,15 +132,6 @@ static void clear_current_locked ()
 {
     if (current_item)
     {
-        if (current_item->filename && current_item->filename[0])
-        {
-            StringBuf scheme = uri_get_scheme (current_item->filename);
-            if (! strcmp_safe (scheme, "stdin"))
-                return;  // (if stdin)
-        }
-        else
-            AUDWARN("w:Current art item has no filename!\n");
-
         art_item_unref_locked (current_item);
         current_item = nullptr;
     }
@@ -340,9 +332,20 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 
     if (! item)
     {
+        /* JWT:IF stdin, SET HIGH REF-COUNT TO PREVENT REMOVAL: */
+        int initref = 1;
+        if (filename && filename[0])
+        {
+            StringBuf scheme = uri_get_scheme (filename);
+            if (! strcmp_safe (scheme, "stdin"))
+                initref = 999;
+        }
+        else
+            AUDWARN("w:Cached art item has no filename!\n");
+
         item = art_items.add (filename, AudArtItem ());
         item->filename = filename;
-        item->refcount = 1; /* temporary reference */
+        item->refcount = initref; /* temporary reference */
 
         int chkres = check_for_user_art (filename, item, false);
         if (chkres > 0)
@@ -378,9 +381,20 @@ void art_cache_current (const String & filename, Index<char> && data, String && 
 
     if (! item)
     {
+        /* JWT:IF stdin, SET HIGH REF-COUNT TO PREVENT REMOVAL: */
+        int initref = 1;
+        if (filename && filename[0])
+        {
+            StringBuf scheme = uri_get_scheme (filename);
+            if (! strcmp_safe (scheme, "stdin"))
+                initref = 999;
+        }
+        else
+            AUDWARN("w:Cache art item has no Filename!\n");
+
         item = art_items.add (filename, AudArtItem ());
         item->filename = filename;
-        item->refcount = 1; /* temporary reference */
+        item->refcount = initref; /* temporary reference */
     }
 
     finish_item_locked (item, std::move (data), std::move (art_file));
@@ -401,24 +415,18 @@ void art_cleanup ()
 {
     auto queued = get_queued ();
     for (AudArtItem * item : queued)
-        aud_art_unref (item); /* release temporary reference */
+    {
+        if (item != current_item) // WORK LIKE AUDACIOUS, CURRENT ONE WILL BE UNREFFED ON SONG-CHANGE|STOP!:
+        {
+            if (item->refcount > 1)
+                item->refcount = 1;  // FORCE CLEANUP.
+
+            aud_art_unref (item); /* release temporary reference */
+        }
+    }
 
     /* playback should already be stopped */
-    /* JWT:WE STILL HAVE CURRENT_ITEM SET IF STDIN, SO MUST FREE IT B4 THE ASSERT!: */
-    if (current_item)
-    {
-        if (current_item->filename && current_item->filename[0])
-        {
-            StringBuf scheme = uri_get_scheme (current_item->filename);
-            if (strcmp_safe (scheme, "stdin"))
-                return;  // (unless stdin)
-        }
-        else
-            AUDWARN("w:Current art item had no filename!\n");
-
-        aud_art_unref (current_item);
-        current_item = nullptr;
-    }
+    clear_current_locked ();
     assert (! current_item);
 
     if (art_items.n_items ())
