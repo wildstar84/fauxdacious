@@ -110,6 +110,7 @@ my $configPath = '';
 if ($ARGV[1]) {
 	($configPath = $ARGV[1]) =~ s#^file:\/\/##;
 }
+my $TMPDIR = defined($ENV{'TMPDIR'}) ? $ENV{'TMPDIR'} : (($^O =~ /MSWin/) ? 'C:/TEMP' : '/tmp');
 my $newPlaylistURL = '';
 my $title = $ARGV[0];
 my $comment = '';
@@ -164,7 +165,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 		}
 
 		$client = new StreamFinder($ARGV[0], -debug => $DEBUG,
-				-log => '/tmp/FauxdaciousUrlHelper.log',
+				-log => "${TMPDIR}/FauxdaciousUrlHelper.log",
 				-logfmt => '[time] "[title]" - [site]: [url] ([albumartist])'
 		);
 		die "f:Could not open streamfinder or no streams found!"  unless ($client);
@@ -277,10 +278,10 @@ TRYIT:
 					} elsif ($worstStream) {
 						print OUT $worstStream;
 						print STDERR "w:ALL streams exceed bandwidth limit, returning WORST stream(bw=$lowestBW)!\n";
-						$newPlaylistURL = "file:///tmp/${stationID}.m3u8";
+						$newPlaylistURL = "file://${TMPDIR}/${stationID}.m3u8";
 					}
 				} else {
-					$newPlaylistURL = "file:///tmp/${stationID}.m3u8";
+					$newPlaylistURL = "file://${TMPDIR}/${stationID}.m3u8";
 				}
 				close OUT;
 				print STDERR "-getURL(m3u8/HLS) 1st=$newPlaylistURL=\n"  if ($DEBUG);
@@ -374,7 +375,7 @@ TRYIT:
 
 	#ALLOW USER TO (TEMPORARILY?) FORCE PRE-DOWNLOADING OF ALL VIDEOS AND PODCASTS (IF INTERNET IS BEING FLAKY):
 	#(WON'T WORK FOR NON-FINITE RADIO-STATION STREAMS, SO WE *TRY* TO EXCLUDE THOSE)!
-	my $forcedownload = ((-e '/tmp/INTERNET_UNSTABLE') && ($ARGV[0] =~ m#\/podcasts?\/# || !$client
+	my $forcedownload = ((-e "${TMPDIR}/INTERNET_UNSTABLE") && ($ARGV[0] =~ m#\/podcasts?\/# || !$client
 			|| $client->getType()
 			!~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast)$/))  #THESE SITES HAVE STATIONS:
 		? 1 : 0;
@@ -391,15 +392,15 @@ TRYIT:
 		}
 
 		$newPlaylistURL =~ s#^(\w+)\:#https:#  if ($downloadit > 1);
-		unless (-f "/tmp/$fn") {
+		unless (-f "${TMPDIR}/$fn") {
 			my $no_wget = system('wget','-V');
-			my $cmd = $no_wget ? "curl -o /tmp/$fn \"$newPlaylistURL\""
-					: "wget -t 2 -T 20 -O /tmp/$fn \"$newPlaylistURL\" 2>/dev/null ";
+			my $cmd = $no_wget ? "curl -o ${TMPDIR}/$fn \"$newPlaylistURL\""
+					: "wget -t 2 -T 20 -O ${TMPDIR}/$fn \"$newPlaylistURL\" 2>/dev/null ";
 			`$cmd`;
 		}
-		if (-f "/tmp/$fn") {   #TRY TO EXTRACT METADATA FROM THE DOWNLOADED FILE:
-			$newPlaylistURL = "file:///tmp/$fn";
-			my @tagdata = `ffprobe -loglevel error -show_entries format_tags -of default=noprint_wrappers=1 /tmp/$fn`;
+		if (-f "${TMPDIR}/$fn") {   #TRY TO EXTRACT METADATA FROM THE DOWNLOADED FILE:
+			$newPlaylistURL = "file://${TMPDIR}/$fn";
+			my @tagdata = `ffprobe -loglevel error -show_entries format_tags -of default=noprint_wrappers=1 ${TMPDIR}/$fn`;
 			my $haveAlbum = 0;
 			for (my $i=0;$i<=$#tagdata;$i++) {
 				chomp $tagdata[$i];
@@ -474,6 +475,7 @@ sub writeTagData {
 	#Fauxd's g_key_file_get_string() CAN'T HANDLE HIGH-ASCII CHARS (ACCENTS, ETC.),
 	#SO ESCAPE 'EM HERE, THEN UNESCAPE 'EM THERE!:
 	$title = uri_escape($title, "\x80-\xff");
+	$title =~ s/\%([^\d]|$)/\%25$1/g;  #FAUD SEEMS TO WANT TO TRY TO ESCAPE STANDALONE %-SIGNS?!
 	$comment = uri_escape($comment, "\x80-\xff");
 	# WE WRITE VIDEOS/PODCASTS TO A TEMP. TAG FILE, SINCE THEY EXPIRE AND ARE USUALLY ONE-OFFS, WHICH
 	# WE THEREFORE WANT Fauxdacious TO DELETE THE TAGS AND COVER ART FILES WHEN PLAYLIST CLEARED (fauxdacious -D)!
@@ -490,7 +492,7 @@ sub writeTagData {
 	if (open TAGDATA, "<${configPath}/$tagfid") {
 		my $omit = 0;
 		while (<TAGDATA>) {
-			$omit = 1  if (/^\[$newPlaylistURL\]/);
+			$omit = 1  if (/^\[\Q$newPlaylistURL\E\]/);
 			if ($omit) {
 				$omit = 0  if (/^\[/o && !/$newPlaylistURL/);
 			}
