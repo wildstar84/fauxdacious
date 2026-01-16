@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2015 Audacious developers -->
+<!-- Copyright 2015-2026 Audacious developers -->
 <component type="desktop">
   <id>fauxdacious.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
@@ -8,7 +8,7 @@
   <developer id="org.atheme.fauxdacious">
     <name>Audacious developers and Jim Turner</name>
   </developer>
-  <summary>Lightweight media player</summary>
+  <summary>Lightweight AV media player</summary>
   <description>
     <p>
       Fauxdacious is an open source media player.  A fork of Audacious,
@@ -27,9 +27,11 @@
     </p>
   </description>
   <url type="homepage">https://wildstar84.wordpress.com/fauxdacious/</url>
+  <url type="bugtracker">https://github.com/wildstar84/fauxdacious/issues</url>
+  <url type="vcs-browser">https://github.com/wildstar84/fauxdacious</url>
   <screenshots>
-    <screenshot type="default">https://wildstar84.files.wordpress.com/2020/07/fauxdaciousqt.png</screenshot>
-    <screenshot>https://wildstar84.files.wordpress.com/2015/11/fauxdaciousvideoscreenshot.png</screenshot>
-    <screenshot>https://audacious-media-player.org/images/settings-window.png</screenshot>
+    <screenshot type="default">https://wildstar84.wordpress.com/wp-content/uploads/2021/12/fauxdaciousqt.png</screenshot>
+    <screenshot>https://wildstar84.wordpress.com/wp-content/uploads/2018/05/fauxdaciousvideo.png</screenshot>
+    <screenshot>https://wildstar84.wordpress.com/wp-content/uploads/2023/05/mini-fauxdacious.png</screenshot>
   </screenshots>
 </component>
