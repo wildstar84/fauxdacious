@@ -1,3 +1,34 @@
+Version 4.6-devel1 [Updated 01/17/2026]
+
+* Fixed Rare crash when stopping play related to cover-art image-handling 
+(afaict), but (still open) Issue #25 reports crashes in the same code that 
+I can't duplicate and has not yet been resolved to requestor's satisfaction.
+
+* Add GTK version of the File Browser plugin from Audacious but with added 
+"Copy Selected" (items to PRIMARY paste-buffer) menu item and a horizontal 
+scrollbar (that appears when needed if any file-names are too long to 
+fit window); and removed the "Open Cover Art" menu item in the Audacious 
+version b/c it's not really useful in Fauxdacious since there can more than 
+one type of cover/channel art images that can be present in a directory.  
+These fauxdacious-specific changes are also in the previously-added Qt-version 
+of this plugin.
+
+* The URL-helper script now first looks at the $TMPDIR environment variable 
+for the directory to use for temporary files instead of hardcoded "/tmp" - 
+Any future Windows-releases will also default instead to "C:\TEMP" (if $TMPDIR 
+is not specified.
+
+* ffaudio plugin now handles .sv8 files and replay-gain tags.
+
+* opus plugin now has better handling of metadata image & lyrics tags.
+
+* "Jump-To-Song" dialog now dynamically hides the filter icon when not needed. 
+
+* More Glib & GTK depreciation / warnings fixed / handled.
+
+* Numerous minor code-tweaks and cleanups under the hood, notably in vumeter, 
+mms, blur_scope, openmpt & sidplay, etc.
+
 Version 4.5.1-devel1 [Updated 10/19/2025]
 
 * There are now 2 separate "Save" buttons available in the [Song Info] dialog 
