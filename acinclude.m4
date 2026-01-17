@@ -153,7 +153,7 @@ if test "x$HAVE_MSWINDOWS" = "xyes" ; then
     EXPORT="__declspec(dllexport)"
 elif test "x$GCC" = "xyes" ; then
     CFLAGS="$CFLAGS -fvisibility=hidden"
-    CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+    CXXFLAGS="$CXXFLAGS -fvisibility=hidden -fvisibility-inlines-hidden"
     EXPORT="__attribute__((visibility(\"default\")))"
 else
     AC_MSG_ERROR([Unknown syntax for EXPORT keyword])
@@ -180,8 +180,6 @@ dnl ======================
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.32)
 PKG_CHECK_MODULES(GMODULE, gmodule-2.0 >= 2.32)
 
-AC_DEFINE([GLIB_VERSION_MIN_REQUIRED], [GLIB_VERSION_2_32], [target GLib 2.32])
-
 dnl GTK support
 dnl ===========
 
@@ -197,6 +195,7 @@ AC_ARG_ENABLE(gtk2,
 if test $USE_GTK2 = yes ; then
     PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.24)
     AC_DEFINE([USE_GTK], [1], [Define if GTK support enabled])
+    AC_DEFINE([GLIB_VERSION_MIN_REQUIRED], [GLIB_VERSION_2_32], [Target GLib 2.32])
 elif test $USE_GTK = yes ; then
     PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.18)
     AC_DEFINE(USE_GTK, 1, [Define if GTK support enabled])
