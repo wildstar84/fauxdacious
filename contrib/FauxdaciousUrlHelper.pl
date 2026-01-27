@@ -207,7 +207,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 			#IE. IF YOU HAVE A MODERN INTERNET CONNECTION (CURRENTLY AROUND 20mbps OR BETTER).
 			my $ua = LWP::UserAgent->new(@{$client->{'_userAgentOps'}});
 			$ua->timeout($client->{'timeout'});
-			$ua->max_size(2048);  #LIMIT FETCH-SIZE TO AVOID POSSIBLY DOWNLOADING A FULL HLS STREAM!
+			$ua->max_size(8192);  #LIMIT FETCH-SIZE TO AVOID POSSIBLY DOWNLOADING A FULL HLS STREAM!
 			$ua->cookie_jar({});
 			$ua->env_proxy;
 			my $html = '';
