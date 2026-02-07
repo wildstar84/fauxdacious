@@ -445,9 +445,9 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 	my $title_uesc = uri_unescape($title);
 	print STDERR "i:ART HELPER: DOING: ALBUM=$album_uesc= TITLE=$title_uesc= ARTIST=$artist_uesc=\n"  if ($DEBUG);
 	foreach my $skipit (@{$SKIPTHESE{'skip'}}) {
-		$skipit =~ s/\|/\\\|/g;
 		$skipit =~ s/\|\_$/\|\Q$title_uesc\E/;  #WILDCARDS:
 		$skipit =~ s/^\_\|/\Q$album_uesc\E\|/;
+		$skipit =~ s/\|/\\\|/g;
 		if ("$album_uesc|$title_uesc" =~ /^${skipit}/i) {
 			print STDERR "i:ART HELPER: SKIPPING ($skipit) AS CONFIGURED.\n"  if ($DEBUG);
 			&albumart_done();
@@ -462,7 +462,7 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 		if ($ARGV[5] =~ m#^file\:\/\/#) {  #FILE (FAUXD. ENTRY), SAVE IT TO THIS FILE INSTEAD OF CACHE:
 		    ($art2fid = $ARGV[5]) =~ s#^file\:\/\/##;
 		    $art2fid =~ s/\.[^\.]*$//;   #STRIP OFF MEDIA EXTENSION!
-print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEBUG);
+			print STDERR "---Save any albumart found to LOCAL FIDBASE=$art2fid=\n"  if ($DEBUG);
 		} elsif ($ARGV[5] !~ m#^https?\:\/\/#) { #("NOWEB") - DONE: CHECKED CACHE, BUT DON'T SEARCH WEB!
 			print STDERR "d:ART HELPER: SKIPPING (URL ALBUM/NOWEB - SHOULD BE CAUGHT IN FAUXD NOW?($ARGV[5])!)\n"  if ($DEBUG);
 			&albumart_done();
@@ -551,10 +551,13 @@ WEBSEARCH:
 					}
 					print STDERR "i:found (".$lf->source().") IMAGE ($image_url)?\n"  if ($DEBUG);
 					$tried = $lf->tried();
-					&albumart_done($tried);
 					print STDERR "i:Albumart tried lyrics sites: ($tried).\n"  if ($DEBUG); #MUST BE HERE (writeArtImage EXITS on success!)
-					&writeArtImage($image_url, $art2fid, '_tmp_albumart')
-							if ($image_url && $image_url !~ /(?:default|place\-?holder|nocover)/i); #EXCLUDE DUMMY-IMAGES.
+					#EXCLUDE COMMON, KNOWN-BAD IMAGES HERE:
+					unless ($image_url =~ m#b\.scorecardresearch\.com\/p\?c1\=2\&c2\=\d+\&cv\=2.0\&cj\=1#) {
+						&albumart_done($tried);
+						&writeArtImage($image_url, $art2fid, '_tmp_albumart')
+								if ($image_url&& $image_url !~ /(?:default|place\-?holder|nocover)/i); #EXCLUDE DUMMY-IMAGES.
+					}
 				} else {
 					$tried = $lf->tried();
 					print STDERR "i:Albumart tried lyrics sites: ($tried).\n"  if ($DEBUG);
