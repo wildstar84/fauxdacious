@@ -352,6 +352,16 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
         tuple.set_int (Tuple::Track, atoi (instr));
     else
         tuple.unset (Tuple::Track);
+    /*
+     * JWT:ALLOW LENGTH TO BE SET VIA StreamFinder, OR USERS IF NEEDED:
+     *     ORIG. USE-CASE IS FOR MAKING APPLE PODCASTS FORWARD-SEEKABLE (PAGES
+     *     PROVIDES LENGTH BUT STREAMS RETERN ZERO (AS IF "LIVE").
+     */
+    instr = g_key_file_get_string (rcfile, song_filename, "Length", nullptr);
+    if (instr && instr[0])
+        tuple.set_int (Tuple::Length, atoi (instr));
+    else
+        tuple.unset (Tuple::Length);
     char * instrc = g_key_file_get_string (rcfile, song_filename, "Lyrics", nullptr);
     if (instrc)
     {

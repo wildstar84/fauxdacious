@@ -222,7 +222,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				my $no_wget = system('wget','-V');
 				unless ($no_wget) {
 					print STDERR "\n..trying wget...\n"  if ($DEBUG);
-					$html = `wget -t 2 -T 20 -O- -o /dev/null \"$newPlaylistURL\" 2>/dev/null `;
+					$html = `wget -t 2 -T 20 -O- -o /dev/null "$newPlaylistURL" 2>/dev/null `;
 				}
 			}
 			if ($stationID && open OUT, ">/tmp/${stationID}.m3u8") {
@@ -281,10 +281,12 @@ TRYIT:
 						$newPlaylistURL = "file://${TMPDIR}/${stationID}.m3u8";
 					}
 				} else {
+					print STDERR "i:using temp m3u8 file (/${TMPDIR}/${stationID}.m3u8) HiBW=$highestBW=\n"
+							  if ($DEBUG);
 					$newPlaylistURL = "file://${TMPDIR}/${stationID}.m3u8";
 				}
 				close OUT;
-				print STDERR "-getURL(m3u8/HLS) 1st=$newPlaylistURL=\n"  if ($DEBUG);
+				print STDERR "-getURL(m3u8/HLS) 1st=$newPlaylistURL= HiBW=$highestBW= tried=$tried=\n"  if ($DEBUG);
 			}
 		}
 
@@ -298,11 +300,19 @@ TRYIT:
 		$comment .= 'AlbumArtist='.$client->{albumartist}."\n"  if (defined($client->{albumartist}) && $client->{albumartist} =~ /\w/);
 		$comment .= 'Year='.$client->{year}."\n"  if (defined($client->{year}) && $client->{year} =~ /\d\d\d\d/);
 		$comment .= 'Genre='.$client->{genre}."\n"  if (defined($client->{genre}) && $client->{genre} =~ /\w/);
+		#Allow Tuple.length TO BE SET BY StreamFinder (FOR PODCAST SITES WHERE NEEDED):
+		#This is currently only used by StreamFinder::Apple to force podcast streams to use
+		#the length shown in the page, since otherwise, Apple makes many unseekable by not
+		#including a length in the stream (to prevent skipping commercials, I guess).
+		#Requires StreamFinder v2.60+ for this to be used:
+		$comment .= 'Length='.$client->{length}."\n"  if (defined($client->{length})
+				&& $client->{length} =~ /^\d+$/ && $client->{length} =~ /[1-9]/);
+
 		#PUT DESCRIPTION FIELD, IF ANY INTO THE "Lyrics" FOR DISPLAY IN LYRICS PLUGINS.
 		#NOTE:  IF THE STREAM HAS LYRICS IN id3 TAGS, THEY WILL REPLACE THIS, REGARDLESS OF "Precedence".
 		#COMMENT OUT NEXT 7 LINES IF THIS IS NOT DESIRED:
 		my $lyrics = '';
-		if (defined($desc) && $desc =~ /\w/ && $desc ne $title) {
+		if (defined($desc) && $desc =~ /\w/) {
 			$desc =~ s/\R+$//s;
 			$desc =~ s/\R/\x02/gs; #MUST BE A SINGLE LINE, SO WORKAROUND FOR PRESERVING MULTILINE DESCRIPTIONS!
 			$desc =~ s#(p|br)\>\s*\x02\s*\<(p|br)#$1\>\<$2#igs;  #TRY TO REMOVE SOME TRIPLE-SPACING.
@@ -482,12 +492,13 @@ sub writeTagData {
 	# THE LIST IN THE REGEX BELOW ARE THE ONES TO *NOT* DELETE ART IMAGES FOR (ie. STREAMING STATIONS)!:
 	my $site = $client ? $client->getType() : '';
 	my $tagfid = (!$downloadit && $client && $site
-			=~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast)$/)  #THESE SITES HAVE STATIONS:
+			=~ /^(?:IHeartRadio|RadioNet|Tunein|InternetRadio|OnlineRadiobox|Rcast|Zeno)$/)  #THESE SITES HAVE STATIONS:
 			? 'user_tag_data' : 'tmp_tag_data';
 	#WORKAROUND FOR IHEART & TUNEIN PODCASTS:
 	if ($client && $tagfid =~ /^user/) {
 		my $mediasource = $site;
-		$tagfid = 'tmp_tag_data'  if ($ARGV[0] =~ m#\/podcasts?\/#);  #CONSIDER ANY PODCASTS TO BE ONE-OFFS:
+		$tagfid = 'tmp_tag_data'   #CONSIDER ANY PODCASTS OR TEMP. FILES TO BE ONE-OFFS:
+				if ($ARGV[0] =~ m#\/podcasts?\/# || $newPlaylistURL =~ m#^file\:\/\/\/tmp\/#);
 	}
 	if (open TAGDATA, "<${configPath}/$tagfid") {
 		my $omit = 0;
