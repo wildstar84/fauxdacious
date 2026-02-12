@@ -21,6 +21,7 @@
 ###use StreamFinder::Podbean;
 ###use StreamFinder::PodcastAddict;
 ###use StreamFinder::Podchaser;
+###use StreamFinder::PragerU;
 ###use StreamFinder::RadioNet;
 ###use StreamFinder::Rcast;
 ###use StreamFinder::Rumble;
@@ -319,6 +320,8 @@ TRYIT:
 			$desc =~ s#\%# percent#gs;
 			$lyrics = "Lyrics=Description:  $desc";
 		}
+		my $artcomment = '';
+		my $path = '';
 		if ($art_url) {
 			my ($image_ext, $art_image) = $client->getIconData;
 			$image_ext =~ tr/A-Z/a-z/;
@@ -326,7 +329,7 @@ TRYIT:
 				binmode IMGOUT;
 				print IMGOUT $art_image;
 				close IMGOUT;
-				my $path = $configPath;
+				$path = $configPath;
 				if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
 					$path =~ s#^(\w)\:#\/$1\%3A#;
 					$path =~ s#\\#\/#g;
@@ -337,30 +340,38 @@ TRYIT:
 					unlink "${path}/${stationID}.$image_ext"  if (-e "${path}/${stationID}.png");
 					$image_ext = 'png';
 				}
-				$comment .= "Comment=file://${path}/${stationID}.$image_ext";
-				my $art_url2 = $client->getIconURL('artist');
-				if ($art_url2 && $art_url2 ne $art_url) {  #Handle some bad Apple in-podcast images
-					my $site = $client->getType();
-					sleep(5)  if ($site eq 'Rumble');  #THEY MAY INTERPRET 3RD HIT TOO SOON AS DOS & REJECT?
-					my ($image_ext, $art_image) = $client->getIconData('artist');
-					$image_ext =~ tr/A-Z/a-z/;
-					if ($configPath && $art_image && length($art_image) > 499 #SANITY-CHECK (RUMBLE.COM)!
-							&& open IMGOUT, ">${configPath}/${stationID}_channel.$image_ext") {
-						binmode IMGOUT;
-						print IMGOUT $art_image;
-						close IMGOUT;
-						if ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
-							#GTK CAN'T HANDLE webp, com, ETC.!:
-							`/usr/bin/convert '${path}/${stationID}_channel.$image_ext' '${path}/${stationID}_channel.png'`;
-							unlink "${path}/${stationID}_channel.$image_ext"  if (-e "${path}/${stationID}_channel.png");
-							$image_ext = 'png';
-						}
-						$comment .= ";file://${path}/${stationID}_channel.$image_ext";
-					}
-				}
-				$comment .= "\n";
+				$artcomment = "Comment=file://${path}/${stationID}.$image_ext";
 			}
 		}
+		my $art_url2 = $client->getIconURL('artist');
+		if ($art_url2 && $art_url2 ne $art_url) {  #Handle some bad Apple in-podcast images
+			my $site = $client->getType();
+			sleep(5)  if ($site eq 'Rumble');  #THEY MAY INTERPRET 3RD HIT TOO SOON AS DOS & REJECT?
+			my ($image_ext, $art_image) = $client->getIconData('artist');
+			$image_ext =~ tr/A-Z/a-z/;
+			if ($configPath && $art_image && length($art_image) > 499 #SANITY-CHECK (RUMBLE.COM)!
+					&& open IMGOUT, ">${configPath}/${stationID}_channel.$image_ext") {
+				binmode IMGOUT;
+				print IMGOUT $art_image;
+				close IMGOUT;
+				unless ($path) {
+					$path = $configPath;
+					if ($path =~ m#^\w\:#) { #WE'RE ON M$-WINDOWS, BUMMER: :(
+						$path =~ s#^(\w)\:#\/$1\%3A#;
+						$path =~ s#\\#\/#g;
+					}
+				}
+				if ($image_ext !~ /^(?:gif|jpg|jpeg|png)$/ && -x '/usr/bin/convert') {
+					#GTK CAN'T HANDLE webp, com, ETC.!:
+					`/usr/bin/convert '${path}/${stationID}_channel.$image_ext' '${path}/${stationID}_channel.png'`;
+					unlink "${path}/${stationID}_channel.$image_ext"  if (-e "${path}/${stationID}_channel.png");
+					$image_ext = 'png';
+				}
+				$artcomment .= ($artcomment ? ';' : 'Comment=');
+				$artcomment .= "file://${path}/${stationID}_channel.$image_ext";
+			}
+		}
+		$comment .= "$artcomment\n"  if ($artcomment);
 		if ($lyrics =~ /\w/) {  #PUT THIS LAST, AS IT SOMETIMES HAS GARBAGE THAT BLOCKS OTHER FIELDS.
 			$lyrics =~ tr/\x00-\x01//d;  #ALSO TRY GETTING RID OF THE GARBAGE (BUT \x02 IS SPECIAL)!:
 			$lyrics =~ tr/\x03-\x19//d;
