@@ -180,9 +180,12 @@ static int check_tag_file (const String & filename, AudArtItem * item, const cha
                             item->art_file = art_file;
                             /* JWT:(ALBUMART PLUGINS): DON'T SEARCH WEB SINCE WE HAVE ART IMAGE ALREADY -
                                THIS ADDED B/C PODCASTS MAY SEND US A BAD IMAGE THAT BLANKS OUR GOOD ONE!
+                               NOTE: tmp_tag_file.image > web.image && web.image > user_tag_file*.image et. al.
+                               AS FAR AS WHETHER TO FURTHER SEARCH WEB FOR AN IMAGE!
                             */
                             if (! strcmp (tagfile, "tmp_tag_data"))
 	                            aud_set_bool (nullptr, "_skip_web_art_search", true);
+
                             return precedence;
                         }
                     }
@@ -227,8 +230,11 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
                     item->data = file.read_all ();
                     if (item->data.len () > 0)
                     {
+                        /* FILE IS AN IMAGE, SO WE'RE DONE (DON'T BOTHER SENDING "art ready")
+                           OR SEARCHING WEB FOR AHOTHER/"BETTER" ONE!: */
                         item->art_file = filename;
-                        return 2;  // FILE IS AN IMAGE, SO WE'RE DONE (DON'T BOTHER SENDING "art ready")!
+	                    aud_set_bool (nullptr, "_skip_web_art_search", true);
+                        return 2;
                     }
                 }
             }
@@ -243,8 +249,9 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
             forcetagcheck = true;  // FOR STREAMS, FORCE FULL TAG-FILE CHECK IF WE PROHIBIT STREAMS TO SET WHEN PLAYING!
     }
 
-    aud_set_bool (nullptr, "_skip_web_art_search", false);
-    if (! item->art_file && aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG-FILES IF USER WANTS TO USE THEM:
+    if (item->art_file)  // ALREADY HAVE IMAGE FILE, DON'T SEARCH WEB FOR ANOTHER ONE!:
+	    aud_set_bool (nullptr, "_skip_web_art_search", true);
+    else if (aud_get_bool (nullptr, "user_tag_data"))  // ONLY CHECK TAG-FILES IF USER WANTS TO USE THEM:
     {
         /* NORMALLY ONLY CHECK TAG-FILES "OVERRIDE"|"ONLY" IF HAVE EXISTING ART FILE, UNLESS FULL CHECK FORCED! */
         int minprec = (! foundArt || forcetagcheck) ? 0 : 1;  // CONSIDER TAG-FILE ONLY IF PRECEDENCE EXCEEDS.
@@ -346,6 +353,9 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
         item = art_items.add (filename, AudArtItem ());
         item->filename = filename;
         item->refcount = initref; /* temporary reference */
+
+        /* JWT:RESET HERE (NEW ART), AND IN albumart.cc ON (STREAM) TUPLE-CHANGES: */
+        aud_set_bool (nullptr, "_skip_web_art_search", false);
 
         int chkres = check_for_user_art (filename, item, false);
         if (chkres > 0)
