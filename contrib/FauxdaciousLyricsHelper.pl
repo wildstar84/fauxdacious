@@ -14,7 +14,6 @@
 ###use LyricFinder::_Class;
 ###use LyricFinder::ApiLyricsOvh;
 ###use LyricFinder::AZLyrics;
-###use LyricFinder::ChartLyrics;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Letras;
 ###use LyricFinder::Lrclib;

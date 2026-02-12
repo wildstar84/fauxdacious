@@ -14,7 +14,6 @@
 ###use LyricFinder::_Class;
 ###use LyricFinder::ApiLyricsOvh;
 ###use LyricFinder::AZLyrics;
-###use LyricFinder::ChartLyrics;
 ###use LyricFinder::Genius;
 ###use LyricFinder::Letras;
 ###use LyricFinder::Lrclib;
@@ -490,8 +489,19 @@ elsif ($ARGV[0] =~ /^ALBUM/i)   #WE'RE AN ALBUM TITLE, GET COVER ART FROM TAGS, 
 			mkdir ("${configPath}/albumart",0755) || die "f:Could not create directory (${configPath}/albumart) ($!)!\n";;
 		}
 		if ($ARGV[5] =~ /^http/) {
-			&albumart_done();
-			&writeArtImage($ARGV[5], "albumart/${albart_FN}", '_tmp_albumart');  #EXITS IF SUCCESSFUL!
+			#FIRST CHECK FOR KNOWN-BAD IMG. URLS:
+			my $badimage = 0;
+			foreach my $skipit (@{$SKIPTHESE{'badimage'}}) {
+				if ($ARGV[5] =~ /$skipit/) {
+					print STDERR "i:ART Skipped known-bad image ($skipit)!\n"  if ($DEBUG);
+					$badimage = 1;
+					last;
+				}
+			}
+			unless ($badimage) {
+				&albumart_done();
+				&writeArtImage($ARGV[5], "albumart/${albart_FN}", '_tmp_albumart');  #EXITS IF SUCCESSFUL!
+			}
 			unlink("${configPath}/_albumart_done.tmp");  #NOPE, IF WE GOT HERE: ALBUMART *NOT* DONE, SEARCH WEB!
 		}
     }
@@ -552,8 +562,16 @@ WEBSEARCH:
 					print STDERR "i:found (".$lf->source().") IMAGE ($image_url)?\n"  if ($DEBUG);
 					$tried = $lf->tried();
 					print STDERR "i:Albumart tried lyrics sites: ($tried).\n"  if ($DEBUG); #MUST BE HERE (writeArtImage EXITS on success!)
-					#EXCLUDE COMMON, KNOWN-BAD IMAGES HERE:
-					unless ($image_url =~ m#b\.scorecardresearch\.com\/p\?c1\=2\&c2\=\d+\&cv\=2.0\&cj\=1#) {
+					#FIRST CHECK FOR KNOWN-BAD IMAGE. URLS:
+					my $badimage = 0;
+					foreach my $skipit (@{$SKIPTHESE{'badimage'}}) {
+						if ($image_url =~ /$skipit/) {
+							print STDERR "i:ART Skipped known-bad image ($skipit)!\n"  if ($DEBUG);
+							$badimage = 1;
+							last;
+						}
+					}
+					unless ($badimage) {
 						&albumart_done($tried);
 						&writeArtImage($image_url, $art2fid, '_tmp_albumart')
 								if ($image_url&& $image_url !~ /(?:default|place\-?holder|nocover)/i); #EXCLUDE DUMMY-IMAGES.
