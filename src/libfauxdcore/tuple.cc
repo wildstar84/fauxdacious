@@ -153,6 +153,7 @@ static const struct {
     {"publisher", Tuple::String, -1},
     {"catalog-number", Tuple::String, -1},
     {"disc-number", Tuple::Int, -1},
+    {"precedence", Tuple::Int, -1},
 
     /* fallbacks */
     {nullptr, Tuple::String, -1},
@@ -198,6 +199,7 @@ static const FieldDictEntry field_dict[] = {
     {"lyrics", Tuple::Lyrics},
     {"musicbrainz-id", Tuple::MusicBrainzID},
     {"performer", Tuple::Performer},
+    {"precedence", Tuple::Precedence},
     {"publisher", Tuple::Publisher},
     {"quality", Tuple::Quality},
     {"segment-end", Tuple::EndTime},
@@ -694,128 +696,145 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
     bool updated = false;
     bool haveArtworkUrl = false;
     int value;
-    bool split_titles = aud_get_bool (nullptr, "split_titles");
     bool genreisset = false;
+    int precedence = get_int (Precedence);
 
     ::String val = stream.get_metadata ("track-name");
-    if (val && val[0] && strncmp ((const char *) val, "  - ", 4))
-    {
-        if (! fauxd_is_prevmeta (0, val))
-        {
-            bool albumisset = false;  /* JWT:TRUE IF STREAM METADATA ITSELF CONTAINS AN ALBUM FIELD. */
-            fauxd_set_prevmeta (0, val);
-            const char * ttloffset = strstr ((const char *) val, " - text=\"");
 
-            aud_set_str (nullptr, "_cover_art_link", "");
-            unset (Lyrics); //JWT:REMOVE ANY RESIDUAL "LYRICS" FROM TAGFILE (LIKELY FROM URLHELPER) SO SONG CHG. CAN OVERRIDE!
-            if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
+    if (val && val[0] && precedence != 3 && strncmp ((const char *) val, "  - ", 4)
+            && ! fauxd_is_prevmeta (0, val))
+    {
+/* ---JWT:PROGRAMMER NOTE:*EVERYTHING* ABOVE HERE GETS HIT *MANY* TIMES PER SECOND!--- */
+        bool albumisset = false;  /* JWT:TRUE IF STREAM METADATA ITSELF CONTAINS AN ALBUM FIELD. */
+        fauxd_set_prevmeta (0, val);
+        const char * ttloffset = strstr ((const char *) val, " - text=\"");
+        bool split_titles = aud_get_bool (nullptr, "split_titles");
+
+        if (precedence < 0)
+            precedence = 0;  // JWT:MAKE SURE WE'RE NOT NEGATIVE/UNSET (TO AVOID FALSE FLAGS)!
+
+        aud_set_str (nullptr, "_cover_art_link", "");
+        unset (Lyrics); //JWT:REMOVE ANY RESIDUAL "LYRICS" FROM TAGFILE (LIKELY FROM URLHELPER) SO SONG CHG. CAN OVERRIDE!
+        if (ttloffset)  //JWT:FIXUP UGLY IHeartRadio STREAM TITLES (EXTRACT TITLE FROM "...-text="TITLE"):
+        {
+            const char * endquote = strstr (ttloffset+10, "\"");
+            if (endquote)
             {
-                const char * endquote = strstr (ttloffset+10, "\"");
-                if (endquote)
+                const char * ttloffset9 = ttloffset + 9;
+                const char * tupletitle = (const char *) get_str (Title);
+                int artlen = ttloffset - (const char *) val;
+                if (artlen > 0 && (! tupletitle || strncmp ((const char *) val, tupletitle, artlen)))
                 {
-                    const char * ttloffset9 = ttloffset + 9;
-                    const char * tupletitle = (const char *) get_str (Title);
-                    int artlen = ttloffset - (const char *) val;
-                    if (artlen > 0 && (! tupletitle || strncmp ((const char *) val, tupletitle, artlen)))
+                    if (split_titles)
                     {
-                        if (split_titles)
-                        {
+                        if (! (precedence & TITLE_F))
                             set_str (Title, str_printf ("%.*s", (int)(endquote-ttloffset9), ttloffset9));
+                        if (! (precedence & ARTIST_F))
                             set_str (Artist, str_printf ("%.*s", artlen, (const char *) val));
-                        }
-                        else
-                        {
+                    }
+                    else
+                    {
+                        if (! (precedence & TITLE_F))
                             set_str (Title, str_printf ("%.*s - %.*s", artlen,
                                     (const char *) val, (int) (endquote-ttloffset9), ttloffset9));
+                        if (! (precedence & ARTIST_F))
                             set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
-                        }
-                        updated = true;
                     }
+                    if (! (precedence & TITLE_F) || ! (precedence & ARTIST_F))
+                        updated = true;
+                }
 
-                    /* JWT:SOME iHeart STATIONS INCLUDE COVER-ART!: */
-                    const char * coverart = strstr (endquote, "ArtworkURL=\"");
-                    if (coverart)
+                /* JWT:SOME iHeart STATIONS INCLUDE COVER-ART!: */
+                const char * coverart = strstr (endquote, "ArtworkURL=\"");
+                if (coverart)
+                {
+                    const char * coveroffset = coverart + 12;
+                    const char * endquote = strstr (coveroffset, "\"");
+                    if (endquote)
                     {
-                        const char * coveroffset = coverart + 12;
-                        const char * endquote = strstr (coveroffset, "\"");
-                        if (endquote)
+                        int coverlen = endquote - coveroffset;
+                        if (coverlen > 0)
                         {
-                            int coverlen = endquote - coveroffset;
-                            if (coverlen > 0)
-                            {
-                                aud_set_str (nullptr, "_cover_art_link", str_printf ("%.*s", coverlen, coveroffset));
-                                haveArtworkUrl = true;
-                            }
+                            aud_set_str (nullptr, "_cover_art_link", str_printf ("%.*s", coverlen, coveroffset));
+                            haveArtworkUrl = true;
                         }
                     }
                 }
             }
-            else  /* LOOK FOR:  'Title: ... Artist: ...' etc.: */
+        }
+        else  /* LOOK FOR:  'Title: ... Artist: ...' etc.: */
+        {
+            ttloffset = strstr_nocase ((const char *) val, "Title: ");
+            if (ttloffset)  //JWT:FIXUP STREAM TILES IN FORMAT: "[[Artist: ]artist - ]Title: title [Album: album]:
             {
-                ttloffset = strstr_nocase ((const char *) val, "Title: ");
-                if (ttloffset)  //JWT:FIXUP STREAM TILES IN FORMAT: "[[Artist: ]artist - ]Title: title [Album: album]:
+                const char * metaindxptr = (const char *) val;
+                const char * metaptr[4];
+                int metaindx = 0;
+                int titleindx = -1;
+                int artistindx = -1;
+                int albumindx = -1;
+                int yearindx = -1;
+                /* JWT:PARSE OUT TITLE, ARTIST, ALBUM, & YEAR PARTS:
+                    (NOTE: MAY NOT HAVE 'EM ALL & ORDER MAY VARY) */
+                while (metaindxptr && metaindx < 4)
                 {
-                    const char * metaindxptr = (const char *) val;
-                    const char * metaptr[4];
-                    int metaindx = 0;
-                    int titleindx = -1;
-                    int artistindx = -1;
-                    int albumindx = -1;
-                    int yearindx = -1;
-                    /* JWT:PARSE OUT TITLE, ARTIST, ALBUM, & YEAR PARTS:
-                        (NOTE: MAY NOT HAVE 'EM ALL & ORDER MAY VARY) */
-                    while (metaindxptr && metaindx < 4)
+                    if (str_has_prefix_nocase (metaindxptr, "Title: "))
                     {
-                        if (str_has_prefix_nocase (metaindxptr, "Title: "))
-                        {
-                            metaptr[metaindx] = metaindxptr;
-                            titleindx = metaindx++;
-                        }
-                        else if (str_has_prefix_nocase (metaindxptr, "Artist: "))
-                        {
-                            metaptr[metaindx] = metaindxptr;
-                            artistindx = metaindx++;
-                        }
-                        else if (str_has_prefix_nocase (metaindxptr, "Album: "))
-                        {
-                            metaptr[metaindx] = metaindxptr;
-                            albumindx = metaindx++;
-                        }
-                        else if (str_has_prefix_nocase (metaindxptr, "Year: "))
-                        {
-                            metaptr[metaindx] = metaindxptr;
-                            yearindx = metaindx++;
-                        }
-                        ++metaindxptr;
+                        metaptr[metaindx] = metaindxptr;
+                        titleindx = metaindx++;
                     }
-                    --metaindx;
-                    int artistlen = (metaptr[artistindx] && artistindx < metaindx)
-                            ? metaptr[artistindx+1] - (metaptr[artistindx]+11) : -1;
-                    int titlelen = (metaptr[titleindx] && titleindx < metaindx)
-                            ? metaptr[titleindx+1] - (metaptr[titleindx]+10) : -1;
-                    if (split_titles)
+                    else if (str_has_prefix_nocase (metaindxptr, "Artist: "))
                     {
+                        metaptr[metaindx] = metaindxptr;
+                        artistindx = metaindx++;
+                    }
+                    else if (str_has_prefix_nocase (metaindxptr, "Album: "))
+                    {
+                        metaptr[metaindx] = metaindxptr;
+                        albumindx = metaindx++;
+                    }
+                    else if (str_has_prefix_nocase (metaindxptr, "Year: "))
+                    {
+                        metaptr[metaindx] = metaindxptr;
+                        yearindx = metaindx++;
+                    }
+                    ++metaindxptr;
+                }
+                --metaindx;
+                int artistlen = (metaptr[artistindx] && artistindx < metaindx)
+                        ? metaptr[artistindx+1] - (metaptr[artistindx]+11) : -1;
+                int titlelen = (metaptr[titleindx] && titleindx < metaindx)
+                        ? metaptr[titleindx+1] - (metaptr[titleindx]+10) : -1;
+                if (split_titles)
+                {
+                    if (! (precedence & TITLE_F))
                         set_str (Title, str_copy (metaptr[titleindx]+7, titlelen));
-                        if (metaptr[artistindx])
+                    if (metaptr[artistindx] && ! (precedence & ARTIST_F))
                             set_str (Artist, str_copy (metaptr[artistindx]+8, artistlen));
-                    }
-                    else
-                    {
+                }
+                else
+                {
+                    if (! (precedence & ARTIST_F))
                         set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
-                        if (metaptr[artistindx])
+                    if (metaptr[artistindx])
+                    {
+                        if (! (precedence & TITLE_F))
                             set_str (Title, str_printf ("%.*s%s%.*s", artistlen, metaptr[artistindx]+8,
                                     " - ", titlelen, metaptr[titleindx]+7));
-                        else
-                            set_str (Title, (const char *) val);
-
                     }
-                    if (metaptr[albumindx])
-                    {
-                        int albumlen = (metaptr[albumindx] && albumindx < metaindx)
-                                ? metaptr[albumindx+1] - (metaptr[albumindx]+10) : -1;
+                    else if (! (precedence & TITLE_F))
+                        set_str (Title, (const char *) val);
 
-                        albumisset = true;
-                        ::String stream_name = stream.get_metadata ("stream-name");
+                }
+                if (metaptr[albumindx])
+                {
+                    int albumlen = (metaptr[albumindx] && albumindx < metaindx)
+                            ? metaptr[albumindx+1] - (metaptr[albumindx]+10) : -1;
+
+                    ::String stream_name = stream.get_metadata ("stream-name");
+                    albumisset = true;  // JWT:DO THIS REGARDLESS OF FLAG B/C IT AFFECTS MORE THAN JUST ALBUM FIELD!
+                    if (! (precedence & ALBUM_F))
+                    {
                         if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
                             set_str (Album, str_printf ("%s%s%s",
                                     (const char *) str_copy (metaptr[albumindx]+7, albumlen), " - ",
@@ -823,77 +842,82 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                         else
                             set_str (Album, str_copy (metaptr[albumindx]+7, albumlen));
                     }
-                    if (metaptr[yearindx])
-                        set_int (Year, atoi (str_copy (metaptr[yearindx]+6, ((yearindx < metaindx)
-                                ? (metaptr[yearindx+1] - (metaptr[yearindx]+6)) : -1))));
                 }
-                else  /* LOOK FOR:  'artist="..." title="..."': */
+                if (metaptr[yearindx] && ! (precedence & YEAR_F))
+                    set_int (Year, atoi (str_copy (metaptr[yearindx]+6, ((yearindx < metaindx)
+                            ? (metaptr[yearindx+1] - (metaptr[yearindx]+6)) : -1))));
+            }
+            else  /* LOOK FOR:  'artist="..." title="..."': */
+            {
+                ttloffset = strstr_nocase ((const char *) val, "title=\"");
+                if (ttloffset)
                 {
-                    ttloffset = strstr_nocase ((const char *) val, "title=\"");
-                    if (ttloffset)
+                    ttloffset += 7;
+                    const char * endquote = strstr (ttloffset+1, "\"");
+                    if (endquote)
+                    {
+                        int ttllen = (int) (endquote-ttloffset);
+                        const char * artoffset = strstr_nocase ((const char *) val, "artist=\"");
+                        if (artoffset)  //WE HAVE A SEPARATE ARTIST FIELD:
+                        {
+                            artoffset += 8;
+                            endquote = strstr (artoffset+1, "\"");
+                            if (endquote)
+                            {
+                                int artlen = (int) (endquote-artoffset);
+                                if (split_titles)
+                                {
+                                    if (ttllen > 0 && ! (precedence & TITLE_F))
+                                        set_str (Title, (const char *) str_printf ("%.*s",
+                                                ttllen, ttloffset));
+                                    if (artlen > 0 && ! (precedence & ARTIST_F))
+                                        set_str (Artist, (const char *) str_printf ("%.*s",
+                                                artlen, artoffset));
+                                }
+                                else if (ttllen > 0 && ! (precedence & TITLE_F))
+                                    set_str (Title, str_printf ("%.*s - %.*s", artlen,
+                                            artoffset, ttllen, ttloffset));
+                            }
+                        }
+                        else if (split_titles)  //NO ARTIST FIELD, CHECK TITLE:
+                        {
+                            const char * split = strstr (ttloffset, " - ");
+                            if (split && endquote > split + 3)
+                            {
+                                if (! (precedence & ARTIST_F))
+                                    set_str (Artist, (const char *) str_printf ("%.*s",
+                                            (int) (split - ttloffset), ttloffset));
+                                split += 3;
+                                if (endquote > split && ! (precedence & TITLE_F))
+                                    set_str (Title, (const char *) str_printf ("%.*s",
+                                            (int) (endquote - split), split));
+                            }
+                            else if (ttllen > 0 && ! (precedence & TITLE_F))
+                                set_str (Title, (const char *) str_printf ("%.*s",
+                                        ttllen, ttloffset));
+                        }
+                        else
+                        {
+                            if (! (precedence & ARTIST_F))
+                                set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
+                            if (ttllen > 0 && ! (precedence & TITLE_F))
+                                set_str (Title, (const char *) str_printf ("%.*s",
+                                        ttllen, ttloffset));
+                        }
+                    }
+                    ttloffset = strstr_nocase ((const char *) val, "album=\"");
+                    if (ttloffset)  //WE HAVE A SEPARATE ALBUM FIELD:
                     {
                         ttloffset += 7;
                         const char * endquote = strstr (ttloffset+1, "\"");
                         if (endquote)
                         {
-                            int ttllen = (int) (endquote-ttloffset);
-                            const char * artoffset = strstr_nocase ((const char *) val, "artist=\"");
-                            if (artoffset)  //WE HAVE A SEPARATE ARTIST FIELD:
+                            int albumlen = (int) (endquote-ttloffset);
+                            if (albumlen > 0)
                             {
-                                artoffset += 8;
-                                endquote = strstr (artoffset+1, "\"");
-                                if (endquote)
+                                albumisset = true;
+                                if (! (precedence & ALBUM_F))
                                 {
-                                    int artlen = (int) (endquote-artoffset);
-                                    if (split_titles)
-                                    {
-                                        if (ttllen > 0)
-                                            set_str (Title, (const char *) str_printf ("%.*s",
-                                                    ttllen, ttloffset));
-                                        if (artlen > 0)
-                                            set_str (Artist, (const char *) str_printf ("%.*s",
-                                                    artlen, artoffset));
-                                    }
-                                    else if (ttllen > 0)
-                                        set_str (Title, str_printf ("%.*s - %.*s", artlen,
-                                                artoffset, ttllen, ttloffset));
-                                }
-                            }
-                            else if (split_titles)  //NO ARTIST FIELD, CHECK TITLE:
-                            {
-                                const char * split = strstr (ttloffset, " - ");
-                                if (split && endquote > split + 3)
-                                {
-                                    set_str (Artist, (const char *) str_printf ("%.*s",
-                                            (int) (split - ttloffset), ttloffset));
-                                    split += 3;
-                                    if (endquote > split)
-                                        set_str (Title, (const char *) str_printf ("%.*s",
-                                                (int) (endquote - split), split));
-                                }
-                                else if (ttllen > 0)
-                                    set_str (Title, (const char *) str_printf ("%.*s",
-                                            ttllen, ttloffset));
-                            }
-                            else
-                            {
-                                set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
-                                if (ttllen > 0)
-                                    set_str (Title, (const char *) str_printf ("%.*s",
-                                            ttllen, ttloffset));
-                            }
-                        }
-                        ttloffset = strstr_nocase ((const char *) val, "album=\"");
-                        if (ttloffset)  //WE HAVE A SEPARATE ALBUM FIELD:
-                        {
-                            ttloffset += 7;
-                            const char * endquote = strstr (ttloffset+1, "\"");
-                            if (endquote)
-                            {
-                                int albumlen = (int) (endquote-ttloffset);
-                                if (albumlen > 0)
-                                {
-                                    albumisset = true;
                                     ::String stream_name = stream.get_metadata ("stream-name");
                                     if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
                                         set_str (Album, (const char *) str_printf ("%.*s%s%s",
@@ -906,151 +930,173 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
                             }
                         }
                     }
-                    else if (split_titles)
+                }
+                else if (split_titles)
+                {
+                    const char * artoffset = (const char *) val;
+                    const char * ttloffset = strstr (artoffset, " - ");
+                    const char * junkoffset = strstr (artoffset, " || "); // JWT:CLEAN UP TITLES W/" || #### S", ETC?!
+                    if (ttloffset)
                     {
-                        const char * artoffset = (const char *) val;
-                        const char * ttloffset = strstr (artoffset, " - ");
-                        const char * junkoffset = strstr (artoffset, " || "); // JWT:CLEAN UP TITLES W/" || #### S", ETC?!
-                        if (ttloffset)
+                        ttloffset += 3;
+                        if (junkoffset && junkoffset > ttloffset)
                         {
-                            ttloffset += 3;
-                            if (junkoffset && junkoffset > ttloffset)
+                            if (! (precedence & TITLE_F))
                                 set_str (Title, (const char *) str_printf ("%.*s",
                                         (int) (junkoffset-ttloffset), ttloffset));
-                            else
+                        }
+                        else
+                        {
+                            const char * extrametadata = strstr (ttloffset, " - ");
+                            if (extrametadata)  // JWT:ASSUMING:  "artist - title - album[ - genre]":
                             {
-                                const char * extrametadata = strstr (ttloffset, " - ");
-                                if (extrametadata)  // JWT:ASSUMING:  "artist - title - album[ - genre]":
-                                {
+                                if (! (precedence & TITLE_F))
                                     set_str (Title, (const char *) str_printf ("%.*s",
                                             (int) (extrametadata-ttloffset), ttloffset));
-                                    const char * album = extrametadata += 3;
-                                    if (album)
+                                const char * album = extrametadata += 3;
+                                if (album)
+                                {
+                                    const char * extrametadata = strstr (album, " - ");
+                                    if (! extrametadata || extrametadata > album)
                                     {
-                                        const char * extrametadata = strstr (album, " - ");
-										 if (! extrametadata || extrametadata > album )
-										 {
-											albumisset = true;
-											::String stream_name = stream.get_metadata ("stream-name");
-											if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
-											{
-												if (extrametadata)
-													set_str (Album, (const char *) str_printf ("%.*s%s%s",
-															(int)(extrametadata - album), album, " - ",
-															(const char *) stream_name));
-												else
-													set_str(Album, (const char *) str_printf ("%s%s%s", album,
-															" - ", (const char *) stream_name));
-											}
-											else
-											{
-												if (extrametadata)
-													set_str (Album, (const char *) str_printf ("%.*s",
-															(int)(extrametadata - album), album));
-												else
-													set_str (Album, album);
-											}
-                                        }
-                                        if (extrametadata)
+                                        albumisset = true;
+                                        if (! (precedence & ALBUM_F))
                                         {
-                                            const char * genre = extrametadata + 3;
-                                            if (genre)
+                                            ::String stream_name = stream.get_metadata ("stream-name");
+                                            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
                                             {
-                                                set_str (Genre, genre);
-                                                genreisset = true;
+                                                if (extrametadata)
+                                                    set_str (Album, (const char *) str_printf ("%.*s%s%s",
+                                                            (int)(extrametadata - album), album, " - ",
+                                                            (const char *) stream_name));
+                                                else
+                                                    set_str (Album, (const char *) str_printf ("%s%s%s", album,
+                                                            " - ", (const char *) stream_name));
+                                            }
+                                            else
+                                            {
+                                                if (extrametadata)
+                                                    set_str (Album, (const char *) str_printf ("%.*s",
+                                                            (int)(extrametadata - album), album));
+                                                else
+                                                    set_str (Album, album);
                                             }
                                         }
                                     }
+                                    if (extrametadata)
+                                    {
+                                        const char * genre = extrametadata + 3;
+                                        if (genre && ! (precedence & GENRE_F))
+                                        {
+                                            set_str (Genre, genre);
+                                            genreisset = true;
+                                        }
+                                    }
                                 }
-                                else
-                                    set_str (Title, ttloffset);
                             }
+                            else if (! (precedence & TITLE_F))
+                                set_str (Title, ttloffset);
+                        }
+                        if (! (precedence & ARTIST_F))
                             set_str (Artist, (const char *) str_printf ("%.*s",
                                     (int) ((ttloffset-artoffset)-3), artoffset));
-                        }
-                        else if (junkoffset && junkoffset > artoffset)
+                    }
+                    else if (junkoffset && junkoffset > artoffset)
+                    {
+                        if (! (precedence & TITLE_F))
                             set_str (Title, (const char *) str_printf ("%.*s",
                                     (int) (junkoffset-artoffset), artoffset));
-                        else
-                            set_str (Title, artoffset);
                     }
-                    else
-                    {
-                        set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
-                        if (val != get_str (Title))
-                            set_str (Title, val);
-                    }
+                    else if (! (precedence & TITLE_F))
+                        set_str (Title, artoffset);
                 }
-
-                updated = true;
-            }
-
-            if (! albumisset)
-            {
-                ::String stream_name = stream.get_metadata ("stream-name");
-                if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
-                {
-                    const char * s;
-                    auto streampath = get_str (Path);
-                    ::String album = get_str (Album);
-                    if (split_titles)
-                    {
-                        if (!album || !album[0])
-                            set_str (Album, stream_name);
-
-                        ::String albumartist = get_str (AlbumArtist);
-                        if ((!albumartist || !albumartist[0]) && streampath && (s = find_domain (streampath)))
-                            set_str (AlbumArtist, extract_domain (s));  //JWT:MOVE STREAM URL DOMAIN-NAME DOWN TO ALBUMARTIST.
-                    }
-                    else
-                    {
-                        set_str (Artist, stream_name);
-                        if (!album || !album[0] || album == stream_name)
-                        {
-                            if (streampath && (s = find_domain (streampath)))
-                                set_str (Album, extract_domain (s));
-                            set_str (AlbumArtist, ::String (""));
-                        }
-                    }
-                }
-                updated = true;
-            }
-            /* JWT:AVOID DUPLICATES: */
-            ::String artist = get_str (Artist);
-            ::String album = get_str (Album);
-            if (artist == album)
-            {
-                if (split_titles)
-                    set_str (Album, ::String (""));
                 else
-                    set_str (Artist, ::String (""));
-                updated = true;
+                {
+                    if (! (precedence & ARTIST_F))
+                        set_str (Artist, ::String(""));  //JWT:BLANK ARTIST FIELD (AS ARTIST IS IN TITLE)!
+                    if (! (precedence & TITLE_F))
+                        set_str (Title, val);
+                }
             }
+            updated = true;
+        }
+
+        if (! albumisset)
+        {
+            ::String stream_name = stream.get_metadata ("stream-name");
+            if (stream_name && stream_name[0] && stream_name != ::String("(null)"))
+            {
+                const char * s;
+                auto streampath = get_str (Path);
+                ::String album = get_str (Album);
+                if (split_titles)
+                {
+                    if ((!album || !album[0]) && ! (precedence & ALBUM_F))
+                        set_str (Album, stream_name);
+
+                    ::String albumartist = get_str (AlbumArtist);
+                    if ((! albumartist || ! albumartist[0])
+                            && (! (precedence & ALBUMARTIST_F))
+                            && streampath && (s = find_domain (streampath)))
+                        //JWT:MOVE STREAM URL DOMAIN-NAME DOWN TO ALBUMARTIST.
+                        set_str (AlbumArtist, extract_domain (s));
+                }
+                else
+                {
+                    if (! (precedence & ARTIST_F))
+                        set_str (Artist, stream_name);
+                    if (! album || ! album[0] || album == stream_name)
+                    {
+                        if (streampath && (! (precedence & ALBUM_F))
+                                && (s = find_domain (streampath)))
+                            set_str (Album, extract_domain (s));
+                        if (! (precedence & ALBUMARTIST_F))
+                            set_str (AlbumArtist, ::String (""));
+                    }
+                }
+            }
+            updated = true;
+        }
+        /* JWT:AVOID DUPLICATES: */
+        ::String artist = get_str (Artist);
+        ::String album = get_str (Album);
+        if (artist == album)
+        {
             if (split_titles)
             {
-                ::String albumartist = get_str (AlbumArtist);
-                if (albumartist == album)
-                {
-                    set_str (AlbumArtist, ::String (""));
-                    updated = true;
-                }
+                if (! (precedence & ALBUM_F))
+                    set_str (Album, ::String (""));
             }
+            else if (! (precedence & ARTIST_F))
+                set_str (Artist, ::String (""));
 
-            if (! haveArtworkUrl && aud_get_str (nullptr, "_cover_art_link") == ::String (""))
+            updated = true;
+        }
+        if (split_titles)
+        {
+            ::String albumartist = get_str (AlbumArtist);
+            if (albumartist == album
+                    && ! (precedence & ALBUMARTIST_F))
             {
-                /* JWT:SOME WEIRD STREAMS PUT A COVER-ART LINK AS THEIR "STREAM-URL"?! */
-                ::String stream_url = stream.get_metadata ("stream-url");
-                if (stream_url && stream_url[0])
+                set_str (AlbumArtist, ::String (""));
+                updated = true;
+            }
+        }
+
+        if (! haveArtworkUrl && aud_get_str (nullptr, "_cover_art_link") == ::String (""))
+        {
+            /* JWT:SOME WEIRD STREAMS PUT A COVER-ART LINK AS THEIR "STREAM-URL"?! */
+            ::String stream_url = stream.get_metadata ("stream-url");
+            if (stream_url && stream_url[0])
+            {
+                Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg,webp", ",");
+                StringBuf uriext = uri_get_extension (stream_url);
+                for (auto & ext : extlist)
                 {
-                    Index<::String> extlist = str_list_to_index ("jpg,png,gif,jpeg,webp", ",");
-                    StringBuf uriext = uri_get_extension (stream_url);
-                    for (auto & ext : extlist)
+                    if (! strcmp_nocase (uriext, ext))
                     {
-                        if (! strcmp_nocase (uriext, ext))
-                        {
-                            aud_set_str (nullptr, "_cover_art_link", stream_url);
-                            break;
-                        }
+                        aud_set_str (nullptr, "_cover_art_link", stream_url);
+                        break;
                     }
                 }
             }
@@ -1060,17 +1106,19 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
     val = stream.get_metadata ("stream-name");
     if (val && val[0] && ! fauxd_is_prevmeta (1, val))
     {
+        bool split_titles = aud_get_bool (nullptr, "split_titles");
         fauxd_set_prevmeta (1, val);
         if (split_titles)
         {
             ::String tuple_album = get_str (Album);
-            if (! tuple_album || tuple_album == ::String("(null)"))
+            if ((! tuple_album || tuple_album == ::String("(null)"))
+                    && ! (precedence & ALBUM_F))
             {
                 set_str (Album, val);
                 updated = true;
             }
         }
-        else if (val != get_str (Artist))
+        else if (val != get_str (Artist) && ! (precedence & ARTIST_F))
         {
             set_str (Artist, val);
             updated = true;
@@ -1078,7 +1126,8 @@ EXPORT bool Tuple::fetch_stream_info (VFSFile & stream)
         if (! genreisset)
         {
             ::String stream_genre = stream.get_metadata ("stream-genre");
-            if (stream_genre && stream_genre[0] && stream_genre != get_str (Genre))
+            if (stream_genre && stream_genre[0] && stream_genre != get_str (Genre)
+                    && ! (precedence & GENRE_F))
             {
                 set_str (Genre, stream_genre);
                 updated = true;

@@ -28,6 +28,17 @@
 
 #include <libfauxdcore/objects.h>
 
+/* JWT:TAG-FILE PRECEDENCE FLAGS (THAT StreamFinder CAN SET & STREAMS CAN DYNAMICALLY CHANGE):  */
+/* NOTE:"ONLY"==3 (DEFAULT_F + OVERRIDE_F). OTHERS INDICATE TAGS SET AS "OVERRIDE" IN TAG-FILE. */
+#define DEFAULT_F      (0x01<<0)
+#define OVERRIDE_F     (0x01<<1)
+#define TITLE_F        (0x01<<2)
+#define ARTIST_F       (0x01<<3)
+#define ALBUM_F        (0x01<<4)
+#define ALBUMARTIST_F  (0x01<<5)
+#define GENRE_F        (0x01<<6)
+#define YEAR_F         (0x01<<7)
+
 struct ReplayGainInfo;
 struct TupleData;
 class PluginHandle;
@@ -104,6 +115,7 @@ public:
         Publisher,      /* Publisher (label) */
         CatalogNum,     /* Catalog number */
         Disc,           /* Disc number from id3 tags. */
+        Precedence,     /* JWT:Highest tag-source precedence & locked field flags */
 
         n_fields
     };

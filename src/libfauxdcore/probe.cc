@@ -18,6 +18,7 @@
  */
 
 #include "internal.h"
+#include "tuple.h"
 #include "probe.h"
 
 #include <stdlib.h>
@@ -472,6 +473,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 tuple.set_int (Tuple::Length, tupleLength);
             if (startTime > 0)
                 tuple.set_int (Tuple::StartTime, startTime);
+            tuple.set_int (Tuple::Precedence, highest_mode);
         }
         else if (highest_mode > 0 && override_tuple >= 0)  // (1 OR 2) TAG FILE(S) FOUND (ALL DEFAULT OR OVERRIDE):
         {
@@ -479,19 +481,32 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             tuple = std::move (song_tuple);  // NOTE: THIS *MOVES*, NOT COPIES song_tuple!!! START OUT WITH ALL THE read_tag() DATA.
             if (highest_mode == 2)  // 2 - (OVERRIDE) - REPLACE ONLY TAG FIELDS THAT ARE ALSO FOUND IN THE PRIMARY TAG FILE:
             {
+                int precedence_flags = 2;
                 String tfld;
                 tfld = tuples[override_tuple].get_str (Tuple::Title);
                 if (tfld && tfld[0])
+                {
                     tuple.set_str (Tuple::Title, tfld);  // OVERRIDE TITLE WITH TITLE FROM THE PRIMARY TAG FILE...
+                    precedence_flags |= TITLE_F;         // PREVENT STREAMS FROM CHANGING!
+                }
                 tfld = tuples[override_tuple].get_str (Tuple::Artist);
                 if (tfld && tfld[0])
+                {
                     tuple.set_str (Tuple::Artist, tfld);
+                    precedence_flags |= ARTIST_F;
+                }
                 tfld = tuples[override_tuple].get_str (Tuple::Album);
                 if (tfld && tfld[0])
+                {
                     tuple.set_str (Tuple::Album, tfld);
+                    precedence_flags |= ALBUM_F;
+                }
                 tfld = tuples[override_tuple].get_str (Tuple::AlbumArtist);
                 if (tfld && tfld[0])
+                {
                     tuple.set_str (Tuple::AlbumArtist, tfld);
+                    precedence_flags |= ALBUMARTIST_F;
+                }
                 tfld = tuples[override_tuple].get_str (Tuple::Comment);
                 if (tfld && tfld[0])
                     tuple.set_str (Tuple::Comment, tfld);
@@ -503,10 +518,16 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                     tuple.set_str (Tuple::Performer, tfld);
                 tfld = tuples[override_tuple].get_str (Tuple::Genre);
                 if (tfld && tfld[0])
+                {
                     tuple.set_str (Tuple::Genre, tfld);
+                     precedence_flags |= GENRE_F;
+                }
                 i_tfld = tuples[override_tuple].get_int (Tuple::Year);
                 if (i_tfld && i_tfld >= 0)
+                {
                     tuple.set_int (Tuple::Year, i_tfld);
+                    precedence_flags |= YEAR_F;
+                }
                 i_tfld = tuples[override_tuple].get_int (Tuple::Track);
                 if (i_tfld && i_tfld >= 0)
                     tuple.set_int (Tuple::Track, i_tfld);
@@ -516,6 +537,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 tfld = tuples[override_tuple].get_str (Tuple::Lyrics);
                 if (tfld && tfld[0])
                     tuple.set_str (Tuple::Lyrics, tfld);
+                tuple.set_int (Tuple::Precedence, precedence_flags);
             }
             else  // 1 - (DEFAULT) - REPLACE ONLY EMPTY(MISSING) TAG FIELDS WITH THE HIGHEST PRIORITY DEFAULT FOUND:
             {
@@ -603,6 +625,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                     if (tfld && tfld[0])
                         tuple.set_str (Tuple::Lyrics, tfld);
                 }
+                tuple.set_int (Tuple::Precedence, 1);
             }
         }
         else  // NO TAG FILE DATA FOUND, ALL WE HAVE IS WHAT'S EMBEDDED IN THE PLAYING FILE ITSELF:
@@ -615,6 +638,7 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 tuple.set_int (Tuple::Length, tupleLength);
             if (startTime > 0)
                 tuple.set_int (Tuple::StartTime, startTime);
+            tuple.set_int (Tuple::Precedence, 0);
         }
 
         return true;
