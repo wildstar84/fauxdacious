@@ -1,4 +1,39 @@
-Version 4.6-devel1 [Updated 01/17/2026]
+Version 4.6-devel1 [Updated 02/14/2026]
+
+* Fauxdacious now supports preventing live-streams (ie. streaming radio-
+station streams that dynamically change song metadata between songs) from 
+updating specific metadata tags, ie. Album, Genre, etc. by specifying the 
+desired-fixed values in the tag file (normally user_tag_data) with the 
+normal Precedence field set to "OVERRIDE".  Other fields the user desires 
+updating, such as Title and Artist, should now be omitted or removed from 
+the tag file in these situations.  The use-case that spawned this change was 
+some streaming stations seem to return non-album name values in the Album 
+field, while frequently change them periodically and playing the same songs 
+again later (with different Album value) causing Fauxdacious's cover-art 
+and lyrics helpers to re-download the album image and lyrics for the same 
+song when played again later - wasting much disk space and hits on the 
+cover-art and lyrics sites.
+
+* StreamFinder v2.60+ now returns the length of podcasts (in millisec) 
+specified on the podcast's webpage for Apple podcasts since Apple likes to 
+not return the length embedded in the stream's metatags making them unseekable 
+and preventing Fauxdacious showing the length.  Fauxdacious can now look for 
+this tag in the StreamFinder-generated tag-file enabling display of the time 
+and ability to seek (at least, surprisingly, in the forward direction, which 
+enables skipping over commercials), but for unknown reasons, not in the 
+reverse direction.
+
+* Various helper-script tweaks to improve web-efficiency and reduce unnecessary 
+hits on the lyric and cover-art lookup sites, including a new "badimage" 
+option in the Lyrics-helper .ini config file to specify all or part of URLs 
+of known-bad but frequently searched-for cover-art images.  This also includes 
+not (re)searching the web for podcast/video cover-images when provided by 
+StreamFinder (which usually, but not always, fail); and now using 
+podcast's/video's channel-image if no main cover-image is provided, 
+similar to how cover-art is handled for streaming radio-stations.  Also  
+we increased the HLS-stream pre-read buffer 4x in order to handle more HLS 
+"playlist" streams with many bandwidth options for users with 
+limited bandwidth internet connections.
 
 * Fixed Rare crash when stopping play related to cover-art image-handling 
 (afaict), but (still open) Issue #25 reports crashes in the same code that 
