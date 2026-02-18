@@ -1,4 +1,10 @@
-Version 4.6-devel1 [Updated 02/14/2026]
+Version 4.6-devel1 [Updated 02/18/2026]
+
+* Add Audacious's new playlist saving-to-file option to fauxdtool 
+("playlist-save").  Saves current playlist to specified file in the 
+format based on the file's extension (required).
+
+Example:  fauxdtool playlist-save /tmp/file.audpl
 
 * Fauxdacious now supports preventing live-streams (ie. streaming radio-
 station streams that dynamically change song metadata between songs) from 
@@ -79,7 +85,7 @@ will be used (shown) instead now.  This closes Fauxdacious feature request#
 Song Info screen".  See updated FAQ# 15 for more details.
 
 * The various startup resume/paused/play options (-p, -u, and related 
-"Resume playback..." [Settings.Playlist] options should now work consistently 
+"Resume playback...") [Settings.Playlist] options should now work consistently 
 regardless of whether Fauxdacious is started up with or without song or 
 playlist entry(s).  As far as I can tell, this had been broken for years in 
 Audacious (and therefore Fauxdacious, but we have fixed here).
@@ -89,7 +95,7 @@ the genre (but one can still type in genres that aren't included in the list.
 
 * "[F6] - Refresh Selected" option now actually forces a metadata-display 
 refresh (previously had been depreciated to a silent no-op due to much improved 
-auto-refreshing metadata when user made changed), but apparently wasn't 
+auto-refreshing metadata when user made change), but apparently wasn't 
 *always* doing it!
 
 Version 4.5-final [Updated 7/22/2025]:

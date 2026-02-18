@@ -302,6 +302,13 @@ static gboolean do_playlist_add (Obj * obj, Invoc * invoc, const char * list)
     return true;
 }
 
+static gboolean do_playlist_save(Obj * obj, Invoc * invoc, const char * url)
+{
+    auto mode = aud_get_bool(nullptr, "metadata_on_play") ? Playlist::NoWait : Playlist::Wait;
+    bool success = aud_playlist_save (CURRENT, url, mode);
+    FINISH2 (playlist_save, success);
+    return true;
+}
 static gboolean do_playlist_enqueue_to_temp (Obj * obj, Invoc * invoc, const char * url)
 {
     aud_drct_pl_open_temp (url);
@@ -767,6 +774,7 @@ handlers[] =
     {"handle-play-pause", (GCallback) do_play_pause},
     {"handle-playing", (GCallback) do_playing},
     {"handle-playlist-add", (GCallback) do_playlist_add},
+    {"handle-playlist-save", (GCallback) do_playlist_save},
     {"handle-playlist-enqueue-to-temp", (GCallback) do_playlist_enqueue_to_temp},
     {"handle-playlist-ins-url-string", (GCallback) do_playlist_ins_url_string},
     {"handle-playqueue-add", (GCallback) do_playqueue_add},
