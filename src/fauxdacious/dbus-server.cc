@@ -39,10 +39,18 @@ typedef GDBusMethodInvocation Invoc;
 #define FINISH2(name, ...) \
  obj_fauxdacious_complete_##name (obj, invoc, __VA_ARGS__)
 
+static bool prefer_playing = true;
+
 static int current_playlist ()
 {
-    int list = aud_playlist_get_playing ();
-    return (list >= 0) ? list : aud_playlist_get_active ();
+    int list = -1;
+
+    if (prefer_playing)
+        list = aud_playlist_get_playing ();
+    if (list < 0)
+        list = aud_playlist_get_active ();
+
+    return list;
 }
 
 #define CURRENT current_playlist ()
@@ -79,7 +87,7 @@ static gboolean do_add_url (Obj * obj, Invoc * invoc, const char * url)
 
 static gboolean do_advance (Obj * obj, Invoc * invoc)
 {
-    aud_drct_pl_next ();
+    playlist_next_song (CURRENT, aud_get_bool (nullptr, "repeat"));
     FINISH (advance);
     return true;
 }
@@ -449,7 +457,7 @@ static gboolean do_repeat (Obj * obj, Invoc * invoc)
 
 static gboolean do_reverse (Obj * obj, Invoc * invoc)
 {
-    aud_drct_pl_prev ();
+    playlist_prev_song (CURRENT);
     FINISH (reverse);
     return true;
 }
@@ -461,12 +469,25 @@ static gboolean do_seek (Obj * obj, Invoc * invoc, unsigned pos)
     return true;
 }
 
+static gboolean do_select_displayed_playlist (Obj * obj, Invoc * invoc)
+{
+    prefer_playing = false;
+    FINISH (select_displayed_playlist);
+    return true;
+}
+static gboolean do_select_playing_playlist (Obj * obj, Invoc * invoc)
+{
+    prefer_playing = true;
+    FINISH (select_playing_playlist);
+    return true;
+}
 static gboolean do_set_active_playlist (Obj * obj, Invoc * invoc, int playlist)
 {
     aud_playlist_set_active (playlist);
 
     // check that the requested playlist exists before switching playback
-    if (aud_playlist_get_active () == playlist && aud_drct_get_playing ())
+    if (prefer_playing
+                && aud_playlist_get_active () == playlist && aud_drct_get_playing ())
         aud_playlist_play (playlist, aud_drct_get_paused ());
 
     FINISH (set_active_playlist);
@@ -794,6 +815,8 @@ handlers[] =
     {"handle-repeat", (GCallback) do_repeat},
     {"handle-reverse", (GCallback) do_reverse},
     {"handle-seek", (GCallback) do_seek},
+    {"handle-select-displayed-playlist", (GCallback) do_select_displayed_playlist},
+    {"handle-select-playing-playlist", (GCallback) do_select_playing_playlist},
     {"handle-set-active-playlist", (GCallback) do_set_active_playlist},
     {"handle-set-active-playlist-name", (GCallback) do_set_active_playlist_name},
     {"handle-set-eq", (GCallback) do_set_eq},

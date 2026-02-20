@@ -24,6 +24,16 @@
 #include "fauxdtool.h"
 #include "wrappers.h"
 
+void select_displayed (int argc, char * * argv)
+{
+    obj_fauxdacious_call_select_displayed_playlist_sync (dbus_proxy, NULL, NULL);
+}
+
+void select_playing (int argc, char * * argv)
+{
+    obj_fauxdacious_call_select_playing_playlist_sync (dbus_proxy, NULL, NULL);
+}
+
 void playlist_reverse (int argc, char * * argv)
 {
     obj_fauxdacious_call_reverse_sync (dbus_proxy, NULL, NULL);

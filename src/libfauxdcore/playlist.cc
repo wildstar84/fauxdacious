@@ -2089,7 +2089,7 @@ static bool shuffle_prev (PlaylistData * playlist)
     return true;
 }
 
-bool playlist_prev_song (int playlist_num)
+EXPORT bool playlist_prev_song (int playlist_num)
 {
     ENTER_GET_PLAYLIST (false);
 
@@ -2106,6 +2106,63 @@ bool playlist_prev_song (int playlist_num)
         aud_set_int (nullptr, "_prev_entry", playlist->position->number);
         set_position (playlist, playlist->entries[playlist->position->number - 1].get (), true);
     }
+
+    PlaybackChange change = change_playback (playlist);
+
+    LEAVE;
+
+    hook_call ("playlist position", aud::to_ptr (playlist_num));
+    call_playback_change_hooks (change);
+    return true;
+}
+
+EXPORT bool playlist_next_song (int playlist_num, bool repeat)
+{
+    ENTER_GET_PLAYLIST (false);
+
+    int hint = playlist->position ? playlist->position->number + 1 : 0;
+    aud_set_int (nullptr, "_prev_entry", hint - 1);
+
+    // JWT:ADDED NEXT CONDITION TO JUMP TO NEXT SELECTED SONG, IF ONE'S SELECTED:
+    // THIS PERMITS US TO "SELECT" THE NEXT SONG TO PLAY ON THE FLY.
+    int others_selected_count = playlist->selected_count
+            - (playlist->position->selected ? 1 : 0);
+    if (hint && others_selected_count > 0)
+    {
+        int entries = playlist->entries.len ();
+        bool saveshuffle = aud_get_bool (nullptr, "shuffle");
+        bool saverepeat = aud_get_bool (nullptr, "repeat");
+        Entry * entry = lookup_entry (playlist, hint);
+        if (saveshuffle)
+            aud_set_bool (nullptr, "shuffle", false); // TEMPORARILY TURN SHUFFLE OFF.
+        if (! saverepeat)
+            aud_set_bool (nullptr, "repeat", true); // TEMPORARILY TURN REPEAT ON.
+        while (1)
+        {
+            if (entry && entry->selected)
+                break;
+            if (++hint >= entries)
+                hint = 0;
+            entry = lookup_entry (playlist, hint);
+        }
+        if (! next_song_locked (playlist, repeat, hint))
+        {
+            if (saveshuffle)
+                aud_set_bool (nullptr, "shuffle", true);
+            if (! repeat)
+                aud_set_bool (nullptr, "repeat", false);
+            RETURN (false);
+        }
+        else
+        {
+            if (saveshuffle)
+                aud_set_bool (nullptr, "shuffle", true);
+            if (! repeat)
+                aud_set_bool (nullptr, "repeat", false);
+        }
+    }
+    else if (! next_song_locked (playlist, repeat, hint))
+        RETURN (false);
 
     PlaybackChange change = change_playback (playlist);
 
@@ -2286,63 +2343,6 @@ static bool next_song_locked (PlaylistData * playlist, bool repeat, int hint)
         set_position (playlist, playlist->entries[hint].get (), true);
     }
 
-    return true;
-}
-
-bool playlist_next_song (int playlist_num, bool repeat)
-{
-    ENTER_GET_PLAYLIST (false);
-
-    int hint = playlist->position ? playlist->position->number + 1 : 0;
-    aud_set_int (nullptr, "_prev_entry", hint - 1);
-
-    // JWT:ADDED NEXT CONDITION TO JUMP TO NEXT SELECTED SONG, IF ONE'S SELECTED:
-    // THIS PERMITS US TO "SELECT" THE NEXT SONG TO PLAY ON THE FLY.
-    int others_selected_count = playlist->selected_count
-            - (playlist->position->selected ? 1 : 0);
-    if (hint && others_selected_count > 0)
-    {
-        int entries = playlist->entries.len ();
-        bool saveshuffle = aud_get_bool (nullptr, "shuffle");
-        bool saverepeat = aud_get_bool (nullptr, "repeat");
-        Entry * entry = lookup_entry (playlist, hint);
-        if (saveshuffle)
-            aud_set_bool (nullptr, "shuffle", false); // TEMPORARILY TURN SHUFFLE OFF.
-        if (! saverepeat)
-            aud_set_bool (nullptr, "repeat", true); // TEMPORARILY TURN REPEAT ON.
-        while (1)
-        {
-            if (entry && entry->selected)
-                break;
-            if (++hint >= entries)
-                hint = 0;
-            entry = lookup_entry (playlist, hint);
-        }
-        if (! next_song_locked (playlist, repeat, hint))
-        {
-            if (saveshuffle)
-                aud_set_bool (nullptr, "shuffle", true);
-            if (! repeat)
-                aud_set_bool (nullptr, "repeat", false);
-            RETURN (false);
-        }
-        else
-        {
-            if (saveshuffle)
-                aud_set_bool (nullptr, "shuffle", true);
-            if (! repeat)
-                aud_set_bool (nullptr, "repeat", false);
-        }
-    }
-    else if (! next_song_locked (playlist, repeat, hint))
-        RETURN (false);
-
-    PlaybackChange change = change_playback (playlist);
-
-    LEAVE;
-
-    hook_call ("playlist position", aud::to_ptr (playlist_num));
-    call_playback_change_hooks (change);
     return true;
 }
 

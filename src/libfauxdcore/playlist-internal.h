@@ -48,9 +48,6 @@ void playlist_save_state ();
 
 void playlist_entry_insert_batch_raw (int playlist, int at, Index<PlaylistAddItem> && items);
 
-bool playlist_prev_song (int playlist);
-bool playlist_next_song (int playlist, bool repeat);
-
 DecodeInfo playback_entry_read (int serial);
 void playback_entry_set_tuple (int serial, Tuple && tuple);
 

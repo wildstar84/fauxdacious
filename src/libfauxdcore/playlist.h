@@ -226,6 +226,17 @@ void aud_playlist_set_position (int playlist, int position);
  * position may be set even if <playlist> is not currently playing. */
 int aud_playlist_get_position (int playlist);
 
+/* Returns the playlist position to the previous entry in playback order.
+ * Does not support wrapping past the beginning of the playlist.  Returns
+ * true on success, false if playlist position was not changed. */
+bool playlist_prev_song (int playlist);
+
+/* Advances the playlist position to the next entry in playback order,
+ * taking current shuffle settings into account.  At the end of the
+ * playlist, wraps around to the beginning if <repeat> is true.  Returns
+ * true on success, false if playlist position was not changed. */
+bool playlist_next_song (int playlist, bool repeat);
+
 /* Sets the entry which has keyboard focus (-1 means no entry). */
 void aud_playlist_set_focus (int playlist, int entry);
 

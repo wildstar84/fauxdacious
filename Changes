@@ -1,7 +1,18 @@
-Version 4.6-devel1 [Updated 02/18/2026]
+Version 4.6-devel1 [Updated 02/19/2026]
+
+* Merge Audacious's "--select-displayed" and "--select-playing" options to 
+fauxdtool.  These allow one to specify whether or not fauxdtool should apply 
+commands involving the "current" playlist to whichever one's currently 
+playing (if any) or (otherwise) to whichever one's tab is currently displayed 
+(on top / active).  The default is "--select-playing" (apply to playing 
+playlist, if any, otherwise, the active (displayed) one.  Audacious did this 
+back in March of 2017, but I had held it back not seeing much point to it at 
+the time, but apparently it addressed a crash bug there that I haven't ever 
+seen or had reported here.  I'm adding it now, as it makes it easier to use 
+fauxdtool's new "--playlist-save" option.
 
 * Add Audacious's new playlist saving-to-file option to fauxdtool 
-("playlist-save").  Saves current playlist to specified file in the 
+("--playlist-save").  Saves current playlist to specified file in the 
 format based on the file's extension (required).
 
 Example:  fauxdtool playlist-save /tmp/file.audpl

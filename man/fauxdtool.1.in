@@ -131,6 +131,12 @@ Return an exit code of 1 (true) if pause is set to just mute.
 .SS Playlist commands:
 
 .TP
+.B --select-displayed
+Apply commands to displayed playlist.
+.TP
+.B --select-playing
+Apply commands to playing playlist.
+.TP
 .B --playlist-advance
 Skip to the next song in the playlist.
 .TP
