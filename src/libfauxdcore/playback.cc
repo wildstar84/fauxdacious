@@ -697,7 +697,8 @@ EXPORT String aud_drct_get_title_one_line (bool flatten)
     StringBuf prefix = aud_get_bool (nullptr, "show_numbers_in_pl") ?
             str_printf ("%d. ", 1 + entry) : StringBuf (0);
 
-    StringBuf time = (length > 0) ? str_format_time (length) : StringBuf ();
+    StringBuf time = (length > 0 && ! aud_get_bool (nullptr, "exclude_time_from_title"))
+            ? str_format_time (length) : StringBuf ();
     StringBuf suffix = time ? str_concat ({" (", time, ")"}) : StringBuf (0);
 
     return String (str_concat ({prefix, title, suffix}));

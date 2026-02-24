@@ -118,5 +118,6 @@ StringBuf double_array_to_str (const double * array, int count);
 StringBuf str_format_time (int64_t milliseconds);
 
 StringBuf str_get_one_line (const char * instr, bool flatten);
+StringBuf str_remove_appended_uris (StringBuf && title);
 
 #endif /* LIBAUDCORE_STRINGS_H */

@@ -1,7 +1,22 @@
-Version 4.6-devel1 [Updated 02/19/2026]
+Version 4.6-devel1 [Updated 02/24/2026]
 
-* Merge Audacious's "--select-displayed" and "--select-playing" options to 
-fauxdtool.  These allow one to specify whether or not fauxdtool should apply 
+* Add 2 new [Settings].[Playlist] option checkboxes for "Exclude appended URLs 
+from window title" and "Exclude time from window title" under 
+[Fauxdacious Extras] to exclude urls (uris) sometimes appended to titles, 
+artists and or albums usually by StreamFinder (ie. in the format: 
+"Artist Name - https://artist's.website.com") with a " - ".  In this example, 
+only the "Artist Name" of the playing entry would be shown in the window 
+titlebar.  The other option permits hiding the time (duration) from the window 
+titlebar.  Note:  If a field contains only a url (uri) - not preceeded by text 
+and " - ", it will not be hidden by this option.  Purpose of these options is 
+to permit shortening of the title to better fit in the space provided by the 
+window titlebar by abbreviating it to the more important information (urls tend 
+to be long & the time is also shown just below next to the time-slider).  Also 
+note, this option does not affect the metadata fields as shown in the playlist 
+table or the info. popups.  Applies to all interfaces.
+
+* Merge Audacious's audtool "--select-displayed" and "--select-playing" options 
+to fauxdtool.  These allow one to specify whether or not fauxdtool should apply 
 commands involving the "current" playlist to whichever one's currently 
 playing (if any) or (otherwise) to whichever one's tab is currently displayed 
 (on top / active).  The default is "--select-playing" (apply to playing 

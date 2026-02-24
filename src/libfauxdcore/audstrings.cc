@@ -1218,3 +1218,55 @@ EXPORT StringBuf str_get_one_line (const char * instr, bool flatten)
     return (len < full_len) ? str_printf (_("%.*s%s"), len, instr, "...")
             : str_printf (_("%.*s"), len, instr);
 }
+
+/* JWT:REMOVE APPENDED URIS, IE. "artist - https://artists.website.com" => "artist"
+   FROM THE FORMATTED COMBO. "TITLE" STRING DISPLAYED ON WINDOW TITLE-BARS BASED ON
+   IF "remove_appended_uris_in_window_titles" IS SET.  THIS ABBREVIATES THE TITLE TO
+   MORE LIKELY FIT AND LOOK BETTER.  NOTE:ONLY APPENDED WITH A PRECEEDING " - " ARE
+   REMOVED FROM FIELDS SUCH AS Artist, Album, Albumartist, ETC. WHICH ALSO CONTAIN
+   AN ACTUAL NAME (TEXT) PART, USUALLY PREPENDED BY StreamFinder.  STANDALONE URI
+   VALUES IN FIELDS ARE NOT REMOVED WHICH WOULD RESULT IN AN EMPTY FIELD; NOR ARE
+   THEY REMOVED FROM FIELDS DISPLAYED IN THE PLAYLIST TABLE.
+*/
+EXPORT StringBuf str_remove_appended_uris (StringBuf && title)
+{
+    if (aud_get_bool (nullptr, "remove_appended_uris_in_window_titles"))
+    {
+        int offset = 0;
+        int looplimit = 4;  /* JWT:PREVENT ANY POSSIBILITY OF AN INFINITE LOOP! */
+        const char * title_ptr = (const char *) title;
+        while (const char * uri = strstr (title+offset, "://"))
+        {
+            int uriidx = uri - title_ptr;
+            int urilen = 0;
+            while (uriidx < title.len ())
+            {
+                if (uri[urilen] == ' ')
+                    break;
+
+                uriidx++;
+                urilen++;
+            }
+            const char * uri0 = uri - 8; /* 8=LONGEST POSSIBLE URI PREFIX(5) + 3(" - ") */
+            if (uri0 > title_ptr) /* ">" B/C NEED AT LEAST 1 CHAR BEFORE THE " - "! */
+            {
+                const char * uri1 = strstr (uri0, " - ");
+                if (uri1 && uri1 < uri)
+                {
+                    title.remove (uri1 - title_ptr, urilen + (uri - uri1));
+                    offset = 0;
+                }
+                else
+                    offset = (uri - title_ptr) + 1;
+            }
+            else
+                offset = (uri - title_ptr) + 1;
+
+            if (looplimit == 0)
+                break;
+
+            looplimit--;
+        }
+    }
+    return std::move (title);
+}
