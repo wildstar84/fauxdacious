@@ -2085,26 +2085,80 @@ static bool shuffle_prev (PlaylistData * playlist)
     if (! found)
         return false;
 
+    /* JWT:NEEDED TO DE-HIGHLIGHT PREVIOUSLY-PLAYING ENTRY, LIKELY B/C
+     * BOTH PREV. & NEW ENTRY HIGHLIGHTED (>1 HIGHLIGHTED, AFFECTED BY
+     * Faudacious's EXTRA ADVANCE TO NEXT HIGHLIGHTED OPTIONS:
+     * (SEE ALSO 2 MORE PLACES BELOW)
+     */
+    aud_set_int (nullptr, "_prev_entry", playlist->position
+            ? playlist->position->number : -1);
+
     set_position (playlist, found, false);
     return true;
 }
 
-EXPORT bool playlist_prev_song (int playlist_num)
+EXPORT bool playlist_prev_song (int playlist_num, bool repeat)
 {
     ENTER_GET_PLAYLIST (false);
 
+    int prev_shuffle_entry = -1;
     if (aud_get_bool (nullptr, "shuffle"))
     {
         if (! shuffle_prev (playlist))
             RETURN (false);
+
+        /* JWT:NEEDED TO DE-HIGHLIGHT PREVIOUSLY-PLAYING ENTRY: */
+        prev_shuffle_entry = aud_get_int (nullptr, "_prev_entry");
+        aud_set_int (nullptr, "_prev_entry", -1);
     }
     else
     {
-        if (! playlist->position || playlist->position->number == 0)
+        if (! playlist->position)
             RETURN (false);
 
-        aud_set_int (nullptr, "_prev_entry", playlist->position->number);
-        set_position (playlist, playlist->entries[playlist->position->number - 1].get (), true);
+        int hint = playlist->position->number - 1;
+        aud_set_int (nullptr, "_prev_entry", hint + 1);
+
+        // JWT:ADDED NEXT CONDITION TO JUMP TO PREV. SELECTED SONG, IF ONE'S SELECTED:
+        // THIS PERMITS US TO "SELECT" THE NEXT SONG TO PLAY ON THE FLY.
+        int others_selected_count = playlist->selected_count
+                - (playlist->position->selected ? 1 : 0);
+        if (hint && others_selected_count > 0)
+        {
+            int entries = playlist->entries.len ();
+            bool saveshuffle = aud_get_bool (nullptr, "shuffle");
+            bool saverepeat = aud_get_bool (nullptr, "repeat");
+            Entry * entry = lookup_entry (playlist, hint);
+            if (saveshuffle)
+                aud_set_bool (nullptr, "shuffle", false); // TEMPORARILY TURN SHUFFLE OFF.
+            if (! saverepeat)
+                aud_set_bool (nullptr, "repeat", true); // TEMPORARILY TURN REPEAT ON.
+            while (1)
+            {
+                if (entry && entry->selected)
+                    break;
+                if (--hint < 0)
+                    hint = entries - 1;
+                entry = lookup_entry (playlist, hint);
+            }
+            if (! next_song_locked (playlist, repeat, hint))
+            {
+                if (saveshuffle)
+                    aud_set_bool (nullptr, "shuffle", true);
+                if (! repeat)
+                    aud_set_bool (nullptr, "repeat", false);
+                RETURN (false);
+            }
+            else
+            {
+                if (saveshuffle)
+                    aud_set_bool (nullptr, "shuffle", true);
+                if (! repeat)
+                    aud_set_bool (nullptr, "repeat", false);
+            }
+        }
+        else if (! next_song_locked (playlist, repeat, hint))
+            RETURN (false);
     }
 
     PlaybackChange change = change_playback (playlist);
@@ -2113,6 +2167,10 @@ EXPORT bool playlist_prev_song (int playlist_num)
 
     hook_call ("playlist position", aud::to_ptr (playlist_num));
     call_playback_change_hooks (change);
+    /* JWT:NEEDED TO DE-HIGHLIGHT PREVIOUSLY-PLAYING ENTRY (NOT SURE WHY): */
+    if (prev_shuffle_entry >= 0 && ! aud_get_bool (nullptr, "keep_selected_on_advance"))
+        aud_playlist_entry_set_selected (playlist_num, prev_shuffle_entry, false);
+
     return true;
 }
 
@@ -2120,7 +2178,10 @@ EXPORT bool playlist_next_song (int playlist_num, bool repeat)
 {
     ENTER_GET_PLAYLIST (false);
 
-    int hint = playlist->position ? playlist->position->number + 1 : 0;
+    if (! playlist->position)
+        RETURN (false);
+
+    int hint = playlist->position->number + 1;
     aud_set_int (nullptr, "_prev_entry", hint - 1);
 
     // JWT:ADDED NEXT CONDITION TO JUMP TO NEXT SELECTED SONG, IF ONE'S SELECTED:
@@ -2339,6 +2400,13 @@ static bool next_song_locked (PlaylistData * playlist, bool repeat, int hint)
 
             hint = 0;
         }
+        else if (hint < 0)  // JWT:MAKE WORK BOTH WAYS!:
+        {
+            if (! repeat)
+                return false;
+
+            hint = entries - 1;
+        }
 
         set_position (playlist, playlist->entries[hint].get (), true);
     }
@@ -2483,7 +2551,7 @@ void playlist_load_state ()
         parser.next ();
 
     while (parser.get_int ("playlist", playlist_num) && playlist_num >= 0 &&
-     playlist_num < playlists.len ())
+            playlist_num < playlists.len ())
     {
         PlaylistData * playlist = playlists[playlist_num].get ();
         int entries = playlist->entries.len ();

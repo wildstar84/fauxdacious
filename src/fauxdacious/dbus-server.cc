@@ -457,7 +457,7 @@ static gboolean do_repeat (Obj * obj, Invoc * invoc)
 
 static gboolean do_reverse (Obj * obj, Invoc * invoc)
 {
-    playlist_prev_song (CURRENT);
+    playlist_prev_song (CURRENT, aud_get_bool (nullptr, "repeat"));
     FINISH (reverse);
     return true;
 }

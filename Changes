@@ -1,5 +1,12 @@
 Version 4.6-devel1 [Updated 02/24/2026]
 
+* Make [Prev] ([<<]) button work much more like [Next] in reverse - now when 
+using [Shuffle] one can go back to the previously-played songs, can wrap back 
+to the top song in the playlist (from the bottom one) when [Repeat] is on, and 
+can also now jump back to the previously selected song in the list (when more 
+than one song is highlighted (and [Settings].[Playlist].[Advance to next 
+selected entry in list] is set.
+
 * Add 2 new [Settings].[Playlist] option checkboxes for "Exclude appended URLs 
 from window title" and "Exclude time from window title" under 
 [Fauxdacious Extras] to exclude urls (uris) sometimes appended to titles, 
@@ -75,7 +82,7 @@ I can't duplicate and has not yet been resolved to requestor's satisfaction.
 "Copy Selected" (items to PRIMARY paste-buffer) menu item and a horizontal 
 scrollbar (that appears when needed if any file-names are too long to 
 fit window); and removed the "Open Cover Art" menu item in the Audacious 
-version b/c it's not really useful in Fauxdacious since there can more than 
+version b/c it's not really useful in Fauxdacious since there can be more than 
 one type of cover/channel art images that can be present in a directory.  
 These fauxdacious-specific changes are also in the previously-added Qt-version 
 of this plugin.

@@ -215,7 +215,7 @@ EXPORT void aud_drct_pl_prev ()
     if (playlist < 0)
         playlist = aud_playlist_get_active ();
 
-    playlist_prev_song (playlist);
+    playlist_prev_song (playlist, aud_get_bool (nullptr, "repeat"));
 }
 
 static void add_list (Index<PlaylistAddItem> && items, int at, bool to_temp, bool play)

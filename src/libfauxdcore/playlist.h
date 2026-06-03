@@ -229,7 +229,7 @@ int aud_playlist_get_position (int playlist);
 /* Returns the playlist position to the previous entry in playback order.
  * Does not support wrapping past the beginning of the playlist.  Returns
  * true on success, false if playlist position was not changed. */
-bool playlist_prev_song (int playlist);
+bool playlist_prev_song (int playlist, bool repeat);
 
 /* Advances the playlist position to the next entry in playback order,
  * taking current shuffle settings into account.  At the end of the
