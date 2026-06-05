@@ -1087,8 +1087,10 @@ EXPORT double str_to_double (const char * string)
 
 EXPORT void str_insert_int (StringBuf & string, int pos, int val)
 {
+    unsigned absval = val;
     bool neg = (val < 0);
-    unsigned absval = neg ? -val : val;
+    if (neg)
+        absval = -absval;
 
     int digits = digits_for (absval);
     int len = (neg ? 1 : 0) + digits;
