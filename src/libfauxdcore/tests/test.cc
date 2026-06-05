@@ -21,14 +21,24 @@
 #include "audstrings.h"
 #include "internal.h"
 #include "ringbuf.h"
-#include "tuple.h"
+#include "runtime.h"
 #include "tuple-compiler.h"
+#include "tuple.h"
 #include "vfs.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+static bool use_qt = false;
+
+MainloopType aud_get_mainloop_type()
+{
+    return use_qt ? MainloopType::Qt : MainloopType::GLib;
+}
+
+extern void test_mainloop();
 
 static void test_audio_conversion ()
 {
@@ -557,16 +567,65 @@ static void test_str_printf ()
     assert (! strcmp (problem, "6 * 7 = 42"));
 }
 
-int main ()
+static void test_uri_construct()
 {
-    test_audio_conversion ();
-    test_case_conversion ();
-    test_numeric_conversion ();
-    test_filename_split ();
-    test_tuple_formats ();
-    test_ringbuf ();
-    test_stringbuf ();
-    test_str_printf ();
+    StringBuf result;
 
+    result = uri_construct ("subfolder/test.mp3", "file:///folder/test.m3u");
+    assert (!strcmp (result, "file:///folder/subfolder/test.mp3"));
+
+    result = uri_construct ("/folder two/test2.mp3", "file:///folder/test.m3u");
+    assert (!strcmp (result, "file:///folder%20two/test2.mp3"));
+
+    result = uri_construct ("http://folder%20two/test2.mp3", "file:///folder/test.m3u");
+    assert (!strcmp (result, "http://folder%20two/test2.mp3"));
+
+    /* valid subtunes */
+    result = uri_construct ("subfolder/test.mp3?2", "file:///folder/test.m3u");
+    assert (!strcmp (result, "file:///folder/subfolder/test.mp3?2"));
+
+    result = uri_construct ("/folder two/test2.mp3?7", "file:///folder/test.m3u");
+    assert (!strcmp (result, "file:///folder%20two/test2.mp3?7"));
+
+    /* invalid subtunes */
+    result = uri_construct ("subfolder/test.mp3?", "file:///folder/test.m3u");
+    assert (!strcmp(result, "file:///folder/subfolder/test.mp3%3F"));
+
+    result = uri_construct ("/folder two/test2.mp3?1a", "file:///folder/test.m3u");
+    assert (!strcmp (result, "file:///folder%20two/test2.mp3%3F1a"));
+
+    /* HTTP query */
+    result = uri_construct ("http://folder%20two/test2.mp3?auth=1", "file:///folder/test.m3u");
+    assert (!strcmp (result, "http://folder%20two/test2.mp3?auth=1"));
+}
+
+int main(int argc, const char ** argv)
+{
+    if (argc >= 2 && !strcmp(argv[1], "--qt"))
+        use_qt = true;
+
+    printf ("testing audio-conversion...\n");
+    test_audio_conversion();
+    printf ("testing case-conversion...\n");
+    test_case_conversion();
+    printf ("testing numeric-conversion...\n");
+    test_numeric_conversion();
+    printf ("testing filename-split...\n");
+    test_filename_split();
+    printf ("testing tuple-formats...\n");
+    test_tuple_formats();
+    printf ("testing ringbuf...\n");
+    test_ringbuf();
+    printf ("testing stringbuf...\n");
+    test_stringbuf();
+    printf ("testing str_printf...\n");
+    test_str_printf();
+    printf ("testing uri_construct...\n");
+    test_uri_construct();
+
+    printf ("testing mainloop...\n");
+    test_mainloop();
+
+    printf ("testing complete.\n");
     return 0;
 }

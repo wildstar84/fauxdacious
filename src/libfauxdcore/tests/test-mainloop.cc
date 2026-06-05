@@ -25,13 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 
-static bool use_qt = false;
-
-MainloopType aud_get_mainloop_type ()
-{
-    return use_qt ? MainloopType::Qt : MainloopType::GLib;
-}
-
 static QueuedFunc counters[70];
 static QueuedFunc timer, delayed;
 
@@ -104,40 +97,35 @@ static void * worker (void * data)
     return nullptr;
 }
 
-int main (int argc, const char * * argv)
+void test_mainloop()
 {
-    if (argc >= 2 && ! strcmp (argv[1], "--qt"))
-        use_qt = true;
-
     main_thread = pthread_self ();
 
     // queue up a bunch of idle calls
-    for (int i = 0; i < 50; i ++)
-        counters[i].queue (count_up, (void *) (size_t) (i - 30));
+    for (int i = 0; i < 50; i++)
+        counters[i].queue(std::bind(count_up, (void *)(size_t)(i - 30)));
 
     // stop some of them
-    for (int i = 10; i < 30; i ++)
-        counters[i].stop ();
+    for (int i = 10; i < 30; i++)
+        counters[i].stop();
 
     // restart some that were stopped and some that weren't
-    for (int i = 0; i < 20; i ++)
-        counters[i].queue (count_up, (void *) (size_t) (20 + i));
+    for (int i = 0; i < 20; i++)
+        counters[i].queue(std::bind(count_up, (void *)(size_t)(20 + i)));
 
     // start a countdown timer at 10 Hz
-    timer.start (100, count_down, & count);
+    timer.start(100, std::bind(count_down, &count));
 
     // queue up a call and then immediately delete the QueuedFunc
-    QueuedFunc ().queue (never_called, nullptr);
+    QueuedFunc().queue(never_called, nullptr);
 
     pthread_t thread;
     pthread_create (& thread, nullptr, worker, nullptr);
 
-    mainloop_run ();
+    mainloop_run();
 
     pthread_join (thread, nullptr);
 
     // check that the timer reports being stopped
-    assert (! timer.running ());
-
-    return 0;
+    assert(!timer.running());
 }

@@ -1,4 +1,4 @@
-all: test test-mainloop
+all: test
 
 SRCS = ../audio.cc \
        ../audstrings.cc \
@@ -15,27 +15,28 @@ SRCS = ../audio.cc \
        ../tuple.cc \
        ../tuple-compiler.cc \
        ../util.cc \
-       stubs.cc
+       stubs.cc \
+       test.cc \
+       test-mainloop.cc
+
+QT_DEP = Qt6Core
+ifneq ($(shell pkg-config --exists ${QT_DEP} && echo 1),1)
+	QT_DEP = Qt5Core
+endif
 
 FLAGS = -I.. -I../.. -DEXPORT= -DPACKAGE=\"fauxdacious\" -DICONV_CONST= \
-        $(shell pkg-config --cflags --libs glib-2.0) \
-        -std=c++11 -Wall -g -O0 -fno-elide-constructors \
+        $(shell pkg-config --cflags --libs glib-2.0 ${QT_DEP}) \
+        -std=c++17 -Wall -g -O0 -fno-elide-constructors \
         -fprofile-arcs -ftest-coverage -pthread -dumpbase ''
 
-test: ${SRCS} test.cc
-	g++ ${SRCS} test.cc ${FLAGS} -o test
-
-test-mainloop: ${SRCS} test-mainloop.cc
-	g++ ${SRCS} test-mainloop.cc ${FLAGS} -DUSE_QT -fPIC \
-	$(shell pkg-config --cflags --libs Qt5Core) \
-	-o test-mainloop
+test: ${SRCS}
+	g++ ${SRCS} ${FLAGS} -DUSE_QT -fPIC -o test
 
 cov: all
 	rm -f *.gcda
 	./test
-	./test-mainloop
-	./test-mainloop --qt
+	./test --qt
 	gcov --object-directory . ${SRCS} ${MAINLOOP_SRCS}
 
 clean:
-	rm -f test test-mainloop *.gcno *.gcda *.gcov
+	rm -f test *.gcno *.gcda *.gcov
