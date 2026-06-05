@@ -1,6 +1,6 @@
 /*
  * audstrings.c
- * Copyright 2009-2012 John Lindgren and William Pitcock
+ * Copyright 2009-2012 John Lindgren and Ariadne Conill
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -293,8 +293,9 @@ EXPORT const char * strstr_nocase_utf8 (const char * haystack, const char * need
             if (! a) /* end of haystack reached */
                 return nullptr;
 
-            if (a != b && (a < 128 ? (gunichar) SWAP_CASE (a) != b :
-             g_unichar_tolower (a) != g_unichar_tolower (b)))
+            if (a != b && (a < 128
+                    ? (gunichar) SWAP_CASE (a) != b
+                    : g_unichar_tolower (a) != g_unichar_tolower (b)))
                 break;
 
             ap = g_utf8_next_char (ap);
@@ -678,20 +679,32 @@ EXPORT StringBuf uri_to_display (const char * uri)
 #undef URI_PREFIX
 #undef URI_PREFIX_LEN
 
-EXPORT void uri_parse (const char * uri, const char * * base_p, const char * * ext_p,
- const char * * sub_p, int * isub_p)
+static const char * parse_subtune (const char * str, int * isub_p)
+{
+    const char * c = strrchr (str, '?');
+    int isub = 0;
+    char junk;
+
+    if (c && sscanf (c + 1, "%d%c", &isub, &junk) != 1)
+        c = nullptr;
+    if (isub_p)
+        *isub_p = isub;
+
+    return c;
+}
+
+EXPORT void uri_parse (const char * uri, const char * * base_p,
+        const char * * ext_p, const char * * sub_p, int * isub_p)
 {
     const char * end = uri + strlen (uri);
     const char * base, * ext, * sub, * c;
-    int isub = 0;
-    char junk;
 
     if ((c = strrchr (uri, '/')))
         base = c + 1;
     else
         base = end;
 
-    if ((c = strrchr (base, '?')) && sscanf (c + 1, "%d%c", & isub, & junk) == 1)
+    if ((c = parse_subtune (base, isub_p)))
         sub = c;
     else
         sub = end;
@@ -707,8 +720,6 @@ EXPORT void uri_parse (const char * uri, const char * * base_p, const char * * e
         * ext_p = ext;
     if (sub_p)
         * sub_p = sub;
-    if (isub_p)
-        * isub_p = isub;
 }
 
 EXPORT StringBuf uri_get_scheme (const char * uri)
@@ -742,12 +753,15 @@ EXPORT StringBuf uri_get_display_base (const char * uri)
 
     return StringBuf ();
 }
+
 /* Constructs a full URI given:
  *   1. path: one of the following:
  *     a. a full URI (returned unchanged)
  *     b. an absolute filename (in UTF-8 or the system locale)
  *     c. a relative path (character set detected according to user settings)
- *   2. reference: the full URI of the playlist containing <path> */
+ *   2. reference: the full URI of the playlist containing <path>
+ *
+ * Valid subtune suffixes such as '?3' are preserved. */
 
 EXPORT StringBuf uri_construct (const char * path, const char * reference)
 {
@@ -755,28 +769,46 @@ EXPORT StringBuf uri_construct (const char * path, const char * reference)
     if (strstr (path, "://"))
         return str_copy (path);
 
-    /* absolute filename */
+    StringBuf buf;
+    auto sub = parse_subtune (path, nullptr);
+    if (sub)
+    {
+        /* split out subtune suffix so it isn't percent-encoded */
+        buf = str_copy (path, sub - path);
+        path = buf;
+    }
+
 #ifdef _WIN32
     if (path[0] && path[1] == ':' && IS_SEP (path[2]))
 #else
     if (path[0] == '/')
 #endif
-        return filename_to_uri (path);
+    {
+        /* absolute filename */
+        buf = filename_to_uri (path);
+    }
+    else
+    {
+        /* relative path */
+        const char * slash = strrchr (reference, '/');
+        if (!slash)
+            return StringBuf ();
 
-    /* relative path */
-    const char * slash = strrchr (reference, '/');
-    if (! slash)
-        return StringBuf ();
+        buf = str_to_utf8 (path, -1);
+        if (!buf)
+            return StringBuf ();
 
-    StringBuf buf = str_to_utf8 (path, -1);
-    if (! buf)
-        return StringBuf ();
+        if (aud_get_bool (nullptr, "convert_backslash"))
+            str_replace_char (buf, '\\', '/');
 
-    if (aud_get_bool (nullptr, "convert_backslash"))
-        str_replace_char (buf, '\\', '/');
+        buf = str_encode_percent (buf);
+        buf.insert (0, reference, slash + 1 - reference);
+    }
 
-    buf = str_encode_percent (buf);
-    buf.insert (0, reference, slash + 1 - reference);
+    /* re-add subtune suffix */
+    if (sub)
+        buf.insert (-1, sub);
+
     return buf.settle ();
 }
 
@@ -1176,11 +1208,13 @@ EXPORT StringBuf str_format_time (int64_t milliseconds)
     int seconds = (milliseconds / 1000) % 60;
 
     if (hours && aud_get_bool (nullptr, "show_hours"))
-        return str_printf ("%s%d:%02d:%02d", neg ? "- " : "",  hours, minutes % 60, seconds);
+        return str_printf ("%s%d:%02d:%02d", neg ? "- " : "",  hours,
+                minutes % 60, seconds);
     else
     {
         bool zero = aud_get_bool (nullptr, "leading_zero");
-        return str_printf (zero ? "%s%02d:%02d" : "%s%d:%02d", neg ? "- " : "", minutes, seconds);
+        return str_printf (zero ? "%s%02d:%02d" : "%s%d:%02d", neg ? "- " : "",
+                minutes, seconds);
     }
 }
 
