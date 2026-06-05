@@ -43,6 +43,11 @@ static const char * const core_defaults[] = {
  "resume_playback_on_startup", "TRUE",
  "show_interface", "TRUE",
  "use_qt", "FALSE",
+#ifdef USE_XWAYLAND
+ "use_xwayland", "TRUE",
+#else
+ "use_xwayland", "FALSE",
+#endif
 
  /* equalizer */
  "eqpreset_dir_default_file", "dir_default.preset",
