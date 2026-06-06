@@ -101,8 +101,13 @@ use StreamFinder;
 
 #THESE SERVERS WILL TIMEOUT ON YOU TRYING TO STREAM, SO DOWNLOAD TO TEMP. FILE, THEN PLAY INSTEAD!:
 #FORMAT:  '//www.problemserver.com' [, ...]
-my @downloadServerList = ();  #USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE OR IN FauxdaciousUrlHelper.ini.
+#USER MAY ADD ANY SUCH SERVERS TO THE LIST HERE OR IN FauxdaciousUrlHelper.ini.
+my @downloadServerList = ();
+#USER MAY OVERRIDE THE PRECEDENCE FOR STREAMFINDER-FETCHED METADATA TAGS FOR SPECIFIC URLS:
+#FORMAT:  '//overrideserver.com' => '{NONE|DEFAULT|OVERRIDE|ONLY}'
 my %setPrecedence = ();
+#NOTE: TO (TEMPORARILY?) FORCE PRE-DOWNLOADING OF ALL VIDEOS AND PODCASTS (IF INTERNET IS BEING FLAKEY)
+#TOUCH THE FILE:  "$TMPDIR/INTERNET_UNSTABLE" TO CAUSE ALL VIDEOS & PODCASTS TO BE PRE-DOWNLOADED.
 
 die "..usage: $0 URL [download-path]\n"  unless ($ARGV[0]);
 exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
@@ -226,7 +231,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 					$html = `wget -t 2 -T 20 -O- -o /dev/null "$newPlaylistURL" 2>/dev/null `;
 				}
 			}
-			if ($stationID && open OUT, ">/tmp/${stationID}.m3u8") {
+			my $tmphlsfile = 0;
+			if ($stationID && open OUT, ">${TMPDIR}/${stationID}.m3u8") {
 				my @lines = split(/\r?\n/, $html);
 				my $line = 0;
 				(my $urlpath = $newPlaylistURL) =~ s#[^\/]+$##;
@@ -237,6 +243,8 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				my $bwexp = 'BANDWIDTH';
 TRYIT:
 				while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
+					goto DONE1  if ($lines[$line] =~ /\.ts$/o);  #PUNT, WE'RE NOT AN HLS PLAYLIST!
+
 					if ($lines[$line] =~ /\s*\#EXT\-X\-STREAM\-INF\:(?:.*?)${bwexp}\=(\d+)/) {
 						$line++;
 						if ($line <= $#lines) {
@@ -274,21 +282,29 @@ TRYIT:
 						++$tried;
 						$bwexp = 'AVERAGE-BANDWIDTH';
 						$line = 1;
-						print STDERR "w:ALL streams exceed bandwidth limit, try AVERAGE BW...\n";
+						print STDERR "w:No streams($highestBW) within bandwidth limit($hls_bandwidth), try AVERAGE BW...\n";
 						goto TRYIT;
 					} elsif ($worstStream) {
 						print OUT $worstStream;
 						print STDERR "w:ALL streams exceed bandwidth limit, returning WORST stream(bw=$lowestBW)!\n";
 						$newPlaylistURL = "file://${TMPDIR}/${stationID}.m3u8";
+						$tmphlsfile = 1
 					}
 				} else {
 					print STDERR "i:using temp m3u8 file (/${TMPDIR}/${stationID}.m3u8) HiBW=$highestBW=\n"
 							  if ($DEBUG);
 					$newPlaylistURL = "file://${TMPDIR}/${stationID}.m3u8";
+					$tmphlsfile = 1;
 				}
 				close OUT;
 				print STDERR "-getURL(m3u8/HLS) 1st=$newPlaylistURL= HiBW=$highestBW= tried=$tried=\n"  if ($DEBUG);
+				#JWT:NEXT TEST NEEDED BY RECENT libavformat CHANGES:
+				#SEE https://coverage.ffmpeg.org/index.hls.c.526cf0c8c5d1c57787145aace325b3fb.html
+				print STDERR "--w:trimmed(m3u8/HLS)=$newPlaylistURL=\n"
+						if ($newPlaylistURL =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//);
 			}
+DONE1:
+			unlink ("${TMPDIR}/${stationID}.m3u8")  unless ($tmphlsfile);
 		}
 
 		if (defined($client->{album}) && $client->{album} =~ /\S/) {
