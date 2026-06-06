@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: https://github.com/wildstar84/fauxdacious/issues\n"
-"POT-Creation-Date: 2025-07-21 22:54-0500\n"
+"POT-Creation-Date: 2026-06-05 20:22-0500\n"
 "PO-Revision-Date: 2018-07-02 04:50+0000\n"
 "Last-Translator: Thomas Lange\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/audacious/"
@@ -170,7 +170,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/fauxdacious/main.cc:720
+#: src/fauxdacious/main.cc:739
 #, fuzzy
 msgid "Fauxdacious"
 msgstr "Audacious"
@@ -186,7 +186,7 @@ msgid "file://"
 msgstr ""
 
 #: src/libfauxdcore/adder.cc:170 src/libfauxdcore/adder.cc:180
-#: src/libfauxdcore/probe.cc:244
+#: src/libfauxdcore/probe.cc:245
 msgid "stdin://"
 msgstr ""
 
@@ -203,30 +203,30 @@ msgstr ""
 msgid "No files found."
 msgstr "找不到檔案。"
 
-#: src/libfauxdcore/audstrings.cc:659 src/libfauxdcore/tuple.cc:559
+#: src/libfauxdcore/audstrings.cc:660 src/libfauxdcore/tuple.cc:561
 msgid "Standard input"
 msgstr "標準輸入"
 
-#: src/libfauxdcore/audstrings.cc:661
+#: src/libfauxdcore/audstrings.cc:662
 #, c-format
 msgid "Audio CD, track %s"
 msgstr "音樂 CD，音軌 %s"
 
-#: src/libfauxdcore/audstrings.cc:663
+#: src/libfauxdcore/audstrings.cc:664
 #, c-format
 msgid "DVD, title %s"
 msgstr ""
 
-#: src/libfauxdcore/audstrings.cc:667 src/libfauxdcore/tuple.cc:535
+#: src/libfauxdcore/audstrings.cc:668 src/libfauxdcore/tuple.cc:537
 msgid "(character encoding error)"
 msgstr "(字元編碼錯誤)"
 
-#: src/libfauxdcore/audstrings.cc:1218
+#: src/libfauxdcore/audstrings.cc:1254
 #, c-format
 msgid "%.*s%s"
 msgstr ""
 
-#: src/libfauxdcore/audstrings.cc:1219
+#: src/libfauxdcore/audstrings.cc:1255
 #, c-format
 msgid "%.*s"
 msgstr ""
@@ -281,8 +281,8 @@ msgstr ""
 
 #: src/libfauxdcore/playlist-files.cc:151
 #: src/libfauxdcore/playlist-files.cc:164
-#: src/libfauxdcore/playlist-files.cc:242 src/libfauxdgui/infowin.cc:744
-#: src/libfauxdqt/infowin-qt.cc:216
+#: src/libfauxdcore/playlist-files.cc:242 src/libfauxdgui/infowin.cc:757
+#: src/libfauxdqt/infowin-qt.cc:248
 #, c-format
 msgid ""
 "Error opening %s:\n"
@@ -292,7 +292,7 @@ msgstr ""
 "%s"
 
 #: src/libfauxdcore/playlist-files.cc:179 src/libfauxdqt/eq-preset-qt.cc:337
-#: src/libfauxdqt/info-widget.cc:266
+#: src/libfauxdqt/info-widget.cc:392
 #, c-format
 msgid "Error loading %s."
 msgstr "載入 %s 時發生錯誤。"
@@ -312,55 +312,55 @@ msgstr "載入 %s 時發生錯誤。"
 msgid "Cannot save %s: unsupported file name extension."
 msgstr "無法儲存 %s：不支援該副檔名。"
 
-#: src/libfauxdcore/probe.cc:60
+#: src/libfauxdcore/probe.cc:61
 msgid "Error loading plugin"
 msgstr "載入外掛時發生錯誤"
 
-#: src/libfauxdcore/probe.cc:231
+#: src/libfauxdcore/probe.cc:232
 msgid "Seek error"
 msgstr "搜尋發生錯誤"
 
-#: src/libfauxdcore/probe.cc:268
+#: src/libfauxdcore/probe.cc:269
 msgid "File format not recognized"
 msgstr "無法辨識檔案格式"
 
-#: src/libfauxdcore/probe.cc:612
+#: src/libfauxdcore/probe.cc:648
 msgid "Error reading metadata"
 msgstr "讀取詮釋資料時發生錯誤"
 
-#: src/libfauxdcore/tuple.cc:589
+#: src/libfauxdcore/tuple.cc:591
 msgid "Mono"
 msgstr "單聲道"
 
-#: src/libfauxdcore/tuple.cc:591
+#: src/libfauxdcore/tuple.cc:593
 msgid "Stereo"
 msgstr "立體聲"
 
-#: src/libfauxdcore/tuple.cc:593
+#: src/libfauxdcore/tuple.cc:595
 #, c-format
 msgid "%d channel"
 msgid_plural "%d channels"
 msgstr[0] "%d 聲道"
 
-#: src/libfauxdcore/tuple.cc:1187
+#: src/libfauxdcore/tuple.cc:1236
 msgid "Audio CD"
 msgstr "音訊 CD"
 
-#: src/libfauxdcore/tuple.cc:1195
+#: src/libfauxdcore/tuple.cc:1244
 msgid "DVD"
 msgstr ""
 
-#: src/libfauxdcore/tuple.cc:1277
+#: src/libfauxdcore/tuple.cc:1326
 #, c-format
 msgid "Track %d"
 msgstr "音軌 %d"
 
-#: src/libfauxdcore/tuple.cc:1286
+#: src/libfauxdcore/tuple.cc:1335
 #, fuzzy, c-format
 msgid "Title %d"
 msgstr "標題"
 
-#: src/libfauxdcore/tuple.cc:1291
+#: src/libfauxdcore/tuple.cc:1340
 msgid "(unknown title)"
 msgstr "(未知的標題)"
 
@@ -484,12 +484,12 @@ msgid "Delete Selected"
 msgstr "刪除選擇的項目"
 
 #: src/libfauxdgui/eq-preset.cc:422 src/libfauxdgui/file-opener.cc:139
-#: src/libfauxdgui/infowin.cc:623 src/libfauxdgui/jump-to-track.cc:315
-#: src/libfauxdgui/plugin-prefs.cc:168 src/libfauxdgui/prefs-window.cc:1064
+#: src/libfauxdgui/infowin.cc:630 src/libfauxdgui/jump-to-track.cc:316
+#: src/libfauxdgui/plugin-prefs.cc:168 src/libfauxdgui/prefs-window.cc:1072
 #: src/libfauxdgui/queue-manager.cc:195 src/libfauxdgui/util.cc:367
-#: src/libfauxdqt/audqt.cc:419 src/libfauxdqt/infowin-qt.cc:100
+#: src/libfauxdqt/audqt.cc:413 src/libfauxdqt/infowin-qt.cc:110
 #: src/libfauxdqt/log-inspector.cc:229 src/libfauxdqt/prefs-plugin.cc:146
-#: src/libfauxdqt/prefs-window-qt.cc:857 src/libfauxdqt/queue-manager-qt.cc:330
+#: src/libfauxdqt/prefs-window-qt.cc:865 src/libfauxdqt/queue-manager-qt.cc:330
 #: src/libfauxdqt/song-window-qt.cc:376
 msgid "_Close"
 msgstr "關閉(_C)"
@@ -599,33 +599,33 @@ msgstr "加入(_A)"
 msgid "Close _dialog on add"
 msgstr "加入後關閉對話視窗(_D)"
 
-#: src/libfauxdgui/infopopup.cc:215 src/libfauxdgui/infowin.cc:557
+#: src/libfauxdgui/infopopup.cc:215 src/libfauxdgui/infowin.cc:558
 #: src/libfauxdgui/prefs-window.cc:114 src/libfauxdqt/infopopup-qt.cc:94
-#: src/libfauxdqt/info-widget.cc:52 src/libfauxdqt/prefs-window-qt.cc:174
+#: src/libfauxdqt/info-widget.cc:59 src/libfauxdqt/prefs-window-qt.cc:174
 #: src/libfauxdqt/queue-manager-qt.cc:123
 msgid "Title"
 msgstr "標題"
 
-#: src/libfauxdgui/infopopup.cc:216 src/libfauxdgui/infowin.cc:560
+#: src/libfauxdgui/infopopup.cc:216 src/libfauxdgui/infowin.cc:561
 #: src/libfauxdgui/prefs-window.cc:111 src/libfauxdqt/infopopup-qt.cc:96
-#: src/libfauxdqt/info-widget.cc:53 src/libfauxdqt/prefs-window-qt.cc:171
+#: src/libfauxdqt/info-widget.cc:60 src/libfauxdqt/prefs-window-qt.cc:171
 msgid "Artist"
 msgstr "藝人"
 
-#: src/libfauxdgui/infopopup.cc:217 src/libfauxdgui/infowin.cc:563
+#: src/libfauxdgui/infopopup.cc:217 src/libfauxdgui/infowin.cc:564
 #: src/libfauxdgui/prefs-window.cc:112 src/libfauxdgui/prefs-window.cc:172
-#: src/libfauxdqt/infopopup-qt.cc:98 src/libfauxdqt/info-widget.cc:54
+#: src/libfauxdqt/infopopup-qt.cc:98 src/libfauxdqt/info-widget.cc:61
 #: src/libfauxdqt/prefs-window-qt.cc:172 src/libfauxdqt/prefs-window-qt.cc:231
 msgid "Album"
 msgstr "專輯"
 
-#: src/libfauxdgui/infopopup.cc:218 src/libfauxdgui/infowin.cc:574
+#: src/libfauxdgui/infopopup.cc:218 src/libfauxdgui/infowin.cc:575
 #: src/libfauxdgui/prefs-window.cc:116 src/libfauxdqt/infopopup-qt.cc:100
-#: src/libfauxdqt/info-widget.cc:58 src/libfauxdqt/prefs-window-qt.cc:176
+#: src/libfauxdqt/info-widget.cc:65 src/libfauxdqt/prefs-window-qt.cc:176
 msgid "Genre"
 msgstr "類型"
 
-#: src/libfauxdgui/infopopup.cc:219 src/libfauxdgui/infowin.cc:577
+#: src/libfauxdgui/infopopup.cc:219 src/libfauxdgui/infowin.cc:578
 #: src/libfauxdgui/prefs-window.cc:121 src/libfauxdqt/infopopup-qt.cc:102
 #: src/libfauxdqt/prefs-window-qt.cc:180
 msgid "Year"
@@ -637,188 +637,32 @@ msgid "Track"
 msgstr "音軌"
 
 #: src/libfauxdgui/infopopup.cc:221 src/libfauxdqt/infopopup-qt.cc:107
-#: src/libfauxdqt/info-widget.cc:70
+#: src/libfauxdqt/info-widget.cc:77
 msgid "Length"
 msgstr "長度"
 
-#: src/libfauxdgui/infowin.cc:53
+#: src/libfauxdgui/infowin.cc:54
 #, fuzzy
 msgid "Codec:"
 msgstr "編解碼器"
 
-#: src/libfauxdgui/infowin.cc:54
+#: src/libfauxdgui/infowin.cc:55
 msgid "Quality:"
 msgstr "品質："
 
-#: src/libfauxdgui/infowin.cc:55
+#: src/libfauxdgui/infowin.cc:56
 msgid "Bitrate:"
 msgstr "位元率："
 
-#: src/libfauxdgui/infowin.cc:96
-msgid "Acid Jazz"
-msgstr "迷幻爵士"
-
-#: src/libfauxdgui/infowin.cc:97
-msgid "Acid Rock"
-msgstr "迷幻搖滾"
-
-#: src/libfauxdgui/infowin.cc:98
-msgid "Ambient"
-msgstr "氛圍音樂"
-
-#: src/libfauxdgui/infowin.cc:99
-msgid "Bebop"
-msgstr "Bebop"
-
-#: src/libfauxdgui/infowin.cc:100
-msgid "Bluegrass"
-msgstr "藍草"
-
-#: src/libfauxdgui/infowin.cc:101
-msgid "Blues"
-msgstr "藍調"
-
-#: src/libfauxdgui/infowin.cc:102
-msgid "Chamber Music"
-msgstr "室內樂"
-
-#: src/libfauxdgui/infowin.cc:103
-msgid "Classical"
-msgstr "古典"
-
-#: src/libfauxdgui/infowin.cc:104
-msgid "Country"
-msgstr "鄉村"
-
-#: src/libfauxdgui/infowin.cc:105
-msgid "Death Metal"
-msgstr "死亡金屬"
-
-#: src/libfauxdgui/infowin.cc:106
-msgid "Disco"
-msgstr "迪斯可"
-
-#: src/libfauxdgui/infowin.cc:107
-msgid "Easy Listening"
-msgstr "輕音樂"
-
-#: src/libfauxdgui/infowin.cc:108
-msgid "Folk"
-msgstr "民謠"
-
-#: src/libfauxdgui/infowin.cc:109
-msgid "Funk"
-msgstr "放客"
-
-#: src/libfauxdgui/infowin.cc:110
-msgid "Gangsta Rap"
-msgstr "黑幫說唱"
-
-#: src/libfauxdgui/infowin.cc:111
-msgid "Gospel"
-msgstr "福音音樂"
-
-#: src/libfauxdgui/infowin.cc:112
-msgid "Grunge"
-msgstr "垃圾搖滾"
-
-#: src/libfauxdgui/infowin.cc:113
-msgid "Hard Rock"
-msgstr "硬式搖滾"
-
-#: src/libfauxdgui/infowin.cc:114
-msgid "Heavy Metal"
-msgstr "重金屬"
-
-#: src/libfauxdgui/infowin.cc:115
-msgid "Hip-hop"
-msgstr "嘻哈"
-
-#: src/libfauxdgui/infowin.cc:116
-msgid "House"
-msgstr "House"
-
-#: src/libfauxdgui/infowin.cc:117
-msgid "Jazz"
-msgstr "爵士"
-
-#: src/libfauxdgui/infowin.cc:118
-msgid "Jungle"
-msgstr "叢林"
-
-#: src/libfauxdgui/infowin.cc:119
-msgid "Metal"
-msgstr "金屬"
-
-#: src/libfauxdgui/infowin.cc:120
-msgid "New Age"
-msgstr "新世紀"
-
-#: src/libfauxdgui/infowin.cc:121
-msgid "New Wave"
-msgstr "新浪潮"
-
-#: src/libfauxdgui/infowin.cc:122
-msgid "Noise"
-msgstr "噪音"
-
-#: src/libfauxdgui/infowin.cc:123
-msgid "Pop"
-msgstr "流行"
-
-#: src/libfauxdgui/infowin.cc:124
-msgid "Punk Rock"
-msgstr "龐克搖滾"
-
-#: src/libfauxdgui/infowin.cc:125
-msgid "Rap"
-msgstr "說唱"
-
-#: src/libfauxdgui/infowin.cc:126
-msgid "Reggae"
-msgstr "雷鬼"
-
-#: src/libfauxdgui/infowin.cc:127
-msgid "Rock"
-msgstr "搖滾 (Rock)"
-
-#: src/libfauxdgui/infowin.cc:128
-msgid "Rock and Roll"
-msgstr "搖滾 (Rock&Roll)"
-
-#: src/libfauxdgui/infowin.cc:129
-msgid "Rhythm and Blues"
-msgstr "R&B"
-
-#: src/libfauxdgui/infowin.cc:130
-msgid "Ska"
-msgstr "Ska"
-
-#: src/libfauxdgui/infowin.cc:131
-msgid "Soul"
-msgstr "靈魂"
-
-#: src/libfauxdgui/infowin.cc:132
-msgid "Swing"
-msgstr "搖擺樂"
-
-#: src/libfauxdgui/infowin.cc:133
-msgid "Techno"
-msgstr "數位"
-
-#: src/libfauxdgui/infowin.cc:134
-msgid "Trip-hop"
-msgstr "迷幻舞曲"
-
-#: src/libfauxdgui/infowin.cc:297
+#: src/libfauxdgui/infowin.cc:261 src/libfauxdgui/infowin.cc:291
 msgid "Save successful"
 msgstr "儲存成功"
 
-#: src/libfauxdgui/infowin.cc:301
+#: src/libfauxdgui/infowin.cc:267 src/libfauxdgui/infowin.cc:296
 msgid "Save error"
 msgstr "儲存失敗"
 
-#: src/libfauxdgui/infowin.cc:432 src/libfauxdqt/info-widget.cc:210
+#: src/libfauxdgui/infowin.cc:432 src/libfauxdqt/info-widget.cc:335
 msgid "Select Cover Art File - Fauxdacious"
 msgstr ""
 
@@ -853,82 +697,86 @@ msgstr ""
 msgid "*.gif"
 msgstr ""
 
-#: src/libfauxdgui/infowin.cc:460
+#: src/libfauxdgui/infowin.cc:461
 #, fuzzy
 msgid "File"
 msgstr "加入檔案"
 
-#: src/libfauxdgui/infowin.cc:472 src/libfauxdqt/infowin-qt.cc:76
+#: src/libfauxdgui/infowin.cc:473 src/libfauxdqt/infowin-qt.cc:80
 #, fuzzy
 msgid "Song Info - Fauxdacious"
 msgstr "關於 Audacious"
 
-#: src/libfauxdgui/infowin.cc:566 src/libfauxdqt/info-widget.cc:55
+#: src/libfauxdgui/infowin.cc:567 src/libfauxdqt/info-widget.cc:62
 msgid "Album Artist"
 msgstr "專輯藝人"
 
-#: src/libfauxdgui/infowin.cc:569
+#: src/libfauxdgui/infowin.cc:570
 #, fuzzy
 msgid "Coverart File"
 msgstr "選擇檔案"
 
-#: src/libfauxdgui/infowin.cc:570 src/libfauxdgui/prefs-window.cc:122
-#: src/libfauxdqt/info-widget.cc:59 src/libfauxdqt/prefs-window-qt.cc:181
+#: src/libfauxdgui/infowin.cc:571 src/libfauxdgui/prefs-window.cc:122
+#: src/libfauxdqt/info-widget.cc:66 src/libfauxdqt/prefs-window-qt.cc:181
 msgid "Comment"
 msgstr "備註"
 
-#: src/libfauxdgui/infowin.cc:580
+#: src/libfauxdgui/infowin.cc:581
 msgid "[Disk#.]Track#"
 msgstr ""
 
-#: src/libfauxdgui/infowin.cc:583
+#: src/libfauxdgui/infowin.cc:584
 msgid "Description (flac, ogg)"
 msgstr ""
 
-#: src/libfauxdgui/infowin.cc:586 src/libfauxdqt/info-widget.cc:65
+#: src/libfauxdgui/infowin.cc:587 src/libfauxdqt/info-widget.cc:72
 #, fuzzy
 msgid "Publisher"
 msgstr "波蘭語"
 
-#: src/libfauxdgui/infowin.cc:589
+#: src/libfauxdgui/infowin.cc:590
 msgid "Catalog Number (ape, flac, ogg)"
 msgstr ""
 
-#: src/libfauxdgui/infowin.cc:592
+#: src/libfauxdgui/infowin.cc:593
 msgid "Composer (ape, mp3)"
 msgstr ""
 
-#: src/libfauxdgui/infowin.cc:595
+#: src/libfauxdgui/infowin.cc:596
 #, fuzzy
 msgid "Performer (flac, ogg)"
 msgstr "表演者"
 
-#: src/libfauxdgui/infowin.cc:606
+#: src/libfauxdgui/infowin.cc:607
 msgid "_Auto-fill empty fields"
 msgstr ""
 
-#: src/libfauxdgui/infowin.cc:620 src/libfauxdqt/infowin-qt.cc:99
-msgid "_Save"
-msgstr "儲存(_S)"
+#: src/libfauxdgui/infowin.cc:621 src/libfauxdqt/infowin-qt.cc:107
+msgid "Embed"
+msgstr ""
 
 #: src/libfauxdgui/infowin.cc:626
+msgid "_Tagfile"
+msgstr ""
+
+#: src/libfauxdgui/infowin.cc:633
 msgid "_Previous"
 msgstr ""
 
-#: src/libfauxdgui/infowin.cc:629
+#: src/libfauxdgui/infowin.cc:636
 msgid "_Next"
 msgstr "下一個(_N)"
 
-#: src/libfauxdgui/infowin.cc:684
+#: src/libfauxdgui/infowin.cc:693
 #, c-format
 msgid "%d kb/s"
 msgstr "%d kb/s"
 
-#: src/libfauxdgui/infowin.cc:689
+#: src/libfauxdgui/infowin.cc:698
 msgid "N/A"
 msgstr "無"
 
-#: src/libfauxdgui/jump-to-time.cc:47 src/libfauxdgui/jump-to-track.cc:320
+#: src/libfauxdgui/jump-to-time.cc:47 src/libfauxdgui/jump-to-track.cc:321
 #: src/libfauxdqt/song-window-qt.cc:373
 msgid "_Jump"
 msgstr "跳轉(_J)"
@@ -942,7 +790,7 @@ msgid "Enter time (minutes:seconds):"
 msgstr "請輸入時間 (分:秒)："
 
 #: src/libfauxdgui/jump-to-track.cc:96 src/libfauxdgui/jump-to-track.cc:104
-#: src/libfauxdgui/jump-to-track.cc:311 src/libfauxdqt/song-window-qt.cc:291
+#: src/libfauxdgui/jump-to-track.cc:312 src/libfauxdqt/song-window-qt.cc:291
 #: src/libfauxdqt/song-window-qt.cc:371
 msgid "_Queue"
 msgstr "排入佇列(_Q)"
@@ -951,15 +799,15 @@ msgstr "排入佇列(_Q)"
 msgid "Un_queue"
 msgstr "移出佇列(_Q)"
 
-#: src/libfauxdgui/jump-to-track.cc:241 src/libfauxdqt/song-window-qt.cc:306
+#: src/libfauxdgui/jump-to-track.cc:244 src/libfauxdqt/song-window-qt.cc:306
 msgid "Jump to Song"
 msgstr "跳轉到指定歌曲"
 
-#: src/libfauxdgui/jump-to-track.cc:267 src/libfauxdqt/song-window-qt.cc:323
+#: src/libfauxdgui/jump-to-track.cc:270 src/libfauxdqt/song-window-qt.cc:323
 msgid "_Filter:"
 msgstr "過濾器(_F)："
 
-#: src/libfauxdgui/jump-to-track.cc:304 src/libfauxdqt/song-window-qt.cc:366
+#: src/libfauxdgui/jump-to-track.cc:305 src/libfauxdqt/song-window-qt.cc:366
 msgid "C_lose on jump"
 msgstr "切換後關閉(_C)"
 
@@ -1019,15 +867,15 @@ msgstr "%s 設定"
 msgid "_Set"
 msgstr "套用(_S)"
 
-#: src/libfauxdgui/plugin-view.cc:236 src/libfauxdgui/prefs-window.cc:876
-#: src/libfauxdgui/prefs-window.cc:916 src/libfauxdqt/prefs-window-qt.cc:808
-#: src/libfauxdqt/prefs-window-qt.cc:811
+#: src/libfauxdgui/plugin-view.cc:236 src/libfauxdgui/prefs-window.cc:884
+#: src/libfauxdgui/prefs-window.cc:924 src/libfauxdqt/prefs-window-qt.cc:816
+#: src/libfauxdqt/prefs-window-qt.cc:819
 msgid "_Settings"
 msgstr "設定(_S)"
 
-#: src/libfauxdgui/plugin-view.cc:243 src/libfauxdgui/prefs-window.cc:890
-#: src/libfauxdgui/prefs-window.cc:928 src/libfauxdqt/prefs-window-qt.cc:809
-#: src/libfauxdqt/prefs-window-qt.cc:812
+#: src/libfauxdgui/plugin-view.cc:243 src/libfauxdgui/prefs-window.cc:898
+#: src/libfauxdgui/prefs-window.cc:936 src/libfauxdqt/prefs-window-qt.cc:817
+#: src/libfauxdqt/prefs-window-qt.cc:820
 msgid "_About"
 msgstr "關於(_A)"
 
@@ -1121,16 +969,16 @@ msgstr "檔案路徑"
 msgid "Date"
 msgstr "日期"
 
-#: src/libfauxdgui/prefs-window.cc:120 src/libfauxdqt/info-widget.cc:60
+#: src/libfauxdgui/prefs-window.cc:120 src/libfauxdqt/info-widget.cc:67
 msgid "Description"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:123 src/libfauxdqt/info-widget.cc:71
+#: src/libfauxdgui/prefs-window.cc:123 src/libfauxdqt/info-widget.cc:78
 #: src/libfauxdqt/prefs-window-qt.cc:182
 msgid "Codec"
 msgstr "編解碼器"
 
-#: src/libfauxdgui/prefs-window.cc:124 src/libfauxdqt/info-widget.cc:72
+#: src/libfauxdgui/prefs-window.cc:124 src/libfauxdqt/info-widget.cc:79
 #: src/libfauxdqt/prefs-window-qt.cc:183
 msgid "Quality"
 msgstr "品質"
@@ -1443,272 +1291,284 @@ msgstr ""
 msgid "Use relative paths when possible"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:374 src/libfauxdgui/prefs-window.cc:429
-#: src/libfauxdgui/prefs-window.cc:465 src/libfauxdqt/prefs-window-qt.cc:489
-#: src/libfauxdqt/prefs-window-qt.cc:541 src/libfauxdqt/prefs-window-qt.cc:577
+#: src/libfauxdgui/prefs-window.cc:374 src/libfauxdgui/prefs-window.cc:433
+#: src/libfauxdgui/prefs-window.cc:473 src/libfauxdqt/prefs-window-qt.cc:489
+#: src/libfauxdqt/prefs-window-qt.cc:545 src/libfauxdqt/prefs-window-qt.cc:585
 #, fuzzy
 msgid "<b>Fauxdacious Extras</b>"
 msgstr "Audacious 設定"
 
 #: src/libfauxdgui/prefs-window.cc:375 src/libfauxdqt/prefs-window-qt.cc:490
+msgid "Exclude time from window title"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:377 src/libfauxdqt/prefs-window-qt.cc:492
+msgid "Exclude appended URLs from window title"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:379 src/libfauxdqt/prefs-window-qt.cc:494
 #, fuzzy
 msgid "Pause mutes instead of pausing"
 msgstr "暫停而非立刻回復播放"
 
-#: src/libfauxdgui/prefs-window.cc:377 src/libfauxdqt/prefs-window-qt.cc:492
+#: src/libfauxdgui/prefs-window.cc:381 src/libfauxdqt/prefs-window-qt.cc:496
 msgid "Split Artist - Title in streams"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:379 src/libfauxdqt/prefs-window-qt.cc:494
+#: src/libfauxdgui/prefs-window.cc:383 src/libfauxdqt/prefs-window-qt.cc:498
 msgid "Advance to next selected entry in list"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:381 src/libfauxdqt/prefs-window-qt.cc:496
+#: src/libfauxdgui/prefs-window.cc:385 src/libfauxdqt/prefs-window-qt.cc:500
 msgid "...and keep selected (for repetition)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:384 src/libfauxdqt/prefs-window-qt.cc:499
+#: src/libfauxdgui/prefs-window.cc:388 src/libfauxdqt/prefs-window-qt.cc:503
 msgid "On add, select 1st entry added"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:386 src/libfauxdqt/prefs-window-qt.cc:501
+#: src/libfauxdgui/prefs-window.cc:390 src/libfauxdqt/prefs-window-qt.cc:505
 msgid "Keep playlist metadata (like cuesheets do)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:388 src/libfauxdqt/prefs-window-qt.cc:503
+#: src/libfauxdgui/prefs-window.cc:392 src/libfauxdqt/prefs-window-qt.cc:507
 msgid "Don't allow streams to change metadata"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:390 src/libfauxdqt/prefs-window-qt.cc:505
+#: src/libfauxdgui/prefs-window.cc:394 src/libfauxdqt/prefs-window-qt.cc:509
 msgid "Limit playlist URLs to"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:392 src/libfauxdqt/prefs-window-qt.cc:507
+#: src/libfauxdgui/prefs-window.cc:396 src/libfauxdqt/prefs-window-qt.cc:511
 msgid "entries (0=no limit)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:396 src/libfauxdqt/prefs-window-qt.cc:511
+#: src/libfauxdgui/prefs-window.cc:400 src/libfauxdqt/prefs-window-qt.cc:515
 msgid "<b>Album Art</b>"
 msgstr "<b>專輯封面</b>"
 
-#: src/libfauxdgui/prefs-window.cc:397 src/libfauxdqt/prefs-window-qt.cc:512
+#: src/libfauxdgui/prefs-window.cc:401 src/libfauxdqt/prefs-window-qt.cc:516
 msgid "Search for images matching these words (comma-separated):"
 msgstr "搜尋符合這些單字的圖片 (以逗號分隔)："
 
-#: src/libfauxdgui/prefs-window.cc:399 src/libfauxdqt/prefs-window-qt.cc:514
+#: src/libfauxdgui/prefs-window.cc:403 src/libfauxdqt/prefs-window-qt.cc:518
 msgid "Exclude images matching these words (comma-separated):"
 msgstr "排除符合這些單字的圖片 (以逗號分隔)："
 
-#: src/libfauxdgui/prefs-window.cc:401 src/libfauxdqt/prefs-window-qt.cc:516
+#: src/libfauxdgui/prefs-window.cc:405 src/libfauxdqt/prefs-window-qt.cc:520
 msgid "Directory Channel-icon image (filename[.ext] only)?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:403 src/libfauxdqt/prefs-window-qt.cc:518
+#: src/libfauxdgui/prefs-window.cc:407 src/libfauxdqt/prefs-window-qt.cc:522
 msgid "Fallback cover image file? (full path required):"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:405 src/libfauxdqt/prefs-window-qt.cc:520
+#: src/libfauxdgui/prefs-window.cc:409 src/libfauxdqt/prefs-window-qt.cc:524
 msgid "Use Directory Channel-icon image file (see above)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:407 src/libfauxdqt/prefs-window-qt.cc:522
+#: src/libfauxdgui/prefs-window.cc:411 src/libfauxdqt/prefs-window-qt.cc:526
 msgid "Search for images matching song file name"
 msgstr "搜尋符合歌曲檔名的圖片"
 
-#: src/libfauxdgui/prefs-window.cc:409 src/libfauxdqt/prefs-window-qt.cc:524
+#: src/libfauxdgui/prefs-window.cc:413 src/libfauxdqt/prefs-window-qt.cc:528
 #, fuzzy
 msgid "Search for images matching Album tag (file name overrides)"
 msgstr "搜尋符合歌曲檔名的圖片"
 
-#: src/libfauxdgui/prefs-window.cc:411 src/libfauxdqt/prefs-window-qt.cc:526
+#: src/libfauxdgui/prefs-window.cc:415 src/libfauxdqt/prefs-window-qt.cc:530
 #, fuzzy
 msgid "Search for images in album-art cache"
 msgstr "搜尋符合歌曲檔名的圖片"
 
-#: src/libfauxdgui/prefs-window.cc:413 src/libfauxdqt/prefs-window-qt.cc:528
+#: src/libfauxdgui/prefs-window.cc:417 src/libfauxdqt/prefs-window-qt.cc:532
 msgid "Search recursively"
 msgstr "遞迴搜尋"
 
-#: src/libfauxdgui/prefs-window.cc:415 src/libfauxdqt/prefs-window-qt.cc:530
+#: src/libfauxdgui/prefs-window.cc:419 src/libfauxdqt/prefs-window-qt.cc:534
 msgid "Search depth:"
 msgstr "搜尋深度："
 
-#: src/libfauxdgui/prefs-window.cc:419 src/libfauxdqt/prefs-window-qt.cc:534
+#: src/libfauxdgui/prefs-window.cc:423 src/libfauxdqt/prefs-window-qt.cc:538
 msgid "<b>Popup Information</b>"
 msgstr "<b>彈出式資訊視窗</b>"
 
-#: src/libfauxdgui/prefs-window.cc:420 src/libfauxdqt/prefs-window-qt.cc:535
+#: src/libfauxdgui/prefs-window.cc:424 src/libfauxdqt/prefs-window-qt.cc:539
 msgid "Show popup information"
 msgstr "顯示彈出式資訊視窗"
 
-#: src/libfauxdgui/prefs-window.cc:422 src/libfauxdqt/prefs-window-qt.cc:537
+#: src/libfauxdgui/prefs-window.cc:426 src/libfauxdqt/prefs-window-qt.cc:541
 msgid "Popup delay (tenths of a second):"
 msgstr "彈出視窗的延遲時間 (十分之一秒)："
 
-#: src/libfauxdgui/prefs-window.cc:426
+#: src/libfauxdgui/prefs-window.cc:430
 msgid "Show time scale for current song"
 msgstr "顯示目前歌曲的時間軸"
 
-#: src/libfauxdgui/prefs-window.cc:430 src/libfauxdqt/prefs-window-qt.cc:542
+#: src/libfauxdgui/prefs-window.cc:434 src/libfauxdqt/prefs-window-qt.cc:546
 msgid "Save unsavable metadata to file"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:433 src/libfauxdqt/prefs-window-qt.cc:545
+#: src/libfauxdgui/prefs-window.cc:437 src/libfauxdqt/prefs-window-qt.cc:549
 msgid "Save tags to:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:436 src/libfauxdqt/prefs-window-qt.cc:548
+#: src/libfauxdgui/prefs-window.cc:440 src/libfauxdqt/prefs-window-qt.cc:552
 msgid "Don't embed images in tags"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:442 src/libfauxdqt/prefs-window-qt.cc:554
+#: src/libfauxdgui/prefs-window.cc:446 src/libfauxdqt/prefs-window-qt.cc:558
 msgid "<b>Compatibility</b>"
 msgstr "<b>相容性</b>"
 
-#: src/libfauxdgui/prefs-window.cc:443 src/libfauxdqt/prefs-window-qt.cc:555
-msgid "Interpret \\ (backward slash) as a folder delimiter"
-msgstr "將 \\ (反斜線) 視為資料夾分隔符號"
-
-#: src/libfauxdgui/prefs-window.cc:446 src/libfauxdqt/prefs-window-qt.cc:558
-msgid "<b>Playlist</b>"
-msgstr ""
-
-#: src/libfauxdgui/prefs-window.cc:447 src/libfauxdqt/prefs-window-qt.cc:559
-msgid "Add folders recursively"
-msgstr ""
-
-#: src/libfauxdgui/prefs-window.cc:449 src/libfauxdqt/prefs-window-qt.cc:561
-msgid "Add folders nested within playlist files"
+#: src/libfauxdgui/prefs-window.cc:448 src/libfauxdqt/prefs-window-qt.cc:560
+msgid "Use Xwayland (requires a restart to take effect)"
 msgstr ""
 
 #: src/libfauxdgui/prefs-window.cc:451 src/libfauxdqt/prefs-window-qt.cc:563
-msgid "<b>Metadata</b>"
-msgstr "<b>詮釋資料</b>"
-
-#: src/libfauxdgui/prefs-window.cc:452 src/libfauxdqt/prefs-window-qt.cc:564
-msgid "Guess missing metadata from file path"
-msgstr "依據檔案路徑補上欠缺的詮釋資料"
+msgid "Interpret \\ (backward slash) as a folder delimiter"
+msgstr "將 \\ (反斜線) 視為資料夾分隔符號"
 
 #: src/libfauxdgui/prefs-window.cc:454 src/libfauxdqt/prefs-window-qt.cc:566
-msgid "Do not load metadata for songs until played"
-msgstr "在歌曲播放以前不要載入詮釋資料"
+msgid "<b>Playlist</b>"
+msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:456 src/libfauxdqt/prefs-window-qt.cc:568
-msgid "Probe content of files with no recognized file name extension"
-msgstr "偵測帶有不明副檔名的檔案內容"
+#: src/libfauxdgui/prefs-window.cc:455 src/libfauxdqt/prefs-window-qt.cc:567
+msgid "Add folders recursively"
+msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:458 src/libfauxdqt/prefs-window-qt.cc:570
-msgid "<b>Miscellaneous</b>"
+#: src/libfauxdgui/prefs-window.cc:457 src/libfauxdqt/prefs-window-qt.cc:569
+msgid "Add folders nested within playlist files"
 msgstr ""
 
 #: src/libfauxdgui/prefs-window.cc:459 src/libfauxdqt/prefs-window-qt.cc:571
+msgid "<b>Metadata</b>"
+msgstr "<b>詮釋資料</b>"
+
+#: src/libfauxdgui/prefs-window.cc:460 src/libfauxdqt/prefs-window-qt.cc:572
+msgid "Guess missing metadata from file path"
+msgstr "依據檔案路徑補上欠缺的詮釋資料"
+
+#: src/libfauxdgui/prefs-window.cc:462 src/libfauxdqt/prefs-window-qt.cc:574
+msgid "Do not load metadata for songs until played"
+msgstr "在歌曲播放以前不要載入詮釋資料"
+
+#: src/libfauxdgui/prefs-window.cc:464 src/libfauxdqt/prefs-window-qt.cc:576
+msgid "Probe content of files with no recognized file name extension"
+msgstr "偵測帶有不明副檔名的檔案內容"
+
+#: src/libfauxdgui/prefs-window.cc:466 src/libfauxdqt/prefs-window-qt.cc:578
+msgid "<b>Miscellaneous</b>"
+msgstr ""
+
+#: src/libfauxdgui/prefs-window.cc:467 src/libfauxdqt/prefs-window-qt.cc:579
 msgid "Step forward/backward by:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:461 src/libfauxdqt/prefs-window-qt.cc:573
+#: src/libfauxdgui/prefs-window.cc:469 src/libfauxdqt/prefs-window-qt.cc:581
 msgid "seconds"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:462 src/libfauxdqt/prefs-window-qt.cc:574
+#: src/libfauxdgui/prefs-window.cc:470 src/libfauxdqt/prefs-window-qt.cc:582
 msgid "Adjust volume by:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:464 src/libfauxdqt/prefs-window-qt.cc:576
+#: src/libfauxdgui/prefs-window.cc:472 src/libfauxdqt/prefs-window-qt.cc:584
 msgid "percent"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:466 src/libfauxdqt/prefs-window-qt.cc:578
+#: src/libfauxdgui/prefs-window.cc:474 src/libfauxdqt/prefs-window-qt.cc:586
 msgid "Allow URL-helper:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:469 src/libfauxdqt/prefs-window-qt.cc:581
+#: src/libfauxdgui/prefs-window.cc:477 src/libfauxdqt/prefs-window-qt.cc:589
 msgid "URL-helper program?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:471 src/libfauxdqt/prefs-window-qt.cc:583
+#: src/libfauxdgui/prefs-window.cc:479 src/libfauxdqt/prefs-window-qt.cc:591
 msgid "Cover Art-helper program?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:473 src/libfauxdqt/prefs-window-qt.cc:585
+#: src/libfauxdgui/prefs-window.cc:481 src/libfauxdqt/prefs-window-qt.cc:593
 msgid "Lyrics plugins helper program?:"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:475 src/libfauxdqt/prefs-window-qt.cc:587
+#: src/libfauxdgui/prefs-window.cc:483 src/libfauxdqt/prefs-window-qt.cc:595
 msgid "Quirky window-managers (ie. AfterStep)?"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:477 src/libfauxdqt/prefs-window-qt.cc:589
+#: src/libfauxdgui/prefs-window.cc:485 src/libfauxdqt/prefs-window-qt.cc:597
 msgid "Start dock plugins late? (affects W/M task-bar order)"
 msgstr ""
 
-#: src/libfauxdgui/prefs-window.cc:497 src/libfauxdqt/prefs-window-qt.cc:611
+#: src/libfauxdgui/prefs-window.cc:505 src/libfauxdqt/prefs-window-qt.cc:619
 msgid "TITLE"
 msgstr "標題"
 
-#: src/libfauxdgui/prefs-window.cc:498 src/libfauxdqt/prefs-window-qt.cc:612
+#: src/libfauxdgui/prefs-window.cc:506 src/libfauxdqt/prefs-window-qt.cc:620
 msgid "TITLE - ARTIST"
 msgstr "標題 - 藝人"
 
-#: src/libfauxdgui/prefs-window.cc:499 src/libfauxdqt/prefs-window-qt.cc:613
+#: src/libfauxdgui/prefs-window.cc:507 src/libfauxdqt/prefs-window-qt.cc:621
 msgid "TITLE - ARTIST - ALBUM"
 msgstr "標題 - 藝人 - 專輯"
 
-#: src/libfauxdgui/prefs-window.cc:500 src/libfauxdqt/prefs-window-qt.cc:614
+#: src/libfauxdgui/prefs-window.cc:508 src/libfauxdqt/prefs-window-qt.cc:622
 msgid "ARTIST - TITLE"
 msgstr "藝人 - 標題"
 
-#: src/libfauxdgui/prefs-window.cc:501 src/libfauxdqt/prefs-window-qt.cc:615
+#: src/libfauxdgui/prefs-window.cc:509 src/libfauxdqt/prefs-window-qt.cc:623
 msgid "ARTIST - ALBUM - TITLE"
 msgstr "藝人 - 專輯 - 標題"
 
-#: src/libfauxdgui/prefs-window.cc:502 src/libfauxdqt/prefs-window-qt.cc:616
+#: src/libfauxdgui/prefs-window.cc:510 src/libfauxdqt/prefs-window-qt.cc:624
 msgid "ARTIST - ALBUM - TRACK. TITLE"
 msgstr "藝人 - 專輯 - 音軌. 標題"
 
-#: src/libfauxdgui/prefs-window.cc:503 src/libfauxdqt/prefs-window-qt.cc:617
+#: src/libfauxdgui/prefs-window.cc:511 src/libfauxdqt/prefs-window-qt.cc:625
 msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
 msgstr "藝人 [ 專輯 ] - 音軌. 標題"
 
-#: src/libfauxdgui/prefs-window.cc:504 src/libfauxdqt/prefs-window-qt.cc:618
+#: src/libfauxdgui/prefs-window.cc:512 src/libfauxdqt/prefs-window-qt.cc:626
 #, fuzzy
 msgid "ARTIST - ALBUM - DISC.TRACK. TITLE"
 msgstr "藝人 - 專輯 - 音軌. 標題"
 
-#: src/libfauxdgui/prefs-window.cc:505 src/libfauxdqt/prefs-window-qt.cc:619
+#: src/libfauxdgui/prefs-window.cc:513 src/libfauxdqt/prefs-window-qt.cc:627
 #, fuzzy
 msgid "ARTIST [ ALBUM ] - DISC.TRACK. TITLE"
 msgstr "藝人 [ 專輯 ] - 音軌. 標題"
 
-#: src/libfauxdgui/prefs-window.cc:506 src/libfauxdqt/prefs-window-qt.cc:620
+#: src/libfauxdgui/prefs-window.cc:514 src/libfauxdqt/prefs-window-qt.cc:628
 msgid "ALBUM - TITLE"
 msgstr "專輯 - 標題"
 
-#: src/libfauxdgui/prefs-window.cc:658
+#: src/libfauxdgui/prefs-window.cc:666
 msgid "Category"
 msgstr "目錄"
 
-#: src/libfauxdgui/prefs-window.cc:698 src/libfauxdqt/prefs-window-qt.cc:638
+#: src/libfauxdgui/prefs-window.cc:706 src/libfauxdqt/prefs-window-qt.cc:646
 msgid "Custom"
 msgstr "自訂"
 
-#: src/libfauxdgui/prefs-window.cc:716 src/libfauxdqt/prefs-window-qt.cc:630
+#: src/libfauxdgui/prefs-window.cc:724 src/libfauxdqt/prefs-window-qt.cc:638
 msgid "Title format:"
 msgstr "標題格式："
 
-#: src/libfauxdgui/prefs-window.cc:717 src/libfauxdqt/prefs-window-qt.cc:641
+#: src/libfauxdgui/prefs-window.cc:725 src/libfauxdqt/prefs-window-qt.cc:649
 msgid "Custom string:"
 msgstr "自訂字串："
 
-#: src/libfauxdgui/prefs-window.cc:942 src/libfauxdqt/prefs-window-qt.cc:970
+#: src/libfauxdgui/prefs-window.cc:950 src/libfauxdqt/prefs-window-qt.cc:978
 #, fuzzy, c-format
 msgid "Enable audio stream recording with %s"
 msgstr "啟用%s進行音訊串流錄製"
 
-#: src/libfauxdgui/prefs-window.cc:951 src/libfauxdqt/prefs-window-qt.cc:981
+#: src/libfauxdgui/prefs-window.cc:959 src/libfauxdqt/prefs-window-qt.cc:989
 msgid "No audio recording plugin available"
 msgstr "找不到可用的錄音外掛"
 
-#: src/libfauxdgui/prefs-window.cc:1012 src/libfauxdqt/prefs-window-qt.cc:820
+#: src/libfauxdgui/prefs-window.cc:1020 src/libfauxdqt/prefs-window-qt.cc:828
 #, fuzzy
 msgid "Settings - Fauxdacious"
 msgstr "關於 Audacious"
@@ -1718,7 +1578,7 @@ msgid "Save"
 msgstr "儲存"
 
 #: src/libfauxdgui/preset-browser.cc:84 src/libfauxdqt/eq-preset-qt.cc:307
-#: src/libfauxdqt/info-widget.cc:214
+#: src/libfauxdqt/info-widget.cc:339
 msgid "Load"
 msgstr "載入"
 
@@ -1866,7 +1726,7 @@ msgstr ""
 "\n"
 "(詳細訊息已被隱藏。)"
 
-#: src/libfauxdqt/audqt.cc:180
+#: src/libfauxdqt/audqt.cc:174
 #, fuzzy
 msgid "Fauxdacious_Qt"
 msgstr "Audacious"
@@ -1938,63 +1798,71 @@ msgstr "加入"
 msgid "Set Font"
 msgstr ""
 
-#: src/libfauxdqt/info-widget.cc:51
+#: src/libfauxdqt/info-widget.cc:58
 msgid "Metadata"
 msgstr "詮釋資料"
 
-#: src/libfauxdqt/info-widget.cc:56
+#: src/libfauxdqt/info-widget.cc:63
 #, fuzzy
 msgid "Disc Number"
 msgstr "音軌編號"
 
-#: src/libfauxdqt/info-widget.cc:57
+#: src/libfauxdqt/info-widget.cc:64
 msgid "Track Number"
 msgstr "音軌編號"
 
-#: src/libfauxdqt/info-widget.cc:61
+#: src/libfauxdqt/info-widget.cc:68
 msgid "Composer"
 msgstr "作曲"
 
-#: src/libfauxdqt/info-widget.cc:62
+#: src/libfauxdqt/info-widget.cc:69
 msgid "Performer"
 msgstr "表演者"
 
-#: src/libfauxdqt/info-widget.cc:63
+#: src/libfauxdqt/info-widget.cc:70
 msgid "Recording Year"
 msgstr "錄製年份"
 
-#: src/libfauxdqt/info-widget.cc:64
+#: src/libfauxdqt/info-widget.cc:71
 msgid "Recording Date"
 msgstr "錄製日期"
 
-#: src/libfauxdqt/info-widget.cc:66
+#: src/libfauxdqt/info-widget.cc:73
 #, fuzzy
 msgid "Catalog Number"
 msgstr "音軌編號"
 
-#: src/libfauxdqt/info-widget.cc:69
+#: src/libfauxdqt/info-widget.cc:76
 msgid "Technical"
 msgstr "技術性資訊"
 
-#: src/libfauxdqt/info-widget.cc:73
+#: src/libfauxdqt/info-widget.cc:80
 msgid "Bitrate"
 msgstr "位元率"
 
-#: src/libfauxdqt/info-widget.cc:74
+#: src/libfauxdqt/info-widget.cc:81
 #, fuzzy
 msgid "Channels"
 msgstr "%d 聲道"
 
-#: src/libfauxdqt/info-widget.cc:75
+#: src/libfauxdqt/info-widget.cc:82
 msgid "MusicBrainz ID"
 msgstr ""
 
-#: src/libfauxdqt/info-widget.cc:209
+#: src/libfauxdqt/info-widget.cc:208
+msgid "Blues"
+msgstr "藍調"
+
+#: src/libfauxdqt/info-widget.cc:334
 msgid "Image files (*.gif *.jpg *.jpeg *.png)"
 msgstr ""
 
-#: src/libfauxdqt/infowin-qt.cc:96
+#: src/libfauxdqt/infowin-qt.cc:100
 msgid "Art Lookup"
+msgstr ""
+
+#: src/libfauxdqt/infowin-qt.cc:104
+msgid "Tagfile"
 msgstr ""
 
 #: src/libfauxdqt/log-inspector.cc:138
@@ -2113,6 +1981,123 @@ msgstr "複製"
 #, c-format
 msgid "%d%%"
 msgstr ""
+
+#~ msgid "Acid Jazz"
+#~ msgstr "迷幻爵士"
+
+#~ msgid "Acid Rock"
+#~ msgstr "迷幻搖滾"
+
+#~ msgid "Ambient"
+#~ msgstr "氛圍音樂"
+
+#~ msgid "Bebop"
+#~ msgstr "Bebop"
+
+#~ msgid "Bluegrass"
+#~ msgstr "藍草"
+
+#~ msgid "Chamber Music"
+#~ msgstr "室內樂"
+
+#~ msgid "Classical"
+#~ msgstr "古典"
+
+#~ msgid "Country"
+#~ msgstr "鄉村"
+
+#~ msgid "Death Metal"
+#~ msgstr "死亡金屬"
+
+#~ msgid "Disco"
+#~ msgstr "迪斯可"
+
+#~ msgid "Easy Listening"
+#~ msgstr "輕音樂"
+
+#~ msgid "Folk"
+#~ msgstr "民謠"
+
+#~ msgid "Funk"
+#~ msgstr "放客"
+
+#~ msgid "Gangsta Rap"
+#~ msgstr "黑幫說唱"
+
+#~ msgid "Gospel"
+#~ msgstr "福音音樂"
+
+#~ msgid "Grunge"
+#~ msgstr "垃圾搖滾"
+
+#~ msgid "Hard Rock"
+#~ msgstr "硬式搖滾"
+
+#~ msgid "Heavy Metal"
+#~ msgstr "重金屬"
+
+#~ msgid "Hip-hop"
+#~ msgstr "嘻哈"
+
+#~ msgid "House"
+#~ msgstr "House"
+
+#~ msgid "Jazz"
+#~ msgstr "爵士"
+
+#~ msgid "Jungle"
+#~ msgstr "叢林"
+
+#~ msgid "Metal"
+#~ msgstr "金屬"
+
+#~ msgid "New Age"
+#~ msgstr "新世紀"
+
+#~ msgid "New Wave"
+#~ msgstr "新浪潮"
+
+#~ msgid "Noise"
+#~ msgstr "噪音"
+
+#~ msgid "Pop"
+#~ msgstr "流行"
+
+#~ msgid "Punk Rock"
+#~ msgstr "龐克搖滾"
+
+#~ msgid "Rap"
+#~ msgstr "說唱"
+
+#~ msgid "Reggae"
+#~ msgstr "雷鬼"
+
+#~ msgid "Rock"
+#~ msgstr "搖滾 (Rock)"
+
+#~ msgid "Rock and Roll"
+#~ msgstr "搖滾 (Rock&Roll)"
+
+#~ msgid "Rhythm and Blues"
+#~ msgstr "R&B"
+
+#~ msgid "Ska"
+#~ msgstr "Ska"
+
+#~ msgid "Soul"
+#~ msgstr "靈魂"
+
+#~ msgid "Swing"
+#~ msgstr "搖擺樂"
+
+#~ msgid "Techno"
+#~ msgstr "數位"
+
+#~ msgid "Trip-hop"
+#~ msgstr "迷幻舞曲"
+
+#~ msgid "_Save"
+#~ msgstr "儲存(_S)"
 
 #~ msgid "Filter: "
 #~ msgstr "過濾器："
