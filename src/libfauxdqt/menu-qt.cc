@@ -61,7 +61,7 @@ MenuAction::MenuAction (const MenuItem & item, const char * domain, QWidget * pa
        IE. playback-history-qt, WHICH USES Ctrl-A & Ctrl-C WHICH WERE GETTING
        "EATEN" BY THE MAIN PLAYLIST WINDOW'S CONTEXT MENU!:
     */
-    setShortcutContext (Qt::WidgetShortcut);  // JWT:SEE https://doc.qt.io/qt-6/qt.html#ShortcutContext-enum
+    setShortcutContext (Qt::WidgetWithChildrenShortcut);  // JWT:SEE https://doc.qt.io/qt-6/qt.html#ShortcutContext-enum
 
     if (item.cfg.name)
     {
