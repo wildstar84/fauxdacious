@@ -1,11 +1,30 @@
-Version 4.6-devel1 [Updated 02/24/2026]
+Version 4.6-final [Updated 06/08/2026]
 
-* Make [Prev] ([<<]) button work much more like [Next] in reverse - now when 
-using [Shuffle] one can go back to the previously-played songs, can wrap back 
-to the top song in the playlist (from the bottom one) when [Repeat] is on, and 
-can also now jump back to the previously selected song in the list (when more 
-than one song is highlighted (and [Settings].[Playlist].[Advance to next 
-selected entry in list] is set.
+This is mostly a maintenance release, and mostly Audacious changes and fixes 
+through 06/07/2026 with a few notable improvements of our own described below.  
+Mostly just lots of minor bugfixes, feature tweaks, and code polishing 
+all over.  This brings us up-to-date with the latest Audacious v4.6.1 final 
+release.  Several Audacious commits were not merged due to either 
+incompatability with existing Fauxdacious features, changes to (the few) 
+Audacious features we chose not to implement, or features we already have.
+
+The gory details (for gorier details see the recent GIT commits):
+
+* Fix longstanding failure of Qt main window and Moonstone window menu keyboard 
+shortcuts not working due to issues with plugin windows has had their own 
+(different) uses for certain shortcut sequences.
+
+* Modify [Repeat]-button tooltips (non-skins interfaces) to remind users how 
+to limit repeat (looping) to a single track (has always required an additional 
+menu toggle).  Skins interfaces do not support tooltips though.  This partially 
+address Audacious requests #1778 & #1779.
+
+* Make [Prev] ([<<]) button work much more like [Next] ([>>]) in reverse - now 
+when using [Shuffle] one can go back to the previously-played songs.  One can 
+also wrap back to the top song in the playlist (from the bottom one) when 
+[Repeat] is on, and can now also jump back to the previously selected song in 
+the list (when more than one song is highlighted and [Settings].[Playlist].
+[Advance to next selected entry in list] option is set.
 
 * Add 2 new [Settings].[Playlist] option checkboxes for "Exclude appended URLs 
 from window title" and "Exclude time from window title" under 
@@ -37,17 +56,17 @@ fauxdtool's new "--playlist-save" option.
 ("--playlist-save").  Saves current playlist to specified file in the 
 format based on the file's extension (required).
 
-Example:  fauxdtool playlist-save /tmp/file.audpl
+Example:  fauxdtool --playlist-save /tmp/file.audpl
 
 * Fauxdacious now supports preventing live-streams (ie. streaming radio-
 station streams that dynamically change song metadata between songs) from 
 updating specific metadata tags, ie. Album, Genre, etc. by specifying the 
 desired-fixed values in the tag file (normally user_tag_data) with the 
 normal Precedence field set to "OVERRIDE".  Other fields the user desires 
-updating, such as Title and Artist, should now be omitted or removed from 
-the tag file in these situations.  The use-case that spawned this change was 
-some streaming stations seem to return non-album name values in the Album 
-field, while frequently change them periodically and playing the same songs 
+dynamic updating, such as Title and Artist, should now be omitted or removed 
+from the tag file in these situations.  The use-case that spawned this change 
+was some streaming stations seem to return non-album-name values in the Album 
+field, while frequently changing them periodically and playing the same songs 
 again later (with different Album value) causing Fauxdacious's cover-art 
 and lyrics helpers to re-download the album image and lyrics for the same 
 song when played again later - wasting much disk space and hits on the 
