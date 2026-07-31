@@ -99,6 +99,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
     StringBuf scheme = uri_get_scheme (filename);
     StringBuf ext = uri_get_extension (filename);
     Index<PluginHandle *> ext_matches;
+    Index<PluginHandle *> mime_matches;
 
     for (PluginHandle * plugin : list)
     {
@@ -107,7 +108,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 
         if (scheme && input_plugin_has_key (plugin, InputKey::Scheme, scheme))
         {
-            AUDINFO ("Matched %s by URI scheme.\n", aud_plugin_get_name (plugin));
+            AUDINFO ("Matched %s by URI scheme (will use).\n", aud_plugin_get_name (plugin));
             return plugin;
         }
 
@@ -139,19 +140,23 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
         while (end[0] && end[0] != '&')
             ++end;
 
-        ext = str_printf ("%.*s", (int)(end - urlmime), urlmime);
-        for (PluginHandle * plugin : list)
+        if (end && urlmime < end)
         {
-            if (! aud_plugin_get_enabled (plugin))
-                continue;
+            ext = str_printf ("%.*s", (int)(end - urlmime), urlmime);
+            AUDINFO ("Found ext (%s) in (Youtube?) URL...\n", (const char *) ext);
+            for (PluginHandle * plugin : list)
+            {
+                if (! aud_plugin_get_enabled (plugin))
+                    continue;
 
-            if (ext && input_plugin_has_key (plugin, InputKey::Ext, ext))
-                ext_matches.append (plugin);
-        }
-        if (ext_matches.len () == 1)
-        {
-            AUDINFO ("Matched %s by in-url mimetype.\n", aud_plugin_get_name (ext_matches[0]));
-            return ext_matches[0];
+                if (input_plugin_has_key (plugin, InputKey::Ext, ext))
+                    ext_matches.append (plugin);
+            }
+            if (ext_matches.len () == 1)
+            {
+                AUDINFO ("Matched %s by in-url mimetype (will use).\n", aud_plugin_get_name (ext_matches[0]));
+                return ext_matches[0];
+            }
         }
     }
 
@@ -168,16 +173,19 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 
     String mime = file.get_metadata ("content-type");
 
-    /* NOTE: OGG-MEMED (WRAPPED) DATA REQUIRES CAREFUL HANDLING, SINCE FLAC OR VORBIS CAN GRAB THE
-       ENTRY, BUT LATER FAIL TO PLAY (LONG AFTER WE'RE DONE PROBING)!  WE CAN TEST VORBIS HERE "BY CONTENT"
-       BUT FLAC CAN PLAY FLAC DATA EMBEDDED IN OGG FILES, BUT WILL FAIL THESE "BY CONTENT" TEST, HOWEVER,
-       OTHER STUFF, IE. OPUS CAN BE EMBEDDED IN OGG FILES, WHICH BOTH WILL GRAB(MIME), THEN FAIL TO PLAY,
-       SO WE MUST CATCH THESE HERE TOO AND "FALL THROUGH", WHICH ALLOWS FFAUDIO TO CATCH AND PLAY LATER!
-       WE PREFER TO TRY & MATCH THE "GOOD" ONES W/FLAC OR VORBIS IF POSSIBLE AS THEY ARE GENERALLY PREFFERED
-       (HIGHER PRIORITY) OVER FFAUDIO.
+    /* JWT:NOTE: OGG-MEMED (WRAPPED) DATA REQUIRES CAREFUL HANDLING, SINCE FLAC
+       OR VORBIS CAN GRAB THE ENTRY, BUT LATER FAIL TO PLAY (LONG AFTER WE'RE
+       DONE PROBING)!  WE CAN TEST VORBIS HERE "BY CONTENT" BUT FLAC CAN PLAY
+       FLAC DATA EMBEDDED IN OGG FILES, BUT WILL FAIL THESE "BY CONTENT" TEST,
+       HOWEVER, OTHER STUFF, IE. OPUS CAN BE EMBEDDED IN OGG FILES, WHICH BOTH
+       WILL GRAB(MIME), THEN FAIL TO PLAY, SO WE MUST CATCH THESE HERE TOO AND
+       "FALL THROUGH", WHICH ALLOWS FFAUDIO TO CATCH AND PLAY LATER!  WE PREFER
+       TO TRY & MATCH THE "GOOD" ONES W/FLAC OR VORBIS IF POSSIBLE AS THEY ARE
+       GENERALLY PREFFERED (HIGHER PRIORITY) OVER FFAUDIO.
     */
     if (mime)
     {
+        AUDINFO ("Found mime-type (%s) in file metadata...\n", (const char *) mime);
         const char * mime_is_oggish = strstr_nocase (mime, "ogg"); // MUST CHECK BOTH FLAC & VORBIS FOR OGG MIMES!
         for (PluginHandle * plugin : (! mime_is_oggish && ext_matches.len () ? ext_matches : list))
         {
@@ -189,31 +197,64 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
                 AUDINFO ("Matched %s by MIME type %s.\n",
                         aud_plugin_get_name (plugin), (const char *) mime);
                 if (! mime_is_oggish)  // NOT AN OGG MIMETYPE, SO WE'RE GOOD...
-                    return plugin;     // ...SO WE'LL USE FIRST MATCHING PLUGIN.
-                else if (strstr (aud_plugin_get_name (plugin), "FLAC Decoder")  // MUST PROBE FLAC THEN VORBIS FOR OGG*:
+                    mime_matches.append (plugin);
+                else if (strstr (aud_plugin_get_name (plugin), "FLAC Decoder")
                         || strstr (aud_plugin_get_name (plugin), "Ogg Vorbis Decoder"))
                 {
+                    /* JWT:MUST PROBE FLAC THEN VORBIS FOR OGG*: */
                     file.set_limit_to_buffer (true);
                     /* JWT:TEST FLAC & VORBIS VIA "our_file()" FN AS THEY CAN ACCEPT EMBEDDED STREAMS OF OTHER TYPES. */
                     auto ip = (InputPlugin *) aud_plugin_get_header (plugin);
                     if (ip && ip->is_our_file (filename, file))
                     {
+                        /* JWT:WILL USE FLAC FOR EMBEDDED OGG* OR VORBIS PLUGIN FOR VALID OGG-VORBIS. */
                         file.set_limit_to_buffer (false);
-                        return plugin;  // WILL USE FLAC FOR EMBEDDED OGG* OR VORBIS PLUGIN FOR VALID OGG-VORBIS.
+                        AUDINFO ("Using Flac/Ogg plugin for Ogg-ish mime-type!\n");
+                        return plugin;
                     }
+                }
+            }
+        }
+
+        /* JWT:ADDED per Audacious BUG#1834-provided PATCH:
+         * Prefer MIME matches among extension candidates, but do not let a
+         * misleading URL extension hide a matching MIME-only decoder.  This is
+         * common with internet radio streams, e.g. Shoutcast servers serving
+         * MP3 data from a .aac URL with Content-Type: audio/mpeg. */
+        if (ext_matches.len () && ! mime_matches.len ())
+        {
+            for (PluginHandle * plugin : list)
+            {
+                if (! aud_plugin_get_enabled (plugin))
+                    continue;
+
+                if (input_plugin_has_key (plugin, InputKey::MIME, mime))
+                {
+                    AUDINFO ("Matched %s by MIME type %s!\n",
+                            aud_plugin_get_name (plugin), (const char *) mime);
+                    return plugin;
                 }
             }
         }
     }
 
+    if (mime_matches.len () == 1)
+    {
+        AUDINFO ("Matched %s by MIME type %s.\n",
+                aud_plugin_get_name (mime_matches[0]), (const char *) mime);
+        return mime_matches[0];
+    }
+
     file.set_limit_to_buffer (true);
 
-    for (PluginHandle * plugin : (ext_matches.len () ? ext_matches : list))
+    for (PluginHandle * plugin : (mime_matches.len()  ? mime_matches
+                                  : ext_matches.len() ? ext_matches
+                                                      : list))
     {
         if (! aud_plugin_get_enabled (plugin))
             continue;
 
-        AUDINFO ("Trying %s.\n", aud_plugin_get_name (plugin));
+        AUDINFO ("Trying %s...\n", aud_plugin_get_name (plugin));
 
         auto ip = (InputPlugin *) aud_plugin_get_header (plugin);
         if (! ip)
@@ -258,6 +299,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
                 {
                     if (incoming_items.len () > 0)
                     {
+                        AUDINFO ("Adding text list of entries from STDIN...");
                         aud_playlist_entry_insert_filtered (aud_playlist_get_active (), -1, std::move (incoming_items), 
                                 nullptr, nullptr, true);
                         error = nullptr;
@@ -265,8 +307,11 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
                 }
             }
         }
+
     if (error)
-        * error = String (_("File format not recognized"));
+        * error = String (_("The file format could not be determined. The "
+                          "format may be unsupported, or a necessary plugin "
+                          "may not be installed/enabled."));
 
     AUDINFO ("No plugins matched.\n");
     return nullptr;
