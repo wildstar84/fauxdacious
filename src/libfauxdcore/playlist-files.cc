@@ -93,10 +93,18 @@ EXPORT bool aud_filename_is_playlist (const char * filename, bool from_playlist)
     */
     aud_set_bool (nullptr, "_in_tempurl", userurl2playlist);
     aud_set_bool ("audacious", "_url_helper_denythistime", false);
-    StringBuf ext = userurl2playlist ? str_printf (_("pls"))
-            : (from_playlist ? StringBuf () : uri_get_extension (filename));
+    StringBuf ext = userurl2playlist
+            ? str_printf (_("pls"))
+            : uri_get_extension (filename);
     if (ext)
     {
+        /* AUDACIOUS POLICY FORBIDS PLAYLISTS W/N PLAYLISTS (TO PREVENT POSSIBLE RECURSION),
+           JWT:BUT WE ALLOW PLAYLIST *URLS* SINCE RECURSION SHOULD NOT HAPPEN THERE!:
+           ADDRESSES AUDACIOUS BUG #1734:
+        */
+        if (from_playlist && ! strncmp (filename, "file://", 7))
+            return false;
+
         for (PluginHandle * plugin : aud_plugin_list (PluginType::Playlist))
         {
             if (aud_plugin_get_enabled (plugin) && playlist_plugin_has_ext (plugin, ext))

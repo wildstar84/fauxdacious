@@ -1,3 +1,15 @@
+Version 4.6.1-devel [Updated 07/31/2026]
+
+* Address Audacious bug #1734: "An .m3u playlist record, containing a correct 
+.pls playlist URL, cannot be played by Audacious":  Enforce Audacious policy 
+of not allowing playlist entries within local playlist *files* due to the 
+potential of infinite recursion.  However, we'll allow this in web-based URLs 
+and *assume* those won't contain infinite recursion.
+
+* Address Audacious bug #1834: "Remote stream with misleading .aac extension 
+but audio/mpeg MIME type is not handled by MP3 decoder [PATCH available]" by 
+adding mime-type check as described in the bug-provided patch.
+
 Version 4.6-final [Updated 06/08/2026]
 
 This is mostly a maintenance release, and mostly Audacious changes and fixes 
@@ -17,14 +29,14 @@ shortcuts not working due to issues with plugin windows has had their own
 * Modify [Repeat]-button tooltips (non-skins interfaces) to remind users how 
 to limit repeat (looping) to a single track (has always required an additional 
 menu toggle).  Skins interfaces do not support tooltips though.  This partially 
-address Audacious requests #1778 & #1779.
+addresses Audacious requests #1778 & #1779.
 
 * Make [Prev] ([<<]) button work much more like [Next] ([>>]) in reverse - now 
 when using [Shuffle] one can go back to the previously-played songs.  One can 
 also wrap back to the top song in the playlist (from the bottom one) when 
 [Repeat] is on, and can now also jump back to the previously selected song in 
 the list (when more than one song is highlighted and [Settings].[Playlist].
-[Advance to next selected entry in list] option is set.
+[Advance to next selected entry in list] option is set).
 
 * Add 2 new [Settings].[Playlist] option checkboxes for "Exclude appended URLs 
 from window title" and "Exclude time from window title" under 
@@ -42,8 +54,8 @@ note, this option does not affect the metadata fields as shown in the playlist
 table or the info. popups.  Applies to all interfaces.
 
 * Merge Audacious's audtool "--select-displayed" and "--select-playing" options 
-to fauxdtool.  These allow one to specify whether or not fauxdtool should apply 
-commands involving the "current" playlist to whichever one's currently 
+into fauxdtool.  These allow one to specify whether or not fauxdtool should 
+apply commands involving the "current" playlist to whichever one's currently 
 playing (if any) or (otherwise) to whichever one's tab is currently displayed 
 (on top / active).  The default is "--select-playing" (apply to playing 
 playlist, if any, otherwise, the active (displayed) one.  Audacious did this 
@@ -95,7 +107,8 @@ limited bandwidth internet connections.
 
 * Fixed Rare crash when stopping play related to cover-art image-handling 
 (afaict), but (still open) Issue #25 reports crashes in the same code that 
-I can't duplicate and has not yet been resolved to requestor's satisfaction.
+I can't duplicate and requestor claims has not yet been fully resolved to 
+requestor's satisfaction.
 
 * Add GTK version of the File Browser plugin from Audacious but with added 
 "Copy Selected" (items to PRIMARY paste-buffer) menu item and a horizontal 
@@ -121,6 +134,9 @@ is not specified.
 
 * Numerous minor code-tweaks and cleanups under the hood, notably in vumeter, 
 mms, blur_scope, openmpt & sidplay, etc.
+
+* Confirm that all Qt6-specific compiler warnings have been fixed (since I now 
+have latest Qt6 (Debian Trixie) installed and am building with it).
 
 Version 4.5.1-devel1 [Updated 10/19/2025]
 
@@ -195,10 +211,11 @@ wouldn't remember the user-set width on restart.  Should work now, as this
 widget has a horizontal scrollbar.
 
 Note:  In the GTK version, the only way to rearrange / reorder the columns 
-selected for display is via dragging them within the righthand sid box titled 
-"Displayed columns" in the Settings.Appearance screen, as the actual column 
-headers are not themselves draggable (unlike the Qt version).  Therefore, I 
-added a note in the Settings screen informing users of this "feature".
+selected for display is via dragging them within the right-hand 
+"Displayed columns"  box in the [Settings].[Appearance] screen, as the actual 
+column headers are not themselves draggable (unlike the Qt version).  
+Therefore, I added a note in the Settings screen informing users of 
+this "feature".
 
 3) (Qt & Moonstone):  When right-clicking on a column header in the header-
 bar to add a column to display, the new column will now be inserted just 
