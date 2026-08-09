@@ -110,7 +110,8 @@ my %setPrecedence = ();
 #TOUCH THE FILE:  "$TMPDIR/INTERNET_UNSTABLE" TO CAUSE ALL VIDEOS & PODCASTS TO BE PRE-DOWNLOADED.
 
 die "..usage: $0 URL [download-path]\n"  unless ($ARGV[0]);
-exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/r\d+\-\-#);  #DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!
+#DON'T REFETCH FETCHED YOUTUBE PLAYABLE URLS!:
+exit (0)  if ($ARGV[0] =~ m#^https?\:\/\/(?:r?r\d+\-\-|manifest\.googlevideo\.com)#);
 
 my $configPath = '';
 if ($ARGV[1]) {
@@ -151,7 +152,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 
 #BEGIN USER-DEFINED PATTERN-MATCHING CODE:
 
-	if ($ARGV[0] !~ /\.(?:asx|mp3|mpv|m3u|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta|mk[av])$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
+	if ($ARGV[0] !~ /\.(?:aac|asx|mp3|mpv|m3u|webm|pls|mov|mp[4acdp]|m4a|avi|flac|flv|og[agmvx]|wav|rtmp|3gp|a[ac]3|ape|dts|tta|mk[av])$/i) {  #ONLY FETCH STREAMS FOR URLS THAT DON'T ALREADY HAVE VALID EXTENSION!
 		#SPECIAL HANDLING FOR rcast.net STREAMS (TOO SIMPLE TO NEED STREAMFINDER):
 		if ($StreamFinder::VERSION < 2.04
 				&& ($newPlaylistURL = $ARGV[0]) =~ s#https\:\/\/dir\.rcast\.net\/radio\/(\d+)\/?(.*)#https\:\/\/stream\.rcast\.net\/$1#) {
@@ -232,7 +233,9 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				}
 			}
 			my $tmphlsfile = 0;
-			if ($stationID && open OUT, ">${TMPDIR}/${stationID}.m3u8") {
+			if ($stationID && $newPlaylistURL =~ /\.m3u8?/
+					&& $newPlaylistURL !~ /\.tar\?r\_file\=chunklist\.m3u8/  #THESE RUMBLE URLS ARE *NOT* PLAYLISTS!
+					&& open OUT, ">${TMPDIR}/${stationID}.m3u8") {
 				my @lines = split(/\r?\n/, $html);
 				my $line = 0;
 				(my $urlpath = $newPlaylistURL) =~ s#[^\/]+$##;
@@ -243,7 +246,7 @@ my $DEBUG = defined($ENV{'FAUXDACIOUS_DEBUG'}) ? $ENV{'FAUXDACIOUS_DEBUG'} : 0;
 				my $bwexp = 'BANDWIDTH';
 TRYIT:
 				while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
-					goto DONE1  if ($lines[$line] =~ /\.ts$/o);  #PUNT, WE'RE NOT AN HLS PLAYLIST!
+					goto DONE1  if ($lines[$line] =~ /\.ts\b/o);  #PUNT, WE'RE NOT AN HLS PLAYLIST!
 
 					if ($lines[$line] =~ /\s*\#EXT\-X\-STREAM\-INF\:(?:.*?)${bwexp}\=(\d+)/) {
 						$line++;
@@ -257,6 +260,7 @@ TRYIT:
 									$lines[$line] = $urlpath . $lines[$line];
 								}
 								print STDERR "++++($bw): found stream at bw=$bw=...\n"  if ($DEBUG);
+								$lines[$line] =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
 								print OUT "$lines[$line-1]\n$lines[$line]\n";
 							} elsif ($lowestBW < 0 || $bw < $lowestBW) {
 								$lowestBW = $bw;
@@ -272,6 +276,7 @@ TRYIT:
 					} elsif ($tried == 0) {
 						$lines[$line] =~ s#URI\=\"\/#URI\=\"#o;
 						$lines[$line] =~ s#URI\=\"#URI\=\"${urlpath}#;
+						$lines[$line] =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
 						print OUT "$lines[$line]\n";
 					}
 
@@ -285,6 +290,7 @@ TRYIT:
 						print STDERR "w:No streams($highestBW) within bandwidth limit($hls_bandwidth), try AVERAGE BW...\n";
 						goto TRYIT;
 					} elsif ($worstStream) {
+						$worstStream =~ s/\&r\_type\=application\%2Fvnd\.apple\.mpegurl.*$//;
 						print OUT $worstStream;
 						print STDERR "w:ALL streams exceed bandwidth limit, returning WORST stream(bw=$lowestBW)!\n";
 						$newPlaylistURL = "file://${TMPDIR}/${stationID}.m3u8";
