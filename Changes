@@ -1,4 +1,36 @@
-Version 4.6.1-devel [Updated 07/31/2026]
+TODO (in Fauxdacious-Next):
+
+* Add ability to play Youtube "DASH streams".  To play these, it is necessary 
+to fetch two separate such streams from Youtube via yt-dlp:  an audio-only 
+stream paired with a video-only one.  Purpose is two-fold:  Youtube no longer 
+provides streams containing both audio and video except for in a single low-
+resolution (640x360) stream (format# 18), and Fauxdacious currently requires 
+a single stream URL to play (either audio-only or audio+video).  The 2nd 
+reason is that Youtube has previously made access to that stream difficult 
+(briefly impossible) until yt-dlp released a new version some some complicated 
+configuration instructions.  Therefore, I suspect that they'll eventually 
+remove that last remaining format alltogether.  Work is coming along better 
+than expected and I hope to make this feature available in v4.6.1-devel (git) 
+soon (currently undergoing further testing)!
+
+Version 4.6.1-devel [Updated 08/09/2026]
+
+* Use ffmpeg as transport instead of neon (when FFaudio is the selected 
+input plugin) now as it is more efficient and handles seeking better.  
+This was needed to handle current Rumble compressed HLS streams that don't 
+always provide a reasonable value for the stream's length (needed for seeking). 
+Also better handle seeking, and handle current ffaudio sometimes NOT returning 
+correct length for some Rumble.com HLS streams.  When the stream's length is 
+returned by StreamFinder (podcasts.apple.com, and now rumble.com, with 
+StreamFinder v2.63+), we now do a sanity-check against the length returned by 
+ffmpeg and override it with the length returned by StreamFinder if not 
+reasonably close.
+
+* Improved the URL-helper to be more efficient and fix stream URLs containing 
+the suffix "&r_type=application\%2Fvnd.apple.mpegurl*" not being recognized 
+due to recent libavformat changes.  
+See:  https://coverage.ffmpeg.org/index.hls.c.526cf0c8c5d1c57787145aace325b3fb.html
+Also fix other minor issues affecting modern Rumble video streams.
 
 * Address Audacious bug #1734: "An .m3u playlist record, containing a correct 
 .pls playlist URL, cannot be played by Audacious":  Enforce Audacious policy 
