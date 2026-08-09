@@ -130,6 +130,7 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
 
     /* JWT:SPECIAL CHECK FOR YOUTUBE STREAMS: CHECK URL FOR EMBEDDED MIME-TYPE (SINCE BY-CONTENT SOMETIMES FAILS): */
     const char * urlmime = strstr(filename, "&mime=");
+
     if (urlmime)
     {
         urlmime += 6;
@@ -408,6 +409,7 @@ EXPORT int aud_read_tag_from_tagfile (const char * song_filename, const char * t
         tuple.set_int (Tuple::Length, atoi (instr));
     else
         tuple.unset (Tuple::Length);
+
     char * instrc = g_key_file_get_string (rcfile, song_filename, "Lyrics", nullptr);
     if (instrc)
     {
@@ -659,9 +661,18 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
                 i_tfld = tuple.is_set (Tuple::Length) ? tuple.get_int (Tuple::Length) : -1;
                 if (i_tfld < 0)
                 {
-                    i_tfld = tuples[override_tuple].is_set (Tuple::Length) ? tuples[override_tuple].get_int (Tuple::Length) : -1;
+                    i_tfld = tuples[override_tuple].is_set (Tuple::Length)
+                            ? tuples[override_tuple].get_int (Tuple::Length) : -1;
                     if (i_tfld >= 0)
                         tuple.set_int (Tuple::Length, i_tfld);
+                }
+                else  // JWT:HACK:SANITY-CHECK FOR SOMETIMES BAD HLS LENGTHS FROM ffaudio:
+                {
+                    int tagfile_len = tuples[override_tuple].is_set (Tuple::Length)
+                            ? tuples[override_tuple].get_int (Tuple::Length) : -1;
+                    if (tagfile_len > 0 &&
+                            (i_tfld < 5000 || i_tfld*2 < tagfile_len))
+                        tuple.set_int (Tuple::Length, tagfile_len);
                 }
                 tfld = tuple.get_str (Tuple::Lyrics);
                 if (! tfld || ! tfld[0])
