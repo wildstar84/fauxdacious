@@ -1,4 +1,4 @@
-TODO (in Fauxdacious-Next):
+Version 4.6.1-devel [Updated 08/13/2026]
 
 * Add ability to play Youtube "DASH streams".  To play these, it is necessary 
 to fetch two separate such streams from Youtube via yt-dlp:  an audio-only 
@@ -13,7 +13,21 @@ remove that last remaining format alltogether.  Work is coming along better
 than expected and I hope to make this feature available in v4.6.1-devel (git) 
 soon (currently undergoing further testing)!
 
-Version 4.6.1-devel [Updated 08/09/2026]
+Example youtube configuration (~/.config/StreamFinder/Youtube/config):
+(This is my currently-working configuration - I have low bandwidth and am 
+limited to 720p videos or less, and I have the deno javascript-challenge 
+checking script installed, which seems to be required now to fetch 
+Youtube video streams)
+
+    youtube-dl => "yt-dlp"
+    format => "bestaudio"
+    formatv => "bv[height<=720][vbr<=3500]"
+    format-fallback => "b[tbr<=3500]"
+    youtube-dl-add-args => " --js-runtimes deno:/home/user/.deno/bin/deno"
+
+#SEE:  https://github.com/ytdl-org/youtube-dl/blob/master/README.md#format-selection
+#AND:  https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#configuration
+#DENO: https://github.com/denoland/deno/
 
 * Use ffmpeg as transport instead of neon (when FFaudio is the selected 
 input plugin) now as it is more efficient and handles seeking better.  
@@ -22,9 +36,20 @@ always provide a reasonable value for the stream's length (needed for seeking).
 Also better handle seeking, and handle current ffaudio sometimes NOT returning 
 correct length for some Rumble.com HLS streams.  When the stream's length is 
 returned by StreamFinder (podcasts.apple.com, and now rumble.com, with 
-StreamFinder v2.63+), we now do a sanity-check against the length returned by 
+StreamFinder v2.70+), we now do a sanity-check against the length returned by 
 ffmpeg and override it with the length returned by StreamFinder if not 
 reasonably close.
+
+* ffaudio - Update the audio/video demuxing interlacing strategy to take 
+advantage of pts timestamps as these are now needed to handle syncing of the 
+separate audio and video stream URLs used in Youtube dash videos.  The result 
+is an increase in the default queue-size of 12 and the addition of a separate 
+minimum queue-size of 6, though for most videos now, the size of these queues 
+seems to have less effect on playback stability.  Audio seems to be much more 
+in sync with the video display now, but the tradeoff sometimes there can be 
+more "jitteriness" in some parts of some less than ideally-muxed videos.
+TODO:  Try implementing more features offered by packet and frame timestamps 
+to further improve video playback!
 
 * Improved the URL-helper to be more efficient and fix stream URLs containing 
 the suffix "&r_type=application\%2Fvnd.apple.mpegurl*" not being recognized 

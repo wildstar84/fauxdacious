@@ -129,7 +129,17 @@ EXPORT PluginHandle * aud_file_find_decoder (const char * filename, bool fast,
     AUDINFO ("Matched %d plugins by extension.\n", ext_matches.len ());
 
     /* JWT:SPECIAL CHECK FOR YOUTUBE STREAMS: CHECK URL FOR EMBEDDED MIME-TYPE (SINCE BY-CONTENT SOMETIMES FAILS): */
-    const char * urlmime = strstr(filename, "&mime=");
+    if (strstr (filename, "|"))  /* JWT:SPECIAL YOUTUBE "DASH" (DUAL) STREAM: */
+    {
+        PluginHandle * plugin = aud_plugin_lookup_basename ("ffaudio");
+        if (aud_plugin_get_enabled (plugin))
+        {
+            AUDINFO ("Duel-stream Youtube DASH video Matched FFmpeg Plugin (will use).\n");
+            return plugin;
+        }
+    }
+
+    const char * urlmime = strstr (filename, "&mime=");
 
     if (urlmime)
     {
