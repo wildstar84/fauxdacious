@@ -1,4 +1,78 @@
-Version 4.6.1-devel [Updated 08/13/2026]
+Version 4.6.1-devel [Updated 08/21/2026]
+
+* NOTE:  Users who frequently watch Youtube videos should upgrade Fauxdacious, 
+StreamFinder (v2.70) and yt-dlp and observe the recent entries in this 
+changelog file & FAQ item# 7!
+
+* Update the audio/video demuxing logic and the ffaudio plugin configuration 
+options (ie. "knobs") that can be adjusted to further improve audio/video 
+syncing and reduce "jitter" resulting in smoother video-play and better 
+syncing, which is most noticable when a video has a speaker so that their 
+lip movements are synced up with their words!  Serious video-players 
+(supported by teams of developers) are very precise with this via large amounts 
+of libav/ffmpeg code involving sophisticated use of packet timestamps, multiple 
+threads and complicated logic.  Unfortunately, I've never been able to find 
+good examples of code that does this well and that I could follow.  Therefore, 
+my code is much simpler, but uses some "hacks" based on months of trial & error 
+that seem to work pretty well (and good enough for me)!  When I added "dash" 
+video-play, which requires now syncing not just two streams from the same open 
+URL, but working with two separate URLs (for the audio and video), it was clear 
+that this needed some further improvement (and a bunch more trial and error).  
+I now have this working noticably better but it may require the user to 
+occasionaly "turn a knob or two" for some videos.  I've provided new default 
+values that should work well for most videos, but some may prefer adjusting for 
+some videos to get better syncing or reduce jitter, based on the video, or 
+perhaps their processor or internet-connection speeds.  The following "knobs" 
+are provided (Note, for users upgrading to this commit, most of these knobs 
+will default to their current values and they should probably change them to 
+the new default values, now shown in the configuration window, as the 
+algorythums they control have changed):
+
+1) "Adjust a/v sync. (recommended for DASH videos)" - boolean (default TRUE/
+checked).  Most DASH videos and some others seem to end up out of sync, 
+particulary since we now do take timestamps into account since audio and video 
+data comes in from separate stream URL handles in separate threads.  This 
+option improves syncing on most videos.  Some non-DASH videos may not only 
+sync better with this option off (which pretty much just uses the previous 
+logic), but may also seem to make fast-moving subjects seem slightly "fuzzy" 
+or more jerky with this option turned on.
+
+2) "Adjust video timestamps (msec.s) - integer (default -500 msec).  This is 
+the knob that users are most likely to wish to turn more frequently.  This 
+directly affects syncing, primarly in DASH videos.  Most videos that seem 
+consistantly a little off (the speaker's lips slightly off from his words) 
+usually have the video slightly dragging behind the audio, and the default of 
+-500 seems to work well with most videos.  If "Adjust a/v sync" is turned off 
+and one is playing a non-DASH video, setting this to zero may work best.  
+Some DASH videos seem to require values as low as -1500 or as high as 1000.  
+If out of sync enough to seem annoying, try adjusting this.  The number is 
+added (or subtracted if negative) to the video timestamp reported for each 
+video packet before being compared to the audio packet's timestamps in order 
+to interlace video and audio packets with timestamps as close together as 
+possible.  If video lags audio consistantly, use a negative value or 
+decrease the value (to force video packets to be queued sooner relative to 
+nearby audio packets), if (less likely) audio lags video, use a positive 
+value or increase the value.
+
+3) "Minimum and Maximum packet queue size" - integer (default 4 and 8 
+respectively).  These settings seem to have less effect now than in the past, 
+but may still be helpful in reducing jitter / stalling on some systems videos, 
+or connections.  For most users and videos, the default settings should work 
+very well for most users.
+
+4) "Reader sleep interval - integer (default 30 msec).  Most users should not 
+need to change this value.  This instructs the reader thread(s) to wait while 
+their respective queues are full before checking if the output thread has 
+drained the queue down to the "minimum queue size" (ideally 1/2 the maximum 
+(full) size) before allowing the reader thread to enqueue additional packets.  
+Making this smaller may cause delays on some slow systems due to more frequent 
+reading but may improve jitter and reduce audio buffer-underruns (empty 
+queues).  Longer waits may have somewhat the opposite effect of increased 
+jitter.  This value previously defaulted to 50 msec. but lower values such as 
+35, or even 20 msec. now seem (for me) to be more optimal. Setting this value 
+really low could also result in more CPU usage (and heat), so users updating 
+should probably now reduce this from 50 to somewhere between 20 and 35, after 
+experimenting!
 
 * Add ability to play Youtube "DASH streams".  To play these, it is necessary 
 to fetch two separate such streams from Youtube via yt-dlp:  an audio-only 
@@ -9,9 +83,7 @@ a single stream URL to play (either audio-only or audio+video).  The 2nd
 reason is that Youtube has previously made access to that stream difficult 
 (briefly impossible) until yt-dlp released a new version some some complicated 
 configuration instructions.  Therefore, I suspect that they'll eventually 
-remove that last remaining format alltogether.  Work is coming along better 
-than expected and I hope to make this feature available in v4.6.1-devel (git) 
-soon (currently undergoing further testing)!
+remove that last remaining format alltogether.  
 
 Example youtube configuration (~/.config/StreamFinder/Youtube/config):
 (This is my currently-working configuration - I have low bandwidth and am 
