@@ -171,7 +171,7 @@ EXPORT void init ()
     qapp->setAttribute (Qt::AA_UseStyleSheetPropagationInWidgetStyles);
 #endif
 
-    qapp->setApplicationName (_("Fauxdacious_Qt"));
+    qapp->setApplicationName ("Fauxdacious_Qt");
     qapp->setQuitOnLastWindowClosed (false);
 
     sizes_local.OneInch = aud::max (96, (int) qapp->primaryScreen ()->logicalDotsPerInch ());
