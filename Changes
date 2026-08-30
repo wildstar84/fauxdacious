@@ -1,3 +1,34 @@
+* Merged several patches offered by github user "birdie-github" 
+(Artem S. Tashkinov) to improve the way several input plugins handle 
+dynamic stream metadata changes affecting bitrate, channels and "quality" 
+parameters and reported by him in several recent Audacious "issues".  
+Whilst at it, Audacious also changed some of them to now use 
+Tuple::set_format() to store the values for these parameters, so merged 
+those commits in with this.
+
+* Skins (Qt) - Added new skin-selector widget to the settings screen that 
+displays a small image of each skin making skin-selection easier (instead 
+of just displaying a list of skin names as before).  The GTK skins version 
+has always had this feature.  This commit was merged from Audacious.
+
+* Skins (both versions) - Merged Audacious commit that enables user to 
+toggle whether skins windows are "sticky" "Show on all desktops" in X.  
+(May not fully work on all window-managers though).  Normally, this can 
+be user-configured in their window-manager settings.
+
+* Removed video-recording options from FFaudio as this never worked with 
+HLS (m3u8) streams (it only really ever worked with the old mp4 / mpd / mov 
+streams) and required video streams to be delivered by Fauxdacious "neon" 
+transport plugin (using Fauxdacious file-handles) which, effective with the 
+recent FFaudio commits (needed for Youtube's new "dash" videos) are no longer 
+used for transport, instead now ffmpeg's own internal handles are used for 
+all internet-based video streams.  To record videos now would require re-
+muxing them inline while being played, a bridge too far that I'm not willing 
+to cross at the moment (patches will be considered though).
+
+* Merged several minor Audacious code touchup commits involving the Sidplay, 
+Hotkey, Scrobbler, and glspectrum plugins.  See commits list for details.
+
 Version 4.6.1-devel [Updated 08/21/2026]
 
 * NOTE:  Users who frequently watch Youtube videos should upgrade Fauxdacious, 
@@ -81,9 +112,9 @@ provides streams containing both audio and video except for in a single low-
 resolution (640x360) stream (format# 18), and Fauxdacious currently requires 
 a single stream URL to play (either audio-only or audio+video).  The 2nd 
 reason is that Youtube has previously made access to that stream difficult 
-(briefly impossible) until yt-dlp released a new version some some complicated 
-configuration instructions.  Therefore, I suspect that they'll eventually 
-remove that last remaining format alltogether.  
+(briefly impossible) until yt-dlp released a new version some time ago with 
+some complicated configuration instructions.  Therefore, I suspect that they'll 
+eventually remove that last remaining format alltogether.  
 
 Example youtube configuration (~/.config/StreamFinder/Youtube/config):
 (This is my currently-working configuration - I have low bandwidth and am 
