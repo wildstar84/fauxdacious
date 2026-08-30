@@ -298,7 +298,7 @@ static void load_playlists_real ()
     StringBuf order_path = filename_build ({folder, "order"});
     auto order_string = VFSFile::read_file (order_path,
         VFSReadOptions (VFS_APPEND_NULL | VFS_IGNORE_MISSING));
-    auto order = str_list_to_index (order_string.begin (), " ");
+    auto order = str_list_to_index (order_string.begin (), " \n");
 
     for (int i = 0; i < order.len (); i ++)
     {
