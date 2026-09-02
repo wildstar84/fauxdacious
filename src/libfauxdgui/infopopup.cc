@@ -58,6 +58,9 @@ static GtkWidget * infopopup_queued;
 /* returns false if album art fetch was queued */
 static bool infopopup_display_image (const char * filename)
 {
+    if (! uri_to_filename (filename))
+        aud_set_bool (nullptr, "_infopopup_no_art_scan", true);
+
     bool queued;
     AudguiPixbuf pb = audgui_pixbuf_request (filename, & queued);
     if (! pb)
@@ -184,6 +187,7 @@ static void infopopup_destroyed ()
     memset (& widgets, 0, sizeof widgets);
 
     current_file = String ();
+    aud_set_bool (nullptr, "_infopopup_no_art_scan", false);
     infopopup_queued = nullptr;
 }
 
@@ -346,9 +350,11 @@ static void infopopup_show (GtkWindow * parent, const char * filename, const Tup
 EXPORT void audgui_infopopup_show (GtkWindow * parent, int playlist, int entry)
 {
     String filename = aud_playlist_entry_get_filename (playlist, entry);
-    Tuple tuple = aud_playlist_entry_get_tuple (playlist, entry);
+    Playlist::GetMode mode = uri_to_filename (filename)
+            ? Playlist::Wait : Playlist::NoWait;
+    Tuple tuple = aud_playlist_entry_get_tuple (playlist, entry, mode);
 
-    if (filename && tuple.valid ())
+    if (filename)
         infopopup_show (parent, filename, tuple);
 }
 

@@ -22,6 +22,7 @@
 #include <libfauxdcore/i18n.h>
 #include <libfauxdcore/playlist.h>
 #include <libfauxdcore/tuple.h>
+#include <libfauxdcore/runtime.h>
 
 #include "libfauxdqt.h"
 #include "libfauxdqt-internal.h"
@@ -132,6 +133,9 @@ void InfoPopup::art_ready (const char * filename)
 
 void InfoPopup::finish_loading ()
 {
+    if (! uri_to_filename (m_filename))
+        aud_set_bool (nullptr, "_infopopup_no_art_scan", true);
+
     QImage image = art_request (m_filename, & m_queued);
 
     if (! image.isNull ())
@@ -167,9 +171,11 @@ static void infopopup_show (const String & filename, const Tuple & tuple)
 EXPORT void infopopup_show (int playlist, int entry)
 {
     String filename = aud_playlist_entry_get_filename (playlist, entry);
-    Tuple tuple = aud_playlist_entry_get_tuple (playlist, entry);
+    Playlist::GetMode mode = uri_to_filename (filename)
+            ? Playlist::Wait : Playlist::NoWait;
+    Tuple tuple = aud_playlist_entry_get_tuple (playlist, entry, mode);
 
-    if (filename && tuple.valid ())
+    if (filename)
         infopopup_show (filename, tuple);
 }
 
@@ -189,8 +195,12 @@ EXPORT void infopopup_hide ()
     /* This function can be called from an enter/leave event, and Qt does not
      * like widgets being deleted from such events.  This is debatably a bug in
      * Qt, but deleteLater() is an effective workaround. */
+
     if (s_infopopup)
+    {
+        aud_set_bool (nullptr, "_infopopup_no_art_scan", false);
         s_infopopup->deleteLater ();
+    }
 }
 
 void infopopup_hide_now ()

@@ -364,7 +364,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
             item->flag = FLAG_SENT;  // ART FOUND IN TAG FILE, WE'RE DONE, DON'T SCAN NON-PLAYING ENTRY (SLOW)!
             return item;
         }
-        else if (chkres == 0)
+        else if (chkres == 0 && ! aud_get_bool (nullptr, "_infopopup_no_art_scan"))
             scanner_request (new ScanRequest (filename, SCAN_IMAGE, request_callback));
         else
         {
