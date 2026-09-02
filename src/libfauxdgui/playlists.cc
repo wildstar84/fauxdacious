@@ -64,14 +64,13 @@ static void finish_job (void * data)
     ImportExportJob * job = (ImportExportJob *) data;
     int list = aud_playlist_by_unique_id (job->list_id);
 
-    Playlist::GetMode mode = Playlist::Wait;
-    if (aud_get_bool (nullptr, "metadata_on_play"))
-        mode = Playlist::NoWait;
-
     if (list >= 0)
     {
         if (job->save)
         {
+            Playlist::GetMode mode = aud_get_bool (nullptr, "metadata_on_play")
+                    ? Playlist::NoWait : Playlist::Wait;
+
             aud_playlist_set_filename (list, job->filename);
             aud_playlist_save (list, job->filename, mode);
         }

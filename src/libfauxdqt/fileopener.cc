@@ -45,9 +45,8 @@ static void export_playlist (int playlist, const char * filename)
     if (playlist < 0)
         return;
 
-    Playlist::GetMode mode = Playlist::Wait;
-    if (aud_get_bool (nullptr, "metadata_on_play"))
-        mode = Playlist::NoWait;
+    Playlist::GetMode mode = aud_get_bool (nullptr, "metadata_on_play")
+            ? Playlist::NoWait : Playlist::Wait;
 
     aud_playlist_set_filename (playlist, filename);
     aud_playlist_save (playlist, filename, mode);
