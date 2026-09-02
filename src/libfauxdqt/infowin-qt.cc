@@ -24,6 +24,7 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QPushButton>
+#include <QComboBox>
 #include <QTextEdit>
 #include <QVBoxLayout>
 
@@ -42,6 +43,8 @@
 #include "libfauxdqt-internal.h"
 
 namespace audqt {
+
+static int tuple_prec;
 
 /* This class remedies some of the deficiencies of QLabel (such as lack
  * of proper wrapping).  It can be expanded and/or made more visible if
@@ -63,6 +66,7 @@ private:
     QLabel m_image;
     QTextEdit m_uri_label;
     QDialogButtonBox * bbox;
+    QComboBox * PriorityBox;
     QPushButton * ArtLookupButton;
     QPushButton * Save2TagfileButton = nullptr;
     QPushButton * EmbedButton;
@@ -96,6 +100,14 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
 
     auto vbox = make_vbox (this);
     vbox->addLayout (hbox);
+    auto hbox2 = make_hbox (nullptr);
+
+    PriorityBox = new QComboBox (this);
+    PriorityBox->addItem (_("None"), 0);
+    PriorityBox->addItem (_("Default"), 1);
+    PriorityBox->addItem (_("Override"), 2);
+    PriorityBox->addItem (_("Only"), 3);
+    PriorityBox->setCurrentIndex (tuple_prec);
 
     ArtLookupButton = new QPushButton (_("Art Lookup"), this);
     ArtLookupButton->setIcon (get_icon ("document-open"));
@@ -112,7 +124,9 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
     bbox->addButton (EmbedButton, QDialogButtonBox::ActionRole);
     if (user_tag_data && Save2TagfileButton)
         bbox->addButton (Save2TagfileButton, QDialogButtonBox::ActionRole);
-    vbox->addWidget (bbox);
+    hbox2->addWidget (PriorityBox, 1, Qt::AlignRight);
+    hbox2->addWidget (bbox, 1);
+    vbox->addLayout (hbox2);
 
 //    m_infowidget.linkEnabled (EmbedButton);
     EmbedButton->setDisabled (true);
@@ -129,6 +143,7 @@ InfoWindow::InfoWindow (QWidget * parent) : QDialog (parent)
     if (user_tag_data && Save2TagfileButton)
     {
         connect (Save2TagfileButton, & QPushButton::clicked, [this] () {
+            aud_set_int ("audqt", "__tagfile_priority", PriorityBox->currentIndex ());
             m_infowidget.updateFile (true);
             deleteLater ();
         });
@@ -187,6 +202,12 @@ static void displayTupleImage (void * image_fn, void * hookarg)
 static void show_infowin (int playlist, int entry, const char * filename,
  const Tuple & tuple, PluginHandle * decoder, bool can_write)
 {
+    /* JWT:HAVE TO DO HERE WHILE WE HAVE A TUPLE, B4 WE OPEN THAT WINDOW BELOW!: */
+    tuple_prec = tuple.get_int (Tuple::Precedence);
+    tuple_prec &= 3;  // JWT:REMOVE ANY EXTRA FLAG BITS.
+    if (tuple_prec < 1 || tuple_prec > 3)
+        tuple_prec = 1;
+
     if (! s_infowin)
     {
         s_infowin = new InfoWindow;

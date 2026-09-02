@@ -426,11 +426,21 @@ bool InfoModel::updateFile (bool tagfile_only) const
 {
     bool success = false;
 
-    if (! m_dirty)
-        return true;
-
     if (tagfile_only)
-        aud_set_str (nullptr, "__tag_precedence", "OVERRIDE");
+    {
+        /* CLEAN OR DIRTY OK IF SAVING TO TAG-FILE: */
+        int tagfile_priority = aud_get_int ("audqt", "__tagfile_priority");
+        if (tagfile_priority == 0)
+            aud_set_str (nullptr, "__tag_precedence", "NOOP");
+        else if (tagfile_priority == 1)
+            aud_set_str (nullptr, "__tag_precedence", "DEFAULT");
+        else if (tagfile_priority == 2)
+            aud_set_str (nullptr, "__tag_precedence", "OVERRIDE");
+        else if (tagfile_priority == 3)
+            aud_set_str (nullptr, "__tag_precedence", "ONLY");
+    }
+    else if (! m_dirty)
+        return true;
 
     /* JWT:IF RECORDING ON, USE THE FILE BEING RECORDED TO (BUT WILL FAIL OVER TO USER TAG-FILE)! */
     if (aud_get_bool (nullptr, "record"))

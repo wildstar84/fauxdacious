@@ -56,6 +56,13 @@ static const char * codec_labels[CODEC_ITEMS] = {
     N_("Bitrate:")
 };
 
+static const char * tuple_precs[4] = {
+    N_("NONE"),
+    N_("DEFAULT"),
+    N_("OVERRIDE"),
+    N_("ONLY")
+};
+
 static struct {
     GtkTextView * location;
     GtkWidget * location_scrolled;
@@ -79,6 +86,7 @@ static struct {
     GtkWidget * apply2tagfile;
     GtkWidget * autofill;
     GtkWidget * ministatus;
+    GtkWidget * priority_box;
 } widgets;
 
 static GtkWidget * infowin;
@@ -126,6 +134,12 @@ static void set_entry_str_from_field (GtkWidget * widget, const Tuple & tuple,
 
     gtk_entry_set_text ((GtkEntry *) widget, text ? text : "");
     gtk_editable_set_editable ((GtkEditable *) widget, editable);
+}
+
+static void set_priority_combo (GtkWidget * widget, String text)
+{
+    gtk_entry_set_text ((GtkEntry *) widget, (text && text[0]) ? text : "DEFAULT");
+    gtk_editable_set_editable ((GtkEditable *) widget, false);
 }
 
 static void set_entry_int_from_field (GtkWidget * widget, const Tuple & tuple,
@@ -270,7 +284,10 @@ static void infowin_update_tuple ()
 static void infowin_update_tuple_tagfile ()
 {
     bool success = false;
-    aud_set_str (nullptr, "__tag_precedence", "OVERRIDE");
+    gchar * tagfile_priority = gtk_combo_box_text_get_active_text (
+            (GtkComboBoxText *) widgets.priority_box);
+
+    aud_set_str (nullptr, "__tag_precedence", tagfile_priority);
     infowin_update_tuple_data ();
 
     if (aud_get_bool (nullptr, "record"))
@@ -296,6 +313,7 @@ static void infowin_update_tuple_tagfile ()
         ministatus_display_message (_("Save error"));
 
     aud_set_str (nullptr, "__tag_precedence", "");
+    g_free (tagfile_priority);
 }
 
 static void infowin_select_entry (int entry)
@@ -618,6 +636,12 @@ static void create_infowin ()
     gtk_widget_set_no_show_all (widgets.ministatus, true);
     gtk_box_pack_start ((GtkBox *) bottom_hbox, widgets.ministatus, true, true, 0);
 
+    widgets.priority_box = gtk_combo_box_text_new_with_entry ();
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) widgets.priority_box, _("DEFAULT"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) widgets.priority_box, _("OVERRIDE"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) widgets.priority_box, _("ONLY"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) widgets.priority_box, _("NONE"));
+
     widgets.apply = audgui_button_new (_("Embed"), "document-save",
      (AudguiCallback) infowin_update_tuple, nullptr);
 
@@ -640,6 +664,7 @@ static void create_infowin ()
     if (aud_get_bool (nullptr, "user_tag_data"))
         gtk_box_pack_end ((GtkBox *) bottom_hbox, widgets.apply2tagfile, false, false, 0);
     gtk_box_pack_end ((GtkBox *) bottom_hbox, widgets.apply, false, false, 0);
+    gtk_box_pack_end ((GtkBox *) bottom_hbox, widgets.priority_box, false, false, 0);
     gtk_box_pack_end ((GtkBox *) bottom_hbox, next_button, false, false, 0);
     gtk_box_pack_end ((GtkBox *) bottom_hbox, prev_button, false, false, 0);
 
@@ -665,6 +690,10 @@ static void infowin_show (int list, int entry, const String & filename, const St
     bool editable = writable || aud_get_bool (nullptr, "user_tag_data");
     bool clear = aud_get_bool ("audgui", "clear_song_fields");
     bool changed = false;
+    int tuple_prec = tuple.get_int (Tuple::Precedence);
+    tuple_prec &= 3;  // JWT:REMOVE ANY EXTRA FLAG BITS.
+    if (tuple_prec < 1 || tuple_prec > 3)
+        tuple_prec = 1;
 
     set_entry_str_from_field (widgets.title, tuple, Tuple::Title, editable, clear, changed);
     set_entry_str_from_field (widgets.artist, tuple, Tuple::Artist, editable, clear, changed);
@@ -677,7 +706,9 @@ static void infowin_show (int list, int entry, const String & filename, const St
     set_entry_str_from_field (widgets.composer, tuple, Tuple::Composer, editable, clear, changed);
     set_entry_str_from_field (widgets.performer, tuple, Tuple::Performer, editable, clear, changed);
     set_entry_str_from_field (gtk_bin_get_child ((GtkBin *) widgets.genre),
-     tuple, Tuple::Genre, editable, clear, changed);
+            tuple, Tuple::Genre, editable, clear, changed);
+    set_priority_combo (gtk_bin_get_child ((GtkBin *) widgets.priority_box),
+            String (tuple_precs[tuple_prec]));
 
     gtk_text_buffer_set_text (widgets.textbuffer, uri_to_display (entryfn), -1);
 
