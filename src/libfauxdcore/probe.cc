@@ -458,7 +458,8 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     if (! ip)
         return false;
 
-    if (! open_input_file (filename, "r", ip, file, error))
+    bool restrict_scan = aud_get_bool(nullptr, "__restrict_scan");
+    if (! restrict_scan && ! open_input_file (filename, "r", ip, file, error))
         return false;
 
     Tuple tuples[4];   // THE TUPLES FROM EACH OF THE POTENTIAL TAG FILES.
@@ -466,6 +467,8 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
     int from[4] = {0,0,0,0}; // PRECEDENCE FOUND IN EACH TAG FILE.
     bool usrtag = aud_get_bool (nullptr, "user_tag_data"); // ARE WE ALLOWED TO LOOK FOR TAG FILES?
     bool fileorNOTstdin = file || strncmp (filename, "stdin://", 8);  // JWT:IF stdin, MUST HAVE OPEN FILEHANDLE!
+    if (restrict_scan)
+        fileorNOTstdin = false;
     String individual_tag_file = String ("");  // ./song_filename.tag (local files only)
     String dir_tag_file = String ("");         // ./user_tag_data.tag (directory-wide tag file - local files only)
     String filename_only = String ("");        // "song_filename" (no path or extension - local files only)
@@ -493,7 +496,8 @@ EXPORT bool aud_file_read_tag (const char * filename, PluginHandle * decoder,
             || (individual_tag_file[0] && (from[1] = aud_read_tag_from_tagfile (filename_only, individual_tag_file, tuples[1])) > 2)
             || (dir_tag_file[0] && (from[2] = aud_read_tag_from_tagfile (filename_only, dir_tag_file, tuples[2])) > 2)
             || (usrtag && (from[3] = aud_read_tag_from_tagfile (filename, "user_tag_data", tuples[3])) > 2)
-            || (fileorNOTstdin && ip->read_tag (filename, file, song_tuple, image)))
+            || (fileorNOTstdin && ip->read_tag (filename, file, song_tuple, image))
+            || restrict_scan)
     {
         int highest_mode = 0;    // HIGHEST PRECEDENCE FOUND IN TAG FILES (0=NONE FOUND, 1=DEFAULT, 2=OVERRIDE, 3=ONLY.
         int override_tuple = -1; // INDEX OF TUPLE IF HIGHEST PRIORITY TAG FILE W/"OVERRIDE" SET, IF ANY.

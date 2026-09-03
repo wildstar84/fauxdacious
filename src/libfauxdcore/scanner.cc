@@ -29,6 +29,7 @@
 #include "probe.h"
 #include "tuple.h"
 #include "vfs.h"
+#include "runtime.h"
 
 static GThreadPool * pool;
 
@@ -76,6 +77,9 @@ void ScanRequest::run ()
 
     bool need_tuple = (flags & SCAN_TUPLE) && ! tuple.valid ();
     bool need_image = (flags & SCAN_IMAGE);
+    bool restrict_scan = (! (flags & SCAN_FILE)
+            && ! uri_to_filename (audio_file)
+            && aud_get_bool (nullptr, "restrict_url_scans"));
 
     if (! decoder)
         decoder = aud_file_find_decoder (audio_file, false, file, & error);
@@ -86,6 +90,9 @@ void ScanRequest::run ()
     {
         if (! (ip = load_input_plugin (decoder, & error)))
             goto err;
+
+        if (restrict_scan) // JWT:TELL aud_file_read_tag TO NOT OPEN/RED URL!:
+            aud_set_bool(nullptr, "__restrict_scan", true);
 
         Tuple dummy_tuple;
         /* don't overwrite tuple if already valid (e.g. from a cuesheet) */
@@ -99,7 +106,7 @@ void ScanRequest::run ()
     }
 
     /* rewind/reopen the input file */
-    if ((flags & SCAN_FILE))
+    if (! restrict_scan && (flags & SCAN_FILE))
         open_input_file (audio_file, "r", ip, file, & error);
     else
     {
@@ -107,6 +114,7 @@ void ScanRequest::run ()
         /* close file if not needed or if an error occurred */
         file = VFSFile ();
     }
+    aud_set_bool(nullptr, "__restrict_scan", false);
 
     callback (this);
 }

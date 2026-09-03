@@ -114,6 +114,7 @@ static const char * const core_defaults[] = {
  "leading_zero", "FALSE",
  "show_hours", "TRUE",
  "metadata_fallbacks", "TRUE",
+ "restrict_url_scans", "FALSE",
  "metadata_on_play", "FALSE",
  "show_numbers_in_pl", "FALSE",
  "slow_probe", "FALSE",

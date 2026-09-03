@@ -459,6 +459,8 @@ static const PreferencesWidget advanced_page_widgets[] = {
     WidgetLabel (N_("<b>Metadata</b>")),
     WidgetCheck (N_("Guess missing metadata from file path"),
         WidgetBool (0, "metadata_fallbacks")),
+    WidgetCheck (N_("Restrict URL metadata scans to tagfiles until played"),
+        WidgetBool (0, "restrict_url_scans")),
     WidgetCheck (N_("Do not load metadata for songs until played"),
         WidgetBool (0, "metadata_on_play")),
     WidgetCheck (N_("Probe content of files with no recognized file name extension"),

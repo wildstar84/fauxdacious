@@ -591,6 +591,11 @@ EXPORT void InputPlugin::set_playback_tuple (Tuple && tuple)
     // due to mutex ordering, we cannot call into the playlist while locked;
     // instead, playback_entry_set_tuple() calls back into first
     // playback_check_serial() and then eventually playback_set_info()
+    // JWT:URL LENGTHS MAY NOT BE SET UNTIL NOW, PARTICULARLY IF
+    // "Restrict URL metadata scans to tagfiles until played" IS SET!:
+    if (pb_info.length < 0)
+        pb_info.length = tuple.get_int (Tuple::Length);
+
     playback_entry_set_tuple (pb_state.playback_serial, std::move (tuple));
 }
 
