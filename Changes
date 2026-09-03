@@ -1,3 +1,57 @@
+Version 4.6.1-beta1 [Updated 08/31/2026]
+
+* Song-Info. window - Added new dropdown-box to specify the "priority" when 
+manually saving metadata edits to tag-files.  Originally these were always 
+saved as "DEFAULT", but later was changed to "OVERRIDE" as needed by users in 
+certain situations.  Now, one can select the desired priority:  "DEFAULT", 
+"OVERRIDE", "ONLY" or "NONE".  See FAQ #15 for details on what the different 
+priorities do.
+
+* Implement "birdie-github" (Artem S. Tashkinov)'s patch to prevent reopening 
+and scanning URL song-entries for album-covers every time a user hovers their 
+mouse over a song-entry in the playlist.  Addresses Audacious issue# 1833.  
+This ended up being more involved than the provided patch (for Audacious), as 
+we often have art images already stored in user tag-files (no such feature 
+exists in Audacious) which we still wish to "scan" for images (without having 
+to access the internet each time)! This also involved fixing a regression when 
+[Advanced]."Do not load metadata for songs until played" (a related option) 
+was set which blocked any appearance of the song-info popup in these cases.
+
+* Adding the "birdie-github" album-cover patch spurred me on to take this 
+further (reducing unnecessary web-accessing by adding a new option:  
+[Advanced]."Restrict URL metadata scans to tagfiles until played" checkbox: 
+If checked, when a (web-based) URL (non-local file) entry is added to the 
+playlist, only user tag-files will be scanned for metadata while avoiding 
+opening and scanning the URL until the entry is actually played (similar 
+to "Do not load metadata for songs until played"), which applies to all entries 
+and does no metadata scanning (including user tag-files).  Purpose of this is 
+to speed up Fauxdacious's initial startup, ie. when a bunch of streaming 
+entries are in the playlist(s) and to reduce the chance of some controlled-
+access sites potentially banning one's IP address due to frequent, robot-like 
+accessing.  This should work well, since we believe that most Fauxdacious users 
+use the URL helper-script which uses StreamFinder to add most streaming URLs 
+now, and it provides most of the user-facing metadata in user tag-files.  Most 
+users should notice quicker startup times without loss of visible metadata.  
+Since a full scan is often required to obtain the stream length (videos & 
+podcasts), that will not be visible until actually played though.  NOTE:  users 
+need to have the [Song Info]."Save unsavable metadata to file" option checked 
+for user tag-files to be used!  Most podcast and video metadata is then 
+saved to a temporary tag-file ("tmp_tag_data") in the Fauxdacious config. 
+directory and deleted when Fauxdacious is restarted with "-D".
+
+The default (like most Fauxdacious-specific feature options) is OFF 
+(unchecked).  Exception would be users who do not use tagfiles (don't enable 
+the "Save unsavable metadata to file" option.
+
+* Skins (GTK & Qt) - Added new suboption checkbox on the [Appearance] config. 
+screen at the bottom just under the "Random skin on play" option to extend this 
+feature to streaming station entries that dynamically change song-titles while 
+playing music.  The option is titled "...And Apply to in-stream title-changes" 
+and, if both are checked, the skin will also be changed randomly whenever the 
+song title changes.  Uncheck to retain the previous behaviour of just changing 
+skins when the actual song-entry in the playlist changes.  Think of it like a 
+"Tour de Skins!"
+
 * Merged several patches offered by github user "birdie-github" 
 (Artem S. Tashkinov) to improve the way several input plugins handle 
 dynamic stream metadata changes affecting bitrate, channels and "quality" 
@@ -6,30 +60,29 @@ Whilst at it, Audacious also changed some of them to now use
 Tuple::set_format() to store the values for these parameters, so merged 
 those commits in with this.
 
-* Skins (Qt) - Added new skin-selector widget to the settings screen that 
-displays a small image of each skin making skin-selection easier (instead 
-of just displaying a list of skin names as before).  The GTK skins version 
-has always had this feature.  This commit was merged from Audacious.
+* Skins (Qt) - Merged Audacious commit that added new skin-selector widget to 
+the settings screen that displays a small image of each skin making skin-
+selection easier (instead of just displaying a list of skin names as before).  
+The GTK skins version has always had this feature.
 
 * Skins (both versions) - Merged Audacious commit that enables user to 
 toggle whether skins windows are "sticky" "Show on all desktops" in X.  
-(May not fully work on all window-managers though).  Normally, this can 
-be user-configured in their window-manager settings.
+(May not fully work on all window-managers though).  This can often 
+be configured by users in their window-manager settings.
 
 * Removed video-recording options from FFaudio as this never worked with 
 HLS (m3u8) streams (it only really ever worked with the old mp4 / mpd / mov 
 streams) and required video streams to be delivered by Fauxdacious "neon" 
 transport plugin (using Fauxdacious file-handles) which, effective with the 
 recent FFaudio commits (needed for Youtube's new "dash" videos) are no longer 
-used for transport, instead now ffmpeg's own internal handles are used for 
+used for transport, instead now ffmpeg's own internal handlers are used for 
 all internet-based video streams.  To record videos now would require re-
 muxing them inline while being played, a bridge too far that I'm not willing 
-to cross at the moment (patches will be considered though).
+to cross at the moment (patches will be considered though)!
 
 * Merged several minor Audacious code touchup commits involving the Sidplay, 
-Hotkey, Scrobbler, and glspectrum plugins.  See commits list for details.
-
-Version 4.6.1-devel [Updated 08/21/2026]
+Hotkey, Scrobbler, and Glspectrum plugins.  See commits list for details.  
+Wayland users will be most affected by these.
 
 * NOTE:  Users who frequently watch Youtube videos should upgrade Fauxdacious, 
 StreamFinder (v2.70) and yt-dlp and observe the recent entries in this 
