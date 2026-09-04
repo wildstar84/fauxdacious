@@ -279,8 +279,10 @@ static int check_for_user_art (const String & filename, AudArtItem * item, bool 
             /* JWT:URL & NO OTHER ART FOUND, SO LOOK FOR IMAGE MATCHING STREAMING URL (IE: www.streamingradio.com.jpg): */
             const char * slash = strstr (filename, "//");
             if (slash)
-            {
                 slash+=2;
+
+            if (slash)
+            {
                 const char * endbase = strstr (slash, "/");
                 int ln = endbase ? endbase - slash : -1;
                 String urlbase = String (str_copy (slash, ln));
@@ -329,7 +331,7 @@ static AudArtItem * art_item_get_locked (const String & filename, bool * queued)
 
     if (item && item->flag)
     {
-        /* MUST BE DONE, NOT SENT, HERE ELSE art_item_unref_locked() NOT CALLED, RESULTING IN LEAK!: */
+        /* MUST BE "DONE", NOT SENT, HERE ELSE art_item_unref_locked() NOT CALLED, RESULTING IN LEAK!: */
         if (check_for_user_art (filename, item, true) > 0)  // ALSO CHECK TAG FILE (MAY OVERWRITE ANY EMBEDDED ART FOUND)!
             item->flag = FLAG_DONE;
 
@@ -440,7 +442,17 @@ void art_cleanup ()
     assert (! current_item);
 
     if (art_items.n_items ())
-        AUDWARN ("Album art reference count not zero at exit (%d)!\n", art_items.n_items ());
+    {
+        AudArtItem * item = art_items.lookup (String ("stdin://"));
+        if (item)
+        {
+            /* JWT:STDIN ENTRY DOESN'T ALWAYS GET REMOVED?, SO MAKE SURE & SHUSH!: */
+            aud_art_unref (item);
+            art_items.remove (String ("stdin://"));
+        }
+        if (art_items.n_items ())
+            AUDWARN ("Album art reference count not zero at exit (%d)!\n", art_items.n_items ());
+    }
 }
 
 EXPORT AudArtPtr aud_art_request (const char * file, int format, bool * queued)

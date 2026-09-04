@@ -187,28 +187,32 @@ String art_search (const char * filename, Tuple & tuple)
     }
 
     /* NEXT, TRY ALL THE USUAL AUDACIOUS OPTIONS: */
-    StringBuf local = uri_to_filename (filename);
-    if (! local)
-        return String ();
+    if (strncmp (filename, "stdin://", 8))
+    {
+        /* JWT:SKIP THIS SECTION IF WE'RE STDIN!: */
+        StringBuf local = uri_to_filename (filename);
+        if (! local)
+            return String ();
 
-    const char * elem = last_path_element (local);
-    if (! elem)
-        return String ();
+        const char * elem = last_path_element (local);
+        if (! elem)
+            return String ();
 
-    String include = aud_get_str (nullptr, "cover_name_include");
-    String exclude = aud_get_str (nullptr, "cover_name_exclude");
+        String include = aud_get_str (nullptr, "cover_name_include");
+        String exclude = aud_get_str (nullptr, "cover_name_exclude");
 
-    SearchParams params = {
-        String (elem),
-        str_list_to_index (include, ", "),
-        str_list_to_index (exclude, ", ")
-    };
+        SearchParams params = {
+            String (elem),
+            str_list_to_index (include, ", "),
+            str_list_to_index (exclude, ", ")
+        };
 
-    cut_path_element (local, elem - local);
+        cut_path_element (local, elem - local);
 
-    String image_local = fileinfo_recursive_get_image (local, & params, 0, tuple);
-    if (image_local)
-        return String (filename_to_uri (image_local));
+        String image_local = fileinfo_recursive_get_image (local, & params, 0, tuple);
+        if (image_local)
+            return String (filename_to_uri (image_local));
+    }
 
     /* JWT:NOW CHECK THE ALBUM-ART CACHE (IF USER WISHES): */
     if (! aud_get_bool (nullptr, "search_albumart_cache"))
