@@ -148,4 +148,4 @@ SEE ALSO
 WEBSITE
        https://wildstar84.wordpress.com/fauxdacious https://audacious-media-player.org
 
-Version 4.1-final                  Nov 2020                     FAUXDACIOUS(1)
+Version 4.6.1-beta1                Sep 2026                     FAUXDACIOUS(1)

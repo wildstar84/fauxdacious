@@ -1,6 +1,6 @@
 Version 4.6.1-beta1 [Updated 09/03/2026]
 
-* Improve metadata handling for stdin (Standard Input).  Note:  Metadata for 
+* Improve cover-art handling for stdin (Standard Input).  Note:  Metadata for 
 files / streams piped in via stdin is still rather limited, depending on the 
 format and decoder, and how / if streams provide the metadata tags.
 
